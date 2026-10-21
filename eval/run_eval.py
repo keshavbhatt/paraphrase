@@ -125,6 +125,53 @@ def report_md(model_id: str, skill: Skill, profile: str, summary: dict[str, Any]
     return "\n".join(lines) + "\n"
 
 
+def write_summary(
+    model_id: str,
+    skill: Skill,
+    profile_name: str,
+    tag: str,
+    rows: list[dict[str, Any]],
+    meta: dict[str, Any],
+) -> dict[str, Any]:
+    groups = {"all": summarise(skill, rows)}
+    for lang, rs in split(rows, lambda r: r["lang"]).items():
+        groups[f"lang={lang}"] = summarise(skill, rs)
+    for src, rs in split(rows, lambda r: r["source"]).items():
+        groups[f"set={src}"] = summarise(skill, rs)
+    summary = {
+        "model": model_id,
+        "skill": skill.id,
+        "skill_version": skill.version,
+        "profile": profile_name,
+        **meta,
+        "tag": tag,
+        "when": time.strftime("%Y-%m-%d %H:%M"),
+        "groups": groups,
+    }
+    out_dir = common.REPORTS_DIR / tag
+    out_dir.mkdir(parents=True, exist_ok=True)
+    # Model ids contain dots, so names are built as strings, never with Path.with_suffix.
+    name = f"{model_id}__{skill.id}"
+    (out_dir / f"{name}.json").write_text(json.dumps(summary, indent=2) + "\n")
+    (out_dir / f"{name}.md").write_text(report_md(model_id, skill, profile_name, summary))
+    return summary
+
+
+def rescore(model_id: str, skill_ids: list[str], tag: str, profile_name: str) -> None:
+    """Recompute scores and summaries from saved raw outputs (after a metric change)."""
+    skills = load_skills(common.SKILLS_DIR)
+    for skill_id in skill_ids:
+        skill = skills[skill_id]
+        items = {i["id"]: i for i in common.dataset(skill.base_id)}
+        path = common.RAW_DIR / tag / f"{model_id}__{skill_id}.jsonl"
+        rows = common.load_jsonl(path)
+        for r in rows:
+            r["score"] = score(skill, items[r["id"]], r["output"])
+        common.write_jsonl(path, rows)
+        summary = write_summary(model_id, skill, profile_name, tag, rows, {"rescored": True})
+        print(model_id, skill_id, json.dumps(summary["groups"]["all"], ensure_ascii=False))
+
+
 def run(
     model_id: str,
     skill_ids: list[str],
@@ -168,28 +215,9 @@ def run(
                 print(f"\r  {skill_id}: {i}/{len(items)}", end="", flush=True)
             print()
             common.write_jsonl(common.RAW_DIR / tag / f"{model_id}__{skill_id}.jsonl", rows)
-            groups = {"all": summarise(skill, rows)}
-            for lang, rs in split(rows, lambda r: r["lang"]).items():
-                groups[f"lang={lang}"] = summarise(skill, rs)
-            for src, rs in split(rows, lambda r: r["source"]).items():
-                groups[f"set={src}"] = summarise(skill, rs)
-            summary = {
-                "model": model_id,
-                "skill": skill_id,
-                "skill_version": skill.version,
-                "profile": profile_name,
-                "load_s": round(server.load_s, 2),
-                "peak_rss_mb": round(server.peak_rss_mb),
-                "tag": tag,
-                "when": time.strftime("%Y-%m-%d %H:%M"),
-                "groups": groups,
-            }
-            out_dir = common.REPORTS_DIR / tag
-            out_dir.mkdir(parents=True, exist_ok=True)
-            stem = out_dir / f"{model_id}__{skill_id}"
-            stem.with_suffix(".json").write_text(json.dumps(summary, indent=2) + "\n")
-            stem.with_suffix(".md").write_text(report_md(model_id, skill, profile_name, summary))
-            print(json.dumps(groups["all"], ensure_ascii=False))
+            meta = {"load_s": round(server.load_s, 2), "peak_rss_mb": round(server.peak_rss_mb)}
+            summary = write_summary(model_id, skill, profile_name, tag, rows, meta)
+            print(json.dumps(summary["groups"]["all"], ensure_ascii=False))
             summaries.append(summary)
     return summaries
 
@@ -202,7 +230,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--set", choices=("generated", "human", "all"), default="all")
     ap.add_argument("--limit", type=int)
     ap.add_argument("--tag", default="m0")
+    ap.add_argument("--rescore", action="store_true", help="re-score saved outputs, no model")
     args = ap.parse_args(argv)
+    if args.rescore:
+        rescore(args.model, args.skill, args.tag, args.profile)
+        return 0
     sets = ("generated", "human") if args.set == "all" else (args.set,)
     run(args.model, args.skill, args.profile, sets, args.limit, args.tag)
     return 0
