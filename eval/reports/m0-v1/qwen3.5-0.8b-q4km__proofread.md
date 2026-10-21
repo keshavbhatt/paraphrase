@@ -1,6 +1,6 @@
 # proofread with qwen3.5-0.8b-q4km
 
-Profile `B-cpu`, skill version 1, run 2026-10-22 01:04.
+Profile `B-cpu`, skill version 1, run 2026-10-22 01:12.
 
 | group | n | ttft_s_median | total_s_median | gen_tps_median | precision | recall | f0_5 | exact_pct | false_alarm_pct | clean_items | protected_kept_pct | preamble_pct | language floor failures |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|

@@ -1,6 +1,6 @@
 # reply with gemma-4-e4b-qat-q4_0
 
-Profile `B-cpu`, skill version 1, run 2026-10-22 01:03.
+Profile `B-cpu`, skill version 1, run 2026-10-22 01:12.
 
 | group | n | ttft_s_median | total_s_median | gen_tps_median | valid_pct | distinct_pct | over_15_words_pct | language floor failures |
 |---|---|---|---|---|---|---|---|---|

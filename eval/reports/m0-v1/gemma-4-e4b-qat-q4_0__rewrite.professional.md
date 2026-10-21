@@ -1,0 +1,11 @@
+# rewrite.professional with gemma-4-e4b-qat-q4_0
+
+Profile `B-cpu`, skill version 1, run 2026-10-22 01:12.
+
+| group | n | ttft_s_median | total_s_median | gen_tps_median | changed_pct | protected_kept_pct | preamble_pct | length_ratio_median | language floor failures |
+|---|---|---|---|---|---|---|---|---|---|
+| all | 65 | 1.104 | 4.334 | 11.4 | 100.0 | 63.1 | 0.0 | 1.33 | rw-en-001, rw-en-002, rw-en-003, rw-en-005, rw-en-006, rw-en-008, rw-en-009, rw-en-011, rw-en-012, rw-en-013, rw-en-014, rw-en-015, rw-en-016, rw-en-017, rw-en-018, rw-en-019, rw-en-020, rw-en-021, rw-en-022, rw-en-023, rw-en-024, rw-en-025, rw-en-026, rw-en-027, rw-en-029, rw-en-030, rw-en-031, rw-en-032, rw-en-033, rw-en-034, rw-en-036, rw-en-037, rw-en-038, rw-en-039, rw-en-040, rw-en-041, rw-en-042, rw-en-043, rw-en-044, rw-en-045, rw-en-046, rw-en-047, rw-en-048, rw-en-049, rw-en-050, rw-hi-010, rw-hi-011, rw-hi-012, rw-hi-013, rw-hi-014, rw-hi-015 |
+| lang=en | 50 | 1.137 | 4.821 | 11.0 | 100.0 | 62.1 | 0.0 | 1.33 | rw-en-001, rw-en-002, rw-en-003, rw-en-005, rw-en-006, rw-en-008, rw-en-009, rw-en-011, rw-en-012, rw-en-013, rw-en-014, rw-en-015, rw-en-016, rw-en-017, rw-en-018, rw-en-019, rw-en-020, rw-en-021, rw-en-022, rw-en-023, rw-en-024, rw-en-025, rw-en-026, rw-en-027, rw-en-029, rw-en-030, rw-en-031, rw-en-032, rw-en-033, rw-en-034, rw-en-036, rw-en-037, rw-en-038, rw-en-039, rw-en-040, rw-en-041, rw-en-042, rw-en-043, rw-en-044, rw-en-045, rw-en-046, rw-en-047, rw-en-048, rw-en-049, rw-en-050 |
+| lang=hi | 8 | 1.023 | 3.741 | 11.8 | 100.0 | 70.6 | 0.0 | 1.32 | none |
+| lang=hinglish | 7 | 0.994 | 3.16 | 12.1 | 100.0 | 66.7 | 0.0 | 1.14 | rw-hi-010, rw-hi-011, rw-hi-012, rw-hi-013, rw-hi-014, rw-hi-015 |
+| set=generated | 65 | 1.104 | 4.334 | 11.4 | 100.0 | 63.1 | 0.0 | 1.33 | rw-en-001, rw-en-002, rw-en-003, rw-en-005, rw-en-006, rw-en-008, rw-en-009, rw-en-011, rw-en-012, rw-en-013, rw-en-014, rw-en-015, rw-en-016, rw-en-017, rw-en-018, rw-en-019, rw-en-020, rw-en-021, rw-en-022, rw-en-023, rw-en-024, rw-en-025, rw-en-026, rw-en-027, rw-en-029, rw-en-030, rw-en-031, rw-en-032, rw-en-033, rw-en-034, rw-en-036, rw-en-037, rw-en-038, rw-en-039, rw-en-040, rw-en-041, rw-en-042, rw-en-043, rw-en-044, rw-en-045, rw-en-046, rw-en-047, rw-en-048, rw-en-049, rw-en-050, rw-hi-010, rw-hi-011, rw-hi-012, rw-hi-013, rw-hi-014, rw-hi-015 |

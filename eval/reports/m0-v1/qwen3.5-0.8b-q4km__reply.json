@@ -2,10 +2,11 @@
   "model": "qwen3.5-0.8b-q4km",
   "skill": "reply",
   "skill_version": 1,
+  "skill_revision": 2,
   "profile": "B-cpu",
   "rescored": true,
   "tag": "m0-v1",
-  "when": "2026-10-22 01:04",
+  "when": "2026-10-22 01:12",
   "groups": {
     "all": {
       "n": 65,
