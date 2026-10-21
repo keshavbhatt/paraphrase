@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "notes": "Model catalog (PLAN 5.5). Every file is fetched from hf_repo at the pinned revision and checked against its sha256. ram_required, vram_recommended, tiers and languages are filled from M0 measurements (DOCS/models.md).",
+  "models": [
+    {
+      "id": "qwen3.5-0.8b-q4km",
+      "role": "candidate",
+      "family": "qwen",
+      "params": "0.8B",
+      "quant": "Q4_K_M",
+      "hf_repo": "bartowski/Qwen_Qwen3.5-0.8B-GGUF",
+      "revision": "f36b1ea49a332ede8fe5f389bbf5b3575ef71f48",
+      "files": [
+        {
+          "file": "Qwen_Qwen3.5-0.8B-Q4_K_M.gguf",
+          "size": 579615840,
+          "sha256": "fb044e93939a70469c905781334f5de1e6c8b608ced6cbc8c9249bd4127d9526"
+        }
+      ],
+      "upstream": "Qwen/Qwen3.5-0.8B",
+      "ram_required": null,
+      "vram_recommended": null,
+      "ctx": 4096,
+      "licence": "Apache-2.0",
+      "licence_url": "https://huggingface.co/Qwen/Qwen3.5-0.8B/blob/main/LICENSE",
+      "chat_template": "embedded",
+      "tiers": [],
+      "languages": {}
+    },
+    {
+      "id": "qwen3.5-2b-q4km",
+      "role": "candidate",
+      "family": "qwen",
+      "params": "2B",
+      "quant": "Q4_K_M",
+      "hf_repo": "bartowski/Qwen_Qwen3.5-2B-GGUF",
+      "revision": "7d26695454df6de5fbcce2e58681e62dae06ce43",
+      "files": [
+        {
+          "file": "Qwen_Qwen3.5-2B-Q4_K_M.gguf",
+          "size": 1396198496,
+          "sha256": "57a1085840f497d764a7fc5d346922dbde961efb54cc792ea81d694fd846a1d8"
+        }
+      ],
+      "upstream": "Qwen/Qwen3.5-2B",
+      "ram_required": null,
+      "vram_recommended": null,
+      "ctx": 4096,
+      "licence": "Apache-2.0",
+      "licence_url": "https://huggingface.co/Qwen/Qwen3.5-2B/blob/main/LICENSE",
+      "chat_template": "embedded",
+      "tiers": [],
+      "languages": {}
+    },
+    {
+      "id": "qwen3.5-4b-q4km",
+      "role": "candidate",
+      "family": "qwen",
+      "params": "4B",
+      "quant": "Q4_K_M",
+      "hf_repo": "bartowski/Qwen_Qwen3.5-4B-GGUF",
+      "revision": "4168f45a16a1290d65a4ec0fa312ae917a4c15d6",
+      "files": [
+        {
+          "file": "Qwen_Qwen3.5-4B-Q4_K_M.gguf",
+          "size": 3013027808,
+          "sha256": "13c16f426047e2de38cd075bdade4a7bcbc8c774384876f677740cda65f8a983"
+        }
+      ],
+      "upstream": "Qwen/Qwen3.5-4B",
+      "ram_required": null,
+      "vram_recommended": null,
+      "ctx": 4096,
+      "licence": "Apache-2.0",
+      "licence_url": "https://huggingface.co/Qwen/Qwen3.5-4B/blob/main/LICENSE",
+      "chat_template": "embedded",
+      "tiers": [],
+      "languages": {}
+    },
+    {
+      "id": "gemma-4-e2b-qat-q4_0",
+      "role": "candidate",
+      "family": "gemma",
+      "params": "E2B (5.1B with per-layer embeddings)",
+      "quant": "Q4_0 (QAT)",
+      "hf_repo": "google/gemma-4-E2B-it-qat-q4_0-gguf",
+      "revision": "675cff42a74c774d6cb76f76d8eacb49b48c9b93",
+      "files": [
+        {
+          "file": "gemma-4-E2B_q4_0-it.gguf",
+          "size": 3349516256,
+          "sha256": "fa401b55b07ee70a54c6dae3903c783a6e65064312529ea57175cb5f8dec6634"
+        }
+      ],
+      "upstream": "google/gemma-4-E2B-it",
+      "ram_required": null,
+      "vram_recommended": null,
+      "ctx": 4096,
+      "licence": "Apache-2.0",
+      "licence_url": "https://ai.google.dev/gemma/docs/gemma_4_license",
+      "chat_template": "embedded",
+      "tiers": [],
+      "languages": {}
+    },
+    {
+      "id": "gemma-4-e4b-qat-q4_0",
+      "role": "candidate",
+      "family": "gemma",
+      "params": "E4B (8B with per-layer embeddings)",
+      "quant": "Q4_0 (QAT)",
+      "hf_repo": "google/gemma-4-E4B-it-qat-q4_0-gguf",
+      "revision": "4b4a2c1d584be7264f87aac328a1bc739ce81b6c",
+      "files": [
+        {
+          "file": "gemma-4-E4B_q4_0-it.gguf",
+          "size": 5154941280,
+          "sha256": "676c35070db6dbe52f93e9c864ee0fba4eddea94b9c875d9cb10daff453fbaee"
+        }
+      ],
+      "upstream": "google/gemma-4-E4B-it",
+      "ram_required": null,
+      "vram_recommended": null,
+      "ctx": 4096,
+      "licence": "Apache-2.0",
+      "licence_url": "https://ai.google.dev/gemma/docs/gemma_4_license",
+      "chat_template": "embedded",
+      "tiers": [],
+      "languages": {}
+    },
+    {
+      "id": "sarvam-30b-q4km",
+      "role": "judge",
+      "family": "sarvam",
+      "params": "30B MoE (2.4B active)",
+      "quant": "Q4_K_M",
+      "hf_repo": "sarvamai/sarvam-30b-gguf",
+      "revision": "54e15edbbcb112e7d6c69b612e5041973e953c2f",
+      "files": [
+        {
+          "file": "sarvam-30b-Q4_K_M.gguf-00001-of-00006.gguf",
+          "size": 3920955744,
+          "sha256": "3846a49dd94118a313ab0368f376c9f0866b6fd95e8e893171f546643949165d"
+        },
+        {
+          "file": "sarvam-30b-Q4_K_M.gguf-00002-of-00006.gguf",
+          "size": 3585809856,
+          "sha256": "d96ae2e9012c030b132c661ff16ea0780705b121cf98f9b365f18dc3ff65f93b"
+        },
+        {
+          "file": "sarvam-30b-Q4_K_M.gguf-00003-of-00006.gguf",
+          "size": 3700365408,
+          "sha256": "4846470605585a8c720a2e99b47ff3092795f6204dc3ea8fd65bd19456948a8c"
+        },
+        {
+          "file": "sarvam-30b-Q4_K_M.gguf-00004-of-00006.gguf",
+          "size": 3885293184,
+          "sha256": "38efbe4b63741e744a0862cef39d3d960daaeb692d675f08f6fe4ea268df30e2"
+        },
+        {
+          "file": "sarvam-30b-Q4_K_M.gguf-00005-of-00006.gguf",
+          "size": 3867549056,
+          "sha256": "34ceb9cb125c7a2523317bd9421ae020980a0e3a6bb3b4d791db1aa9b35b985f"
+        },
+        {
+          "file": "sarvam-30b-Q4_K_M.gguf-00006-of-00006.gguf",
+          "size": 610812416,
+          "sha256": "4dfe5bf3ced850378af5a3b879b2bde7c681b8afd2f8af101f56bc7ca3674ad8"
+        }
+      ],
+      "upstream": "sarvamai/sarvam-30b",
+      "ram_required": null,
+      "vram_recommended": null,
+      "ctx": 8192,
+      "licence": "Apache-2.0",
+      "licence_url": "https://huggingface.co/sarvamai/sarvam-30b",
+      "chat_template": "embedded",
+      "tiers": [],
+      "languages": {}
+    }
+  ]
+}
