@@ -17,6 +17,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from paraeval import common
 
 SKILLS = ("proofread", "reply", "rewrite.professional")
+BENCH_ORDER = ("reply", "proofread", "rewrite.professional")  # matches the latency header
 TARGETS = {  # PLAN 5.4: (A ttft, A total, B total) in seconds
     "reply": (0.8, 2.0, 0.8),
     "proofread": (0.8, 3.5, 1.2),
@@ -175,7 +176,7 @@ def bench_tables(tag: str) -> list[str]:
             if not r:
                 continue
             cells = []
-            for s in SKILLS:
+            for s in BENCH_ORDER:
                 t = r["tasks"][s]
                 a_ttft, a_total, b_total = TARGETS[s]
                 if pname.startswith("A"):
@@ -185,7 +186,7 @@ def bench_tables(tag: str) -> list[str]:
             gen = r["tasks"]["reply"]["gen_tps"]
             pp = r["tasks"]["proofread"]["prompt_tps"]
             out.append(
-                f"| {m} | {' | '.join(cells)} | {gen} | {pp:.0f} | "
+                f"| {m} | {' | '.join(cells)} | {gen:.1f} | {pp:.0f} | "
                 f"{r['load_cold_s']} / {r['load_warm_s']} | {r['peak_rss_mb']} |"
             )
     return out
