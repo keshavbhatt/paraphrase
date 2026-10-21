@@ -116,8 +116,11 @@ def _download(url: str, part: Path, size: int) -> None:
                     last = now
                     rate = (done - have) / max(now - start, 1e-6) / 1e6
                     pct = 100 * done / size
-                    print(f"\r  {pct:5.1f}%  {done / 1e9:.2f}/{size / 1e9:.2f} GB  {rate:.1f} MB/s",
-                          end="", flush=True)
+                    print(
+                        f"\r  {pct:5.1f}%  {done / 1e9:.2f}/{size / 1e9:.2f} GB  {rate:.1f} MB/s",
+                        end="",
+                        flush=True,
+                    )
     print()
 
 
