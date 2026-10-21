@@ -1,0 +1,6 @@
+# Exactly three short replies as JSON: {"replies": ["...", "...", "..."]}
+# Each reply is 1 to 160 characters on one line (no raw control characters).
+root  ::= "{" ws "\"replies\":" ws "[" ws item ws "," ws item ws "," ws item ws "]" ws "}"
+item  ::= "\"" char{1,160} "\""
+char  ::= [^"\\\x00-\x1F] | "\\" ["\\/nt]
+ws    ::= " "?
