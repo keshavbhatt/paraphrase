@@ -1,0 +1,55 @@
+# Build
+build/
+build-*/
+cmake-build-*/
+CMakeUserPresets.json
+compile_commands.json
+
+# Python (eval harness and scripts)
+.venv/
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+*.egg-info/
+
+# Models: downloaded from upstream by pinned revision, never committed
+models/
+*.gguf
+*.gguf.part
+
+# Eval output: raw model outputs and bench traces stay local; summaries in eval/reports/ are committed
+eval/reports/raw/
+
+# IDE
+.vscode/
+.idea/
+*.user
+*.user.*
+.cache/
+.qtcreator/
+
+# Generated
+*.o
+*.a
+*.so
+*.autosave
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local agent state: settings, worktrees, anything a session leaves behind
+.claude/
+
+# Secrets and credentials
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.credentials
+
+# Scratch output
+*.log

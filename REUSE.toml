@@ -1,0 +1,23 @@
+version = 1
+SPDX-PackageName = "Paraphrase"
+SPDX-PackageSupplier = "Keshav Bhatt <connect@ktechpit.com>"
+SPDX-PackageDownloadLocation = "https://github.com/keshavbhatt/paraphrase"
+
+# Everything is GPL-3.0-or-later except the licensing module and third-party code below.
+[[annotations]]
+path = "**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Keshav Bhatt (Ktechpit)"
+SPDX-License-Identifier = "GPL-3.0-or-later"
+
+# The licensing module: account, licence, evaluation and allowance code.
+# Reserved from the first milestone that adds it; these paths do not exist yet.
+[[annotations]]
+path = [
+    "app/src/modules/AccountAndLicense/**",
+    "app/src/services/licensing/**",
+    "daemon/src/licensing/**"
+]
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Keshav Bhatt (Ktechpit)"
+SPDX-License-Identifier = "LicenseRef-Ktechpit-Licensing-Module"

@@ -1,0 +1,38 @@
+[project]
+name = "paraphrase-eval"
+version = "0.0.0"
+description = "Paraphrase offline tooling: model catalog, eval harness and latency bench (never shipped)."
+license = "GPL-3.0-or-later"
+requires-python = ">=3.11"
+dependencies = [
+    "PyYAML",
+]
+
+[dependency-groups]
+dev = [
+    "ruff",
+    "mypy",
+    "pytest",
+    "types-PyYAML",
+    "reuse",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4", "PTH", "RUF", "N", "ANN"]
+
+[tool.mypy]
+strict = true
+python_version = "3.11"
+mypy_path = "eval"
+explicit_package_bases = true
+
+[tool.pytest.ini_options]
+testpaths = ["eval/tests"]
+pythonpath = ["eval"]
