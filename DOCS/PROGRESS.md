@@ -14,6 +14,24 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-22 - M0 measurements
+
+- llama.cpp v0.7.0 built CPU only and CPU + Vulkan. Five candidates and the judge fetched by
+  pinned revision and sha256 (`models.json`, `DOCS/models.md`).
+- Eval harness, three skills (proofread, reply, rewrite with 9 tones) and 195 project-written
+  eval items. No public dataset is used.
+- Prompt revision 1: models answered English text in Hindi (Qwen3.5-4B rewrote 49 of 50
+  English texts into Devanagari). Revision 2 removed Hindi from the system prompts and names
+  the detected language in the user message: English drift went to 0 for every model.
+- Revision 2 left two problems: proofread changed correct casual text (up to 6 of 12 clean
+  items), and the professional rewrite translated Hinglish into English (3 to 5 of 7).
+  Revision 3 addresses both; its eval, the judge (Sarvam-30B, tier-relevant pairs only) and
+  the latency bench run overnight.
+- Latency (revision 2, `eval/reports/m0-v2/summary.md`): no candidate meets the PLAN 5.4
+  totals on A or B. The iGPU through Vulkan is slower than the CPU on this laptop.
+- Waiting on the owner: the results table, the spot-check ratings, then the go/no-go and
+  the revised latency targets.
+
 ## 2026-10-21 - M0 started
 
 - Owner answers for M0 (recorded in `PLAN.md` section 11):
