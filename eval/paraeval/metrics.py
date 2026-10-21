@@ -209,8 +209,11 @@ def language_check(lang: str, source: str, output: str) -> tuple[bool, str]:
         src = hinglish_ratio(source)
         if src > 0 and hinglish_ratio(output) < 0.4 * src:
             return False, "Hinglish turned into English"
-    elif lang == "en" and deva > 0.2:
-        return False, "English answered in Devanagari"
+    elif lang == "en":
+        if deva > 0.2:
+            return False, "English answered in Devanagari"
+        if hinglish_ratio(output) >= 0.2 and hinglish_ratio(source) < 0.05:
+            return False, "English answered in Hinglish"
     return True, ""
 
 

@@ -1,0 +1,42 @@
+{
+  "model": "qwen3.5-0.8b-q4km",
+  "skill": "reply",
+  "skill_version": 1,
+  "profile": "B-cpu",
+  "load_s": 2.31,
+  "peak_rss_mb": 1210,
+  "tag": "smoke",
+  "when": "2026-10-21 23:49",
+  "groups": {
+    "all": {
+      "n": 5,
+      "lang_floor_fail": [],
+      "ttft_s_median": 1.824,
+      "total_s_median": 4.459,
+      "gen_tps_median": 14.3,
+      "valid_pct": 100.0,
+      "distinct_pct": 100.0,
+      "over_15_words_pct": 0.0
+    },
+    "lang=en": {
+      "n": 5,
+      "lang_floor_fail": [],
+      "ttft_s_median": 1.824,
+      "total_s_median": 4.459,
+      "gen_tps_median": 14.3,
+      "valid_pct": 100.0,
+      "distinct_pct": 100.0,
+      "over_15_words_pct": 0.0
+    },
+    "set=generated": {
+      "n": 5,
+      "lang_floor_fail": [],
+      "ttft_s_median": 1.824,
+      "total_s_median": 4.459,
+      "gen_tps_median": 14.3,
+      "valid_pct": 100.0,
+      "distinct_pct": 100.0,
+      "over_15_words_pct": 0.0
+    }
+  }
+}

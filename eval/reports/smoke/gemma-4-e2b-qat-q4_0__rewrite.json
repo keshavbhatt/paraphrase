@@ -1,0 +1,51 @@
+{
+  "model": "gemma-4-e2b-qat-q4_0",
+  "skill": "rewrite.professional",
+  "skill_version": 1,
+  "profile": "B-cpu",
+  "load_s": 3.17,
+  "peak_rss_mb": 4489,
+  "tag": "smoke",
+  "when": "2026-10-21 23:54",
+  "groups": {
+    "all": {
+      "n": 3,
+      "lang_floor_fail": [
+        "rw-en-003"
+      ],
+      "ttft_s_median": 2.437,
+      "total_s_median": 3.701,
+      "gen_tps_median": 14.2,
+      "changed_pct": 100.0,
+      "protected_kept_pct": 71.4,
+      "preamble_pct": 0.0,
+      "length_ratio_median": 1.19
+    },
+    "lang=en": {
+      "n": 3,
+      "lang_floor_fail": [
+        "rw-en-003"
+      ],
+      "ttft_s_median": 2.437,
+      "total_s_median": 3.701,
+      "gen_tps_median": 14.2,
+      "changed_pct": 100.0,
+      "protected_kept_pct": 71.4,
+      "preamble_pct": 0.0,
+      "length_ratio_median": 1.19
+    },
+    "set=generated": {
+      "n": 3,
+      "lang_floor_fail": [
+        "rw-en-003"
+      ],
+      "ttft_s_median": 2.437,
+      "total_s_median": 3.701,
+      "gen_tps_median": 14.2,
+      "changed_pct": 100.0,
+      "protected_kept_pct": 71.4,
+      "preamble_pct": 0.0,
+      "length_ratio_median": 1.19
+    }
+  }
+}
