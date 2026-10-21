@@ -200,7 +200,8 @@ def language_check(lang: str, source: str, output: str) -> tuple[bool, str]:
     if lang == "hi":
         if devanagari_broken(output):
             return False, "broken Devanagari"
-        if deva < 0.6:
+        # Code-mixed Hindi keeps English words in Latin letters, so compare with the source.
+        if deva < min(0.6, 0.5 * script_shares(source)[0]):
             return False, "Hindi answered outside Devanagari"
     elif lang == "hinglish":
         if deva > 0.2:

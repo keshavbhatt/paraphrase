@@ -57,3 +57,9 @@ def test_reply_scores() -> None:
     assert not metrics.score_reply(item, "not json").valid
     s = metrics.score_reply(item, '{"replies": ["Yes!", "Yes!", "Sorry, busy."]}')
     assert not s.distinct
+
+
+def test_code_mixed_hindi_is_not_a_language_switch() -> None:
+    src = "Hi team, कल का deadline बहुत important है। सभी लोग अपना code आज रात तक push कर दें।"
+    assert metrics.language_check("hi", src, "ठीक है, आज रात तक code push कर दूँगा।")[0]
+    assert not metrics.language_check("hi", src, "Sure, I will push my code tonight.")[0]
