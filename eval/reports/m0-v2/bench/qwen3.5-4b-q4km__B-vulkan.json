@@ -1,0 +1,47 @@
+{
+  "model": "qwen3.5-4b-q4km",
+  "profile": "B-vulkan",
+  "label": "B, Vulkan: Core Ultra 7 255U + Intel Graphics (Arrow Lake iGPU, Mesa), 30 GB",
+  "when": "2026-10-22 02:48",
+  "load_cold_s": 3.04,
+  "load_warm_s": 2.61,
+  "tasks": {
+    "reply": {
+      "runs": 5,
+      "input_words": 91,
+      "ttft_s": 3.522,
+      "total_s": 8.193,
+      "total_s_max": 9.416,
+      "gen_tps": 9.197,
+      "prompt_tps": 54.855,
+      "prompt_tokens": 149,
+      "cached_tokens": 120,
+      "gen_tokens": 42
+    },
+    "proofread": {
+      "runs": 5,
+      "input_words": 100,
+      "ttft_s": 3.627,
+      "total_s": 17.382,
+      "total_s_max": 19.852,
+      "gen_tps": 9.15,
+      "prompt_tps": 56.365,
+      "prompt_tokens": 160,
+      "cached_tokens": 145,
+      "gen_tokens": 126
+    },
+    "rewrite.professional": {
+      "runs": 5,
+      "input_words": 101,
+      "ttft_s": 3.554,
+      "total_s": 21.225,
+      "total_s_max": 24.755,
+      "gen_tps": 9.02,
+      "prompt_tps": 62.344,
+      "prompt_tokens": 177,
+      "cached_tokens": 85,
+      "gen_tokens": 160
+    }
+  },
+  "peak_rss_mb": 2884
+}
