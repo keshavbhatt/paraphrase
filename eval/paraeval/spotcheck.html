@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<style>
+:root { --bg:#fbfaf8; --fg:#1d1c1a; --muted:#6b6862; --card:#fff; --line:#e4e1db;
+  --good:#1f7a4d; --ok:#9a6b00; --bad:#b3261e; --accent:#3557c5; }
+@media (prefers-color-scheme: dark) { :root { --bg:#161514; --fg:#ece9e4; --muted:#a29e97;
+  --card:#1f1e1c; --line:#34322f; --good:#5cc28f; --ok:#e0b04a; --bad:#f07a72; --accent:#8ea6ff; } }
+* { box-sizing:border-box } body { margin:0; background:var(--bg); color:var(--fg);
+  font:15px/1.5 system-ui, sans-serif; }
+header { position:sticky; top:0; background:var(--bg); border-bottom:1px solid var(--line);
+  padding:10px 16px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; z-index:1 }
+header h1 { font-size:16px; margin:0 } .muted { color:var(--muted) }
+main { max-width:980px; margin:0 auto; padding:16px }
+.card { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px;
+  margin:0 0 18px }
+.meta { font-size:13px; color:var(--muted); margin-bottom:8px }
+pre { white-space:pre-wrap; word-wrap:break-word; font:inherit; margin:0 }
+.input { border-left:3px solid var(--accent); padding:4px 10px; margin:6px 0 12px }
+.ref { border-left:3px solid var(--line); padding:4px 10px; margin:0 0 12px; color:var(--muted) }
+.out { border-top:1px solid var(--line); padding:10px 0; display:grid;
+  grid-template-columns:28px 1fr; gap:10px }
+.letter { font-weight:700 } .btns { display:flex; gap:6px; margin-top:6px; flex-wrap:wrap }
+button { font:inherit; border:1px solid var(--line); background:transparent; color:var(--fg);
+  border-radius:6px; padding:2px 10px; cursor:pointer }
+button.on[data-r=good] { background:var(--good); color:#fff; border-color:var(--good) }
+button.on[data-r=ok] { background:var(--ok); color:#fff; border-color:var(--ok) }
+button.on[data-r=bad] { background:var(--bad); color:#fff; border-color:var(--bad) }
+input.note { font:inherit; flex:1; min-width:160px; background:transparent; color:var(--fg);
+  border:1px solid var(--line); border-radius:6px; padding:2px 8px }
+</style></head><body>
+<header><h1>__TITLE__</h1><span class="muted" id="progress"></span>
+<button id="export">Download ratings</button>
+<span class="muted">good = would ship it · ok = usable with edits · bad = wrong, unsafe or wrong language</span>
+</header><main id="cards"></main>
+<script>
+const DATA = __DATA__;
+const KEY = "spotcheck-" + DATA.tag;
+let ratings = {};
+try { ratings = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) { ratings = {}; }
+function save() { try { localStorage.setItem(KEY, JSON.stringify(ratings)); } catch (e) {} progress(); }
+function progress() {
+  let done = 0, total = 0;
+  for (const c of DATA.cards) for (const o of c.outputs) { total++;
+    if (ratings[c.id] && ratings[c.id][o.letter] && ratings[c.id][o.letter].rating) done++; }
+  document.getElementById("progress").textContent = done + " / " + total + " rated";
+}
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = text; return e; }
+const root = document.getElementById("cards");
+DATA.cards.forEach((c, i) => {
+  const card = el("section", "card");
+  card.append(el("div", "meta", (i + 1) + ". " + c.skill + " · " + c.lang + " · " + c.id));
+  const inp = el("div", "input"); inp.append(el("pre", "", c.input)); card.append(inp);
+  if (c.draft) card.append(el("div", "meta", "User's started draft: " + c.draft));
+  if (c.reference) { const r = el("div", "ref"); r.append(el("pre", "", "Reference: " + c.reference));
+    card.append(r); }
+  for (const o of c.outputs) {
+    const row = el("div", "out"); row.append(el("div", "letter", o.letter));
+    const body = el("div"); body.append(el("pre", "", o.text));
+    const btns = el("div", "btns");
+    const cur = (ratings[c.id] || {})[o.letter] || {};
+    for (const r of ["good", "ok", "bad"]) {
+      const b = el("button", cur.rating === r ? "on" : "", r); b.dataset.r = r;
+      b.onclick = () => { ratings[c.id] = ratings[c.id] || {};
+        ratings[c.id][o.letter] = Object.assign(ratings[c.id][o.letter] || {}, { rating: r });
+        btns.querySelectorAll("button").forEach(x => x.classList.toggle("on", x === b)); save(); };
+      btns.append(b);
+    }
+    const note = el("input", "note"); note.placeholder = "note (optional)"; note.value = cur.note || "";
+    note.oninput = () => { ratings[c.id] = ratings[c.id] || {};
+      ratings[c.id][o.letter] = Object.assign(ratings[c.id][o.letter] || {}, { note: note.value }); save(); };
+    btns.append(note); body.append(btns); row.append(body); card.append(row);
+  }
+  root.append(card);
+});
+document.getElementById("export").onclick = () => {
+  const blob = new Blob([JSON.stringify({ tag: DATA.tag, ratings }, null, 2)], { type: "application/json" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+  a.download = "ratings-" + DATA.tag + ".json"; a.click();
+};
+progress();
+</script></body></html>
