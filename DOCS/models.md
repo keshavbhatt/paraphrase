@@ -98,6 +98,7 @@ real typing, typos, Hinglish); reports score those separately from the generated
 |---|---|---|
 | 1 | first drafts | M0 baseline |
 | 2 | the system prompt no longer names Hindi or Hinglish; a language detector names the answer language in the user message ("The text is in English. Keep it in that language.") | with revision 1, models answered English in Hindi: Qwen3.5-4B rewrote 49 of 50 English texts into Devanagari and answered 36 of 50 English messages in Hinglish |
+| 3 | proofread keeps casual lowercase, a missing final full stop, British or American spelling and date formats as written; the Hinglish language name says to keep Hinglish even in a formal tone | with revision 2, Gemma E4B changed 6 of 12 already-correct texts ("colour" to "color", "14 September" to "September 14", capitalised chat); 3 to 5 of 7 Hinglish texts were translated into English by the professional rewrite |
 
 ## Results
 

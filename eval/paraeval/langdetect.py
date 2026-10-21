@@ -14,8 +14,8 @@ from paraeval.metrics import hinglish_ratio, script_shares
 LANG_NAMES = {
     "en": "English",
     "hi": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
-    "hinglish": "Hinglish: Hindi written in Latin letters as in chat messages (not English, "
-    "not Devanagari)",
+    "hinglish": "Hinglish: Hindi written in Latin letters as in chat messages. Keep it Hinglish "
+    "even in a formal tone: do not translate it into English or Devanagari",
 }
 
 HINGLISH_MIN_RATIO = 0.15
