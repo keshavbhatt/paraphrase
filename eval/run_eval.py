@@ -142,6 +142,7 @@ def write_summary(
         "model": model_id,
         "skill": skill.id,
         "skill_version": skill.version,
+        "skill_revision": skill.revision,
         "profile": profile_name,
         **meta,
         "tag": tag,

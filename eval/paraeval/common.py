@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from paraeval import langdetect
 from paraeval.llama import Profile
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -83,5 +84,6 @@ def dataset(
 def skill_inputs(base_skill: str, item: dict[str, Any]) -> dict[str, str]:
     """Map a dataset item to the skill's input keys (PLAN 5.1)."""
     if base_skill == "reply":
-        return {"context": item["context"], "text": item.get("text", "")}
-    return {"text": item["text"]}
+        inputs = {"context": item["context"], "text": item.get("text", "")}
+        return inputs | langdetect.inputs_for(item["context"])
+    return {"text": item["text"]} | langdetect.inputs_for(item["text"])

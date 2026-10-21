@@ -1,0 +1,96 @@
+{
+  "model": "gemma-4-e2b-qat-q4_0",
+  "skill": "reply",
+  "skill_version": 1,
+  "profile": "B-cpu",
+  "rescored": true,
+  "tag": "m0-v1",
+  "when": "2026-10-22 01:04",
+  "groups": {
+    "all": {
+      "n": 65,
+      "lang_floor_fail": [
+        "rp-en-002",
+        "rp-en-006",
+        "rp-en-012",
+        "rp-en-027",
+        "rp-en-036",
+        "rp-en-040",
+        "rp-en-047",
+        "rp-hi-005",
+        "rp-hi-009",
+        "rp-hi-014"
+      ],
+      "ttft_s_median": 0.505,
+      "total_s_median": 2.097,
+      "gen_tps_median": 20.6,
+      "valid_pct": 100.0,
+      "distinct_pct": 100.0,
+      "over_15_words_pct": 0.0
+    },
+    "lang=en": {
+      "n": 50,
+      "lang_floor_fail": [
+        "rp-en-002",
+        "rp-en-006",
+        "rp-en-012",
+        "rp-en-027",
+        "rp-en-036",
+        "rp-en-040",
+        "rp-en-047"
+      ],
+      "ttft_s_median": 0.53,
+      "total_s_median": 2.076,
+      "gen_tps_median": 20.6,
+      "valid_pct": 100.0,
+      "distinct_pct": 100.0,
+      "over_15_words_pct": 0.0
+    },
+    "lang=hi": {
+      "n": 8,
+      "lang_floor_fail": [
+        "rp-hi-005"
+      ],
+      "ttft_s_median": 0.49,
+      "total_s_median": 2.205,
+      "gen_tps_median": 20.6,
+      "valid_pct": 100.0,
+      "distinct_pct": 100.0,
+      "over_15_words_pct": 0.0
+    },
+    "lang=hinglish": {
+      "n": 7,
+      "lang_floor_fail": [
+        "rp-hi-009",
+        "rp-hi-014"
+      ],
+      "ttft_s_median": 0.414,
+      "total_s_median": 2.154,
+      "gen_tps_median": 20.7,
+      "valid_pct": 100.0,
+      "distinct_pct": 100.0,
+      "over_15_words_pct": 0.0
+    },
+    "set=generated": {
+      "n": 65,
+      "lang_floor_fail": [
+        "rp-en-002",
+        "rp-en-006",
+        "rp-en-012",
+        "rp-en-027",
+        "rp-en-036",
+        "rp-en-040",
+        "rp-en-047",
+        "rp-hi-005",
+        "rp-hi-009",
+        "rp-hi-014"
+      ],
+      "ttft_s_median": 0.505,
+      "total_s_median": 2.097,
+      "gen_tps_median": 20.6,
+      "valid_pct": 100.0,
+      "distinct_pct": 100.0,
+      "over_15_words_pct": 0.0
+    }
+  }
+}

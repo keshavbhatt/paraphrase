@@ -11,6 +11,7 @@ daemon's `SkillRegistry` from M1), and comes with an eval before/after report.
 |---|---|---|---|
 | `id` | string | yes | Skill id, e.g. `proofread`. With `presets`, each preset becomes `<id>.<preset>` |
 | `version` | int | yes | Schema version the file is written for (`1`) |
+| `revision` | int | no (1) | Revision of this skill's prompts. Bumped on every prompt, grammar or sampling change; eval reports record it so before/after runs are comparable |
 | `title` | string | yes | Name shown in the UI |
 | `tier` | `fast` \| `quality` \| `any` | yes | Which model tier runs it by default (PLAN 5.3) |
 | `max_input_tokens` | int | yes | Longer input is rejected with a clear error (or chunked, for skills that say so) |
@@ -33,7 +34,14 @@ reach files or the network:
 - Nothing else: no loops, filters, includes or expressions.
 
 Values come from the request input (PLAN 5.1: `text`, `context`, `lang`, `tone`, `intent`,
-`target_lang`) and from the chosen preset. The validator rejects any other variable name.
+`target_lang`), from the engine, and from the chosen preset. The validator rejects any other
+variable name.
+
+The engine adds `lang` (`en`, `hi` or `hinglish`) and `lang_name` (a short description of
+that language for the prompt) from its language detector, run on `text`, or on `context`
+for skills that answer a message. Prompts name the language only through `lang_name`, in the
+user message: in M0, naming Hindi and Hinglish in a shared system prompt made small models
+answer English text in Hindi (`DOCS/models.md`, prompt revisions).
 
 **Captured text is untrusted data.** The template fences it in tags (`<text>`, `<message>`,
 `<draft>`), and the renderer rewrites any `<tag>` or `</tag>` inside a value that matches

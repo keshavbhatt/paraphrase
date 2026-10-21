@@ -31,7 +31,9 @@ SAMPLES = [
 
 def check_offline(skill: Skill) -> list[str]:
     problems = []
-    known = {"text", "context", "lang", "tone", "intent", "target_lang"} | set(skill.preset)
+    known = {"text", "context", "lang", "lang_name", "tone", "intent", "target_lang"} | set(
+        skill.preset
+    )
     unknown = template_vars(skill.template) - known
     if unknown:
         problems.append(f"unknown template variables {sorted(unknown)}")

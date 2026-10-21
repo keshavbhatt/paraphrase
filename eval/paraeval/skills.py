@@ -46,6 +46,7 @@ class Skill:
     id: str
     base_id: str
     version: int
+    revision: int
     title: str
     tier: str
     max_input_tokens: int
@@ -125,6 +126,7 @@ def load_skill_file(path: Path) -> list[Skill]:
     common: dict[str, Any] = {
         "base_id": raw["id"],
         "version": raw["version"],
+        "revision": int(raw.get("revision", 1)),
         "tier": raw["tier"],
         "max_input_tokens": int(raw["max_input_tokens"]),
         "max_output_tokens": int(raw["max_output_tokens"]),
