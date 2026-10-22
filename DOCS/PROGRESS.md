@@ -14,6 +14,24 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-22 - M1 step 4: the engine
+
+- `paraphrase_engine`: `LlamaEngine`, the only code that includes llama.cpp. It builds prompts
+  as llama-server does (the model's chat template, thinking off) and matches its tokens for
+  all 15 vector prompts (tests/vectors/prompt_tokens.json, from eval/export_prompt_tokens.py).
+  One deliberate difference: user text is never parsed for control tokens, so text that spells
+  out `<|turn>` stays plain text. Prompt prefix cache (a repeat reuses all but the last
+  token), the skill's GBNF grammar, streaming of whole characters, an output limit, cancel,
+  and variants decoded in one batch.
+- `SkillRunner`: a port of eval/paraeval/engine.py. Checks the language of every output,
+  retries once with a line naming the language (temperature 0.3 for greedy skills, seed
+  +7919), and returns a second failure with a warning (ADR-006).
+- Measured on machine B with E2B: peak memory 4.49 GB with the full-size sliding-window cache,
+  below llama-server in M0 (4.5 to 5.1 GB).
+- Found: llama.cpp's default thread count on this hybrid Intel CPU is 2 (performance cores
+  only), where the M0 sweep found 10 fastest. The hardware probe (step 5) picks the threads.
+- Next: step 4b, per-skill MTP drafting (ADR-004); then step 5, models.
+
 ## 2026-10-22 - M1 steps 1 to 3: tooling, language logic and skills in C++
 
 - Tooling as Omnidict (owner): DOCS/CODING_STANDARDS.md, .clang-tidy, scripts/dev-build.sh and
