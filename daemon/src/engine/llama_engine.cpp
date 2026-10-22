@@ -246,6 +246,10 @@ void LlamaEngine::Run::prepareVariants(const Tokens& prompt)
         }
         auto& var = m_variants[static_cast<size_t>(v)];
         var.sampler.reset(common_sampler_init(m_engine.m_init->model(), own));
+        // As llama-server: the sampler sees the prompt, so the repeat penalty counts its words.
+        for (const llama_token tok : prompt) {
+            common_sampler_accept(var.sampler.get(), tok, false);
+        }
         var.pos = static_cast<llama_pos>(prompt.size());
         var.batchIndex = -1; // the prompt's last token: logits index -1
     }
