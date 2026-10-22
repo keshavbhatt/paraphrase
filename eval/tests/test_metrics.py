@@ -69,3 +69,12 @@ def test_english_answered_in_hinglish() -> None:
     src = "you coming tonight?"
     assert metrics.language_check("en", src, "Yes, see you there!")[0]
     assert not metrics.language_check("en", src, "Haan bilkul! Kab milna hai?")[0]
+
+
+def test_reply_continues_the_draft() -> None:
+    item = {"lang": "en", "context": "Can you pick up milk?", "text": "Yes"}
+    good = '{"replies": ["Yes, on my way.", "yes! anything else?", "Yes, I will."]}'
+    bad = '{"replies": ["Yes, sure.", "Sure thing.", "Yes."]}'
+    assert metrics.score_reply(item, good).draft_kept is True
+    assert metrics.score_reply(item, bad).draft_kept is False
+    assert metrics.score_reply({**item, "text": ""}, good).draft_kept is None

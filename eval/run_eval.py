@@ -91,6 +91,9 @@ def summarise(skill: Skill, rows: list[dict[str, Any]]) -> dict[str, Any]:
             "distinct_pct": _pct(sum(x["distinct"] for x in valid), len(valid)),
             "over_15_words_pct": _pct(sum(x["max_words"] > 15 for x in valid), len(valid)),
         }
+        drafts = [x for x in s if x.get("draft_kept") is not None]
+        if drafts:
+            out["draft_kept_pct"] = _pct(sum(x["draft_kept"] for x in drafts), len(drafts))
     elif skill.base_id == "rewrite":
         kept, prot = sum(x["kept"] for x in s), sum(x["protected"] for x in s)
         out |= {

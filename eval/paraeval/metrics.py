@@ -240,6 +240,15 @@ class ReplyScore:
     lang_ok: bool
     lang_reason: str
     replies: list[str]
+    # With a started draft: every reply starts with it (None when there is no draft).
+    draft_kept: bool | None = None
+
+
+def draft_continued(draft: str, reply: str) -> bool:
+    """Whether a reply starts with the user's draft, ignoring case and the draft's own
+    trailing punctuation ("Yes" fits "Yes, I can" and "yes!")."""
+    want = normalise_ws(draft.lower()).rstrip(" .,!?")
+    return normalise_ws(reply.lower()).startswith(want)
 
 
 def parse_replies(output: str) -> list[str] | None:
@@ -271,7 +280,11 @@ def score_reply(item: dict[str, Any], output: str, max_words: int = 15) -> Reply
             lang_ok, why = False, reason
             break
     valid = len(replies) == 3 and all(r for r in replies)
-    return ReplyScore(valid, len(replies), max(words, default=0), distinct, lang_ok, why, replies)
+    draft = item.get("text", "").strip()
+    kept = all(draft_continued(draft, r) for r in replies) if draft else None
+    return ReplyScore(
+        valid, len(replies), max(words, default=0), distinct, lang_ok, why, replies, kept
+    )
 
 
 @dataclass
