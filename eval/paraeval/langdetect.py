@@ -10,24 +10,20 @@ same rules to C++ (daemon/src/util/ from M1), sharing test vectors with this mod
 
 from __future__ import annotations
 
-from paraeval import scripts
+from paraeval import langdata, scripts
 from paraeval.metrics import hinglish_ratio, script_shares
 
-LANG_NAMES = {
-    "en": "English",
-    "hi": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
-    "hinglish": "Hinglish: Hindi written in Latin letters as in chat messages. Keep it Hinglish "
-    "even in a formal tone: do not translate it into English or Devanagari",
-}
-# A language the detector cannot name. The prompt must not guess a name: a wrong one makes
-# the model translate (and naming Hindi pulls small models into Hindi, M0 v1).
-UNKNOWN_NAME = "its own language: keep that language and script, do not translate it"
+# Prompt names (from daemon/data/language.json). A language the detector cannot name gets
+# UNKNOWN_NAME: a wrong name makes the model translate, and naming Hindi pulls small models
+# into Hindi (M0 v1).
+LANG_NAMES: dict[str, str] = dict(langdata.DATA["prompt_names"])
+UNKNOWN_NAME: str = langdata.DATA["unknown_prompt_name"]
 
 # Plain names, used when the user chose the output language: LANG_NAMES above also tells
 # the model to keep the input's language, which would contradict that choice.
 LANG_SHORT = scripts.NAMES
 
-HINGLISH_MIN_RATIO = 0.15
+HINGLISH_MIN_RATIO: float = langdata.DATA["hinglish_min_ratio"]
 
 
 def detect(text: str) -> str:

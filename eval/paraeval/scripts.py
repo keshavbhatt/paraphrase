@@ -13,149 +13,19 @@ import re
 import unicodedata
 from collections import Counter
 
-# Scripts that point to one language (or one main language) by themselves.
-SCRIPT_LANG = {
-    "TAMIL": "ta",
-    "TELUGU": "te",
-    "KANNADA": "kn",
-    "MALAYALAM": "ml",
-    "GUJARATI": "gu",
-    "GURMUKHI": "pa",
-    "ORIYA": "or",
-    "BENGALI": "bn",
-    "SINHALA": "si",
-    "THAI": "th",
-    "LAO": "lo",
-    "KHMER": "km",
-    "MYANMAR": "my",
-    "HANGUL": "ko",
-    "GREEK": "el",
-    "HEBREW": "he",
-    "GEORGIAN": "ka",
-    "ARMENIAN": "hy",
-    "ETHIOPIC": "am",
-}
+from paraeval import langdata
 
-NAMES = {
-    "en": "English",
-    "hi": "Hindi",
-    "hinglish": "Hinglish (Hindi in Latin letters)",
-    "mr": "Marathi",
-    "ne": "Nepali",
-    "ta": "Tamil",
-    "te": "Telugu",
-    "kn": "Kannada",
-    "ml": "Malayalam",
-    "gu": "Gujarati",
-    "pa": "Punjabi",
-    "or": "Odia",
-    "bn": "Bengali",
-    "si": "Sinhala",
-    "th": "Thai",
-    "lo": "Lao",
-    "km": "Khmer",
-    "my": "Burmese",
-    "ko": "Korean",
-    "ja": "Japanese",
-    "zh": "Chinese",
-    "el": "Greek",
-    "he": "Hebrew",
-    "ka": "Georgian",
-    "hy": "Armenian",
-    "am": "Amharic",
-    "ar": "Arabic",
-    "ur": "Urdu",
-    "fa": "Persian",
-    "ru": "Russian",
-    "uk": "Ukrainian",
-    "es": "Spanish",
-    "fr": "French",
-    "de": "German",
-    "pt": "Portuguese",
-    "it": "Italian",
-    "nl": "Dutch",
-    "id": "Indonesian",
-    "tr": "Turkish",
-}
+# Tables come from daemon/data/language.json, shared with the daemon (paraeval.langdata).
+SCRIPT_LANG: dict[str, str] = dict(langdata.DATA["script_language"])
+NAMES: dict[str, str] = dict(langdata.DATA["names"])
 
-# Whole-word markers that separate languages sharing a script.
-_DEVANAGARI_MARKERS = {
-    "mr": {
-        "आहे",
-        "आहेत",
-        "नाही",
-        "आणि",
-        "मला",
-        "तुला",
-        "तुम्ही",
-        "आम्ही",
-        "मी",
-        "येऊ",
-        "पाहतो",
-        "उद्या",
-        "येतोस",
-        "चुकीचा",
-        "चुकीची",
-        "नीट",
-        "बरं",
-        "माझं",
-        "तुमचं",
-        "कोणीतरी",
-        "काल",
-    },
-    "ne": {"छ", "छु", "छन्", "हुन्छ", "गर्नुहोस्", "तपाईं", "हुनुहुन्छ", "भयो", "गर्छु"},
-}
-_ARABIC_MARKERS = {
-    "ur": {"ہے", "ہیں", "کے", "کی", "میں", "نہیں", "کیا", "آپ", "اور"},
-    "fa": {"است", "می", "این", "برای", "شما", "نیست", "هستم"},
-}
-_CYRILLIC_MARKERS = {
-    "uk": {"що", "це", "не", "як", "ви", "дякую", "привіт", "буде"},
-    "ru": {"что", "это", "не", "как", "вы", "спасибо", "привет", "будет"},
-}
-_UK_LETTERS = set("іїєґ")
-_LATIN_STOPWORDS = {
-    "en": set(
-        "the a an is are was were to of and in on for you i it that this with be have has at "
-        "not will can my your we me do does did so but if or just there here what when how "
-        "about would could should all our they them his her".split()
-    ),
-    "es": set(
-        "el la los las que de y en es por para con una un no se del está pero muy gracias "
-        "hola yo tú usted nosotros mañana hoy también porque".split()
-    ),
-    "fr": set(
-        "le la les des est et que de un une pour pas je tu vous nous avec ce ça dans sur "
-        "merci bonjour mais très aujourd'hui demain est-ce encore fois c'est j'ai t'as au aux "
-        "du salut".split()
-    ),
-    "de": set(
-        "der die das und ist nicht ich du sie wir ein eine mit für auf den dem zu es danke "
-        "hallo aber heute morgen bitte".split()
-    ),
-    "pt": set(
-        "o a os as que de e é não um uma para com você obrigado obrigada olá está mas muito "
-        "hoje amanhã ao à vamos oi tô tá do da no na em".split()
-    ),
-    "it": set(
-        "il lo la che di e è non un una per con sono ciao grazie ma molto oggi domani".split()
-    ),
-    "nl": set(
-        "de het een en is niet ik je van dat met voor op dank hallo maar vandaag morgen".split()
-    ),
-    "id": set(
-        "yang dan di ini itu tidak saya kamu untuk dengan ada akan terima kasih sudah ke "
-        "besok hari".split()
-    ),
-    "tr": set("ve bir bu için ne çok değil ben sen mi ile teşekkür merhaba yarın".split()),
-}
-_LATIN_LETTER_HINTS = {
-    "es": set("ñ¿¡"),
-    "fr": set("çœàèêëîôû"),
-    "de": set("ßäöü"),
-    "pt": set("ãõ"),
-    "tr": set("ışğ"),
-}
+# Whole-word markers that separate languages sharing a script; the first listed wins a tie.
+_DEVANAGARI_MARKERS = langdata.ordered_sets("devanagari_markers")
+_ARABIC_MARKERS = langdata.ordered_sets("arabic_markers")
+_CYRILLIC_MARKERS = langdata.ordered_sets("cyrillic_markers")
+_UK_LETTERS = set(langdata.DATA["ukrainian_letters"])
+_LATIN_STOPWORDS = langdata.ordered_sets("latin_stopwords")
+_LATIN_LETTER_HINTS = {code: set(letters) for code, letters in langdata.DATA["latin_letter_hints"]}
 # Split on spaces, digits and punctuation, not on \W: Python's \w does not match combining
 # vowel signs, so "आहे" would break apart.
 _WORD = re.compile(r"[^\s\d.,!?;:\"()\[\]{}…।॥؟،¿¡«»“”‘’/\\|*#@&%+=<>~^`_]+")

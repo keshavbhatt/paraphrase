@@ -30,6 +30,7 @@ build:
 test-eval:
 	uv run pytest -q
 	$(PY) eval/validate_skills.py
+	$(PY) eval/export_vectors.py --check
 
 test-daemon: build
 	PARAPHRASE_BUILD_DIR=$(abspath $(BUILD_DIR)) scripts/dev-run.sh --ctest

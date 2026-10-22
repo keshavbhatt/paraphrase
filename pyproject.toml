@@ -32,6 +32,7 @@ select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4", "PTH", "RUF", "N", "ANN"]
 # Word lists of other languages: non-ASCII letters and quote marks are the point there.
 "eval/paraeval/scripts.py" = ["SIM905", "RUF001"]
 "eval/tests/test_langdetect.py" = ["RUF001"]
+"eval/export_vectors.py" = ["RUF001"]
 
 [tool.mypy]
 strict = true
