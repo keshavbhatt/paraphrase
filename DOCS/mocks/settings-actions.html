@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Paraphrase mock: Settings, my actions</title><link rel="stylesheet" href="mock.css"><script src="mock.js"></script>
+<style>
+  .alist { display: flex; flex-direction: column; }
+  .arow { display: flex; align-items: center; gap: 12px; padding: 11px 4px; border-bottom: 1px solid var(--border); }
+  .arow:last-child { border-bottom: 0; }
+  .arow .what { flex: 1; min-width: 0; }
+  .arow .what p { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .form { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 12px 16px; align-items: start; }
+  .form label { padding-top: 9px; }
+  textarea.input { min-height: 84px; padding: 9px 10px; resize: vertical; font: 15px/1.5 var(--font); }
+  .tryout { background: var(--sunk); border-radius: 10px; padding: 10px 12px; font-size: 14px; line-height: 1.5; }
+  @media (max-width: 640px) { .form { grid-template-columns: 1fr; } .form label { padding-top: 0; } }
+</style></head>
+<body>
+<div class="window">
+  <div class="titlebar"><div class="lights"><i></i><i></i><i></i></div><div class="title">Paraphrase settings</div><div class="wc"><span>−</span><span>□</span><span>✕</span></div></div>
+  <div class="settings">
+    <nav aria-label="Settings sections">
+      <a href="#">General</a><a href="#">Shortcut</a><a class="on" href="#" aria-current="page">My actions</a>
+      <a href="#">Models</a><a href="#">Privacy</a><a href="#">About</a>
+    </nav>
+    <main>
+      <div class="stack" style="gap: 6px">
+        <h1>My actions</h1>
+        <p class="muted" style="max-width: 64ch">Your own actions, in your words. They appear under My actions in the window and the popup, and run on this computer like the others.</p>
+      </div>
+
+      <section class="card" aria-labelledby="list-h">
+        <div class="row" style="margin-bottom: 6px"><h2 id="list-h">Your actions</h2><span class="small muted">3 of 20</span><span class="grow"></span><button class="btn"><svg class="ic s"><use href="#i-pen"/></svg>New action</button></div>
+        <div class="alist">
+          <div class="arow"><div class="what"><b>Tweet</b><p class="small muted">Turn this into a tweet under 280 characters, keep the facts, one hashtag at most</p></div><span class="pill">Fast</span><button class="btn flat">Edit</button><button class="btn flat danger">Delete</button></div>
+          <div class="arow"><div class="what"><b>Meeting notes</b><p class="small muted">Turn these notes into decisions, action items with owners, and open questions</p></div><span class="pill">Quality</span><button class="btn flat">Edit</button><button class="btn flat danger">Delete</button></div>
+          <div class="arow"><div class="what"><b>Explain simply</b><p class="small muted">Explain this in simple words for someone new to the topic</p></div><span class="pill">Quality</span><button class="btn flat">Edit</button><button class="btn flat danger">Delete</button></div>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="edit-h">
+        <h2 id="edit-h" style="margin-bottom: 14px">Edit "Tweet"</h2>
+        <div class="form">
+          <label for="a-name" class="small muted">Name</label>
+          <input id="a-name" class="input" value="Tweet" maxlength="40">
+          <label for="a-what" class="small muted">What it does</label>
+          <div class="stack" style="gap: 6px">
+            <textarea id="a-what" class="input" maxlength="600">Turn this into a tweet under 280 characters, keep the facts, one hashtag at most</textarea>
+            <span class="small muted">Say what to do with the text, as you would ask a person. The text itself is added for you.</span>
+          </div>
+          <span class="small muted" style="padding-top: 6px">Model</span>
+          <div class="stack" style="gap: 6px">
+            <span class="seg" role="group" aria-label="Model"><span class="on">Fast</span><span>Quality</span></span>
+            <span class="small muted">Fast answers in a few seconds; Quality writes better and takes longer.</span>
+          </div>
+          <span class="small muted" style="padding-top: 6px">Try it</span>
+          <div class="stack" style="gap: 8px">
+            <div class="tryout">We moved the launch to March 12 because the payment provider needs one more week of testing. Sorry for the wait, everyone!</div>
+            <div class="row"><button class="btn">Try it</button><span class="small muted">Launch moved to March 12: our payment provider needs one more week of testing. Thanks for waiting! #launch</span></div>
+          </div>
+        </div>
+        <div class="row" style="margin-top: 16px"><span class="grow"></span><button class="btn">Cancel</button><button class="btn primary">Save</button></div>
+      </section>
+    </main>
+  </div>
+</div>
+<span class="pin" style="left: 300px; top: 150px">1</span>
+<span class="pin" style="left: 300px; top: 270px">2</span>
+<span class="pin" style="left: 300px; top: 470px">3</span>
+<span class="pin" style="left: 300px; top: 600px">4</span>
+<section class="notes"><h2>Notes</h2><ol>
+  <li><b>Your actions</b> (PLAN 3, <code>custom.*</code>): each is a preset of the built-in "custom" skill, kept in the user's config folder, never shared. In the window and the popup they sit under My actions, in this order; the menu ends with "New action..." which opens this page. Up to 20.</li>
+  <li><b>Delete</b> asks once in place ("Delete Tweet? Keep / Delete") and is never silent.</li>
+  <li><b>What it does</b> is the user's own instruction, up to 600 characters. The text the action works on is fenced as data, as for every skill, so text that contains instructions cannot take over. The result keeps the language of the text.</li>
+  <li><b>Try it</b> runs the action on a short sample (or on what is in the main window's text box) before saving, so the user sees what it does.</li>
+</ol></section>
+</body></html>
