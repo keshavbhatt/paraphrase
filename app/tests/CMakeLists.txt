@@ -26,3 +26,6 @@ endforeach()
 
 # The facts a rewrite must keep, checked like the eval's protected tokens.
 paraphrase_add_test(tst_facts_check tst_facts_check.cpp paraphrase_ui)
+
+# Every action with the real models, by hand only (PARAPHRASE_TEST_REAL=1); it skips otherwise.
+paraphrase_add_test(tst_real_models tst_real_models.cpp paraphrase_popup)

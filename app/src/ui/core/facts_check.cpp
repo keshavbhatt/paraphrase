@@ -13,7 +13,7 @@ constexpr qsizetype kShown = 4; ///< facts named in the line; the rest are count
 QStringList protectedTokens(const QString& text)
 {
     static const QRegularExpression kProtected(
-        uR"(https?://\S+|www\.\S+|[\w.+-]+@[\w-]+\.[\w.]+|[@#]\w+|`[^`]+`|\d[\d,.:/-]*\d|\d)"_s);
+        uR"(https?://\S+|www\.\S+|[\w.+-]+@[\w-]+\.[\w.]+|[@#]\w+|`[^`]+`|\d[\d,.:/-]*\d\p{L}*|\d\p{L}*)"_s);
     static const QRegularExpression kTrailing(u"[.,;:!?)]+$"_s);
     QStringList out;
     for (auto it = kProtected.globalMatch(text); it.hasNext();) {

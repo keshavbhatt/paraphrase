@@ -392,6 +392,7 @@ void MainWindow::onFinished(const QJsonObject& result)
         m_output->textView()->showText(output);
     }
     showResult(result);
+    loadStatus(); // the model that answered, and its memory
     Q_EMIT finished();
 }
 

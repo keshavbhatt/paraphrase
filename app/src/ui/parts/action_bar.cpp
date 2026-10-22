@@ -24,15 +24,11 @@ ActionBar::ActionBar(const util::LanguageDetector& detector, Keys keys, QWidget*
     : QWidget(parent)
     , m_detector(detector)
     , m_keys(keys)
+    // The actions wrap onto a second line when the window is narrow or a label grows
+    // ("Tone: Professional"), instead of widening the window.
+    , m_row(new FlowLayout(this))
 {
-    if (keys == Keys::Digits) {
-        m_row = new FlowLayout(this);
-    } else {
-        auto* row = new QHBoxLayout(this);
-        row->setContentsMargins(0, 0, 0, 0);
-        row->setSpacing(8);
-        m_row = row;
-    }
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 }
 
 void ActionBar::setCatalog(const SkillCatalog* catalog)
@@ -54,9 +50,6 @@ void ActionBar::setCatalog(const SkillCatalog* catalog)
         m_row->addWidget(b);
         m_buttons.insert(base, b);
         m_built.append(b);
-    }
-    if (auto* row = qobject_cast<QHBoxLayout*>(m_row)) {
-        row->addStretch();
     }
     updateArrows();
 }
