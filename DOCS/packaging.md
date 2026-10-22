@@ -55,7 +55,10 @@ already has this "clipboard flow"; the popup and setup must explain it per forma
    `com.ktechpit.paraphrase.Daemon` (object path `/com/ktechpit/paraphrase/Daemon`, interface
    `com.ktechpit.paraphrase.Daemon1` for versioning). PLAN 5.1's `com.ktechpit.Paraphrase1`
    would need `--own-name` in the Flatpak. The snap still needs a store declaration for the
-   name: request it with the first upload.
+   name: request it with the first upload. The app owns a second name,
+   `com.ktechpit.paraphrase.App` (object `/com/ktechpit/paraphrase/App`): one running copy,
+   so `paraphrase-app --popup` bound to a desktop shortcut reaches it. It starts with the app
+   ID, so the Flatpak needs nothing extra; the snap declares it with the daemon's.
 2. **Portable CPU build.** The M0 build uses `GGML_NATIVE=ON`, tuned to this laptop's CPU; a
    package built that way crashes on older CPUs. Packages build llama.cpp with
    `GGML_NATIVE=OFF`, `BUILD_SHARED_LIBS=ON`, `GGML_BACKEND_DL=ON` and `GGML_CPU_ALL_VARIANTS=ON`:

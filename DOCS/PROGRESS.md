@@ -8,11 +8,47 @@ Newest first. One entry per working session.
 |---|---|
 | M0 Feasibility spike | done: go (DOCS/models.md, 2026-10-22) |
 | M1 Daemon | done (2026-10-22) |
-| M2 Main window + popup on X11 + KDE Wayland | in progress: main window done |
+| M2 Main window + popup on X11 + KDE Wayland | in progress: main window, popup, backends built; live desktop checks left |
 | M3 Polish + GNOME/wlroots | todo |
 | M4 Mail | todo |
 | M5 Release | todo |
 | M6 IME + Windows | todo |
+
+## 2026-10-23 - M2: every main-window feature, the popup, setup and settings, desktop backends
+
+Owner, before sleeping: autopilot; screens without an approved mock get a mock, are built, and
+are flagged for review; quick replies stay on E2B; desktop tests type only into windows the
+tests open; up to about 15 GB of model downloads allowed.
+
+- Main window matches the approved mocks (header and notice bands, key chips, pane heads,
+  change chips, reply cards) and has every skill as an action: Summarize, Format (menu),
+  Translate (language menu, the text's own language left out), and Reply with Quick replies
+  or a Full reply (mock main-window-reply-draft.html, approved 2026-10-23): what you want to
+  say, email or chat message, a tone, one editable draft with versions, Another version and
+  Shorter.
+- Owner: no big single-file classes. The app is split by responsibility: `ui/core` (skill
+  catalog, request runner, result summary, languages; no widgets), `ui/common` (theme,
+  widgets, chip button, flow layout), `ui/parts` (action bar, input pages, result views,
+  change list: shared by the window and the popup), `ui/main`, `ui/setup`, `ui/settings`,
+  `ui/models`, `popup/`, `integration/`, `shell/` (Application, AppFlow, tray, App service).
+- First-run setup and Settings (mocks setup-model.html and settings-models.html): hardware
+  chips, Fast and Quality cards, download with progress, pause and the exact source, Try it;
+  Settings with the Models page (tier pickers, installed models with Remove after a
+  confirmation, speed-up switch, languages); daemon `SetTierModel` and `SetSpeedUp`.
+- The popup (mocks popup-*.html): actions numbered 1 to N with reading ahead for the most
+  used one, proofread diff with Undo per change, three replies, tone presets, Replace or
+  Insert reply only on click, Copy, Retry, Esc closes, Open in window.
+- Desktop backends behind interfaces (DOCS/platform-matrix.md): GlobalShortcuts portal and
+  X11 key grab; data-control capture of the selection on KDE Wayland and PRIMARY on X11;
+  paste through the RemoteDesktop portal or XTest with the clipboard restored, only into the
+  window the text came from (KWin script or _NET_ACTIVE_WINDOW), else the clipboard; the
+  clipboard and "bind `paraphrase-app --popup`" as fallbacks everywhere.
+- One running copy on the session bus (`com.ktechpit.paraphrase.App`), a tray icon, one
+  daemon connection for the whole app.
+- Daemon: `ListSkills` reports each skill's main input and request inputs; requests may carry
+  `intent` and `tone`; inputs follow the skill's main input, not a hardcoded reply check.
+- Not verified live yet (need a person): the first-time GlobalShortcuts and RemoteDesktop
+  dialogs on this KDE session, X11 on a real X server, GNOME and wlroots.
 
 ## 2026-10-23 - Fixes from the owner's CLI suite: daemon and CLI, proofread 10
 

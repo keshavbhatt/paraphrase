@@ -102,10 +102,10 @@ paraphrase/
 │   └── tests/
 ├── app/                            # Qt 6 desktop client: tray, popup, main window, settings
 │   ├── src/
-│   │   ├── capture/                # ICaptureBackend + X11, WaylandDataControl, Clipboard, Portal backends
-│   │   ├── inject/                 # IInjectBackend + X11 (XTest), RemoteDesktopPortal, ClipboardOnly
-│   │   ├── hotkey/                 # X11 grab, GlobalShortcuts portal, "bind this command" fallback
-│   │   └── ui/                     # Popup, DiffView, VariantCarousel, ModelManager, Settings
+│   │   ├── integration/            # capture, insert and shortcut backends behind interfaces: X11, KDE Wayland (portals, data-control, KWin), clipboard and "bind this command" fallbacks
+│   │   ├── popup/                  # the popup: pages, window, controller
+│   │   ├── shell/                  # Application, AppFlow (setup, main, settings), tray, the App D-Bus service
+│   │   └── ui/                     # core (no widgets), common (theme, widgets), parts (shared by window and popup), main, setup, settings, models
 │   └── tests/
 ├── client/                         # D-Bus client wrapper and word diff, shared by app and CLI
 ├── cli/                            # paraphrase CLI (D-Bus client)
