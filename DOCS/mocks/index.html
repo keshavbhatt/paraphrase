@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Paraphrase mock: Index</title><link rel="stylesheet" href="mock.css"><script src="mock.js"></script>
+<style>
+  .idx { max-width: 960px; margin: 0 auto; padding: 32px 24px 80px; }
+  .idx h1 { font-size: 24px; margin-bottom: 6px; }
+  .idx h2 { margin-top: 28px; }
+  .idx .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-top: 12px; }
+  .idx .grid a { display: block; padding: 14px 16px; border-radius: 12px; background: var(--panel); border: 1px solid var(--border); color: var(--text); }
+  .idx .grid a:hover { background: var(--hover); }
+  .idx .grid a b { display: block; margin-bottom: 2px; }
+  .idx .grid a span { color: var(--muted); font-size: 12px; display: block; }
+  .idx .grid a em { font-style: normal; font-size: 11px; color: var(--warning); display: block; margin-top: 6px; }
+  .idx .grid a em.ok { color: var(--success); }
+  .sw { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 26px; }
+  .sw i { display: block; width: 44px; height: 44px; border-radius: 10px; border: 1px solid var(--border); position: relative; }
+  .sw i::after { content: attr(data-n); position: absolute; left: -6px; right: -6px; top: 48px; font-size: 10px; color: var(--muted); font-style: normal; text-align: center; }
+</style></head>
+<body>
+<div class="idx">
+  <h1>Paraphrase mocks</h1>
+  <p class="muted">Every screen before it is coded (DOCS/DESIGN.md). The toolbar at the bottom right switches dark and light, the OS title bar and the review notes; yellow pins match the numbered notes under each screen. Approval is recorded here and in <code>DOCS/PROGRESS.md</code>.</p>
+  <h2>Tokens</h2>
+  <div class="sw">
+    <i style="background:var(--accent)" data-n="accent"></i><i style="background:var(--accent-strong)" data-n="strong"></i><i style="background:var(--accent-soft)" data-n="soft"></i>
+    <i style="background:var(--bg)" data-n="bg"></i><i style="background:var(--bar)" data-n="bar"></i><i style="background:var(--panel)" data-n="panel"></i><i style="background:var(--sunk)" data-n="sunk"></i><i style="background:var(--hover)" data-n="hover"></i>
+    <i style="background:var(--text)" data-n="text"></i><i style="background:var(--muted)" data-n="muted"></i>
+    <i style="background:var(--ins-bg)" data-n="ins"></i><i style="background:var(--del-bg)" data-n="del"></i>
+    <i style="background:var(--private)" data-n="private"></i><i style="background:var(--warning)" data-n="warning"></i><i style="background:var(--danger)" data-n="danger"></i>
+  </div>
+  <h2>Popup (M2)</h2>
+  <div class="grid">
+    <a href="popup-actions.html"><b>Choose an action</b><span>Captured text, numbered actions, reading ahead for the likely action</span><em>Proposed 2026-10-22, waiting for the owner</em></a>
+    <a href="popup-proofread.html"><b>Proofread</b><span>Word diff, one line per change with Undo, Replace in the source app</span><em>Proposed 2026-10-22, waiting for the owner</em></a>
+    <a href="popup-reply.html"><b>Reply</b><span>Three replies in the message's language (Hinglish here), edit, insert never sends</span><em>Proposed 2026-10-22, waiting for the owner</em></a>
+    <a href="popup-rewrite.html"><b>Change tone</b><span>Tone presets, streaming result, versions, facts kept, language kept</span><em>Proposed 2026-10-22, waiting for the owner</em></a>
+  </div>
+  <h2>Setup and settings (M3)</h2>
+  <div class="grid">
+    <a href="setup-model.html"><b>First run, choose a model</b><span>Hardware probe, fast and quality tiers, exact download source and check</span><em>Proposed 2026-10-22, waiting for the owner</em></a>
+    <a href="settings-models.html"><b>Settings, models and languages</b><span>Tier defaults, installed models, speed-up, tested and best-effort languages</span><em>Proposed 2026-10-22, waiting for the owner</em></a>
+  </div>
+</div>
+</body></html>

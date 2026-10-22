@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Paraphrase mock: First run, choose a model</title><link rel="stylesheet" href="mock.css"><script src="mock.js"></script>
+<style>
+  .setup { max-width: 780px; }
+  .steps { display: flex; gap: 18px; list-style: none; margin: 0; padding: 0; font-size: 13px; }
+  .steps li { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+  .steps li.done { color: var(--success); }
+  .steps li.on { color: var(--text); font-weight: 600; }
+  .steps .n { width: 18px; height: 18px; border-radius: 9px; display: grid; place-items: center; font: 600 11px ui-monospace, monospace; border: 1px solid var(--border); }
+  .steps li.on .n { background: var(--accent-strong); border-color: var(--accent-strong); color: var(--accent-text); }
+  .models { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .model { display: flex; flex-direction: column; gap: 8px; padding: 16px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel); }
+  .model.on { border: 1.5px solid var(--accent); }
+  .model input { width: 18px; height: 18px; margin: 0; accent-color: var(--accent-strong); }
+  @media (max-width: 640px) { .models { grid-template-columns: 1fr; } }
+</style></head>
+<body>
+<div class="window setup">
+  <div class="titlebar"><div class="lights"><i></i><i></i><i></i></div><div class="title">Set up Paraphrase</div><div class="wc"><span>−</span><span>□</span><span>✕</span></div></div>
+  <div class="row" style="padding: 16px 24px; background: var(--bar); border-bottom: 1px solid var(--border)">
+    <h1 style="font-size: 16px">Set up Paraphrase</h1><span class="grow"></span>
+    <ol class="steps">
+      <li class="done"><svg class="ic s"><use href="#i-check"/></svg>Shortcut</li>
+      <li class="on" aria-current="step"><span class="n">2</span>Model</li>
+      <li><span class="n">3</span>Try it</li>
+    </ol>
+  </div>
+  <div class="stack" style="padding: 22px 24px; gap: 16px">
+    <div class="stack" style="gap: 8px">
+      <h2 style="font-size: 20px">Choose the model that writes for you</h2>
+      <div class="row wrap small"><span>This computer:</span><span class="pill">16 GB memory</span><span class="pill">8 CPU cores</span><span class="pill">Intel Graphics, not used (the CPU is faster here)</span></div>
+    </div>
+    <div class="models">
+      <label class="model on" for="m-fast">
+        <span class="row"><input id="m-fast" type="checkbox" checked><b style="font-size: 15px">Fast</b><span class="pill accent">Recommended</span></span>
+        <span>Gemma 4 E2B</span>
+        <span class="small muted">Proofread, reply and quick fixes. Works on 8 GB computers.</span>
+        <span class="small" style="font-variant-numeric: tabular-nums">3.35 GB download · about 4.6 GB memory in use<br>On this computer: a reply in about 3 s</span>
+      </label>
+      <label class="model" for="m-quality">
+        <span class="row"><input id="m-quality" type="checkbox"><b style="font-size: 15px">Quality</b><span class="pill">Optional</span></span>
+        <span>Gemma 4 E4B</span>
+        <span class="small muted">Better tone changes and longer writing. Best with 16 GB memory.</span>
+        <span class="small" style="font-variant-numeric: tabular-nums">5.15 GB download · about 8 GB memory in use<br>On this computer: a rewrite in about 8 s</span>
+      </label>
+    </div>
+    <div class="card stack" style="gap: 10px">
+      <div class="row wrap">
+        <b style="font-size: 13px">Downloading Gemma 4 E2B</b><span class="grow"></span>
+        <span class="small" style="font-variant-numeric: tabular-nums">1.21 of 3.35 GB · 8.4 MB/s · about 4 min left</span>
+        <button class="btn"><svg class="ic s"><use href="#i-pause"/></svg>Pause</button>
+      </div>
+      <div class="progress" role="progressbar" aria-label="Download progress" aria-valuenow="36" aria-valuemin="0" aria-valuemax="100"><i style="width: 36%"></i></div>
+      <div class="small muted">From <span class="mono" style="color: var(--text)">huggingface.co/google/gemma-4-E2B-it-qat-q4_0-gguf</span> at version <span class="mono" style="color: var(--text)">675cff4</span><br>Checked against its SHA-256 fingerprint before first use · licence Apache-2.0</div>
+    </div>
+    <div class="row small" style="align-items: flex-start; gap: 10px"><span class="private"><svg class="ic s"><use href="#i-lock"/></svg></span><span>Downloading models is the only time Paraphrase goes online. What you write never leaves this computer, and there is no account.</span></div>
+  </div>
+  <div class="row" style="padding: 14px 24px; border-top: 1px solid var(--border); background: var(--bar)">
+    <button class="btn big">Back</button><span class="grow"></span>
+    <span class="small muted">You can change models later in Settings</span>
+    <button class="btn big primary" disabled>Continue when ready</button>
+  </div>
+  <span class="pin" style="left: 420px; top: 120px">1</span>
+  <span class="pin" style="left: 14px; top: 160px">2</span>
+  <span class="pin" style="left: 14px; top: 330px">3</span>
+  <span class="pin" style="left: 14px; top: 420px">4</span>
+</div>
+<section class="notes"><h2>Notes</h2><ol>
+  <li><b>The hardware probe</b> (PLAN D9) runs before this step: memory, cores, CPU features, a Vulkan device. When the iGPU measures slower than the CPU (as on the M0 laptop) it is named but not used, so nobody wonders why their graphics chip sits idle.</li>
+  <li><b>Fast is preselected</b> and is the only model needed. Quality is offered, never pushed, and its card says plainly that it wants 16 GB. On an 8 GB computer the Quality card reads "Too large for this computer's memory" and stays unticked.</li>
+  <li><b>Estimates are per computer</b>, from a short timing run after the probe, rounded to whole seconds. They are estimates, so they say "about".</li>
+  <li><b>The exact source</b> (PLAN 8): the upstream repository, the pinned version and the SHA-256 check, so a careful user can verify the download. Pause and resume work across restarts. If the check fails, the file is deleted and the panel says so with a Retry button.</li>
+</ol></section>
+</body></html>

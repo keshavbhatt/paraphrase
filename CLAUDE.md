@@ -15,3 +15,6 @@ Rules:
 - Dev machine is Arch Linux: use pacman package names when listing dependencies.
 - C++20, Qt 6, clang-format; Python 3.11+, ruff, type hints. Run ctest and the eval smoke suite before declaring a task done.
 - Commit in small, logical steps with clear messages.
+- Mocks before screens: every screen or visible UI change first gets an HTML mock in
+  `DOCS/mocks/` (see `DOCS/DESIGN.md`) that the owner approves; approval is recorded in
+  `DOCS/mocks/index.html` and `DOCS/PROGRESS.md`. No screen is coded from a description alone.

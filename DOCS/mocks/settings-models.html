@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Paraphrase mock: Settings, models and languages</title><link rel="stylesheet" href="mock.css"><script src="mock.js"></script>
+<style>
+  .tiers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 22px; }
+  .langs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+  .lang { border: 1px solid var(--border); border-radius: 10px; padding: 11px 14px; }
+  @media (max-width: 640px) { .tiers, .langs { grid-template-columns: 1fr; } }
+</style></head>
+<body>
+<div class="window">
+  <div class="titlebar"><div class="lights"><i></i><i></i><i></i></div><div class="title">Paraphrase settings</div><div class="wc"><span>−</span><span>□</span><span>✕</span></div></div>
+  <div class="settings">
+    <nav aria-label="Settings sections">
+      <a href="#">General</a><a href="#">Shortcut</a><a href="#">My actions</a>
+      <a class="on" href="#" aria-current="page">Models</a><a href="#">Privacy</a><a href="#">About</a>
+    </nav>
+    <main>
+      <div class="stack" style="gap: 6px">
+        <h1>Models</h1>
+        <p class="muted" style="max-width: 64ch">Paraphrase runs these models on this computer. Quick actions use the fast model; tone changes and longer writing use the quality model when it is installed.</p>
+      </div>
+
+      <section class="card" aria-labelledby="tiers-h">
+        <h2 id="tiers-h" style="margin-bottom: 12px">Which model does what</h2>
+        <div class="tiers">
+          <div class="stack" style="gap: 6px; min-width: 0"><label class="small muted" for="t-fast">Fast: proofread, reply, format</label><select id="t-fast" class="input"><option>Gemma 4 E2B</option><option>Gemma 4 E4B</option></select></div>
+          <div class="stack" style="gap: 6px; min-width: 0"><label class="small muted" for="t-quality">Quality: tone, summarize, translate, compose</label><select id="t-quality" class="input"><option>Gemma 4 E4B</option><option>Gemma 4 E2B</option></select></div>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="inst-h">
+        <div class="row wrap" style="margin-bottom: 8px"><h2 id="inst-h">Installed</h2><span class="small muted" style="font-variant-numeric: tabular-nums">8.6 GB used on disk</span><span class="grow"></span><button class="btn"><svg class="ic s"><use href="#i-plus"/></svg>Add a model</button></div>
+        <div class="scroll">
+          <table class="list" style="min-width: 640px">
+            <thead><tr><th>Model</th><th>Used for</th><th style="text-align: right">Size</th><th>Memory</th><th>Status</th><th><span class="small" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Actions</span></th></tr></thead>
+            <tbody>
+              <tr><td><b>Gemma 4 E2B</b><div class="small muted">Google · Apache-2.0</div></td><td>Fast</td><td style="text-align: right">3.35 GB</td><td>about 4.6 GB</td><td><span class="pill ok">Ready, verified</span></td><td style="text-align: right"><button class="btn flat danger">Remove</button></td></tr>
+              <tr><td><b>Gemma 4 E4B</b><div class="small muted">Google · Apache-2.0</div></td><td>Quality</td><td style="text-align: right">5.15 GB</td><td>about 8 GB</td><td><span class="pill ok">Ready, verified</span></td><td style="text-align: right"><button class="btn flat danger">Remove</button></td></tr>
+              <tr><td><b>Speed-up for each model</b><div class="small muted">A small helper that drafts ahead: same results, faster</div></td><td>Proofread, tone</td><td style="text-align: right">2 × 60 MB</td><td>under 0.1 GB</td><td><span class="pill ok">On</span></td><td style="text-align: right"><button class="btn flat" style="color: var(--link)">Turn off</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="lang-h">
+        <h2 id="lang-h">Languages</h2>
+        <p class="small muted" style="margin: 4px 0 12px; max-width: 66ch">Paraphrase answers in the language you wrote in. Tested languages were checked by the Paraphrase team with these models; others work as well as the model allows.</p>
+        <div class="langs">
+          <div class="lang"><b>English</b><div class="small" style="color: var(--success)">Tested · all actions</div></div>
+          <div class="lang"><b>Hindi</b><div class="small" style="color: var(--success)">Tested · all actions</div></div>
+          <div class="lang"><b>Hinglish</b><div class="small" style="color: var(--success)">Tested · all actions</div></div>
+        </div>
+        <p class="small" style="margin-top: 12px">Best effort: Marathi, Bengali, Tamil, Spanish, French, German, Portuguese, Chinese and many more. <a href="#">How languages are checked</a></p>
+      </section>
+
+      <p class="row small" style="align-items: flex-start; gap: 10px"><span class="private"><svg class="ic s"><use href="#i-lock"/></svg></span><span>Models download only from their makers, at a fixed version, and are checked before use. They live in <span class="mono">~/.local/share/paraphrase/models</span>.</span></p>
+    </main>
+  </div>
+  <span class="pin" style="left: 236px; top: 150px">1</span>
+  <span class="pin" style="left: 236px; top: 290px">2</span>
+  <span class="pin" style="left: 236px; top: 470px">3</span>
+  <span class="pin" style="left: 236px; top: 610px">4</span>
+</div>
+<section class="notes"><h2>Notes</h2><ol>
+  <li><b>Tiers, not models</b>: actions name a tier (fast or quality, PLAN 5.3); this is where a tier gets its model. With only the fast model installed, the quality row reads "Uses the fast model (install Quality for better rewrites)".</li>
+  <li><b>Installed models</b> with the memory they take while loaded, measured in M0 (peak resident memory). "Ready, verified" means the SHA-256 matched. Remove asks once, in place, and frees the disk space.</li>
+  <li><b>The speed-up</b> is the multi-token-prediction draft head for each Gemma model (M0: proofread 26% faster on an 8 GB laptop, identical output). It is on by default and listed so it is never a hidden download.</li>
+  <li><b>Languages</b> (PLAN 3.1: the UI must say which languages the installed model handles well): "Tested" only for languages with a full eval set and a passed floor check; everything else is "Best effort". The list comes from <code>models.json</code> <code>languages</code>, not from a vendor's claims.</li>
+</ol></section>
+</body></html>

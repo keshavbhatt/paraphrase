@@ -21,3 +21,10 @@ path = [
 precedence = "override"
 SPDX-FileCopyrightText = "2026 Keshav Bhatt (Ktechpit)"
 SPDX-License-Identifier = "LicenseRef-Ktechpit-Licensing-Module"
+
+# The mocks embed Lucide glyph paths in their helper script.
+[[annotations]]
+path = "DOCS/mocks/mock.js"
+precedence = "override"
+SPDX-FileCopyrightText = ["2026 Keshav Bhatt (Ktechpit)", "2026 Lucide Icons and Contributors"]
+SPDX-License-Identifier = "GPL-3.0-or-later AND ISC"

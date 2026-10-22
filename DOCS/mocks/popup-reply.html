@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Paraphrase mock: Popup, reply</title><link rel="stylesheet" href="mock.css"><script src="mock.js"></script></head>
+<body>
+<div class="desk" style="min-height: 720px">
+  <div class="other" style="left: 40px; top: 30px; width: 700px; height: 600px; background: #EEF1F4">
+    <div class="bar" style="background: #FFFFFF">Courier - Telegram</div>
+    <div class="chat">
+      <div class="msg" lang="hi-Latn"><mark>bhaiya parcel aapke ghar ke bahar rakh du? koi phone nahi utha raha</mark></div>
+      <div style="flex: 1; min-height: 420px"></div>
+      <div class="compose" style="color: #8A8F98">Write a message…</div>
+    </div>
+  </div>
+
+  <div class="popup" style="left: 420px; top: 90px">
+    <div class="phead">
+      <a class="btn flat" href="popup-actions.html"><svg class="ic s"><use href="#i-left"/></svg>Actions</a>
+      <b style="font-size: 14px">Reply</b>
+      <span class="grow"></span>
+      <span class="private"><svg class="ic s"><use href="#i-lock"/></svg>On this device</span>
+      <button class="btn flat icon" aria-label="Close (Esc)"><svg class="ic s"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="pbody">
+      <div class="row"><span class="cap">Message you got</span><span class="grow"></span><span class="pill">Hinglish</span></div>
+      <div class="source" lang="hi-Latn">bhaiya parcel aapke ghar ke bahar rakh du? koi phone nahi utha raha</div>
+      <span class="cap">Pick a reply</span>
+      <button class="choice on"><span class="num">1</span><span lang="hi-Latn">Haan, rakh do main check karta hoon.</span></button>
+      <button class="choice"><span class="num">2</span><span lang="hi-Latn">Thoda time do, main call karta hoon.</span></button>
+      <button class="choice"><span class="num">3</span><span lang="hi-Latn">Abhi nahi, main khud utha lunga.</span></button>
+      <label class="small muted" for="edit">Edit before sending</label>
+      <input id="edit" class="input" lang="hi-Latn" value="Haan, rakh do main check karta hoon.">
+    </div>
+    <div class="pfoot">
+      <button class="btn big primary">Insert reply <span class="num">Enter</span></button>
+      <button class="btn big"><svg class="ic s"><use href="#i-copy"/></svg>Copy</button>
+      <button class="btn big"><svg class="ic s"><use href="#i-refresh"/></svg>3 new ones</button>
+    </div>
+  </div>
+
+  <span class="pin" style="left: 838px; top: 150px">1</span>
+  <span class="pin" style="left: 410px; top: 230px">2</span>
+  <span class="pin" style="left: 410px; top: 370px">3</span>
+  <span class="pin" style="left: 410px; top: 470px">4</span>
+</div>
+<section class="notes"><h2>Notes</h2><ol>
+  <li><b>The language follows the message</b>: here Hinglish (Hindi in Latin letters), so the replies are Hinglish too, never English or Devanagari. The pill shows the detected language; for a language Paraphrase has not tested it reads "Best effort" next to the name.</li>
+  <li><b>Written as the user</b>: replies answer the message, they never speak for the sender (the "wrong side" failure the M0 spot-check counted).</li>
+  <li><b>Three replies from one run</b> of the model (PLAN 3.1), so they differ: typically agree, ask or suggest, decline or defer. Number keys 1 to 3 pick one into the edit box; Enter inserts it. If the engine's language check fails on a reply after its one retry, that reply carries a small "Not in Hinglish?" note instead of being dropped.</li>
+  <li><b>Insert reply</b> types into the app's message box (the remembered window); it is never sent. Sending stays the user's action (CLAUDE.md: never send text without an explicit user action). "3 new ones" runs again.</li>
+</ol></section>
+</body></html>

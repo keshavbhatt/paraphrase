@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Paraphrase mock: Popup, choose an action</title><link rel="stylesheet" href="mock.css"><script src="mock.js"></script></head>
+<body>
+<div class="desk" style="min-height: 720px">
+  <div class="other" style="left: 40px; top: 30px; width: 700px; height: 600px; background: #EEF1F4">
+    <div class="bar" style="background: #FFFFFF">Mia - Telegram</div>
+    <div class="chat">
+      <div class="msg">Are you home? I can't find the keys anywhere</div>
+      <div class="msg me">Did you check the hall table?</div>
+      <div class="msg">Yes, not there either</div>
+      <div style="flex: 1; min-height: 300px"></div>
+      <div class="compose"><mark>Mia dont know where the keys are, can you check the drawer next to the fridge</mark></div>
+    </div>
+  </div>
+
+  <div class="popup" style="left: 420px; top: 120px">
+    <div class="phead">
+      <svg class="ic mark"><use href="#i-pen"/></svg>
+      <b style="font-size: 14px">Paraphrase</b>
+      <span class="small muted">from Telegram</span>
+      <span class="grow"></span>
+      <span class="private"><svg class="ic s"><use href="#i-lock"/></svg>On this device</span>
+      <button class="btn flat icon" aria-label="Close (Esc)"><svg class="ic s"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="pbody">
+      <div class="row"><span class="cap">Selected text</span><span class="small muted">· 16 words · English</span></div>
+      <div class="source">Mia dont know where the keys are, can you check the drawer next to the fridge</div>
+      <span class="cap" style="margin-top: 4px">Actions</span>
+      <div class="row wrap">
+        <a class="action hot" href="popup-proofread.html"><span class="num">1</span>Proofread</a>
+        <a class="action" href="popup-rewrite.html"><span class="num">2</span>Tone<svg class="ic s muted"><use href="#i-down"/></svg></a>
+        <a class="action" href="popup-reply.html"><span class="num">3</span>Reply</a>
+        <button class="action"><span class="num">4</span>Summarize</button>
+        <button class="action"><span class="num">5</span>Format<svg class="ic s muted"><use href="#i-down"/></svg></button>
+        <button class="action"><span class="num">6</span>Translate<svg class="ic s muted"><use href="#i-down"/></svg></button>
+        <button class="action"><span class="num">7</span>My actions<svg class="ic s muted"><use href="#i-down"/></svg></button>
+      </div>
+    </div>
+    <div class="pfoot">
+      <span class="dot" aria-hidden="true"></span>
+      <span class="small">Reading the text for Proofread…</span>
+      <span class="grow"></span>
+      <span class="small muted"><span class="kbd">Esc</span> close</span>
+    </div>
+  </div>
+
+  <span class="pin" style="left: 410px; top: 110px">1</span>
+  <span class="pin" style="left: 410px; top: 200px">2</span>
+  <span class="pin" style="left: 410px; top: 280px">3</span>
+  <span class="pin" style="left: 410px; top: 425px">4</span>
+  <span class="pin" style="left: 838px; top: 128px">5</span>
+</div>
+<section class="notes"><h2>Notes</h2><ol>
+  <li><b>Opens near the cursor</b> from the global shortcut, over any app, about 440 px wide. It remembers the app the text came from ("from Telegram"); if focus moves to another window before Replace, the result goes to the clipboard instead of being typed into the wrong window (PLAN 6).</li>
+  <li><b>The captured text</b>: the selection where the session allows reading it (X11, KDE Wayland), else the clipboard. Word count and the detected language are shown; the language is what the result will be written in.</li>
+  <li><b>Actions</b> are skills (PLAN D4): number keys 1 to 7 pick one, arrow keys move, Enter runs the highlighted one. The highlighted action is the one the user picks most often, so the next point can work ahead.</li>
+  <li><b>Reading ahead</b>: as soon as the popup opens, the engine starts processing the text for the highlighted action (the daemon's <code>Warm()</code>, PLAN 5). On an 8 GB, 4-core laptop reading a 100-word text takes about 3 s; working ahead hides the second or so spent choosing. If the user picks another action the read-ahead is dropped. The line says what is happening in plain words, never a percentage.</li>
+  <li><b>On this device</b> is always visible: nothing leaves the computer. Esc closes the popup from any state; the popup never keeps focus longer than needed.</li>
+</ol></section>
+</body></html>

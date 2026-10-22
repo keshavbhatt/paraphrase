@@ -11,3 +11,9 @@ with their licences in `models.json` and `DOCS/models.md`.
 | mypy | dev-only | MIT | PyPI, via `uv` | tooling |
 | pytest | dev-only | MIT | PyPI, via `uv` | tooling |
 | reuse | dev-only | Apache-2.0 AND GPL-3.0-or-later (tool only, not linked) | PyPI, via `uv` | tooling (licence lint) |
+
+## Design mocks only
+
+`DOCS/mocks/mock.js` embeds Lucide glyph paths (ISC licence, the same set Omnidict's mocks
+use) so the HTML mocks can draw icons. They do not ship in the app; licence text in
+`LICENSES/ISC.txt`.

@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Paraphrase mock: Popup, proofread</title><link rel="stylesheet" href="mock.css"><script src="mock.js"></script></head>
+<body>
+<div class="desk" style="min-height: 720px">
+  <div class="other" style="left: 40px; top: 30px; width: 700px; height: 600px; background: #EEF1F4">
+    <div class="bar" style="background: #FFFFFF">Mia - Telegram</div>
+    <div class="chat">
+      <div class="msg">Are you home? I can't find the keys anywhere</div>
+      <div class="msg me">Did you check the hall table?</div>
+      <div class="msg">Yes, not there either</div>
+      <div style="flex: 1; min-height: 300px"></div>
+      <div class="compose"><mark>Mia dont know where the keys are, can you check the drawer next to the fridge</mark></div>
+    </div>
+  </div>
+
+  <div class="popup" style="left: 420px; top: 100px">
+    <div class="phead">
+      <a class="btn flat" href="popup-actions.html"><svg class="ic s"><use href="#i-left"/></svg>Actions</a>
+      <b style="font-size: 14px">Proofread</b>
+      <span class="grow"></span>
+      <span class="private"><svg class="ic s"><use href="#i-lock"/></svg>On this device</span>
+      <button class="btn flat icon" aria-label="Close (Esc)"><svg class="ic s"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="pbody">
+      <div class="row">
+        <b style="font-size: 13px">2 changes</b><span class="small muted">· kept in English</span>
+        <span class="grow"></span>
+        <span class="seg" role="group" aria-label="View"><span class="on">Changes</span><span>Result</span></span>
+      </div>
+      <div class="result">Mia <del class="d">dont</del> <ins class="d">doesn't</ins> know where the keys are, can you check the drawer next to the fridge<ins class="d">?</ins></div>
+      <div class="stack" style="gap: 4px">
+        <div class="row small"><del class="d mono">dont</del><svg class="ic s muted"><use href="#i-forward"/></svg><ins class="d mono">doesn't</ins><span class="muted">spelling and agreement</span><span class="grow"></span><button class="btn flat" style="min-height: 30px; color: var(--link)">Undo</button></div>
+        <div class="row small"><span class="pill mono">end</span><svg class="ic s muted"><use href="#i-forward"/></svg><ins class="d mono">?</ins><span class="muted">question mark</span><span class="grow"></span><button class="btn flat" style="min-height: 30px; color: var(--link)">Undo</button></div>
+      </div>
+    </div>
+    <div class="pfoot">
+      <button class="btn big primary">Replace in Telegram <span class="num">Enter</span></button>
+      <button class="btn big"><svg class="ic s"><use href="#i-copy"/></svg>Copy</button>
+      <button class="btn big"><svg class="ic s"><use href="#i-refresh"/></svg>Retry</button>
+    </div>
+  </div>
+
+  <span class="pin" style="left: 410px; top: 160px">1</span>
+  <span class="pin" style="left: 410px; top: 210px">2</span>
+  <span class="pin" style="left: 410px; top: 290px">3</span>
+  <span class="pin" style="left: 410px; top: 385px">4</span>
+  <span class="pin" style="left: 848px; top: 160px">5</span>
+</div>
+<section class="notes"><h2>Notes</h2><ol>
+  <li><b>Summary first</b>: how many changes, and that the language was kept. The engine checks the language of every result (skill schema v2) and retries once if it changed; if the retry also changes it, a yellow "This may not be in English" pill replaces "kept in English" and Replace is still allowed, never hidden.</li>
+  <li><b>The diff</b> (PLAN D6): the model returns the whole corrected text, the client computes a word diff. Deletions are orange and struck out, insertions blue and underlined: different lightness as well as hue, and the strike-through and underline carry the meaning without colour. While the model is still writing, the corrected text streams in and the diff fills in behind it.</li>
+  <li><b>One line per change</b>, with Undo. Undo reverts only that change, so a wrong fix (a name, a handle, a British spelling) never forces the user to throw away the rest. The short reason comes from the diff category (spelling, punctuation, capital letter), not from the model.</li>
+  <li><b>Replace</b> types the result into the app the text came from (the remembered window); Enter does the same. Copy puts it on the clipboard; Retry runs again with a new seed. "Result" switches to the clean corrected text.</li>
+  <li><b>No change needed</b>: the panel says "Looks good, no changes" and offers only Close, so the user is never asked to replace text with itself.</li>
+</ol></section>
+</body></html>
