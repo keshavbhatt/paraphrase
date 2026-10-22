@@ -138,7 +138,7 @@ table.list tr:last-child td { border-bottom: 0; }
 .notes { max-width: 1000px; margin: 0 auto; padding: 28px 24px 80px; }
 .notes h2 { margin-bottom: 10px; font-size: 16px; }
 .notes ol { margin: 0; padding-left: 22px; } .notes li { margin: 6px 0; }
-.notes li b { margin-right: 4px; }
+.notes li b { margin-right: 0; }
 body.clean .pin, body.clean .notes { display: none; }
 
 /* Review toolbar. */
