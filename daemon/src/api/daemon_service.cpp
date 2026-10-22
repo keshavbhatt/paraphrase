@@ -187,10 +187,11 @@ QString DaemonService::buildJob(const QString& skillId, const QVariantMap& input
     return {};
 }
 
-bool DaemonService::chooseModel(Job& job) const
+bool DaemonService::chooseModel(Job& job, const models::ModelEntry* requested) const
 {
     const models::TierSelector selector(m_setup.catalog, m_setup.hardware);
-    const models::ModelEntry* model = selector.modelFor(job.skill.tier, installedModels());
+    const models::ModelEntry* model =
+        requested != nullptr ? requested : selector.modelFor(job.skill.tier, installedModels());
     if (model == nullptr) {
         return false;
     }
@@ -211,13 +212,31 @@ bool DaemonService::chooseModel(Job& job) const
 
 QString DaemonService::RunSkill(const QString& skillId, const QVariantMap& input, const QVariantMap& options)
 {
-    Q_UNUSED(options) // reserved (DOCS/api.md)
     Job job;
     if (const QString problem = buildJob(skillId, input, job); !problem.isEmpty()) {
         replyError(u"InvalidInput"_s, problem);
         return {};
     }
-    if (!chooseModel(job)) {
+    // options.model: a model chosen by the user or the eval, instead of the tier's.
+    const models::ModelEntry* requested = nullptr;
+    if (const QString modelId = options.value(u"model"_s).toString(); !modelId.isEmpty()) {
+        requested = m_setup.catalog.find(modelId);
+        if (requested == nullptr || requested->role != u"model"_s) {
+            replyError(u"InvalidInput"_s, tr("Unknown model \"%1\".").arg(modelId));
+            return {};
+        }
+        if (!m_store.isInstalled(*requested)) {
+            replyError(u"NoModel"_s, tr("%1 is not installed.").arg(requested->name));
+            return {};
+        }
+    }
+    for (auto it = options.begin(); it != options.end(); ++it) {
+        if (it.key() != u"model"_s) {
+            replyError(u"InvalidInput"_s, tr("Unknown option \"%1\".").arg(it.key()));
+            return {};
+        }
+    }
+    if (!chooseModel(job, requested)) {
         replyError(u"NoModel"_s, tr("No model is installed. Download one in Settings, or run "
                                     "\"paraphrase models download fast\"."));
         return {};

@@ -112,8 +112,9 @@ private:
     /// Checks the input and builds the skill's values; an error message when it is wrong.
     [[nodiscard]] QString buildJob(const QString& skillId, const QVariantMap& input, Job& job) const;
     [[nodiscard]] QSet<QString> installedModels() const;
-    /// The model for the job's tier (TierSelector), with its draft head when installed.
-    [[nodiscard]] bool chooseModel(Job& job) const;
+    /// The requested model, or the one for the job's tier (TierSelector), with its draft
+    /// head when installed.
+    [[nodiscard]] bool chooseModel(Job& job, const models::ModelEntry* requested = nullptr) const;
     void dispatchNext();
     void cancelClientRequests(const Client& client);
     void finishRequest(const QString& id);

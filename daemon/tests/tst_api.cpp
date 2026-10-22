@@ -449,6 +449,38 @@ private Q_SLOTS:
         QCOMPARE(ls.done.value(id2).value(u"model"_s).toString(), u"fast-model"_s);
     }
 
+    void runsOnTheRequestedModel()
+    {
+        startServer(32, {u"fast-model"_s, u"quality-model"_s});
+        QDBusConnection c = connect();
+        Listener l;
+        QVERIFY(l.listen(c));
+        const QDBusMessage reply = call(c, u"RunSkill"_s,
+                                        {
+                                            u"proofread"_s,
+                                            QVariantMap{{u"text"_s, u"x y"_s}},
+                                            QVariantMap{{u"model"_s, u"quality-model"_s}},
+                                        });
+        const QString id = reply.arguments().value(0).toString();
+        QTRY_VERIFY_WITH_TIMEOUT(l.done.contains(id), kTimeoutMs);
+        QCOMPARE(l.done.value(id).value(u"model"_s).toString(), u"quality-model"_s);
+        QVERIFY(l.done.value(id).value(u"load_s"_s).toDouble() >= 0.0);
+        const auto run = [&](const QVariantMap& options) {
+            return call(c, u"RunSkill"_s, {u"proofread"_s, QVariantMap{{u"text"_s, u"x"_s}}, options})
+                .errorName();
+        };
+        QCOMPARE(run({{u"model"_s, u"fast-draft"_s}}), u"com.ktechpit.paraphrase.Error.InvalidInput"_s);
+        QCOMPARE(run({{u"colour"_s, u"red"_s}}), u"com.ktechpit.paraphrase.Error.InvalidInput"_s);
+        cleanup();
+        startServer(32, {u"fast-model"_s});
+        QDBusConnection c2 = connect();
+        QCOMPARE(call(c2, u"RunSkill"_s,
+                      {u"proofread"_s, QVariantMap{{u"text"_s, u"x"_s}},
+                       QVariantMap{{u"model"_s, u"quality-model"_s}}})
+                     .errorName(),
+                 u"com.ktechpit.paraphrase.Error.NoModel"_s);
+    }
+
     void refusesTooLongInput()
     {
         startServer(32, {u"fast-model"_s});

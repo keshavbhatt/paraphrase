@@ -50,7 +50,9 @@ daemon exits; never while a download runs).
 (the message to reply to; required for reply), `target_lang` (a language code the user
 chose, for example `fr`; otherwise the output keeps the input's language; only skills whose
 prompt takes it, today rewrite, accept it). Any other key is
-an error. **`options`** is reserved; pass an empty map.
+an error. **`options`**: `model` (a model id from `ListModels` with role `model`) runs the
+request on that model instead of the tier's (the eval harness, and a future Settings choice);
+any other key is an error.
 
 Skill ids are those `ListSkills` returns: `proofread`, `reply`, and a preset as
 `<skill>.<preset>` (`rewrite.professional`).
@@ -110,6 +112,7 @@ while reading or writing).
   "retried": false,
   "warning": "",
   "finish": "stop",
+  "load_s": 0,
   "calls": [
     {"ttft_s": 0.61, "total_s": 2.4, "prompt_tokens": 182, "cached_tokens": 150,
      "generated_tokens": 31, "draft_tokens": 0, "draft_accepted": 0}
@@ -122,6 +125,7 @@ while reading or writing).
 - `warning`: set when the retry also failed the language check (`language: <why>`); the
   answer is still shown, with the warning, never hidden (ADR-006).
 - `finish`: `stop`, or `length` when the output limit cut it short.
+- `load_s`: seconds this request spent loading the model first; 0 when it was loaded.
 - `calls`: one per model call (two after a retry), for the latency bench.
 
 ### `DownloadProgress` status

@@ -2,6 +2,7 @@
 
 #include "engine/skill_runner.h"
 
+#include <QElapsedTimer>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -29,7 +30,7 @@ QJsonObject timings(const engine::Generation& g)
 
 /// The Done JSON (DOCS/api.md): the output as stored, the replies of a JSON skill, the
 /// warning of a failed language check, and the timings of every model call.
-QString resultJson(const Job& job, const engine::SkillResult& r)
+QString resultJson(const Job& job, const engine::SkillResult& r, double loadSeconds)
 {
     QJsonObject o{
         {u"request_id"_s, job.id},
@@ -39,6 +40,7 @@ QString resultJson(const Job& job, const engine::SkillResult& r)
         {u"retried"_s, r.retried},
         {u"warning"_s, r.warning},
         {u"finish"_s, r.calls.isEmpty() ? QString() : r.calls.last().finishReason},
+        {u"load_s"_s, loadSeconds}, // this request loaded the model first; 0 when it was loaded
     };
     if (job.skill.outputType() == u"json"_s || job.skill.variants > 1) {
         o.insert(u"replies"_s, QJsonArray::fromStringList(r.texts));
@@ -75,7 +77,10 @@ bool InferenceWorker::ensureModel(const Job& job)
         return true;
     }
     qCInfo(lcInference) << "loading" << job.modelId;
+    QElapsedTimer clock;
+    clock.start();
     const auto loaded = m_engine->load(job.model);
+    m_loadSeconds = static_cast<double>(clock.elapsed()) / 1000.0;
     if (!loaded.ok()) {
         m_modelId.clear();
         Q_EMIT modelChanged({});
@@ -95,6 +100,7 @@ int InferenceWorker::inputTokens(const Job& job) const
 
 void InferenceWorker::run(const Job& job)
 {
+    m_loadSeconds = 0.0;
     {
         const QMutexLocker lock(&m_cancelLock);
         if (m_cancelled == job.id) {
@@ -142,7 +148,7 @@ void InferenceWorker::run(const Job& job)
                result.value().calls.last().finishReason == u"cancelled"_s) {
         Q_EMIT failed(id, u"cancelled"_s, tr("Cancelled."));
     } else {
-        Q_EMIT finished(id, resultJson(job, result.value()));
+        Q_EMIT finished(id, resultJson(job, result.value(), m_loadSeconds));
     }
     Q_EMIT idle();
 }

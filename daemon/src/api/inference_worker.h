@@ -65,7 +65,8 @@ private:
     const util::LanguageDetector& m_detector;
     std::unique_ptr<engine::Engine> m_engine; ///< loads and runs on the inference thread
     QString m_modelId;
-    QMutex m_cancelLock; ///< guards m_cancelled and the engine's cancel flag at job start
+    double m_loadSeconds = 0.0; ///< of the running job, when it loaded the model
+    QMutex m_cancelLock;        ///< guards m_cancelled and the engine's cancel flag at job start
     QString m_cancelled;
 };
 
