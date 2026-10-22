@@ -92,6 +92,8 @@ class Daemon:
         env |= {
             "PARAPHRASE_RUN": "cli/paraphrase",
             "PARAPHRASE_BUILD_DIR": str(self.build_dir),
+            # A portable build loads its CPU libraries from its bin/ (ADR-008).
+            "PARAPHRASE_GGML_BACKEND_DIR": str(self.build_dir / "bin"),
             "PARAPHRASE_PRIVATE": "1",  # its own daemon: nothing else shares the model
             "PARAPHRASE_MODELS_DIR": str(common.MODELS_DIR),
             "QT_LOGGING_RULES": "paraphrase.*.debug=false",

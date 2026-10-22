@@ -2,12 +2,15 @@
 
 #include <QCoreApplication>
 #include <QElapsedTimer>
+#include <QFile>
+#include <QFileInfo>
 #include <QJsonValue>
 #include <QLoggingCategory>
 
 #include <algorithm>
 #include <chat.h>
 #include <common.h>
+#include <ggml-backend.h>
 #include <llama.h>
 #include <mutex>
 #include <sampling.h>
@@ -35,12 +38,27 @@ void llamaLog(ggml_log_level level, const char* text, void* /*user*/)
     }
 }
 
+/// Portable builds (ADR-008) load one CPU library per instruction-set level at run time and
+/// keep the best: from $PARAPHRASE_GGML_BACKEND_DIR (development builds, where they sit in
+/// the build's bin/), else from `<prefix>/lib/paraphrase/ggml` beside the daemon (packages),
+/// else where llama.cpp looks itself (the program's folder). Native builds have the CPU
+/// backend built in, and none of this applies.
 void initBackend()
 {
     static std::once_flag once;
     std::call_once(once, [] {
         llama_log_set(llamaLog, nullptr);
-        llama_backend_init();
+        if (ggml_backend_reg_count() == 0) {
+            QString dir = qEnvironmentVariable("PARAPHRASE_GGML_BACKEND_DIR");
+            if (dir.isEmpty()) {
+                dir = QCoreApplication::applicationDirPath() + u"/../lib/paraphrase/ggml"_s;
+            }
+            if (QFileInfo(dir).isDir()) {
+                ggml_backend_load_all_from_path(QFile::encodeName(dir).constData());
+            }
+        }
+        llama_backend_init(); // loads from the default places when nothing is loaded yet
+        qCInfo(lcEngine) << "backends:" << ggml_backend_reg_count();
     });
 }
 
