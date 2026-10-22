@@ -1,6 +1,9 @@
 #include "integrations.h"
 
 #include "clipboard_backends.h"
+#include "session_backends.h"
+
+#include <QGuiApplication>
 
 #include <algorithm>
 
@@ -28,13 +31,22 @@ Integrations::Integrations(std::vector<std::unique_ptr<CaptureBackend>> capture,
 
 Integrations Integrations::forThisSession(QObject* owner)
 {
-    // Session-specific backends (X11, KDE Wayland) go before the fallbacks as they land.
-    std::vector<std::unique_ptr<CaptureBackend>> capture;
-    capture.push_back(std::make_unique<ClipboardCapture>());
-    std::vector<std::unique_ptr<InsertBackend>> insert;
-    insert.push_back(std::make_unique<ClipboardInsert>());
-    std::vector<ShortcutBackend*> shortcuts{new CommandShortcut(owner)};
-    return {std::move(capture), std::move(insert), std::move(shortcuts)};
+    SessionBackends b;
+    // PARAPHRASE_NO_INTEGRATIONS=1 switches every desktop backend off: the standalone check
+    // (ADR-013) and tests.
+    if (qEnvironmentVariableIntValue("PARAPHRASE_NO_INTEGRATIONS") == 0) {
+        const QString platform = QGuiApplication::platformName();
+        if (platform == u"xcb"_s) {
+            addX11Backends(b, owner);
+        } else if (platform == u"wayland"_s) {
+            addWaylandBackends(b, owner);
+        }
+    }
+    // The fallbacks work everywhere, so something always does.
+    b.capture.push_back(std::make_unique<ClipboardCapture>());
+    b.insert.push_back(std::make_unique<ClipboardInsert>());
+    b.shortcuts.push_back(new CommandShortcut(owner));
+    return {std::move(b.capture), std::move(b.insert), std::move(b.shortcuts)};
 }
 
 CaptureBackend& Integrations::capture() const
