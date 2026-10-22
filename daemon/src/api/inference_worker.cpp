@@ -70,6 +70,12 @@ void InferenceWorker::cancel(const QString& id)
     m_engine->cancel(); // only atomic state: safe from this thread
 }
 
+bool InferenceWorker::cancelled(const QString& id) const
+{
+    const QMutexLocker lock(&m_cancelLock);
+    return m_cancelled == id;
+}
+
 bool InferenceWorker::ensureModel(const Job& job)
 {
     if (m_engine->isLoaded() && m_engine->loadedConfig().modelPath == job.model.modelPath &&
@@ -113,6 +119,13 @@ void InferenceWorker::run(const Job& job)
         m_engine->resetCancel(); // a cancel from here on is for this job
     }
     if (!ensureModel(job)) {
+        Q_EMIT idle();
+        return;
+    }
+    if (cancelled(job.id)) { // cancelled while the model loaded
+        if (!job.warmOnly) {
+            Q_EMIT failed(job.id, u"cancelled"_s, tr("Cancelled."));
+        }
         Q_EMIT idle();
         return;
     }

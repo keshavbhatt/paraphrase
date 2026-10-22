@@ -294,10 +294,12 @@ void DaemonService::Cancel(const QString& requestId)
         return; // unknown, finished, or someone else's
     }
     if (requestId == m_running) {
-        m_worker->cancel(requestId); // ends with failed(id, "cancelled")
-        return;
+        // Answer now: a model load cannot stop halfway, and the client should not wait for it.
+        // The worker drops the job when it can; its late events find no open request.
+        m_worker->cancel(requestId);
+    } else {
+        m_queue.removeIf([&](const Job& j) { return j.id == requestId; });
     }
-    m_queue.removeIf([&](const Job& j) { return j.id == requestId; });
     sendTo(requestId, "Error", {requestId, u"cancelled"_s, tr("Cancelled.")});
     finishRequest(requestId);
 }

@@ -14,6 +14,7 @@
 #include <QDBusReply>
 #include <QDBusServer>
 #include <QDir>
+#include <QElapsedTimer>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -320,6 +321,30 @@ private Q_SLOTS:
         QTRY_VERIFY_WITH_TIMEOUT(l.errors.contains(id), kTimeoutMs);
         QCOMPARE(l.errors.value(id), u"cancelled"_s);
         QVERIFY(l.tokens.size() < 100);
+    }
+
+    void cancelsAtOnceDuringAModelLoad()
+    {
+        // Ctrl+C while the model loads: the client hears "cancelled" at once, not after the
+        // load, and nothing of the dropped request follows.
+        startServer(32, {u"fast-model"_s});
+        m_state->loadDelayMs = 1500;
+        QDBusConnection c = connect();
+        Listener l;
+        QVERIFY(l.listen(c));
+        const QString id = runSkill(c, u"proofread"_s, {{u"text"_s, u"Their going home."_s}});
+        QTest::qWait(100);
+        QElapsedTimer timer;
+        timer.start();
+        call(c, u"Cancel"_s, {id});
+        QTRY_VERIFY_WITH_TIMEOUT(l.errors.contains(id), kTimeoutMs);
+        QVERIFY2(timer.elapsed() < 1000, "the cancel waited for the model load");
+        QCOMPARE(l.errors.value(id), u"cancelled"_s);
+        // The next request runs once the load is over; the cancelled one never produced text.
+        const QString next = runSkill(c, u"proofread"_s, {{u"text"_s, u"Their going home."_s}});
+        QTRY_VERIFY_WITH_TIMEOUT(l.done.contains(next), kTimeoutMs);
+        QVERIFY(!l.done.contains(id));
+        QVERIFY(std::ranges::none_of(l.tokens, [&](const QString& t) { return t.startsWith(id + u':'); }));
     }
 
     void aNewRequestCancelsTheClientsLastOne()

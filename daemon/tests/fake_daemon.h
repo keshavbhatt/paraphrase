@@ -40,6 +40,7 @@ struct FakeState
     QStringList answers; ///< scripted, one per generate(); the default answer after
     QString defaultAnswer = u"They are going home."_s;
     int pieceDelayMs = 0; ///< per streamed word
+    int loadDelayMs = 0;  ///< per model load
     QList<EngineConfig> loads;
     QStringList warmed;    ///< user prompts read ahead
     QList<int> cachedHits; ///< per generate(): whether the prompt matched the last warm
@@ -56,6 +57,12 @@ public:
 
     Result<bool> load(const EngineConfig& config) override
     {
+        int delay = 0;
+        {
+            const QMutexLocker lock(&m_state->lock);
+            delay = m_state->loadDelayMs;
+        }
+        QThread::msleep(static_cast<unsigned long>(delay));
         const QMutexLocker lock(&m_state->lock);
         m_state->loads.append(config);
         m_state->loaded = true;
