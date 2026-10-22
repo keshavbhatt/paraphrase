@@ -62,8 +62,9 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void actionsLoaded();
-    void finished();          ///< a request ended, with a result or a message
-    void settingsRequested(); ///< the header's Settings, or the notice's link
+    void finished();           ///< a request ended, with a result or a message
+    void settingsRequested();  ///< the header's Settings, or the notice's link
+    void newActionRequested(); ///< "New action..." under My actions
 
 protected:
     void changeEvent(QEvent* event) override;
@@ -73,6 +74,7 @@ private:
     void buildUi();
     void connectParts();
     void applyTheme();
+    void loadSkills();
     void loadStatus();
     void chooseReply(bool full);
     void onSecondary();

@@ -6,6 +6,7 @@
 #include "ui/core/languages.h"
 #include "ui/core/request_runner.h"
 #include "ui/core/result_summary.h"
+#include "ui/core/user_actions_client.h"
 #include "ui/parts/action_bar.h"
 #include "ui/parts/result_views.h"
 
@@ -55,6 +56,8 @@ PopupController::PopupController(const Integrations& integrations, client::Daemo
         }
     });
     connect(m_runner, &RequestRunner::finished, this, &PopupController::onFinished);
+    // An action saved or deleted: read the skills again on the next open.
+    connect(&m_client, &client::DaemonClient::skillsChanged, this, [this] { m_catalog = {}; });
     connect(m_runner, &RequestRunner::failed, this, &PopupController::onFailed);
 }
 
@@ -66,6 +69,10 @@ void PopupController::connectWindow()
     const PopupResultPage* result = m_window->resultPage();
     connect(actions->actionBar(), &ActionBar::chosen, this, &PopupController::run);
     connect(actions->actionBar(), &ActionBar::replyChosen, this, [this] { run(u"reply"_s, {}); });
+    connect(actions->actionBar(), &ActionBar::newActionRequested, this, [this] {
+        m_window->close();
+        Q_EMIT newActionRequested();
+    });
     actions->actionBar()->setTextLanguage([this] { return m_detector.detect(m_text.text); });
     connect(actions, &PopupActionsPage::openInWindow, this, [this] {
         m_window->close();
@@ -95,6 +102,10 @@ bool PopupController::ensureCatalog()
     }
     const QDBusMessage reply = m_client.call(u"ListSkills"_s, {});
     m_catalog = SkillCatalog::fromJson(reply.arguments().value(0).toString());
+    UserActionsClient actions(m_client);
+    if (actions.load()) {
+        m_catalog.setUserActionsBase(actions.templateSkill());
+    }
     m_window->actionsPage()->actionBar()->setCatalog(&m_catalog);
     m_window->applyTheme();
     return !m_catalog.isEmpty();

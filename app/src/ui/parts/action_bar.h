@@ -41,6 +41,7 @@ public:
                        QWidget* parent = nullptr);
     ~ActionBar() override = default;
 
+    /// Builds the buttons from the catalog, replacing any built before (skills changed).
     void setCatalog(const SkillCatalog* catalog);
     /// Shows `skill` as the current action, naming its preset or language: "Tone: Polite".
     void setCurrent(const SkillInfo& skill, const QString& targetLang);
@@ -53,6 +54,7 @@ public:
 Q_SIGNALS:
     void chosen(const QString& skillId, const QString& targetLang);
     void replyChosen();
+    void newActionRequested(); ///< "New action..." under My actions
 
 private:
     [[nodiscard]] ChipButton* addAction(int number, const QString& base);
@@ -66,6 +68,7 @@ private:
     Keys m_keys;
     QLayout* m_row = nullptr;
     QHash<QString, ChipButton*> m_buttons; ///< base -> button
+    QList<QObject*> m_built;               ///< buttons, shortcuts and groups to remove on rebuild
     std::function<QString()> m_textLanguage;
     Tokens m_tokens;
 };

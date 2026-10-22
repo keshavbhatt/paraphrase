@@ -87,6 +87,7 @@ QLabel[chip="ins"] { color: @ins@; background: @insBg@; border-radius: 3px; padd
 QLabel[chip="pill"] { color: @muted@; background: @hover@; border-radius: 9px; padding: 0 8px;
     font-family: monospace; font-size: 12px; }
 
+QFrame#actionRow { border: none; border-bottom: 1px solid @border@; }
 QFrame#popup { background: @panel@; border: 1px solid @border@; border-radius: 14px; }
 QFrame#popupHead { border: none; border-bottom: 1px solid @border@; }
 QFrame#popupFoot { border: none; border-top: 1px solid @border@; background: @bar@;

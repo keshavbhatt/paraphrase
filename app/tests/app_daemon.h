@@ -27,7 +27,7 @@ public:
 
     /// Starts the daemon with `installed` models on a computer with `memoryGb`, and points
     /// clients at it through PARAPHRASE_DAEMON_ADDRESS.
-    bool start(const QStringList& installed, double memoryGb = 32)
+    bool start(const QStringList& installed, double memoryGb = 32, bool userActions = false)
     {
         using namespace Qt::StringLiterals;
         stop();
@@ -37,8 +37,9 @@ public:
         if (!install(catalog, m_dir->path() + u"/models"_s, installed)) {
             return false;
         }
-        auto skills =
-            paraphrase::skills::SkillRegistry::load(QStringLiteral(PARAPHRASE_REPO_ROOT) + u"/skills"_s);
+        const QString skillsDir =
+            userActions ? skillsWithUserActions() : QStringLiteral(PARAPHRASE_REPO_ROOT "/skills");
+        auto skills = paraphrase::skills::SkillRegistry::load(skillsDir);
         if (!skills.ok()) {
             return false;
         }
@@ -89,6 +90,30 @@ public:
     }
 
     ~AppDaemon() { stop(); }
+
+    /// The shipped skills plus a small skill that takes the user's own actions (schema v5).
+    [[nodiscard]] QString skillsWithUserActions() const
+    {
+        using namespace Qt::StringLiterals;
+        const QString dir = m_dir->path() + u"/skills"_s;
+        QDir().mkpath(dir + u"/grammars"_s);
+        const QDir shipped(QStringLiteral(PARAPHRASE_REPO_ROOT "/skills"));
+        for (const QString& f : shipped.entryList({u"*.yaml"_s}, QDir::Files)) {
+            QFile::copy(shipped.filePath(f), dir + u'/' + f);
+        }
+        for (const QString& f : QDir(shipped.filePath(u"grammars"_s)).entryList(QDir::Files)) {
+            QFile::copy(shipped.filePath(u"grammars/"_s + f), dir + u"/grammars/"_s + f);
+        }
+        if (!QFile::exists(dir + u"/custom.yaml"_s)) {
+            (void)writeFile(
+                dir + u"/custom.yaml"_s,
+                "id: custom\nversion: 5\ntitle: My actions\ntier: fast\nmax_input_tokens: 500\n"
+                "max_output_tokens: 200\nsampling: { temperature: 0.2 }\noutput: { type: text }\n"
+                "user_presets: { values: [instruction] }\nsystem: Do what the user asks with the text.\n"
+                "template: |\n  {{instruction}}\n  <text>\n  {{text}}\n  </text>\n");
+        }
+        return dir;
+    }
 
     /// The engine's answers, in order; the default answer after them.
     void setAnswers(const QStringList& answers) const

@@ -32,11 +32,18 @@ SampleRun::SampleRun(client::DaemonClient& client, QObject* parent)
 
 bool SampleRun::run(const QString& skillId, const QString& text)
 {
-    if (running() || text.trimmed().isEmpty()) {
+    if (text.trimmed().isEmpty()) {
         return false;
     }
-    const QDBusMessage reply =
-        m_client.call(u"RunSkill"_s, {skillId, QVariantMap{{u"text"_s, text}}, QVariantMap()});
+    return run(skillId, QVariantMap{{u"text"_s, text}}, QVariantMap());
+}
+
+bool SampleRun::run(const QString& skillId, const QVariantMap& input, const QVariantMap& options)
+{
+    if (running()) {
+        return false;
+    }
+    const QDBusMessage reply = m_client.call(u"RunSkill"_s, {skillId, input, options});
     if (reply.type() == QDBusMessage::ErrorMessage) {
         Q_EMIT failed(reply.errorMessage());
         return false;

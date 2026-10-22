@@ -62,6 +62,9 @@ endif()
 
 add_library(paraphrase_ui STATIC
     src/ui/settings/about_page.cpp
+    src/ui/settings/action_editor.cpp
+    src/ui/settings/action_list.cpp
+    src/ui/settings/actions_page.cpp
     src/ui/parts/action_bar.cpp
     src/ui/main/bars.cpp
     src/ui/parts/change_list.cpp
@@ -90,6 +93,7 @@ add_library(paraphrase_ui STATIC
     src/ui/setup/setup_window.cpp
     src/ui/setup/shortcut_page.cpp
     src/ui/core/skill_catalog.cpp
+    src/ui/core/user_actions_client.cpp
     src/ui/setup/step_header.cpp
     src/ui/settings/text_page.cpp
     src/ui/common/theme.cpp

@@ -41,7 +41,8 @@ public:
 Q_SIGNALS:
     /// "Open in window": the main window takes the text (ADR-013).
     void openInWindow(const QString& text);
-    void finished(); ///< a run ended, with a result or a message (tests)
+    void finished();           ///< a run ended, with a result or a message (tests)
+    void newActionRequested(); ///< "New action..." under My actions
 
 private:
     [[nodiscard]] bool ensureCatalog();

@@ -681,9 +681,12 @@ QString DaemonService::ListActions() const
             {u"tier"_s, a.tier},
         });
     }
+    // The skill that runs an action not saved yet: "custom" for "custom.<action>".
+    const QString templateId = m_setup.skills.userActionSkillId({}).section(u'.', 0, 0);
     const QJsonObject o{
         {u"supported"_s, m_setup.skills.takesUserActions() && !m_setup.settingsPath.isEmpty()},
         {u"max"_s, static_cast<int>(skills::UserActions::kMaxActions)},
+        {u"template"_s, templateId},
         {u"actions"_s, actions},
     };
     return QString::fromUtf8(QJsonDocument(o).toJson(QJsonDocument::Compact));

@@ -36,6 +36,7 @@ void Application::wire()
     connect(m_service, &AppService::popupRequested, m_popup, &PopupController::show);
     connect(m_service, &AppService::windowRequested, m_flow, &AppFlow::showMain);
     connect(&m_integrations->shortcut(), &ShortcutBackend::activated, m_popup, &PopupController::show);
+    connect(m_popup, &PopupController::newActionRequested, m_flow, &AppFlow::newAction);
     connect(m_popup, &PopupController::openInWindow, this, [this](const QString& text) {
         m_flow->showMain();
         m_flow->mainWindow().takeText(text);

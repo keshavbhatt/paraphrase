@@ -5,6 +5,7 @@
 // PARAPHRASE_SCREENSHOTS=<dir> it also saves the window in light and dark for review.
 
 #include "app_daemon.h"
+#include "daemon_client.h"
 #include "ui/common/chip_button.h"
 #include "ui/main/main_window.h"
 
@@ -188,6 +189,33 @@ private Q_SLOTS:
         QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 1, kTimeoutMs);
         QCOMPARE(translate->label(), u"Translate: French"_s);
         QVERIFY(w.findChild<QLabel*>(u"outInfo"_s)->text().contains(u"French"_s));
+    }
+
+    void listsMyActionsAndNewAction()
+    {
+        // My actions shows before the first action, with New action...; a saved action appears
+        // at once (the daemon's SkillsChanged).
+        QVERIFY(m_daemon.start({u"fast-model"_s}, 32, true));
+        MainWindow w;
+        w.start();
+        const auto* mine = w.findChild<paraphrase::app::ChipButton*>(u"action-custom"_s);
+        QVERIFY(mine != nullptr && mine->menu() != nullptr);
+        QCOMPARE(mine->label(), u"My actions"_s);
+        QVERIFY(mine->menu()->findChild<QAction*>(u"newAction"_s) != nullptr);
+        const QSignalSpy wanted(&w, &MainWindow::newActionRequested);
+        mine->menu()->findChild<QAction*>(u"newAction"_s)->trigger();
+        QCOMPARE(wanted.size(), 1);
+
+        paraphrase::client::DaemonClient other;
+        QVERIFY(other.connectToDaemon().isEmpty());
+        (void)other.call(u"SaveAction"_s, {QString(), u"Tweet"_s, u"Turn this into a tweet"_s, u"fast"_s});
+        QTRY_VERIFY_WITH_TIMEOUT(w.findChild<QAction*>(u"custom.tweet"_s) != nullptr, kTimeoutMs);
+        w.findChild<QPlainTextEdit*>(u"text"_s)->setPlainText(u"We launch on March 12."_s);
+        setAnswers({u"Launching March 12!"_s});
+        const QSignalSpy finished(&w, &MainWindow::finished);
+        w.findChild<QAction*>(u"custom.tweet"_s)->trigger();
+        QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 1, kTimeoutMs);
+        QCOMPARE(w.resultText(), u"Launching March 12!"_s);
     }
 
     void saysWhenNoModelIsInstalled()

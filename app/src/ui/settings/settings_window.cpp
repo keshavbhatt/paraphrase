@@ -3,6 +3,7 @@
 #include "ui/common/window_style.h"
 #include "ui/models/models_controller.h"
 #include "ui/settings/about_page.h"
+#include "ui/settings/actions_page.h"
 #include "ui/settings/models_settings_page.h"
 #include "ui/settings/settings_nav.h"
 #include "ui/settings/text_page.h"
@@ -31,6 +32,7 @@ QWidget* scrolled(QWidget* page)
 
 SettingsWindow::SettingsWindow(client::DaemonClient& client, QWidget* parent)
     : QWidget(parent)
+    , m_client(client)
     , m_tokens(Theme::current())
     , m_models(new ModelsController(client, this))
     , m_nav(new SettingsNav({
@@ -72,13 +74,8 @@ void SettingsWindow::addPages()
             tr("The global shortcut that opens Paraphrase over any app comes in a later version. Until "
                "then everything works in Paraphrase's own window."),
         })));
-    m_pages->addWidget(scrolled(new TextPage(
-        tr("My actions"),
-        {
-            tr("Your own actions, such as \"Rewrite as a LinkedIn post\" or \"Explain like I'm "
-               "twelve\", come in a later version. They will sit next to the built-in ones in the "
-               "main window and the popup."),
-        })));
+    m_actionsPage = new ActionsPage(m_client);
+    m_pages->addWidget(scrolled(m_actionsPage));
     m_modelsPage = new ModelsSettingsPage(*m_models);
     m_pages->addWidget(scrolled(m_modelsPage));
     m_pages->addWidget(scrolled(new TextPage(
@@ -99,6 +96,13 @@ void SettingsWindow::showPage(Page page)
     m_nav->setCurrent(page);
     m_pages->setCurrentIndex(page);
     m_models->refresh();
+    m_actionsPage->reload();
+}
+
+void SettingsWindow::newAction()
+{
+    showPage(MyActions);
+    m_actionsPage->startNew();
 }
 
 void SettingsWindow::applyTheme()

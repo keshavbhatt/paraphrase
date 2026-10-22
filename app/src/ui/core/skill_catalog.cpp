@@ -78,6 +78,9 @@ QStringList SkillCatalog::actionBases() const
             bases.append(s.base);
         }
     }
+    if (!m_userActionsBase.isEmpty() && !bases.contains(m_userActionsBase)) {
+        bases.append(m_userActionsBase);
+    }
     return bases;
 }
 
@@ -124,6 +127,9 @@ QString SkillCatalog::actionTitle(const QString& base) const
     }
     if (base == u"reply"_s) {
         return QObject::tr("Reply");
+    }
+    if (base == m_userActionsBase) {
+        return QObject::tr("My actions");
     }
     const auto v = variants(base);
     return v.isEmpty() ? base : v.front()->title.section(u':', 0, 0).trimmed();

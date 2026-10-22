@@ -2,6 +2,7 @@
 
 #include <QObject>
 #include <QString>
+#include <QVariantMap>
 
 namespace paraphrase::client {
 class DaemonClient;
@@ -22,6 +23,8 @@ public:
 
     /// Starts the run; false when one is running already or the daemon refused it (failed()).
     bool run(const QString& skillId, const QString& text);
+    /// The same with any inputs and options (DOCS/api.md, RunSkill).
+    bool run(const QString& skillId, const QVariantMap& input, const QVariantMap& options);
     [[nodiscard]] bool running() const { return !m_requestId.isEmpty(); }
 
 Q_SIGNALS:

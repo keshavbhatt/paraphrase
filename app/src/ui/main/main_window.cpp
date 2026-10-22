@@ -3,6 +3,7 @@
 #include "ui/core/languages.h"
 #include "ui/core/request_runner.h"
 #include "ui/core/result_summary.h"
+#include "ui/core/user_actions_client.h"
 #include "ui/main/bars.h"
 #include "ui/main/input_pane.h"
 #include "ui/main/output_pane.h"
@@ -100,6 +101,7 @@ void MainWindow::connectParts()
         selectSkill(id);
         run();
     });
+    connect(m_actions, &ActionBar::newActionRequested, this, &MainWindow::newActionRequested);
     connect(m_actions, &ActionBar::replyChosen, this, [this] {
         chooseReply(m_fullReply);
         run();
@@ -188,11 +190,9 @@ void MainWindow::start()
         m_output->textView()->showMessage(problem, true);
         return;
     }
-    const QDBusMessage reply = m_client.call(u"ListSkills"_s, {});
-    m_catalog = SkillCatalog::fromJson(reply.arguments().value(0).toString());
-    m_actions->setCatalog(&m_catalog);
-    m_input->fullReplyInput()->setTones(m_catalog.tones());
-    m_input->setFullReplyAvailable(!m_catalog.fullReplyId(false).isEmpty());
+    loadSkills();
+    connect(&m_client, &client::DaemonClient::skillsChanged, this, &MainWindow::loadSkills,
+            Qt::UniqueConnection);
     m_fullReply = QSettings().value(kFullReplyKey).toBool();
     if (!m_catalog.isEmpty()) {
         selectSkill(m_catalog.skills().front().id);
@@ -201,6 +201,23 @@ void MainWindow::start()
     m_output->textView()->showMessage(tr("Paste or type your text on the left, then pick an action."), false);
     applyTheme();
     Q_EMIT actionsLoaded();
+}
+
+void MainWindow::loadSkills()
+{
+    const QDBusMessage reply = m_client.call(u"ListSkills"_s, {});
+    m_catalog = SkillCatalog::fromJson(reply.arguments().value(0).toString());
+    UserActionsClient actions(m_client);
+    if (actions.load()) {
+        m_catalog.setUserActionsBase(actions.templateSkill());
+    }
+    m_actions->setCatalog(&m_catalog);
+    m_actions->applyTheme(m_tokens);
+    m_input->fullReplyInput()->setTones(m_catalog.tones());
+    m_input->setFullReplyAvailable(!m_catalog.fullReplyId(false).isEmpty());
+    if (const SkillInfo* current = m_catalog.find(m_skill)) {
+        m_actions->setCurrent(*current, m_targetLang);
+    }
 }
 
 void MainWindow::loadStatus()

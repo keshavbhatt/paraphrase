@@ -52,6 +52,11 @@ public:
     /// The Tone action's presets as (tone, title): what a full reply can be written in.
     [[nodiscard]] QList<std::pair<QString, QString>> tones() const;
 
+    /// The skill that holds the user's own actions ("" when the daemon keeps none): its button
+    /// shows even before the first action, with "New action..." (settings-actions.html).
+    void setUserActionsBase(const QString& base) { m_userActionsBase = base; }
+    [[nodiscard]] const QString& userActionsBase() const { return m_userActionsBase; }
+
     /// "Tone" for rewrite, "Reply" for reply, else the skill's title before a preset's ":".
     [[nodiscard]] QString actionTitle(const QString& base) const;
     /// A preset's own name: "Polite" for "Change tone: Polite".
@@ -59,6 +64,7 @@ public:
 
 private:
     QList<SkillInfo> m_skills;
+    QString m_userActionsBase;
 };
 
 } // namespace paraphrase::app

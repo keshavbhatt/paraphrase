@@ -37,8 +37,15 @@ ActionBar::ActionBar(const util::LanguageDetector& detector, Keys keys, QWidget*
 
 void ActionBar::setCatalog(const SkillCatalog* catalog)
 {
+    qDeleteAll(m_built);
+    m_built.clear();
+    m_buttons.clear();
+    while (const QLayoutItem* item = m_row->takeAt(0)) {
+        delete item;
+    }
     m_catalog = catalog;
     auto* group = new QButtonGroup(this);
+    m_built.append(group);
     group->setExclusive(true);
     int number = 0;
     for (const QString& base : catalog->actionBases()) {
@@ -46,6 +53,7 @@ void ActionBar::setCatalog(const SkillCatalog* catalog)
         group->addButton(b);
         m_row->addWidget(b);
         m_buttons.insert(base, b);
+        m_built.append(b);
     }
     if (auto* row = qobject_cast<QHBoxLayout*>(m_row)) {
         row->addStretch();
@@ -67,6 +75,15 @@ ChipButton* ActionBar::addAction(int number, const QString& base)
     const auto variants = m_catalog->variants(base);
     if (base == u"reply"_s) {
         connect(b, &QPushButton::clicked, this, &ActionBar::replyChosen);
+    } else if (base == m_catalog->userActionsBase()) {
+        QMenu* menu = presetMenu(b, base);
+        if (!menu->isEmpty()) {
+            menu->addSeparator();
+        }
+        QAction* add = menu->addAction(tr("New action..."));
+        add->setObjectName(u"newAction"_s);
+        connect(add, &QAction::triggered, this, &ActionBar::newActionRequested);
+        b->setMenu(menu);
     } else if (m_catalog->picksLanguage(base)) {
         b->setMenu(languageMenu(b, variants.front()->id));
     } else if (variants.size() > 1) {
@@ -77,7 +94,8 @@ ChipButton* ActionBar::addAction(int number, const QString& base)
     }
     if (number <= kMaxShortcuts) {
         const QKeySequence keys(digits ? QString::number(number) : u"Ctrl+%1"_s.arg(number));
-        const auto* shortcut = new QShortcut(keys, window());
+        auto* shortcut = new QShortcut(keys, window());
+        m_built.append(shortcut);
         connect(shortcut, &QShortcut::activated, b, [b] {
             if (b->menu() != nullptr) {
                 b->showMenu();

@@ -30,6 +30,8 @@ public:
     /// Brings the main window up, creating it when needed (not during setup).
     void showMain();
     void showSettings();
+    /// Settings, My actions, with the editor on a new action.
+    void newAction();
     /// The main window, created on first use.
     [[nodiscard]] MainWindow& mainWindow();
     /// Whether the desktop gave a global shortcut; the main window's notice depends on it.

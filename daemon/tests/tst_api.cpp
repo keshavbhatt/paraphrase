@@ -407,11 +407,12 @@ private Q_SLOTS:
         {
             Listener l;
             QVERIFY(l.listen(c));
-            const QDBusMessage tried = call(
-                c, u"RunSkill"_s,
-                {u"custom"_s,
-                 QVariantMap{{u"text"_s, u"Launch on March 12."_s}, {u"instruction"_s, u"Make it a haiku"_s}},
-                 QVariantMap{{u"tier"_s, u"fast"_s}}});
+            const QVariantMap input{
+                {u"text"_s, u"Launch on March 12."_s},
+                {u"instruction"_s, u"Make it a haiku"_s},
+            };
+            const QDBusMessage tried =
+                call(c, u"RunSkill"_s, {u"custom"_s, input, QVariantMap{{u"tier"_s, u"fast"_s}}});
             const QString triedId = tried.arguments().value(0).toString();
             QTRY_VERIFY_WITH_TIMEOUT(l.done.contains(triedId), kTimeoutMs);
             QCOMPARE(l.done.value(triedId).value(u"model"_s).toString(), u"fast-model"_s);

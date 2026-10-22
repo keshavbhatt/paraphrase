@@ -45,7 +45,7 @@ daemon exits; never while a download runs).
 | `DownloadModel(s model_id)` | | Downloads a model and its draft head |
 | `PauseDownload(s model_id)` | | Keeps what arrived; `DownloadModel` resumes |
 | `DeleteModel(s model_id)` | | Deletes a model and its draft head |
-| `ListActions()` | `s` JSON object | The user's own actions: `supported`, `max`, `actions` [{`id`, `skill`, `name`, `instruction`, `tier`}] |
+| `ListActions()` | `s` JSON object | The user's own actions: `supported`, `max`, `template` (the skill to run an action not saved yet, with `instruction`), `actions` [{`id`, `skill`, `name`, `instruction`, `tier`}] |
 | `SaveAction(s id, s name, s instruction, s tier)` | `s` skill id | Adds an action (empty `id`) or changes one; `tier` is `fast` or `quality`; name at most 40 characters, instruction at most 600, at most 20 actions. Kept in `actions.json` next to the settings, never logged |
 | `DeleteAction(s id)` | | Deletes one of the user's actions |
 | `SetTierModel(s tier, s model_id)` | | The model a tier (`fast`, `quality`) runs on, chosen in Settings; `""` goes back to the automatic choice. Kept across restarts |

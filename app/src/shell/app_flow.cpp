@@ -61,6 +61,7 @@ MainWindow& AppFlow::mainWindow()
         m_main = std::make_unique<MainWindow>(&m_client);
         m_main->setGlobalShortcut(m_globalShortcut);
         connect(m_main.get(), &MainWindow::settingsRequested, this, &AppFlow::showSettings);
+        connect(m_main.get(), &MainWindow::newActionRequested, this, &AppFlow::newAction);
         // Connect after the window is up: starting the daemon can take a moment.
         QTimer::singleShot(0, m_main.get(), &MainWindow::start);
     }
@@ -85,6 +86,12 @@ void AppFlow::setGlobalShortcut(bool available)
     if (m_main) {
         m_main->setGlobalShortcut(available);
     }
+}
+
+void AppFlow::newAction()
+{
+    showSettings();
+    m_settings->newAction();
 }
 
 void AppFlow::showSettings()

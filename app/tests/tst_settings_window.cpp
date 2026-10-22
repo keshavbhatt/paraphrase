@@ -13,6 +13,9 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QLabel>
+#include <QLineEdit>
+#include <QMutexLocker>
+#include <QPlainTextEdit>
 #include <QPushButton>
 #include <QTest>
 
@@ -101,6 +104,37 @@ private Q_SLOTS:
                  u"fast-model"_s);
     }
 
+    void makesTriesSavesAndDeletesAnAction()
+    {
+        // settings-actions.html: a new action is tried before saving, then listed; Delete asks
+        // once in place.
+        QVERIFY(m_daemon.start({u"fast-model"_s, u"quality-model"_s}, 32, true));
+        DaemonClient client;
+        QVERIFY(client.connectToDaemon().isEmpty());
+        SettingsWindow w(client);
+        w.show();
+        w.newAction();
+        w.findChild<QLineEdit*>(u"actionName"_s)->setText(u"Tweet"_s);
+        w.findChild<QPlainTextEdit*>(u"actionInstruction"_s)->setPlainText(u"Turn this into a tweet"_s);
+        m_daemon.setAnswers({u"Launch moved to March 12! #launch"_s});
+        w.findChild<QPushButton*>(u"tryAction"_s)->click();
+        QTRY_COMPARE_WITH_TIMEOUT(w.findChild<QLabel*>(u"tryResult"_s)->text(),
+                                  u"Launch moved to March 12! #launch"_s, AppDaemon::kTimeoutMs);
+        {
+            const QMutexLocker lock(&m_daemon.state->lock);
+            QVERIFY(m_daemon.state->prompts.last().contains(u"Turn this into a tweet"_s));
+        }
+        w.findChild<QPushButton*>(u"saveAction"_s)->click();
+        QVERIFY(client.call(u"ListSkills"_s, {}).arguments().value(0).toString().contains(u"custom.tweet"_s));
+        auto* remove = w.findChild<QPushButton*>(u"delete-tweet"_s);
+        QVERIFY(remove != nullptr);
+        remove->click(); // asks
+        QVERIFY(client.call(u"ListSkills"_s, {}).arguments().value(0).toString().contains(u"custom.tweet"_s));
+        remove->click(); // deletes
+        QTRY_VERIFY(
+            !client.call(u"ListSkills"_s, {}).arguments().value(0).toString().contains(u"custom.tweet"_s));
+    }
+
     void savesScreenshots()
     {
         const QString dir = qEnvironmentVariable("PARAPHRASE_SCREENSHOTS");
@@ -111,14 +145,40 @@ private Q_SLOTS:
         for (const char* theme : {"light", "dark"}) {
             qputenv("PARAPHRASE_THEME", theme);
             QVERIFY(m_daemon.start({u"fast-model"_s, u"quality-model"_s, u"fast-draft"_s}));
-            DaemonClient client;
-            QVERIFY(client.connectToDaemon().isEmpty());
-            SettingsWindow w(client);
-            w.resize(1180, 1000);
-            w.show();
-            w.showPage(SettingsWindow::Models);
+            {
+                DaemonClient client;
+                QVERIFY(client.connectToDaemon().isEmpty());
+                SettingsWindow w(client);
+                w.resize(1180, 1000);
+                w.show();
+                w.showPage(SettingsWindow::Models);
+                QTest::qWait(50);
+                QVERIFY(w.grab().save(dir + u"/settings-models-%1.png"_s.arg(QLatin1StringView(theme))));
+            }
+            m_daemon.stop();
+            QVERIFY(m_daemon.start({u"fast-model"_s}, 32, true));
+            DaemonClient actionsClient;
+            QVERIFY(actionsClient.connectToDaemon().isEmpty());
+            (void)actionsClient.call(u"SaveAction"_s,
+                                     {
+                                         QString(),
+                                         u"Tweet"_s,
+                                         u"Turn this into a tweet under 280 characters, keep the facts"_s,
+                                         u"fast"_s,
+                                     });
+            (void)actionsClient.call(u"SaveAction"_s,
+                                     {
+                                         QString(),
+                                         u"Meeting notes"_s,
+                                         u"Turn these notes into decisions and action items with owners"_s,
+                                         u"quality"_s,
+                                     });
+            SettingsWindow actions(actionsClient);
+            actions.resize(1180, 1000);
+            actions.show();
+            actions.newAction();
             QTest::qWait(50);
-            QVERIFY(w.grab().save(dir + u"/settings-models-%1.png"_s.arg(QLatin1StringView(theme))));
+            QVERIFY(actions.grab().save(dir + u"/settings-actions-%1.png"_s.arg(QLatin1StringView(theme))));
             m_daemon.stop();
         }
         qunsetenv("PARAPHRASE_THEME");
