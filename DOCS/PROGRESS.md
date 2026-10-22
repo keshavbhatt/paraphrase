@@ -14,6 +14,25 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-22 - M1 steps 1 to 3: tooling, language logic and skills in C++
+
+- Tooling as Omnidict (owner): DOCS/CODING_STANDARDS.md, .clang-tidy, scripts/dev-build.sh and
+  dev-run.sh against the KDE Qt snap SDK and runtime, Makefile (build, test, lint, format) and
+  CI (.github/workflows/ci.yml). The SDK library path is no longer exported for cmake: it
+  breaks the host's cmake on Arch (libnettle.so.8), and the SDK's moc runs without it.
+- Step 1: CMake at the repository root, llama.cpp linked as a library (native for dev,
+  portable for packages, ADR-008), headers of third-party code treated as system headers.
+- Step 2: `paraphrase_util` with the language detector and check. The word lists and names
+  moved to daemon/data/language.json, read by both the daemon and the Python harness; the
+  Python code stays the reference and eval/export_vectors.py writes tests/vectors/. C++
+  matches all 774 detection and 429 check vectors.
+- Step 3: yaml-cpp 0.9.0 (ADR-014) and `paraphrase_skills`: registry, schema v3 loader with
+  PyYAML's scalar rules, template rendering with fences, request inputs. C++ matches all 11
+  skills, 254 input builds, 293 rendered prompts and 12 template cases; broken files (bad
+  YAML, unknown values, a grammar outside skills/) are rejected by name.
+- Next: step 4, the engine (model, chat template, prompt cache, grammar, streaming,
+  variants, cancel, language retry, per-skill MTP drafting).
+
 ## 2026-10-22 - Mocks approved, packaging decided, M1 started
 
 - Owner approved all eight mocks (DOCS/mocks/index.html): main window proofread and reply,
