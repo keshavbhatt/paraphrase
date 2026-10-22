@@ -13,6 +13,8 @@
 
 #include <QDir>
 #include <QLabel>
+#include <QMenu>
+#include <QMutexLocker>
 #include <QPushButton>
 #include <QSignalSpy>
 #include <QTest>
@@ -125,6 +127,29 @@ private Q_SLOTS:
         popup.window()->findChild<QPushButton*>(u"reply2"_s)->click();
         popup.window()->findChild<ChipButton*>(u"insert"_s)->click();
         QCOMPARE(m_sent, QStringList{u"Thoda ruko."_s});
+    }
+
+    void rewritesInAnotherLanguage()
+    {
+        QObject owner;
+        const auto backends = integrations(&owner);
+        PopupController popup(*backends);
+        popup.showText(selected(u"send me the report by friday"_s));
+        m_daemon.setAnswers({u"Could you send me the report by Friday?"_s});
+        const auto* tone = popup.window()->findChild<ChipButton*>(u"action-rewrite"_s);
+        QVERIFY(tone != nullptr);
+        const QSignalSpy finished(&popup, &PopupController::finished);
+        tone->menu()->findChild<QAction*>(u"rewrite.polite"_s)->trigger();
+        QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 1, AppDaemon::kTimeoutMs);
+        const auto* other = popup.window()->findChild<QPushButton*>(u"otherLanguage"_s);
+        QVERIFY(other != nullptr && !other->isHidden());
+        Q_EMIT other->menu()->aboutToShow();
+        QVERIFY(other->menu()->findChild<QAction*>(u"lang-en"_s) == nullptr); // its own language
+        m_daemon.setAnswers({u"क्या आप शुक्रवार तक रिपोर्ट भेज सकते हैं?"_s});
+        other->menu()->findChild<QAction*>(u"lang-hi"_s)->trigger();
+        QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 2, AppDaemon::kTimeoutMs);
+        const QMutexLocker lock(&m_daemon.state->lock);
+        QVERIFY(m_daemon.state->prompts.last().contains(u"Hindi"_s));
     }
 
     void escCloses()

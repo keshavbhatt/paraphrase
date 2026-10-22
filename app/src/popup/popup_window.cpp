@@ -23,7 +23,7 @@ PopupWindow::PopupWindow(const util::LanguageDetector& detector, QWidget* parent
     : QWidget(parent, Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint)
     , m_pages(new QStackedWidget)
     , m_actions(new PopupActionsPage(detector))
-    , m_result(new PopupResultPage)
+    , m_result(new PopupResultPage(detector))
 {
     setObjectName(u"popupWindow"_s);
     setWindowTitle(tr("Paraphrase"));

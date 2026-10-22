@@ -83,6 +83,8 @@ void PopupController::connectWindow()
     connect(result, &PopupResultPage::copyClicked, this, &PopupController::copy);
     connect(result, &PopupResultPage::presetChosen, this,
             [this](const QString& id) { run(id, m_targetLang); });
+    connect(result, &PopupResultPage::languageChosen, this,
+            [this](const QString& code) { run(m_skill, code); });
     connect(result, &PopupResultPage::againClicked, this, [this] {
         if (m_runner->busy()) {
             m_runner->cancel(); // Stop keeps what is there
@@ -184,6 +186,9 @@ void PopupController::run(const QString& skillId, const QString& targetLang)
     // Proofread shows the diff of the text itself (popup-proofread.html); the others show it too.
     page->begin(kind, title, m_text.text, m_text.appName, skill->base != u"proofread"_s);
     page->setPresets(m_catalog.variants(skill->base), skillId);
+    // A tone keeps the text's language unless the user picks another (owner, 2026-10-22).
+    page->offerOtherLanguages(skill->takes(u"target_lang"_s) && !m_catalog.picksLanguage(skill->base),
+                              m_detector.detect(m_text.text));
     page->setLanguagePill(kind == SkillKind::Text ? QString()
                                                   : languageName(m_detector, m_detector.detect(m_text.text)));
     m_window->showResult();

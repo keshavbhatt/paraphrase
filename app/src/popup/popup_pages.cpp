@@ -10,6 +10,7 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QMenu>
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QStackedWidget>
@@ -162,8 +163,9 @@ void PopupActionsPage::applyTheme(const Tokens& t)
     m_actions->applyTheme(t);
 }
 
-PopupResultPage::PopupResultPage(QWidget* parent)
+PopupResultPage::PopupResultPage(const util::LanguageDetector& detector, QWidget* parent)
     : QWidget(parent)
+    , m_detector(detector)
 {
     auto* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -234,9 +236,35 @@ QWidget* PopupResultPage::buildBody()
     m_results->addWidget(m_text);
     m_results->addWidget(m_replies);
     layout->addWidget(m_results, 1);
+    m_otherLanguage = buildLanguageLink();
+    layout->addWidget(m_otherLanguage, 0, Qt::AlignLeft);
     connect(m_view, &SegmentedControl::changed, this,
             [this](int index) { m_text->setShowResult(index == 1); });
     return body;
+}
+
+QPushButton* PopupResultPage::buildLanguageLink()
+{
+    // "Write it in another language": a menu of languages, filled when it opens.
+    QPushButton* link = makeButton(tr("Write it in another language"), u"link"_s);
+    link->setObjectName(u"otherLanguage"_s);
+    auto* languages = new QMenu(link);
+    link->setMenu(languages);
+    connect(languages, &QMenu::aboutToShow, this, [this, languages] {
+        languages->clear();
+        for (const MenuLanguage& lang : menuLanguages()) {
+            const QString name = languageName(m_detector, lang.code);
+            if (name.isEmpty() || lang.code == m_ownLanguage) {
+                continue;
+            }
+            QAction* item = languages->addAction(name);
+            item->setObjectName(u"lang-"_s + lang.code);
+            const QString code = lang.code;
+            connect(item, &QAction::triggered, this, [this, code] { Q_EMIT languageChosen(code); });
+        }
+    });
+    link->hide();
+    return link;
 }
 
 QWidget* PopupResultPage::buildFoot()
@@ -339,6 +367,12 @@ void PopupResultPage::setLanguagePill(const QString& language)
 QString PopupResultPage::result() const
 {
     return m_kind == SkillKind::Text ? m_text->result() : m_replies->chosen();
+}
+
+void PopupResultPage::offerOtherLanguages(bool offer, const QString& own)
+{
+    m_ownLanguage = own;
+    m_otherLanguage->setVisible(offer);
 }
 
 void PopupResultPage::showNothingToFix()

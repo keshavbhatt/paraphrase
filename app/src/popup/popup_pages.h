@@ -69,7 +69,7 @@ class PopupResultPage : public QWidget
     Q_DISABLE_COPY_MOVE(PopupResultPage)
 
 public:
-    explicit PopupResultPage(QWidget* parent = nullptr);
+    explicit PopupResultPage(const util::LanguageDetector& detector, QWidget* parent = nullptr);
     ~PopupResultPage() override = default;
 
     /// Starts showing a run: its kind, its title, the text it works on, the app to put it back in.
@@ -83,6 +83,9 @@ public:
     /// Proofread found nothing: "Looks good, no changes" and only Close (popup-proofread.html,
     /// note 5), so the user is never asked to replace text with itself.
     void showNothingToFix();
+    /// Offers "Write it in another language" (popup-rewrite.html, note 5) for a skill that
+    /// takes a target language; `own` is the text's language, left out of the menu.
+    void offerOtherLanguages(bool offer, const QString& own);
     [[nodiscard]] TextResultView* textView() const { return m_text; }
     [[nodiscard]] QuickRepliesView* repliesView() const { return m_replies; }
     /// What Replace or Copy uses.
@@ -96,11 +99,13 @@ Q_SIGNALS:
     void copyClicked();
     void againClicked();
     void presetChosen(const QString& skillId);
+    void languageChosen(const QString& code);
 
 private:
     [[nodiscard]] QWidget* buildHead();
     [[nodiscard]] QWidget* buildBody();
     [[nodiscard]] QWidget* buildFoot();
+    [[nodiscard]] QPushButton* buildLanguageLink();
     void updateButtons();
 
     QLabel* m_title = nullptr;
@@ -121,6 +126,9 @@ private:
     QPushButton* m_copy = nullptr;
     QPushButton* m_again = nullptr;
     QPushButton* m_done = nullptr;
+    QPushButton* m_otherLanguage = nullptr;
+    const util::LanguageDetector& m_detector;
+    QString m_ownLanguage;
     bool m_nothingToFix = false;
     SkillKind m_kind = SkillKind::Text;
     QString m_appName;
