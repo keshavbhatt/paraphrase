@@ -1,0 +1,38 @@
+{
+ "acceptable_pct": {
+  "q-rr-new2": 56.2,
+  "q-rw-r7": 56.2
+ },
+ "judged": {
+  "q-rr-new2": 48,
+  "q-rw-r7": 48
+ },
+ "better": {
+  "tie": 18,
+  "q-rw-r7": 17,
+  "q-rr-new2": 13
+ },
+ "problems": {
+  "q-rr-new2": {
+   "meaning_changed": 13,
+   "tone_missed": 9,
+   "unnatural": 5,
+   "obeyed_instruction": 2,
+   "info_added": 2,
+   "wrong_language": 1
+  },
+  "q-rw-r7": {
+   "unnatural": 10,
+   "tone_missed": 9,
+   "meaning_changed": 8,
+   "info_added": 2,
+   "obeyed_instruction": 1
+  }
+ },
+ "acceptable_by_skill": {
+  "rewrite.friendly q-rr-new2": "14/24",
+  "rewrite.friendly q-rw-r7": "13/24",
+  "rewrite.polite q-rr-new2": "13/24",
+  "rewrite.polite q-rw-r7": "14/24"
+ }
+}
