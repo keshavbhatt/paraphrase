@@ -143,3 +143,11 @@ target_link_libraries(paraphrase-app PRIVATE paraphrase_shell)
 if(PARAPHRASE_BUILD_TESTS)
     add_subdirectory(tests)
 endif()
+
+# Desktop integration: the menu entry with its "Work on the selected text" action, the icon
+# and the store metadata (PLAN 13).
+include(GNUInstallDirs)
+install(TARGETS paraphrase-app RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(FILES data/com.ktechpit.paraphrase.desktop DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+install(FILES data/com.ktechpit.paraphrase.metainfo.xml DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
+install(FILES data/com.ktechpit.paraphrase.svg DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps)

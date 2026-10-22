@@ -1,0 +1,17 @@
+[Desktop Entry]
+Type=Application
+Name=Paraphrase
+GenericName=Offline AI Writing Assistant
+Comment=Proofread, change tone and write replies with AI that runs on this computer
+Exec=paraphrase-app
+Icon=com.ktechpit.paraphrase
+Terminal=false
+Categories=Utility;TextTools;
+Keywords=grammar;spelling;proofread;rewrite;paraphrase;tone;reply;email;summarize;translate;writing;assistant;AI;offline;
+StartupNotify=true
+SingleMainWindow=true
+Actions=popup;
+
+[Desktop Action popup]
+Name=Work on the selected text
+Exec=paraphrase-app --popup

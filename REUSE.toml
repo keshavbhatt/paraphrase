@@ -35,3 +35,10 @@ path = "app/icons/**"
 precedence = "override"
 SPDX-FileCopyrightText = "2026 Lucide Icons and Contributors"
 SPDX-License-Identifier = "ISC"
+
+# Store metadata is CC0 (AppStream's rule); the app icon is ours.
+[[annotations]]
+path = "app/data/com.ktechpit.paraphrase.metainfo.xml"
+precedence = "override"
+SPDX-FileCopyrightText = "2026 KTechpit"
+SPDX-License-Identifier = "CC0-1.0"

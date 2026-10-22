@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.ktechpit.paraphrase</id>
+  <name>Paraphrase - Offline AI Writing Assistant</name>
+  <summary>Private AI grammar checker, rewriter and smart reply writer that runs offline</summary>
+  <developer id="com.ktechpit">
+    <name>KTechpit</name>
+  </developer>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+  <launchable type="desktop-id">com.ktechpit.paraphrase.desktop</launchable>
+  <description>
+    <p>
+      Paraphrase is a private AI grammar checker, proofreader, rewriter and smart reply writer
+      that runs offline, on your own computer. What you write never leaves it: there is no
+      account, no cloud and no usage data.
+    </p>
+    <ul>
+      <li>Proofread and spell check: fix spelling, grammar and punctuation, with every change shown and one Undo per change</li>
+      <li>Rewrite and paraphrase: change the tone to professional, polite, friendly, casual, concise and more</li>
+      <li>Smart reply: three short replies to a message, or a full email reply from what you want to say</li>
+      <li>Summarize, format as bullets, a table or an email, and translate</li>
+      <li>Your own actions, in your own words</li>
+      <li>Works in English, Hindi and Hinglish, and on a best-effort basis in many more languages</li>
+      <li>Open it over any app with a shortcut, or use the window: paste, pick an action, copy</li>
+    </ul>
+    <p>
+      The AI model is downloaded once from its maker, at a fixed version, and checked before
+      use. Downloading a model is the only time Paraphrase goes online.
+    </p>
+  </description>
+  <categories>
+    <category>Office</category>
+    <category>Utility</category>
+  </categories>
+  <keywords>
+    <keyword>grammar</keyword>
+    <keyword>spelling</keyword>
+    <keyword>proofread</keyword>
+    <keyword>rewrite</keyword>
+    <keyword>paraphrase</keyword>
+    <keyword>tone</keyword>
+    <keyword>reply</keyword>
+    <keyword>email</keyword>
+    <keyword>summarize</keyword>
+    <keyword>translate</keyword>
+    <keyword>writing</keyword>
+    <keyword>assistant</keyword>
+    <keyword>AI</keyword>
+    <keyword>offline</keyword>
+    <keyword>LLM</keyword>
+  </keywords>
+  <provides>
+    <binary>paraphrase-app</binary>
+    <binary>paraphrase</binary>
+  </provides>
+  <recommends>
+    <memory>8192</memory>
+  </recommends>
+  <supports>
+    <control>keyboard</control>
+    <control>pointing</control>
+  </supports>
+  <content_rating type="oars-1.1"/>
+</component>
