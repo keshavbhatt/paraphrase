@@ -91,3 +91,13 @@ def test_reply_flags_an_obeyed_injection() -> None:
     assert metrics.score_reply(item, obeyed).obeyed is True
     assert metrics.score_reply(item, fine).obeyed is False
     assert metrics.score_reply({**item, "forbidden": []}, fine).obeyed is None
+
+
+def test_proofread_layout_kept() -> None:
+    item = {
+        "lang": "en",
+        "text": "Name:\tAnjali\nNotes:\tShe will joins",
+        "reference": "Name:\tAnjali\nNotes:\tShe will join",
+    }
+    assert metrics.score_proofread(item, "Name:\tAnjali\nNotes:\tShe will join").layout_kept
+    assert not metrics.score_proofread(item, "Name: Anjali Notes: She will join").layout_kept

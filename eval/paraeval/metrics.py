@@ -196,6 +196,13 @@ class ProofreadScore:
     lang_ok: bool
     lang_reason: str
     preamble: bool
+    layout_kept: bool = True
+
+
+def layout(text: str) -> tuple[int, int]:
+    """(line breaks, tabs) inside the text, ignoring leading and trailing whitespace."""
+    t = text.strip()
+    return t.count("\n"), t.count("\t")
 
 
 def score_proofread(item: dict[str, Any], output: str) -> ProofreadScore:
@@ -220,6 +227,7 @@ def score_proofread(item: dict[str, Any], output: str) -> ProofreadScore:
         lang_ok=ok,
         lang_reason=why,
         preamble=has_preamble(output, item["text"]),
+        layout_kept=layout(output) == layout(item["text"]),
     )
 
 

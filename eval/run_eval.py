@@ -83,6 +83,7 @@ def summarise(skill: Skill, rows: list[dict[str, Any]]) -> dict[str, Any]:
             "clean_items": len(clean),
             "protected_kept_pct": _pct(kept, prot),
             "preamble_pct": _pct(sum(x["preamble"] for x in s), n),
+            "layout_kept_pct": _pct(sum(x.get("layout_kept", True) for x in s), n),
         }
     elif skill.base_id == "reply":
         valid = [x for x in s if x["valid"]]
