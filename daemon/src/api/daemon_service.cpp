@@ -1,0 +1,357 @@
+#include "daemon_service.h"
+
+#include "models/tier_selector.h"
+#include "skills/request_inputs.h"
+
+#include <QCoreApplication>
+#include <QDBusMessage>
+#include <QFile>
+#include <QJsonArray>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QLoggingCategory>
+#include <QUuid>
+
+using namespace Qt::StringLiterals;
+
+Q_LOGGING_CATEGORY(lcApi, "paraphrase.api")
+
+namespace paraphrase::api {
+namespace {
+
+const QString kErrorPrefix = u"com.ktechpit.paraphrase.Error."_s;
+
+/// Resident memory of this process in MB (VmRSS), for Status.
+double residentMb()
+{
+    QFile f(u"/proc/self/status"_s);
+    if (!f.open(QIODevice::ReadOnly)) {
+        return 0.0;
+    }
+    for (const QByteArray& line : f.readAll().split('\n')) {
+        if (line.startsWith("VmRSS:")) {
+            return line.mid(6).trimmed().split(' ').front().toDouble() / 1024.0;
+        }
+    }
+    return 0.0;
+}
+
+} // namespace
+
+DaemonService::DaemonService(ServiceSetup setup, QObject* parent)
+    : QObject(parent)
+    , m_setup(std::move(setup))
+    , m_detector(util::LanguageData::builtIn())
+    , m_store(m_setup.modelsRoot)
+    , m_worker(new InferenceWorker(m_setup.engineFactory, m_detector))
+{
+    for (const auto& s : m_setup.skills.skills()) {
+        m_maxVariants = std::max(m_maxVariants, s.variants);
+    }
+    m_thread.setObjectName(u"inference"_s);
+    m_worker->moveToThread(&m_thread);
+    connect(&m_thread, &QThread::finished, m_worker, &QObject::deleteLater);
+    connect(m_worker, &InferenceWorker::token, this, &DaemonService::onToken);
+    connect(m_worker, &InferenceWorker::retrying, this, &DaemonService::onRetrying);
+    connect(m_worker, &InferenceWorker::finished, this, &DaemonService::onFinished);
+    connect(m_worker, &InferenceWorker::failed, this, &DaemonService::onFailed);
+    connect(m_worker, &InferenceWorker::idle, this, &DaemonService::onIdle);
+    connect(m_worker, &InferenceWorker::modelChanged, this,
+            [this](const QString& id) { m_loadedModel = id; });
+    m_thread.start();
+
+    m_unloadTimer.setSingleShot(true);
+    m_unloadTimer.setInterval(m_setup.idleUnloadMs);
+    connect(&m_unloadTimer, &QTimer::timeout, this,
+            [this] { QMetaObject::invokeMethod(m_worker, &InferenceWorker::unload, Qt::QueuedConnection); });
+    m_exitTimer.setSingleShot(true);
+    m_exitTimer.setInterval(m_setup.idleExitMs);
+    connect(&m_exitTimer, &QTimer::timeout, this, &DaemonService::idleTimeout);
+    restartIdleTimers();
+}
+
+DaemonService::~DaemonService()
+{
+    if (!m_running.isEmpty()) {
+        m_worker->cancel(m_running);
+    }
+    m_thread.quit();
+    m_thread.wait();
+}
+
+bool DaemonService::exportOn(QDBusConnection connection)
+{
+    return connection.registerObject(QString::fromLatin1(kObjectPath), this,
+                                     QDBusConnection::ExportScriptableSlots |
+                                         QDBusConnection::ExportScriptableSignals);
+}
+
+DaemonService::Client DaemonService::caller() const
+{
+    if (!calledFromDBus()) {
+        return {};
+    }
+    return {.connection = connection().name(), .service = message().service()};
+}
+
+void DaemonService::replyError(const QString& name, const QString& message)
+{
+    if (calledFromDBus()) {
+        sendErrorReply(kErrorPrefix + name, message);
+    }
+}
+
+void DaemonService::sendTo(const QString& requestId, const char* signal, const QVariantList& args)
+{
+    const auto it = m_clients.constFind(requestId);
+    if (it == m_clients.constEnd() || it->connection.isEmpty()) {
+        return;
+    }
+    const QString path = QString::fromLatin1(kObjectPath);
+    const QString iface = QString::fromLatin1(kInterface);
+    const QString name = QString::fromLatin1(signal);
+    // A peer connection has one client; on the bus, address the one that asked.
+    QDBusMessage msg = it->service.isEmpty()
+                           ? QDBusMessage::createSignal(path, iface, name)
+                           : QDBusMessage::createTargetedSignal(it->service, path, iface, name);
+    msg.setArguments(args);
+    QDBusConnection(it->connection).send(msg);
+}
+
+QSet<QString> DaemonService::installedModels() const
+{
+    QSet<QString> out;
+    for (const auto& m : m_setup.catalog.models) {
+        if (m.role == u"model"_s && m_store.isInstalled(m)) {
+            out.insert(m.id);
+        }
+    }
+    return out;
+}
+
+QString DaemonService::buildJob(const QString& skillId, const QVariantMap& input, Job& job) const
+{
+    const skills::Skill* skill = m_setup.skills.find(skillId);
+    if (skill == nullptr) {
+        return tr("Unknown skill \"%1\".").arg(skillId);
+    }
+    static const QSet<QString> kKeys = {u"text"_s, u"context"_s, u"target_lang"_s};
+    for (auto it = input.begin(); it != input.end(); ++it) {
+        if (!kKeys.contains(it.key()) || it.value().typeId() != QMetaType::QString) {
+            return tr("Unknown input \"%1\": text, context and target_lang are strings.").arg(it.key());
+        }
+    }
+    const skills::RequestFields fields{
+        .text = input.value(u"text"_s).toString(),
+        .context = input.value(u"context"_s).toString(),
+        .targetLang = input.value(u"target_lang"_s).toString(),
+    };
+    if (skill->baseId == u"reply"_s ? fields.context.trimmed().isEmpty() : fields.text.trimmed().isEmpty()) {
+        return skill->baseId == u"reply"_s ? tr("Reply needs the message to reply to (context).")
+                                           : tr("%1 needs some text.").arg(skill->title);
+    }
+    if (!fields.targetLang.isEmpty() && m_detector.plainName(fields.targetLang).isEmpty()) {
+        return tr("Unknown language \"%1\".").arg(fields.targetLang);
+    }
+    job.skill = *skill;
+    job.inputs = skills::buildInputs(skill->baseId, fields, m_detector);
+    return {};
+}
+
+bool DaemonService::chooseModel(Job& job) const
+{
+    const models::TierSelector selector(m_setup.catalog, m_setup.hardware);
+    const models::ModelEntry* model = selector.modelFor(job.skill.tier, installedModels());
+    if (model == nullptr) {
+        return false;
+    }
+    const models::ModelEntry* draft = m_setup.catalog.draftFor(model->id);
+    job.modelId = model->id;
+    job.model = engine::EngineConfig{
+        .modelPath = m_store.modelPath(*model),
+        .draftModelPath =
+            draft != nullptr && m_store.isInstalled(*draft) ? m_store.modelPath(*draft) : QString(),
+        .threads = m_setup.hardware.threads,
+        .gpuLayers = 0, // CPU only (ADR-016)
+        .contextSize = model->ctx,
+        .maxVariants = m_maxVariants,
+        .flashAttention = true,
+    };
+    return true;
+}
+
+QString DaemonService::RunSkill(const QString& skillId, const QVariantMap& input, const QVariantMap& options)
+{
+    Q_UNUSED(options) // reserved (DOCS/api.md)
+    Job job;
+    if (const QString problem = buildJob(skillId, input, job); !problem.isEmpty()) {
+        replyError(u"InvalidInput"_s, problem);
+        return {};
+    }
+    if (!chooseModel(job)) {
+        replyError(u"NoModel"_s, tr("No model is installed. Download one in Settings, or run "
+                                    "\"paraphrase models download fast\"."));
+        return {};
+    }
+    job.id = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    const Client client = caller();
+    cancelClientRequests(client);
+    m_queue.removeIf([](const Job& j) { return j.warmOnly; }); // a real request beats read-ahead
+    m_clients.insert(job.id, client);
+    qCInfo(lcApi) << "request" << job.id << job.skill.id << "on" << job.modelId;
+    m_queue.append(job);
+    dispatchNext();
+    return job.id;
+}
+
+void DaemonService::Warm(const QString& skillId, const QVariantMap& input)
+{
+    Job job;
+    if (!buildJob(skillId, input, job).isEmpty()) {
+        return;
+    }
+    if (std::ranges::any_of(m_queue, [](const Job& j) { return !j.warmOnly; })) {
+        return; // real work is waiting
+    }
+    if (!chooseModel(job)) {
+        return;
+    }
+    job.id = u"warm-"_s + QUuid::createUuid().toString(QUuid::WithoutBraces);
+    job.warmOnly = true;
+    m_queue.removeIf([](const Job& j) { return j.warmOnly; });
+    m_queue.append(job);
+    dispatchNext();
+}
+
+void DaemonService::cancelClientRequests(const Client& client)
+{
+    if (client.connection.isEmpty()) {
+        return;
+    }
+    QStringList mine;
+    for (auto it = m_clients.begin(); it != m_clients.end(); ++it) {
+        if (it.value() == client) {
+            mine.append(it.key());
+        }
+    }
+    for (const QString& id : mine) {
+        Cancel(id);
+    }
+}
+
+void DaemonService::Cancel(const QString& requestId)
+{
+    const auto it = m_clients.constFind(requestId);
+    if (it == m_clients.constEnd() || (calledFromDBus() && !(it.value() == caller()))) {
+        return; // unknown, finished, or someone else's
+    }
+    if (requestId == m_running) {
+        m_worker->cancel(requestId); // ends with failed(id, "cancelled")
+        return;
+    }
+    m_queue.removeIf([&](const Job& j) { return j.id == requestId; });
+    sendTo(requestId, "Error", {requestId, u"cancelled"_s, tr("Cancelled.")});
+    finishRequest(requestId);
+}
+
+void DaemonService::dispatchNext()
+{
+    if (m_busy || m_queue.isEmpty()) {
+        return;
+    }
+    m_unloadTimer.stop();
+    m_exitTimer.stop();
+    const Job job = m_queue.takeFirst();
+    m_busy = true;
+    m_running = job.warmOnly ? QString() : job.id;
+    QMetaObject::invokeMethod(m_worker, [worker = m_worker, job] { worker->run(job); }, Qt::QueuedConnection);
+}
+
+void DaemonService::finishRequest(const QString& id)
+{
+    m_clients.remove(id);
+}
+
+void DaemonService::onIdle()
+{
+    m_busy = false;
+    m_running.clear();
+    dispatchNext();
+    if (!m_busy) {
+        restartIdleTimers();
+    }
+}
+
+void DaemonService::restartIdleTimers()
+{
+    m_unloadTimer.start();
+    m_exitTimer.start();
+}
+
+void DaemonService::onToken(const QString& id, int variant, const QString& text)
+{
+    sendTo(id, "Token", {id, variant, text});
+}
+
+void DaemonService::onRetrying(const QString& id, const QString& reason)
+{
+    sendTo(id, "Retrying", {id, reason});
+}
+
+void DaemonService::onFinished(const QString& id, const QString& result)
+{
+    sendTo(id, "Done", {id, result});
+    finishRequest(id);
+}
+
+void DaemonService::onFailed(const QString& id, const QString& code, const QString& message)
+{
+    qCInfo(lcApi) << "request" << id << "failed:" << code;
+    sendTo(id, "Error", {id, code, message});
+    finishRequest(id);
+}
+
+QString DaemonService::ListSkills() const
+{
+    QJsonArray out;
+    for (const auto& s : m_setup.skills.skills()) {
+        out.append(QJsonObject{
+            {u"id"_s, s.id},
+            {u"base"_s, s.baseId},
+            {u"title"_s, s.title},
+            {u"tier"_s, s.tier},
+            {u"output"_s, s.outputType()},
+            {u"variants"_s, s.variants},
+            {u"max_input_tokens"_s, s.maxInputTokens},
+        });
+    }
+    return QString::fromUtf8(QJsonDocument(out).toJson(QJsonDocument::Compact));
+}
+
+QString DaemonService::Status()
+{
+    const auto& hw = m_setup.hardware;
+    const QJsonObject o{
+        {u"version"_s, QCoreApplication::applicationVersion()},
+        {u"model"_s, m_loadedModel},
+        {u"backend"_s, u"cpu"_s},
+        {u"threads"_s, hw.threads},
+        {u"busy"_s, m_busy},
+        {u"queue"_s, m_queue.size()},
+        {u"memory_mb"_s, residentMb()},
+        {
+            u"computer"_s,
+            QJsonObject{
+                {u"cpu"_s, hw.cpuModel},
+                {u"memory_gb"_s, hw.totalMemoryGb()},
+                {u"cpus"_s, hw.logicalCpus},
+                {u"features"_s, QJsonArray::fromStringList(hw.cpuFeatures)},
+            },
+        },
+        {u"models_dir"_s, m_store.root()},
+        {u"installed"_s, QJsonArray::fromStringList(installedModels().values())},
+    };
+    return QString::fromUtf8(QJsonDocument(o).toJson(QJsonDocument::Compact));
+}
+
+} // namespace paraphrase::api

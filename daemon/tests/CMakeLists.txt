@@ -36,3 +36,4 @@ paraphrase_add_test(tst_engine tst_engine.cpp paraphrase_engine paraphrase_model
 paraphrase_add_test(tst_models tst_models.cpp paraphrase_models)
 paraphrase_add_test(tst_downloader tst_downloader.cpp paraphrase_models)
 target_sources(tst_downloader PRIVATE test_http_server.h) # Q_OBJECT: automoc must see it
+paraphrase_add_test(tst_api tst_api.cpp paraphrase_api)
