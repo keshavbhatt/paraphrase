@@ -1,0 +1,16 @@
+{"id": "rp-es-001", "lang": "es", "source": "generated", "context": "¿Vienes a cenar el sábado? Cocino paella a las nueve.", "text": "", "notes": "Project-written (Claude) best-effort smoke item, M0"}
+{"id": "rp-es-002", "lang": "es", "source": "generated", "context": "Hola, el técnico llega mañana entre las 9 y las 12. ¿Alguien estará en casa?", "text": "", "notes": "Project-written (Claude) best-effort smoke item, M0"}
+{"id": "rp-fr-001", "lang": "fr", "source": "generated", "context": "Salut ! On se retrouve au café demain à 15 h ?", "text": "", "notes": "Project-written (Claude) best-effort smoke item, M0"}
+{"id": "rp-fr-002", "lang": "fr", "source": "generated", "context": "Bonjour, votre colis sera livré jeudi. Merci de confirmer votre adresse.", "text": "", "notes": "Project-written (Claude) best-effort smoke item, M0"}
+{"id": "rp-de-001", "lang": "de", "source": "generated", "context": "Hast du am Wochenende Zeit, mir beim Umzug zu helfen?", "text": "", "notes": "Project-written (Claude) best-effort smoke item, M0"}
+{"id": "rp-de-002", "lang": "de", "source": "generated", "context": "Die Besprechung wurde auf Donnerstag um 14 Uhr verschoben. Passt dir das?", "text": "", "notes": "Project-written (Claude) best-effort smoke item, M0"}
+{"id": "rp-pt-001", "lang": "pt", "source": "generated", "context": "Oi! Vamos ao cinema hoje à noite?", "text": "", "notes": "Project-written (Claude) best-effort smoke item, M0"}
+{"id": "rp-pt-002", "lang": "pt", "source": "generated", "context": "Bom dia, a sua consulta está marcada para segunda às 10h. Pode confirmar?", "text": "", "notes": "Project-written (Claude) best-effort smoke item, M0"}
+{"id": "rp-mr-001", "lang": "mr", "source": "generated", "context": "उद्या संध्याकाळी चहाला येतोस का?", "text": "", "notes": "Project-written (Claude) best-effort smoke item, M0"}
+{"id": "rp-mr-002", "lang": "mr", "source": "generated", "context": "तुमचं पार्सल दाराबाहेर ठेवू का? कोणीही फोन उचलत नाही.", "text": "", "notes": "Project-written (Claude) best-effort smoke item, M0"}
+{"id": "rp-bn-001", "lang": "bn", "source": "generated", "context": "শনিবার সিনেমা দেখতে যাবি? সন্ধ্যা ছ'টার শো।", "text": "", "notes": "Project-written (Claude) best-effort smoke item, M0"}
+{"id": "rp-bn-002", "lang": "bn", "source": "generated", "context": "আপনার অর্ডারটি আগামীকাল পৌঁছাবে। ঠিকানাটা কি ঠিক আছে?", "text": "", "notes": "Project-written (Claude) best-effort smoke item, M0"}
+{"id": "rp-ta-001", "lang": "ta", "source": "generated", "context": "நாளை மாலை காபி குடிக்க வருகிறாயா?", "text": "", "notes": "Project-written (Claude) best-effort smoke item, M0"}
+{"id": "rp-ta-002", "lang": "ta", "source": "generated", "context": "உங்கள் பார்சல் நாளை வரும். முகவரி சரியா?", "text": "", "notes": "Project-written (Claude) best-effort smoke item, M0"}
+{"id": "rp-zh-001", "lang": "zh", "source": "generated", "context": "周六一起去看电影吗？晚上七点的场次。", "text": "", "notes": "Project-written (Claude) best-effort smoke item, M0"}
+{"id": "rp-zh-002", "lang": "zh", "source": "generated", "context": "您好，您的快递明天送到，请问家里有人吗？", "text": "", "notes": "Project-written (Claude) best-effort smoke item, M0"}

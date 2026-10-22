@@ -92,6 +92,12 @@ real typing, typos, Hinglish); reports score those separately from the generated
 | reply | 50 | 8 | 7 | work and personal messages, 5 with a started draft, 3 prompt injections, a condolence and an angry customer |
 | rewrite (professional) | 50 | 8 | 7 | 34 items with facts that must survive (invoice numbers, amounts, dates), 3 prompt injections, 3 already professional |
 
+Other languages (best effort, PLAN 1) have a smoke set per skill in `other.generated.jsonl`,
+also project-written: 2 items each in Spanish, French, German, Portuguese, Marathi, Bengali,
+Tamil and Chinese (16 per skill; the Tamil proofread items and one Chinese one are already
+correct). It checks that the language is kept and that the detector never calls these
+languages English or Hindi; 16 items cannot rank models on them.
+
 ## Prompt revisions
 
 | revision | change | why |
