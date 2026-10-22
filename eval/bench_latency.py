@@ -67,28 +67,29 @@ def bench(
     runs: int,
     server_args: list[str] | None = None,
     overrides: list[Path] | None = None,
+    tasks: tuple[str, ...] = TASKS,
 ) -> dict[str, Any]:
     info = common.model(model_id)
     profile = common.profiles()[profile_name]
     if server_args:
         profile = dataclasses.replace(profile, extra_args=profile.extra_args + server_args)
     skills = load_skills(common.SKILLS_DIR, overrides)
-    parallel = max(skills[t].variants for t in TASKS)
+    parallel = max(skills[t].variants for t in tasks)
     result: dict[str, Any] = {
         "model": model_id,
         "profile": profile_name,
         "label": profile.label,
         "when": time.strftime("%Y-%m-%d %H:%M"),
         "server_args": server_args or [],
-        "skill_revisions": {t: skills[t].revision for t in TASKS},
+        "skill_revisions": {t: skills[t].revision for t in tasks},
     }
     evict_page_cache(info.path)
     with LlamaServer(info.path, profile, ctx=info.ctx, parallel=parallel) as cold:
         result["load_cold_s"] = round(cold.load_s, 2)
     with LlamaServer(info.path, profile, ctx=info.ctx, parallel=parallel) as server:
         result["load_warm_s"] = round(server.load_s, 2)
-        tasks: dict[str, Any] = {}
-        for task in TASKS:
+        results_by_task: dict[str, Any] = {}
+        for task in tasks:
             skill = skills[task]
             inputs = bench_inputs(skill.base_id, runs)
             samples = []
@@ -99,7 +100,7 @@ def bench(
                     continue  # warm-up: fills the system-prompt cache
                 samples.append(res.calls[0])
                 results.append(res)
-            tasks[task] = {
+            results_by_task[task] = {
                 "runs": len(samples),
                 "input_words": _median(
                     [
@@ -129,14 +130,14 @@ def bench(
                 "cached_tokens": _median([c.cached_tokens for c in samples]),
                 "gen_tokens": _median([c.gen_tokens for c in samples]),
             }
-            t = tasks[task]
+            t = results_by_task[task]
             print(
                 f"  {task:22} ttft {t['ttft_s']:.2f}/{t['ttft_s_p90']:.2f}s"
                 f"  total {t['total_s']:.2f}/{t['total_s_p90']:.2f}s (p50/p90)"
                 f"  gen {t['gen_tps']:.1f} t/s  prompt {t['prompt_tps']:.0f} t/s"
                 f"  draft accepted {t['draft_accept_pct']}%"
             )
-        result["tasks"] = tasks
+        result["tasks"] = results_by_task
         result["peak_rss_mb"] = round(server.peak_rss_mb)
     return result
 
@@ -151,6 +152,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--variant", default="", help="names an experiment in the output file")
     ap.add_argument("--skill-override", type=Path, action="append", default=[])
     ap.add_argument(
+        "--tasks",
+        nargs="+",
+        default=list(TASKS),
+        choices=TASKS,
+        help="time only these tasks (e.g. reply without a draft head, the rest with one)",
+    )
+    ap.add_argument(
         "--check", action="store_true", help="fail when a result exceeds eval/targets.json"
     )
     args = ap.parse_args(argv)
@@ -161,7 +169,12 @@ def main(argv: list[str] | None = None) -> int:
         for profile in args.profile:
             print(f"{model_id} on {profile}")
             res = bench(
-                model_id, profile, args.runs, shlex.split(args.server_args), args.skill_override
+                model_id,
+                profile,
+                args.runs,
+                shlex.split(args.server_args),
+                args.skill_override,
+                tuple(args.tasks),
             )
             res["variant"] = args.variant
             print(
@@ -187,6 +200,8 @@ def check(model_id: str, profile: str, res: dict[str, Any]) -> list[str]:
     out = []
     for key, limit in targets.items():
         if isinstance(limit, dict):
+            if key not in res["tasks"]:
+                continue
             for metric, cap in limit.items():
                 got = res["tasks"][key][metric]
                 if got > cap:

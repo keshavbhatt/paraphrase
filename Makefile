@@ -37,7 +37,7 @@ lint:
 smoke:
 	@test -n "$(MODEL)" || { echo "usage: make smoke MODEL=<id>"; exit 2; }
 	for s in proofread reply rewrite.professional; do \
-		$(PY) eval/run_eval.py --model $(MODEL) --skill $$s --limit 5 --tag smoke || exit 1; \
+		$(PY) eval/run_eval.py --model $(MODEL) --skill $$s --limit 5 --profile B-cpu --tag smoke || exit 1; \
 	done
 
 format:
