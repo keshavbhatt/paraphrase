@@ -105,9 +105,9 @@ paraphrase/
 │   │   ├── capture/                # ICaptureBackend + X11, WaylandDataControl, Clipboard, Portal backends
 │   │   ├── inject/                 # IInjectBackend + X11 (XTest), RemoteDesktopPortal, ClipboardOnly
 │   │   ├── hotkey/                 # X11 grab, GlobalShortcuts portal, "bind this command" fallback
-│   │   ├── ui/                     # Popup, DiffView, VariantCarousel, ModelManager, Settings
-│   │   └── client/                 # D-Bus client wrapper
+│   │   └── ui/                     # Popup, DiffView, VariantCarousel, ModelManager, Settings
 │   └── tests/
+├── client/                         # D-Bus client wrapper and word diff, shared by app and CLI
 ├── cli/                            # paraphrase CLI (D-Bus client)
 ├── skills/                         # built-in skill YAML files + per-model-family overrides
 │   ├── proofread.yaml

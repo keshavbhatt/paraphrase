@@ -7,12 +7,33 @@ Newest first. One entry per working session.
 | Milestone | Status |
 |---|---|
 | M0 Feasibility spike | done: go (DOCS/models.md, 2026-10-22) |
-| M1 Daemon | in progress |
-| M2 Popup on X11 + KDE Wayland | todo |
+| M1 Daemon | done (2026-10-22) |
+| M2 Main window + popup on X11 + KDE Wayland | in progress: main window done |
 | M3 Polish + GNOME/wlroots | todo |
 | M4 Mail | todo |
 | M5 Release | todo |
 | M6 IME + Windows | todo |
+
+## 2026-10-22 - M2 step 1: the standalone main window
+
+- M1 is done: the CLI works for proofread, reply and rewrite, the eval runs through the daemon
+  (`eval/reports/m1-daemon/`, same quality as M0) and the unit tests pass.
+- `client/` (new top-level library, moved out of the CLI; PLAN's tree had it under
+  `app/src/client`): the daemon client and the word diff, shared by the CLI and the app.
+- `paraphrase-app` (ADR-013, mocks main-window.html and main-window-reply.html): actions
+  come from the daemon's skills (Proofread, a Tone menu with the rewrite presets, Smart reply,
+  Ctrl+1 to Ctrl+3); results stream in; proofread shows the word diff with Undo per change
+  and a Changes/Result switch; reply shows three cards with copy, an edit box, 3 new ones and
+  Make it polite; Copy and Use as my text; Retry and Stop; light and dark from DESIGN.md.
+  tst_main_window drives it against a real daemon service with a fake engine; with
+  `PARAPHRASE_SCREENSHOTS=<dir>` it saves the window in both themes.
+- Differences from the mock: Summarize, Format, Translate and My actions are not shown
+  because those skills do not exist yet; no reason per change, because proofread returns only
+  the corrected text; Settings waits for M3; the notice text says what works without a
+  shortcut.
+- Lint now runs clang-format 23 and clang-tidy 23 inside the core24 SDK
+  (`scripts/lint-cxx.sh`), because the host's GCC 16 headers broke clang-tidy.
+- Next: tray, hotkey, capture and inject backends and the popup, on X11 and KDE Wayland.
 
 ## 2026-10-22 - Quality first: reply revision 4, rewrite revision 5
 
