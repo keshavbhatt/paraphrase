@@ -1,7 +1,7 @@
 # Skill files: schema reference
 
 Every feature is a skill (PLAN D4): a YAML file in `skills/` that the engine loads without
-recompiling. This page is the reference for **schema version 2**. Any change to the schema
+recompiling. This page is the reference for **schema version 3**. Any change to the schema
 bumps `version`, updates this page and the loaders (`eval/paraeval/skills.py` now, the
 daemon's `SkillRegistry` from M1), and comes with an eval before/after report.
 
@@ -10,13 +10,14 @@ daemon's `SkillRegistry` from M1), and comes with an eval before/after report.
 | Field | Type | Required | Meaning |
 |---|---|---|---|
 | `id` | string | yes | Skill id, e.g. `proofread`. With `presets`, each preset becomes `<id>.<preset>` |
-| `version` | int | yes | Schema version the file is written for (`2`) |
+| `version` | int | yes | Schema version the file is written for (`3`) |
 | `revision` | int | no (1) | Revision of this skill's prompts. Bumped on every prompt, grammar or sampling change; eval reports record it so before/after runs are comparable |
 | `title` | string | yes | Name shown in the UI |
 | `tier` | `fast` \| `quality` \| `any` | yes | Which model tier runs it by default (PLAN 5.3) |
 | `max_input_tokens` | int | yes | Longer input is rejected with a clear error (or chunked, for skills that say so) |
 | `max_output_tokens` | int | yes | Hard cap on generated tokens |
 | `variants` | int | no (1) | Number of completions decoded in one batch from one prompt (PLAN 5.3); the prompt is processed once. Each variant is one `text` output |
+| `speculative` | `none` \| `draft` | no (`none`) | Whether the engine drafts ahead with the model's draft head (ADR-004). Greedy outputs are identical either way; `draft` pays off where the output repeats the input (proofread, rewrite) and costs reply its p90 |
 | `sampling` | map | yes | `temperature`, `top_p`, `top_k`, `min_p`, `repeat_penalty`, `seed` (`null` = random) |
 | `grammar` | path | no | GBNF file under `skills/grammars/`; the output must parse. Required when `output.type` is `json` (PLAN D5) |
 | `output` | map | yes | `type: text` or `type: json`; `schema` describes the JSON; `items` the expected count; `diff: words` asks the client for a word diff (PLAN D6); `language: same` turns on the engine's language check (below), `any` (default) turns it off |
@@ -58,7 +59,7 @@ plain name, because the default `lang_name` tells the model to keep the input's 
 one of the template's own fence tags (`</text>` becomes `< /text>`), so the data cannot
 close its fence and pose as instructions.
 
-## Language check (schema v2)
+## Language check (schema v2 and later)
 
 For a skill with `output.language: same` the engine checks every output (each reply, for
 reply) before showing it: it must be in the expected language and script, which is the
@@ -67,7 +68,10 @@ input answered outside Devanagari, broken Devanagari, Hinglish turned into Engli
 Devanagari, and English answered in Hindi or Hinglish all fail (the owner's floor, PLAN 11
 Q6); with a `target_lang`, the output must detect as that language. On a failure the engine
 retries once with a fresh seed (greedy skills retry at temperature 0.3, or the retry would
-repeat the same output). If the retry fails too, it shows the output with a warning instead
+repeat the same output) and one added line after the prompt that names the language by its
+plain name ("Important: write your answer in Hinglish (Hindi in Latin letters), the language
+of the original."); a fresh seed alone kept giving English for Hinglish professional
+rewrites in M0. If the retry fails too, it shows the output with a warning instead
 of hiding it. Reference implementation: `eval/paraeval/engine.py`; the eval and the latency
 bench run through it, so their numbers include retries.
 

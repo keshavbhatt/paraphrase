@@ -8,7 +8,11 @@ The M1 daemon implements the same steps in C++ (PLAN D2); keep the two in step:
    expected language and script, which is the input's language unless the request names a
    `target_lang` the user chose. On a mismatch, retry once with a fresh seed (greedy skills
    retry with a little temperature, or the retry would repeat the same output); if the retry
-   also fails, return it with a warning instead of hiding it (owner, 2026-10-22).
+   also fails, return it with a warning instead of hiding it (owner, 2026-10-22). The retry
+   adds one line after the prompt naming the language the answer must be in: a new seed
+   alone kept giving English for Hinglish professional rewrites (M0 v5).
+4. Speculative decoding per skill (schema v3, ADR-004): `speculative: none` asks the server
+   not to draft for this request, even when it runs with a draft head.
 """
 
 from __future__ import annotations
@@ -75,10 +79,18 @@ def language_ok(skill: Skill, inputs: dict[str, str], texts: list[str]) -> tuple
 def run(server: LlamaServer, skill: Skill, inputs: dict[str, str]) -> Result:
     system, user = skill.render(inputs)
     sampling = dict(skill.sampling)
+    extra = {"speculative.type": "none"} if skill.speculative == "none" else {}
     calls: list[Completion] = []
     for attempt in range(2):
+        prompt = user if attempt == 0 else f"{user}\n\n{retry_hint(inputs)}"
         c = server.chat(
-            system, user, sampling, skill.max_output_tokens, skill.grammar, n=skill.variants
+            system,
+            prompt,
+            sampling,
+            skill.max_output_tokens,
+            skill.grammar,
+            n=skill.variants,
+            extra=extra,
         )
         calls.append(c)
         output, texts = outputs_of(skill, c)
@@ -87,6 +99,17 @@ def run(server: LlamaServer, skill: Skill, inputs: dict[str, str]) -> Result:
             return Result(output, c, calls, retried=attempt > 0)
         sampling = _retry_sampling(skill.sampling)
     return Result(output, c, calls, retried=True, warning=f"language: {why}")
+
+
+def retry_hint(inputs: dict[str, str]) -> str:
+    """The line the retry adds: which language the answer must be in, by its plain name."""
+    want = expected_lang(inputs)
+    name = langdetect.LANG_SHORT.get(want)
+    if want != inputs["lang"]:
+        return f"Important: write your answer in {name}, as the user asked."
+    if not name:
+        return "Important: write your answer in the same language and script as the original."
+    return f"Important: write your answer in {name}, the language of the original."
 
 
 def _retry_sampling(sampling: dict[str, Any]) -> dict[str, Any]:

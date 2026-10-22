@@ -53,3 +53,21 @@ def test_greedy_retry_gets_temperature_and_a_new_seed() -> None:
     assert s["temperature"] == engine.RETRY_TEMPERATURE and s["seed"] != 1
     s = engine._retry_sampling({"temperature": 0.7, "seed": None})
     assert s["temperature"] == 0.7 and s["seed"]
+
+
+def test_retry_hint_names_the_expected_language() -> None:
+    hinglish = common.skill_inputs(
+        "rewrite", {"text": "sir kal nahi aa paunga, tabiyat thik nahi hai"}
+    )
+    assert "Hinglish" in engine.retry_hint(hinglish)
+    chose_en = common.skill_inputs(
+        "rewrite", {"text": "sir kal nahi aa paunga, tabiyat thik nahi hai", "target_lang": "en"}
+    )
+    assert "English, as the user asked" in engine.retry_hint(chose_en)
+    unknown = common.skill_inputs("rewrite", {"text": "Ты придёшь сегодня вечером?"})
+    assert "same language and script" in engine.retry_hint(unknown)
+
+
+def test_reply_does_not_draft_proofread_does() -> None:
+    assert SKILLS["reply"].speculative == "none"
+    assert SKILLS["proofread"].speculative == "draft"

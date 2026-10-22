@@ -237,6 +237,7 @@ class LlamaServer:
         max_tokens: int,
         grammar: str | None = None,
         n: int = 1,
+        extra: dict[str, Any] | None = None,
     ) -> Completion:
         """One chat request. With n > 1 the prompt is processed once and n completions are
         decoded in one batch (llama-server `n_cmpl`; the server needs n slots)."""
@@ -256,6 +257,7 @@ class LlamaServer:
             body["grammar"] = grammar
         if n > 1:
             body["n_cmpl"] = n
+        body.update(extra or {})
         start = time.monotonic()
         resp = self._post("/v1/chat/completions", body)
         ttft = 0.0

@@ -1,4 +1,4 @@
-"""Skill files (skills/*.yaml, schema v2): loading, validation and prompt rendering.
+"""Skill files (skills/*.yaml, schema v3): loading, validation and prompt rendering.
 
 This mirrors what the daemon's SkillRegistry will do in M1, so the template rules here are
 the reference for the C++ port (DOCS/skills.md): `{{name}}` inserts a value and
@@ -15,7 +15,8 @@ from typing import Any
 
 import yaml
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
+SPECULATIVE = ("none", "draft")
 OUTPUT_LANGUAGE = ("same", "any")
 TIERS = ("fast", "quality", "any")
 OUTPUT_TYPES = ("text", "json")
@@ -54,6 +55,7 @@ class Skill:
     max_input_tokens: int
     max_output_tokens: int
     variants: int
+    speculative: str
     sampling: dict[str, Any]
     output: dict[str, Any]
     system: str
@@ -113,6 +115,8 @@ def _check(raw: dict[str, Any], path: Path) -> None:
     extra = set(raw["sampling"]) - SAMPLING_KEYS
     if extra:
         raise SkillError(f"{path.name}: unknown sampling keys {sorted(extra)}")
+    if raw.get("speculative", "none") not in SPECULATIVE:
+        raise SkillError(f"{path.name}: speculative must be one of {SPECULATIVE}")
     if raw["output"].get("language", "any") not in OUTPUT_LANGUAGE:
         raise SkillError(f"{path.name}: output.language must be one of {OUTPUT_LANGUAGE}")
     if int(raw.get("variants", 1)) > 1 and raw["output"]["type"] != "text":
@@ -141,6 +145,7 @@ def load_skill_file(path: Path) -> list[Skill]:
         "max_input_tokens": int(raw["max_input_tokens"]),
         "max_output_tokens": int(raw["max_output_tokens"]),
         "variants": int(raw.get("variants", 1)),
+        "speculative": raw.get("speculative", "none"),
         "sampling": dict(raw["sampling"]),
         "output": dict(raw["output"]),
         "system": raw["system"],

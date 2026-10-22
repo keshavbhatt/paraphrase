@@ -1,7 +1,7 @@
 # Candidate reply revision 4 (M0 experiment): 3 variants decoded in one batch from one
 # prompt (engine `variants`), instead of one sequence writing all three as JSON.
 id: reply
-version: 2
+version: 3
 revision: 4
 title: Smart reply
 tier: fast

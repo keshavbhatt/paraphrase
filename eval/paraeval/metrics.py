@@ -228,8 +228,9 @@ def _other_language_check(lang: str, source: str, output: str) -> tuple[bool, st
     src, out = scripts.dominant_script(source), scripts.dominant_script(output)
     if src and out and src != out:
         return False, f"{name} answered in {out.title()} script"
-    if src == "LATIN" and lang != "und":
-        en, own = scripts.word_share(output, "en"), scripts.word_share(output, lang)
+    if src == "LATIN" and lang != "und" and len(output.split()) >= 4:
+        en = scripts.word_share(output, "en", against=lang)
+        own = scripts.word_share(output, lang, against="en")
         if en >= 0.2 and en > own + 0.05:
             return False, f"{name} answered in English"
     return True, ""

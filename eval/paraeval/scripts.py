@@ -214,11 +214,16 @@ def latin_language(text: str) -> str | None:
     return None
 
 
-def word_share(text: str, lang: str) -> float:
-    """Share of words that are common words of a Latin-script language (0 if unknown)."""
-    words = _words(text)
+def word_share(text: str, lang: str, against: str = "") -> float:
+    """Share of words that are common words of a Latin-script language (0 if unknown).
+    One-letter words never count, nor words the `against` language also uses ("a", "de",
+    "no"), so "¿A qué hora?" is not English."""
+    words = [w for w in _words(text) if len(w) > 1]
     stop = _LATIN_STOPWORDS.get(lang)
-    return sum(w in stop for w in words) / len(words) if words and stop else 0.0
+    if not words or not stop:
+        return 0.0
+    shared = _LATIN_STOPWORDS.get(against, set())
+    return sum(w in stop and w not in shared for w in words) / len(words)
 
 
 def other_language(text: str, script: str) -> str:

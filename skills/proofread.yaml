@@ -1,11 +1,12 @@
 id: proofread
-version: 2
+version: 3
 revision: 4
 title: Proofread
 tier: fast
 max_input_tokens: 1500
 max_output_tokens: 2000
 variants: 1
+speculative: draft
 sampling: { temperature: 0.0, top_p: 1.0, top_k: 1, repeat_penalty: 1.0, seed: 0 }
 output: { type: text, diff: words, language: same }
 system: |
