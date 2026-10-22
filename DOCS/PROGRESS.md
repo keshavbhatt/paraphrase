@@ -14,6 +14,25 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-22 - Quality push and M1 close-out (parallel session)
+
+- Rewrite revision 9 shipped: temperature back to 0.6 and new polite and friendly presets with
+  one worked example each. Judged blind by Claude on 48 hard polite and friendly items: E4B
+  acceptable 60.4% to 83.3% (20 wins, 5 losses), E2B 47.9% to 72.9% (19 wins, 3 losses).
+  Holdout: E4B 70% to 85%, E2B 70% to 75%. E4B hard set overall is about 81% (target 80%);
+  E2B is still below its 75% target.
+- Rejected: rewrite revision 8 (temperature 0.3, mostly ties) and proofread revision 8
+  (agreement rules: E2B F0.5 0.92 to 0.88, English false alarms 8.3% to 16.7%). Proofread
+  stays at 7, reply at 4. Records in `eval/reports/q-*` and the judge folders.
+- Latency (`eval/reports/m1-final/bench/`, E2B, B-cpu, daemon, 10 runs): reply and proofread
+  are within targets; rewrite.professional is over (total p50 9.28 s against 8.5 s, p90
+  13.1 s against 12.2 s, ttft p90 4.8 s against 3.3 s). The machine was loaded (load average
+  about 6, another daemon running), so this needs a quiet re-measure before acting on it.
+  Cold load 5.5 s, peak RSS 4.8 GB.
+- Portable build (`PARAPHRASE_PORTABLE_CPU=ON`) builds all targets and ships the
+  libggml-cpu variants; the portable daemon ran 5 proofread items correctly
+  (`eval/reports/q-portable/`).
+
 ## 2026-10-22 - M2 step 1: the standalone main window
 
 - M1 is done: the CLI works for proofread, reply and rewrite, the eval runs through the daemon

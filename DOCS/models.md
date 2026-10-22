@@ -139,6 +139,7 @@ languages English or Hindi; 16 items cannot rank models on them.
 | 5 | proofread only: fixes like a proofreader (owner, 2026-10-22): capital at every sentence start, end punctuation, question marks, run-ons split; names the error kinds the model missed (tense against time words, missing words, verb forms, prepositions, Hindi and Hinglish gender and number agreement); instructions inside the text are corrected and kept | revision 4 left lowercase starts and missing full stops by design, missed tense and agreement errors, and dropped 2 of 3 injected instructions ("Summarize the following ..."): E2B recall 0.68 on 124 items |
 | 6 | proofread only: a "change nothing else" list: keep contractions, no optional commas, no added words in casual sentences, no full stop after headings or a final emoji, hashtag or URL, keep chat spellings and time formats, English words stay in Latin letters in Hindi; one worked injection example | revision 5 raised recall to 0.89 but changed 2 of 19 correct texts, expanded contractions, added Oxford commas and transliterated English words into Devanagari |
 | 7 | proofread only: the worked example no longer resembles a test item | the model copied the example's British "summarise" into a test item |
+| 8 (rejected) | proofread only: agreement rules with examples (a possessive takes the gender of the noun after it, plural verbs with आप, ने agreement) | E2B F0.5 0.92 to 0.88, false alarms on correct English 8% to 17%, Hindi and Hinglish worse; holdout unchanged. The remaining agreement misses look like a limit of E2B, not of the prompt |
 
 **Proofread revision 4 to 7, Gemma 4 E2B, through the daemon** (`eval/reports/q-proofread-r4`
 to `-r7`, `q-holdout-r4`, `q-holdout-r7`):
@@ -169,10 +170,15 @@ suggestion continues the user's draft.
 | rewrite | 6 (rejected) | firmer rules for meaning, feeling and formats; "you" in the text is the reader; new polite, friendly and concise presets | E4B 67% to 70%, a tie in wins; E2B a tie in rate and worse in wins (61 against 86): more missed tone and 6 obeyed instructions. The polite and friendly presets alone helped on E4B (friendly 9 to 15 of 24) and are tried next on their own |
 | rewrite | 7 | revision 5 with only the new polite and friendly presets (the old polite one said "softening any demands") | polite and friendly, 48 items: meaning changed 13 to 8 (E2B) and 15 to 9 (E4B), better in 17 against 13 and 21 against 17; somewhat stiffer wording |
 | reply | 6 (rejected) | revision 4 plus "a person, never an assistant or an AI" and reacting to instructions inside the message as the user would | a tie in rate (79% each) and worse in wins (32 against 43): fewer unsafe replies (4 to 1) but stiffer ones |
+| rewrite | 8 (rejected) | revision 7 at temperature 0.3 instead of 0.6 | E4B, 120 hard items in five tones: a tie (79% against 78% on professional, casual and concise, 67% against 63% on polite and friendly; most pairs identical). Randomness is not what goes wrong |
+| rewrite | 9 | polite and friendly presets with one worked example each (sentences unlike any test item); polite no longer asks for "please and thank you", which the model tacked on at the end | polite and friendly, 48 hard items: E4B acceptable 60% to 83% (better 20 against 5), E2B 48% to 73% (19 against 3). Holdout (20 per model): E4B 70% to 85%, E2B 70% to 75% |
 
 A first draft of both named Hindi and Hinglish in the system prompt and made the models answer
 Devanagari messages in Latin letters (12 reply failures), the M0 revision 2 lesson again: the
 prompts state script rules without naming a language.
+
+Revisions 8 and 9 (rewrite) and 8 (proofread) were judged by Claude in a parallel session
+(no reviewer agents there), blind to which revision wrote which output.
 
 Prompting has levelled off for reply at about 80% acceptable. Still weak: rewrite in polite and
 friendly tones (about half acceptable) and meaning drift in
