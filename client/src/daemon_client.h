@@ -55,7 +55,8 @@ private:
     QDBusConnection m_connection;
     std::unique_ptr<QProcess> m_private; ///< the private daemon, when there is one
     QString m_socketPath;
-    bool m_peer = false; ///< connected to $PARAPHRASE_DAEMON_ADDRESS, a daemon someone else runs
+    bool m_peer = false;       ///< connected to $PARAPHRASE_DAEMON_ADDRESS, a daemon someone else runs
+    bool m_subscribed = false; ///< listening to the daemon: connected, so connecting again does nothing
 };
 
 } // namespace paraphrase::client

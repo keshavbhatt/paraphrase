@@ -67,6 +67,11 @@ QString DaemonClient::daemonProgram()
 
 QString DaemonClient::connectToDaemon()
 {
+    // Several parts of the app share one client: the first one connects, the others reuse it,
+    // so there is one daemon, one subscription and one private daemon at most.
+    if (m_subscribed && m_connection.isConnected()) {
+        return {};
+    }
     // A daemon already serving on a private socket (tests, and a debugging session).
     if (const QString address = qEnvironmentVariable("PARAPHRASE_DAEMON_ADDRESS"); !address.isEmpty()) {
         m_connection = QDBusConnection::connectToPeer(address, kPrivateName);
@@ -145,16 +150,17 @@ bool DaemonClient::subscribe()
 {
     // On the bus only the daemon's own signals: they are addressed to this connection anyway.
     const QString service = (m_private || m_peer) ? QString() : kService;
-    return m_connection.connect(service, kPath, kInterface, u"Token"_s, this,
-                                SLOT(onToken(QString, int, QString))) &&
-           m_connection.connect(service, kPath, kInterface, u"Retrying"_s, this,
-                                SLOT(onRetrying(QString, QString))) &&
-           m_connection.connect(service, kPath, kInterface, u"Done"_s, this,
-                                SLOT(onDone(QString, QString))) &&
-           m_connection.connect(service, kPath, kInterface, u"Error"_s, this,
-                                SLOT(onError(QString, QString, QString))) &&
-           m_connection.connect(service, kPath, kInterface, u"DownloadProgress"_s, this,
-                                SLOT(onDownloadProgress(QString)));
+    m_subscribed =
+        m_connection.connect(service, kPath, kInterface, u"Token"_s, this,
+                             SLOT(onToken(QString, int, QString))) &&
+        m_connection.connect(service, kPath, kInterface, u"Retrying"_s, this,
+                             SLOT(onRetrying(QString, QString))) &&
+        m_connection.connect(service, kPath, kInterface, u"Done"_s, this, SLOT(onDone(QString, QString))) &&
+        m_connection.connect(service, kPath, kInterface, u"Error"_s, this,
+                             SLOT(onError(QString, QString, QString))) &&
+        m_connection.connect(service, kPath, kInterface, u"DownloadProgress"_s, this,
+                             SLOT(onDownloadProgress(QString)));
+    return m_subscribed;
 }
 
 QDBusMessage DaemonClient::call(const QString& method, const QVariantList& args)

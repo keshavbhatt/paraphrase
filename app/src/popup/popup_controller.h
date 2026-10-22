@@ -27,7 +27,9 @@ class PopupController : public QObject
     Q_DISABLE_COPY_MOVE(PopupController)
 
 public:
-    PopupController(const Integrations& integrations, QObject* parent = nullptr);
+    /// Uses `client` when given (one connection for the whole app), else its own.
+    explicit PopupController(const Integrations& integrations, client::DaemonClient* client = nullptr,
+                             QObject* parent = nullptr);
     ~PopupController() override;
 
     /// Captures the text now and opens the popup near the cursor.
@@ -53,7 +55,8 @@ private:
     [[nodiscard]] QString likelyBase() const;
 
     const Integrations& m_integrations;
-    client::DaemonClient m_client;
+    std::unique_ptr<client::DaemonClient> m_ownClient;
+    client::DaemonClient& m_client;
     util::LanguageDetector m_detector;
     SkillCatalog m_catalog;
     RequestRunner* m_runner = nullptr;

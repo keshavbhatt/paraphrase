@@ -15,9 +15,9 @@ using namespace Qt::StringLiterals;
 
 namespace paraphrase::app {
 
-AppFlow::AppFlow(QObject* parent)
+AppFlow::AppFlow(client::DaemonClient& client, QObject* parent)
     : QObject(parent)
-    , m_client(std::make_unique<client::DaemonClient>())
+    , m_client(client)
 {}
 
 AppFlow::~AppFlow() = default;
@@ -25,7 +25,7 @@ AppFlow::~AppFlow() = default;
 void AppFlow::start(bool showWindow)
 {
     // When the daemon cannot start, the main window says why (it connects on its own).
-    if (m_client->connectToDaemon().isEmpty() && !hasModel()) {
+    if (m_client.connectToDaemon().isEmpty() && !hasModel()) {
         showSetup();
         return;
     }
@@ -39,13 +39,13 @@ void AppFlow::start(bool showWindow)
 bool AppFlow::hasModel()
 {
     const QList<ModelInfo> models =
-        parseModels(m_client->call(u"ListModels"_s, {}).arguments().value(0).toString());
+        parseModels(m_client.call(u"ListModels"_s, {}).arguments().value(0).toString());
     return std::ranges::any_of(models, [](const ModelInfo& m) { return m.isModel() && m.installed; });
 }
 
 void AppFlow::showSetup()
 {
-    m_setup = std::make_unique<SetupWindow>(*m_client);
+    m_setup = std::make_unique<SetupWindow>(m_client);
     connect(m_setup.get(), &SetupWindow::finished, this, [this] {
         m_setup->hide();
         showMain();
@@ -58,7 +58,7 @@ void AppFlow::showSetup()
 MainWindow& AppFlow::mainWindow()
 {
     if (!m_main) {
-        m_main = std::make_unique<MainWindow>();
+        m_main = std::make_unique<MainWindow>(&m_client);
         m_main->setGlobalShortcut(m_globalShortcut);
         connect(m_main.get(), &MainWindow::settingsRequested, this, &AppFlow::showSettings);
         // Connect after the window is up: starting the daemon can take a moment.
@@ -90,7 +90,7 @@ void AppFlow::setGlobalShortcut(bool available)
 void AppFlow::showSettings()
 {
     if (!m_settings) {
-        m_settings = std::make_unique<SettingsWindow>(*m_client);
+        m_settings = std::make_unique<SettingsWindow>(m_client);
     }
     m_settings->showPage(SettingsWindow::Models);
     m_settings->show();

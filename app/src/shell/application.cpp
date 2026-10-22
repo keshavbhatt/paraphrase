@@ -1,5 +1,6 @@
 #include "shell/application.h"
 
+#include "daemon_client.h"
 #include "integration/integrations.h"
 #include "popup/popup_controller.h"
 #include "shell/app_service.h"
@@ -13,9 +14,10 @@ namespace paraphrase::app {
 
 Application::Application(QObject* parent)
     : QObject(parent)
+    , m_client(std::make_unique<client::DaemonClient>())
     , m_integrations(std::make_unique<Integrations>(Integrations::forThisSession(this)))
-    , m_flow(new AppFlow(this))
-    , m_popup(new PopupController(*m_integrations, this))
+    , m_flow(new AppFlow(*m_client, this))
+    , m_popup(new PopupController(*m_integrations, m_client.get(), this))
     , m_service(new AppService(this))
 {
     if (TrayIcon::available()) {

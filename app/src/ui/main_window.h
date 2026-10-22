@@ -9,6 +9,8 @@
 #include <QString>
 #include <QWidget>
 
+#include <memory>
+
 class QSplitter;
 
 namespace paraphrase::app {
@@ -35,7 +37,8 @@ class MainWindow : public QWidget
     Q_DISABLE_COPY_MOVE(MainWindow)
 
 public:
-    explicit MainWindow(QWidget* parent = nullptr);
+    /// Uses `client` when given (one connection for the whole app), else its own.
+    explicit MainWindow(client::DaemonClient* client = nullptr, QWidget* parent = nullptr);
     ~MainWindow() override;
 
     /// Connects to the daemon (starting it when needed) and loads the actions.
@@ -82,7 +85,8 @@ private:
     void showResult(const QJsonObject& result);
     [[nodiscard]] QString inputLanguageName() const;
 
-    client::DaemonClient m_client;
+    std::unique_ptr<client::DaemonClient> m_ownClient;
+    client::DaemonClient& m_client;
     util::LanguageDetector m_detector;
     Tokens m_tokens;
     SkillCatalog m_catalog;

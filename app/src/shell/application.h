@@ -4,6 +4,10 @@
 
 #include <memory>
 
+namespace paraphrase::client {
+class DaemonClient;
+}
+
 namespace paraphrase::app {
 
 class AppFlow;
@@ -30,6 +34,7 @@ public:
 private:
     void wire();
 
+    std::unique_ptr<client::DaemonClient> m_client; ///< one connection to the daemon for everything
     std::unique_ptr<Integrations> m_integrations;
     AppFlow* m_flow = nullptr;
     PopupController* m_popup = nullptr;

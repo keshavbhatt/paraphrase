@@ -38,8 +38,10 @@ QJsonValue parseJson(const QString& text)
 
 } // namespace
 
-MainWindow::MainWindow(QWidget* parent)
+MainWindow::MainWindow(client::DaemonClient* client, QWidget* parent)
     : QWidget(parent)
+    , m_ownClient(client == nullptr ? std::make_unique<client::DaemonClient>() : nullptr)
+    , m_client(client == nullptr ? *m_ownClient : *client)
     , m_detector(util::LanguageData::builtIn())
     , m_tokens(Theme::current())
     , m_runner(new RequestRunner(m_client, this))

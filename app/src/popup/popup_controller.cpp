@@ -37,9 +37,12 @@ QVariantMap inputFor(SkillKind kind, const QString& text, const QString& targetL
 
 } // namespace
 
-PopupController::PopupController(const Integrations& integrations, QObject* parent)
+PopupController::PopupController(const Integrations& integrations, client::DaemonClient* client,
+                                 QObject* parent)
     : QObject(parent)
     , m_integrations(integrations)
+    , m_ownClient(client == nullptr ? std::make_unique<client::DaemonClient>() : nullptr)
+    , m_client(client == nullptr ? *m_ownClient : *client)
     , m_detector(util::LanguageData::builtIn())
     , m_runner(new RequestRunner(m_client, this))
     , m_window(std::make_unique<PopupWindow>(m_detector))

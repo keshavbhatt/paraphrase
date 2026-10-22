@@ -22,7 +22,7 @@ class AppFlow : public QObject
     Q_DISABLE_COPY_MOVE(AppFlow)
 
 public:
-    explicit AppFlow(QObject* parent = nullptr);
+    explicit AppFlow(client::DaemonClient& client, QObject* parent = nullptr);
     ~AppFlow() override;
 
     /// Opens setup on first run, else the main window (or keeps it hidden: tray autostart).
@@ -39,7 +39,7 @@ private:
     [[nodiscard]] bool hasModel();
     void showSetup();
 
-    std::unique_ptr<client::DaemonClient> m_client; ///< for setup and settings
+    client::DaemonClient& m_client; ///< the app's one connection, for every window
     std::unique_ptr<MainWindow> m_main;
     std::unique_ptr<SetupWindow> m_setup;
     std::unique_ptr<SettingsWindow> m_settings;
