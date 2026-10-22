@@ -34,7 +34,7 @@ def report(tag: str, model: str, skill: str) -> dict[str, Any] | None:
 
 
 def candidates() -> list[str]:
-    return [m.id for m in common.catalog().values() if m.role == "candidate"]
+    return [m.id for m in common.catalog().values() if m.role in ("candidate", "model")]
 
 
 def floor(r: dict[str, Any] | None) -> str:

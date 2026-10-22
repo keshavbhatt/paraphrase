@@ -265,3 +265,22 @@ both read a skill file the same way; `tests/vectors/skills.json` checks it.
 
 **Consequences.** yaml-cpp throws on malformed YAML; the loader catches it and returns an
 error naming the file, as the coding standards require.
+
+---
+
+## ADR-015: The model catalog is built into the daemon (2026-10-22)
+
+**Status.** Accepted.
+
+**Context.** Omnidict fetches its dictionary catalog from a release on the network. A model
+catalog pins each file to an upstream revision and a sha256; those pins are what make a
+download trustworthy, so whoever can change the catalog can change what users run.
+
+**Decision.** `models.json` is compiled into the daemon as a resource and never fetched. The
+only network use stays the model files themselves, from Hugging Face at the pinned revision,
+over HTTPS, checked against the sha256 before first use (PLAN D8, section 8). New or updated
+models arrive with an app update.
+
+**Consequences.** No signing or update channel for the catalog is needed. A model fix waits
+for a release. The eval harness and the daemon read the same file (`models.json` at the
+repository root), so what is measured is what ships.

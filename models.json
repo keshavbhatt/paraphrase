@@ -1,9 +1,10 @@
 {
-  "schema_version": 1,
-  "notes": "Model catalog (PLAN 5.5). Every file is fetched from hf_repo at the pinned revision and checked against its sha256. ram_required, vram_recommended, tiers and languages are filled from M0 measurements (DOCS/models.md).",
+  "schema_version": 2,
+  "notes": "Model catalog (PLAN 5.5, schema in DOCS/models.md). Every file is fetched from hf_repo at the pinned revision and checked against its sha256. role: model (ships, has tiers), draft (a draft head for the models in draft_for), candidate, experiment and judge (evaluation only, the daemon ignores them). ram_required: total memory in GB a computer needs for the model; memory_gb: peak memory in use with its draft head, measured in M0 (DOCS/models.md).",
   "models": [
     {
       "id": "qwen3.5-0.8b-q4km",
+      "name": "Qwen3.5 0.8B",
       "role": "candidate",
       "family": "qwen",
       "params": "0.8B",
@@ -19,6 +20,7 @@
       ],
       "upstream": "Qwen/Qwen3.5-0.8B",
       "ram_required": null,
+      "memory_gb": null,
       "vram_recommended": null,
       "ctx": 4096,
       "licence": "Apache-2.0",
@@ -29,6 +31,7 @@
     },
     {
       "id": "qwen3.5-2b-q4km",
+      "name": "Qwen3.5 2B",
       "role": "candidate",
       "family": "qwen",
       "params": "2B",
@@ -44,6 +47,7 @@
       ],
       "upstream": "Qwen/Qwen3.5-2B",
       "ram_required": null,
+      "memory_gb": null,
       "vram_recommended": null,
       "ctx": 4096,
       "licence": "Apache-2.0",
@@ -54,6 +58,7 @@
     },
     {
       "id": "qwen3.5-4b-q4km",
+      "name": "Qwen3.5 4B",
       "role": "candidate",
       "family": "qwen",
       "params": "4B",
@@ -69,6 +74,7 @@
       ],
       "upstream": "Qwen/Qwen3.5-4B",
       "ram_required": null,
+      "memory_gb": null,
       "vram_recommended": null,
       "ctx": 4096,
       "licence": "Apache-2.0",
@@ -79,7 +85,8 @@
     },
     {
       "id": "gemma-4-e2b-qat-q4_0",
-      "role": "candidate",
+      "name": "Gemma 4 E2B",
+      "role": "model",
       "family": "gemma",
       "params": "E2B (5.1B with per-layer embeddings)",
       "quant": "Q4_0 (QAT)",
@@ -93,18 +100,22 @@
         }
       ],
       "upstream": "google/gemma-4-E2B-it",
-      "ram_required": null,
+      "ram_required": 8,
+      "memory_gb": 5.0,
       "vram_recommended": null,
       "ctx": 4096,
       "licence": "Apache-2.0",
       "licence_url": "https://ai.google.dev/gemma/docs/gemma_4_license",
       "chat_template": "embedded",
-      "tiers": [],
+      "tiers": [
+        "fast"
+      ],
       "languages": {}
     },
     {
       "id": "gemma-4-e4b-qat-q4_0",
-      "role": "candidate",
+      "name": "Gemma 4 E4B",
+      "role": "model",
       "family": "gemma",
       "params": "E4B (8B with per-layer embeddings)",
       "quant": "Q4_0 (QAT)",
@@ -118,17 +129,21 @@
         }
       ],
       "upstream": "google/gemma-4-E4B-it",
-      "ram_required": null,
+      "ram_required": 16,
+      "memory_gb": 8.8,
       "vram_recommended": null,
       "ctx": 4096,
       "licence": "Apache-2.0",
       "licence_url": "https://ai.google.dev/gemma/docs/gemma_4_license",
       "chat_template": "embedded",
-      "tiers": [],
+      "tiers": [
+        "quality"
+      ],
       "languages": {}
     },
     {
       "id": "sarvam-30b-q4km",
+      "name": "Sarvam 30B",
       "role": "judge",
       "family": "sarvam",
       "params": "30B MoE (2.4B active)",
@@ -169,6 +184,7 @@
       ],
       "upstream": "sarvamai/sarvam-30b",
       "ram_required": null,
+      "memory_gb": null,
       "vram_recommended": null,
       "ctx": 8192,
       "licence": "Apache-2.0",
@@ -179,6 +195,7 @@
     },
     {
       "id": "gemma-4-e2b-q4km",
+      "name": "Gemma 4 E2B (Q4_K_M)",
       "role": "experiment",
       "family": "gemma",
       "params": "E2B (5.1B with per-layer embeddings)",
@@ -194,6 +211,7 @@
       ],
       "upstream": "google/gemma-4-E2B-it",
       "ram_required": null,
+      "memory_gb": null,
       "vram_recommended": null,
       "ctx": 4096,
       "licence": "Apache-2.0",
@@ -205,6 +223,7 @@
     },
     {
       "id": "gemma-4-e2b-mtp-q4_0",
+      "name": "Gemma 4 E2B speed-up",
       "role": "draft",
       "family": "gemma",
       "params": "multi-token-prediction head for E2B",
@@ -220,6 +239,7 @@
       ],
       "upstream": "google/gemma-4-E2B-it",
       "ram_required": null,
+      "memory_gb": null,
       "vram_recommended": null,
       "ctx": 4096,
       "licence": "Apache-2.0",
@@ -234,6 +254,7 @@
     },
     {
       "id": "gemma-4-e4b-mtp-q4_0",
+      "name": "Gemma 4 E4B speed-up",
       "role": "draft",
       "family": "gemma",
       "params": "multi-token-prediction head for E4B",
@@ -249,6 +270,7 @@
       ],
       "upstream": "google/gemma-4-E4B-it",
       "ram_required": null,
+      "memory_gb": null,
       "vram_recommended": null,
       "ctx": 4096,
       "licence": "Apache-2.0",

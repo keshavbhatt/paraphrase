@@ -262,7 +262,7 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("ratings", type=Path)
     args = ap.parse_args(argv)
     if args.cmd == "build":
-        models = [m.id for m in common.catalog().values() if m.role == "candidate"]
+        models = [m.id for m in common.catalog().values() if m.role in ("candidate", "model")]
         skill_tags = dict(x.split("=", 1) for x in args.skill_tag)
         unknown = set(skill_tags) - set(PLAN)
         if unknown:

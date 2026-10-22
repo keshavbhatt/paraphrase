@@ -16,9 +16,26 @@ Checked on Hugging Face on 2026-10-21.
 | `qwen3.5-0.8b-q4km` | candidate | Qwen/Qwen3.5-0.8B | bartowski/Qwen_Qwen3.5-0.8B-GGUF | Q4_K_M (imatrix) | 0.58 GB | Apache-2.0 |
 | `qwen3.5-2b-q4km` | candidate | Qwen/Qwen3.5-2B | bartowski/Qwen_Qwen3.5-2B-GGUF | Q4_K_M (imatrix) | 1.40 GB | Apache-2.0 |
 | `qwen3.5-4b-q4km` | candidate | Qwen/Qwen3.5-4B | bartowski/Qwen_Qwen3.5-4B-GGUF | Q4_K_M (imatrix) | 3.01 GB | Apache-2.0 |
-| `gemma-4-e2b-qat-q4_0` | candidate | google/gemma-4-E2B-it | google/gemma-4-E2B-it-qat-q4_0-gguf (official) | Q4_0, quantisation-aware trained | 3.35 GB | Apache-2.0 |
-| `gemma-4-e4b-qat-q4_0` | candidate | google/gemma-4-E4B-it | google/gemma-4-E4B-it-qat-q4_0-gguf (official) | Q4_0, quantisation-aware trained | 5.15 GB | Apache-2.0 |
+| `gemma-4-e2b-qat-q4_0` | model, fast tier | google/gemma-4-E2B-it | google/gemma-4-E2B-it-qat-q4_0-gguf (official) | Q4_0, quantisation-aware trained | 3.35 GB | Apache-2.0 |
+| `gemma-4-e4b-qat-q4_0` | model, quality tier | google/gemma-4-E4B-it | google/gemma-4-E4B-it-qat-q4_0-gguf (official) | Q4_0, quantisation-aware trained | 5.15 GB | Apache-2.0 |
 | `sarvam-30b-q4km` | judge only | sarvamai/sarvam-30b | sarvamai/sarvam-30b-gguf (official, 6 parts) | Q4_K_M | 19.57 GB | Apache-2.0 |
+| `gemma-4-e2b-q4km` | experiment | google/gemma-4-E2B-it | bartowski/google_gemma-4-E2B-it-GGUF | Q4_K_M (imatrix) | 3.46 GB | Apache-2.0 |
+| `gemma-4-e2b-mtp-q4_0` | draft for E2B | google/gemma-4-E2B-it | ggml-org/gemma-4-E2B-it-GGUF | Q4_0 | 0.06 GB | Apache-2.0 |
+| `gemma-4-e4b-mtp-q4_0` | draft for E4B | google/gemma-4-E4B-it | ggml-org/gemma-4-E4B-it-GGUF | Q4_0 | 0.06 GB | Apache-2.0 |
+
+**Schema 2** (after M0). The daemon builds `models.json` in (ADR-015) and reads only the
+entries it can offer:
+
+- `role`: `model` ships and has `tiers` (`fast`, `quality`); `draft` is a draft head for the
+  models in `draft_for` (ADR-004), downloaded with them and shown as "speed-up"; `candidate`,
+  `experiment` and `judge` are for evaluation only.
+- `name`: what the app shows ("Gemma 4 E2B").
+- `ram_required`: the computer's total memory, in GB, the model needs (8 for the fast tier,
+  16 for the quality tier). A computer reporting slightly less, as most do, still counts.
+- `memory_gb`: peak memory in use with its draft head (M0, Chosen setup below), for the
+  first-run and settings screens.
+- `files`: each file's name, size and sha256; the download URL is
+  `https://huggingface.co/<hf_repo>/resolve/<revision>/<file>`.
 
 Notes on the choices:
 
