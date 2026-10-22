@@ -71,7 +71,8 @@ private:
     /// The slot to load `job`'s model into: a free one when two may stay loaded, else the one
     /// used longest ago (the others are unloaded when only one may stay).
     [[nodiscard]] std::size_t slotFor(const Job& job);
-    [[nodiscard]] static std::array<std::unique_ptr<engine::Engine>, 2>
+    static constexpr std::size_t kSlots = 2; ///< the fast and the quality model
+    [[nodiscard]] static std::array<std::unique_ptr<engine::Engine>, kSlots>
     makeEngines(const EngineFactory& factory);
     [[nodiscard]] static bool holds(const engine::Engine& engine, const engine::EngineConfig& model);
 
