@@ -39,6 +39,9 @@ struct Skill
     [[nodiscard]] Prompt render(const Values& inputs) const;
 
     [[nodiscard]] QString outputType() const { return output.value(QStringLiteral("type")).toString(); }
+    /// The input the skill works on: "context" for a skill that answers a message (its
+    /// template uses {{context}}; "text" is then an optional draft), otherwise "text".
+    [[nodiscard]] QString mainInput() const;
     [[nodiscard]] bool keepsLanguage() const
     {
         return output.value(QStringLiteral("language")).toString() == QStringLiteral("same");

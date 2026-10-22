@@ -39,15 +39,15 @@ daemon exits; never while a download runs).
 | `RunSkill(s skill_id, a{sv} input, a{sv} options)` | `s request_id` | Queues a run; the answer comes as signals |
 | `Cancel(s request_id)` | | Stops one of the caller's requests |
 | `Warm(s skill_id, a{sv} input)` | | Reads the text ahead for a likely action (ADR-005) |
-| `ListSkills()` | `s` JSON array | Every skill and preset |
+| `ListSkills()` | `s` JSON array | Every skill and preset: `id`, `base`, `title`, `tier`, `output`, `variants`, `max_input_tokens`, `main_input` (`text`, or `context` for a skill that answers a message) |
 | `Status()` | `s` JSON object | Loaded model, threads, queue, memory, the computer |
 | `ListModels()` | `s` JSON array | Offered models, installed or not, with their source |
 | `DownloadModel(s model_id)` | | Downloads a model and its draft head |
 | `PauseDownload(s model_id)` | | Keeps what arrived; `DownloadModel` resumes |
 | `DeleteModel(s model_id)` | | Deletes a model and its draft head |
 
-**`input`** (all strings): `text` (what to work on; required except for reply), `context`
-(the message to reply to; required for reply), `target_lang` (a language code the user
+**`input`** (all strings): `text` (what to work on; required unless the skill's
+`main_input` is `context`), `context` (the message to reply to; required when it is), `target_lang` (a language code the user
 chose, for example `fr`; otherwise the output keeps the input's language; only skills whose
 prompt takes it, today rewrite, accept it). Any other key is
 an error. **`options`**: `model` (a model id from `ListModels` with role `model`) runs the

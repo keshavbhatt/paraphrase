@@ -1,5 +1,7 @@
 #include "skill.h"
 
+#include "template_renderer.h"
+
 namespace paraphrase::skills {
 
 Skill::Prompt Skill::render(const Values& inputs) const
@@ -13,6 +15,12 @@ Skill::Prompt Skill::render(const Values& inputs) const
         it.value() = neutralise(it.value(), tags);
     }
     return {.system = system.trimmed(), .user = renderTemplate(templ, values).trimmed()};
+}
+
+QString Skill::mainInput() const
+{
+    return templateVariables(templ).contains(QStringLiteral("context")) ? QStringLiteral("context")
+                                                                        : QStringLiteral("text");
 }
 
 } // namespace paraphrase::skills

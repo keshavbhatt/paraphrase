@@ -170,9 +170,12 @@ QString DaemonService::buildJob(const QString& skillId, const QVariantMap& input
         .context = input.value(u"context"_s).toString(),
         .targetLang = input.value(u"target_lang"_s).toString(),
     };
-    if (skill->baseId == u"reply"_s ? fields.context.trimmed().isEmpty() : fields.text.trimmed().isEmpty()) {
-        return skill->baseId == u"reply"_s ? tr("Reply needs the message to reply to (context).")
-                                           : tr("%1 needs some text.").arg(skill->title);
+    if (skill->mainInput() == u"context"_s) {
+        if (fields.context.trimmed().isEmpty()) {
+            return tr("%1 needs the message to reply to (context).").arg(skill->title);
+        }
+    } else if (fields.text.trimmed().isEmpty()) {
+        return tr("%1 needs some text.").arg(skill->title);
     }
     // Only a skill whose prompt names the target language can write in another one.
     if (!fields.targetLang.isEmpty() && !skill->templ.contains(u"target_lang"_s)) {
@@ -506,6 +509,7 @@ QString DaemonService::ListSkills() const
             {u"output"_s, s.outputType()},
             {u"variants"_s, s.variants},
             {u"max_input_tokens"_s, s.maxInputTokens},
+            {u"main_input"_s, s.mainInput()},
         });
     }
     return QString::fromUtf8(QJsonDocument(out).toJson(QJsonDocument::Compact));
