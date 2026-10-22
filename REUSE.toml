@@ -28,3 +28,10 @@ path = "DOCS/mocks/mock.js"
 precedence = "override"
 SPDX-FileCopyrightText = ["2026 Keshav Bhatt (Ktechpit)", "2026 Lucide Icons and Contributors"]
 SPDX-License-Identifier = "GPL-3.0-or-later AND ISC"
+
+# The app's icons are Lucide glyphs, the same as the mocks.
+[[annotations]]
+path = "app/icons/**"
+precedence = "override"
+SPDX-FileCopyrightText = "2026 Lucide Icons and Contributors"
+SPDX-License-Identifier = "ISC"
