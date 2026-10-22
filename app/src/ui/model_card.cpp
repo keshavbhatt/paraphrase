@@ -1,5 +1,6 @@
 #include "model_card.h"
 
+#include "widgets.h"
 #include "window_style.h"
 
 #include <QCheckBox>
@@ -25,7 +26,8 @@ QString describe(const ModelInfo& m, ModelCard::Tier tier)
 
 QString facts(const ModelInfo& m)
 {
-    QString line = ModelCard::tr("%1 download · %2 memory in use").arg(formatSize(m.size), formatMemory(m.memoryGb));
+    QString line =
+        ModelCard::tr("%1 download · %2 memory in use").arg(formatSize(m.size), formatMemory(m.memoryGb));
     if (m.installed) {
         line += ModelCard::tr(" · installed");
     }
@@ -50,18 +52,18 @@ ModelCard::ModelCard(const ModelInfo& model, Tier tier, QWidget* parent)
     m_tick->setAccessibleName(model.name);
     m_tick->setEnabled(model.fits);
     top->addWidget(m_tick);
-    QLabel* name = textLabel(tier == Tier::Fast ? tr("Fast") : tr("Quality"));
+    QLabel* name = makeLabel(tier == Tier::Fast ? tr("Fast") : tr("Quality"));
     name->setStyleSheet(u"font-size: 15px; font-weight: 600;"_s);
     top->addWidget(name);
-    top->addWidget(tier == Tier::Fast ? textLabel(tr("Recommended"), u"pill-accent"_s)
-                                      : textLabel(tr("Optional"), u"pill"_s));
+    top->addWidget(tier == Tier::Fast ? makeLabel(tr("Recommended"), u"pill-accent"_s)
+                                      : makeLabel(tr("Optional"), u"pill"_s));
     top->addStretch();
     col->addLayout(top);
-    col->addWidget(textLabel(model.name));
-    QLabel* about = textLabel(describe(model, tier), u"small"_s);
+    col->addWidget(makeLabel(model.name));
+    QLabel* about = makeLabel(describe(model, tier), u"small"_s);
     about->setWordWrap(true);
     col->addWidget(about);
-    QLabel* line = textLabel(facts(model));
+    QLabel* line = makeLabel(facts(model));
     line->setStyleSheet(u"font-size: 12px;"_s);
     col->addWidget(line);
     col->addStretch();

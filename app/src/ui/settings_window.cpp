@@ -33,6 +33,15 @@ SettingsWindow::SettingsWindow(client::DaemonClient& client, QWidget* parent)
     : QWidget(parent)
     , m_tokens(Theme::current())
     , m_models(new ModelsController(client, this))
+    , m_nav(new SettingsNav({
+          tr("General"),
+          tr("Shortcut"),
+          tr("My actions"),
+          tr("Models"),
+          tr("Privacy"),
+          tr("About"),
+      }))
+    , m_pages(new QStackedWidget)
 {
     setObjectName(u"settingsWindow"_s);
     setWindowTitle(tr("Paraphrase settings"));
@@ -40,9 +49,7 @@ SettingsWindow::SettingsWindow(client::DaemonClient& client, QWidget* parent)
     auto* root = new QHBoxLayout(this);
     root->setContentsMargins(24, 24, 24, 24);
     root->setSpacing(28);
-    m_nav = new SettingsNav({tr("General"), tr("Shortcut"), tr("My actions"), tr("Models"), tr("Privacy"), tr("About")});
     root->addWidget(m_nav, 0, Qt::AlignTop);
-    m_pages = new QStackedWidget;
     root->addWidget(m_pages, 1);
     addPages();
     connect(m_nav, &SettingsNav::pageChosen, this, [this](int page) { showPage(static_cast<Page>(page)); });
@@ -54,23 +61,35 @@ SettingsWindow::~SettingsWindow() = default;
 void SettingsWindow::addPages()
 {
     m_pages->addWidget(scrolled(new TextPage(
-        tr("General"), {tr("Starting with your computer, the tray icon and the language of the app come here with "
-                           "the popup, in a later version.")})));
+        tr("General"),
+        {
+            tr("Starting with your computer, the tray icon and the language of the app come here with "
+               "the popup, in a later version."),
+        })));
     m_pages->addWidget(scrolled(new TextPage(
-        tr("Shortcut"), {tr("The global shortcut that opens Paraphrase over any app comes in a later version. Until "
-                            "then everything works in Paraphrase's own window.")})));
+        tr("Shortcut"),
+        {
+            tr("The global shortcut that opens Paraphrase over any app comes in a later version. Until "
+               "then everything works in Paraphrase's own window."),
+        })));
     m_pages->addWidget(scrolled(new TextPage(
-        tr("My actions"), {tr("Your own actions, such as \"Rewrite as a LinkedIn post\" or \"Explain like I'm "
-                              "twelve\", come in a later version. They will sit next to the built-in ones in the "
-                              "main window and the popup.")})));
+        tr("My actions"),
+        {
+            tr("Your own actions, such as \"Rewrite as a LinkedIn post\" or \"Explain like I'm "
+               "twelve\", come in a later version. They will sit next to the built-in ones in the "
+               "main window and the popup."),
+        })));
     m_modelsPage = new ModelsSettingsPage(*m_models);
     m_pages->addWidget(scrolled(m_modelsPage));
     m_pages->addWidget(scrolled(new TextPage(
-        tr("Privacy"), {tr("What you write is read by the model on this computer and nowhere else. Paraphrase keeps "
-                           "none of it: there is no history, no account and no usage data. It goes online only to "
-                           "download a model you chose."),
-                        tr("A history you can turn on, kept on this computer only, may come in a later version. It "
-                           "will be off unless you turn it on.")})));
+        tr("Privacy"),
+        {
+            tr("What you write is read by the model on this computer and nowhere else. Paraphrase keeps "
+               "none of it: there is no history, no account and no usage data. It goes online only to "
+               "download a model you chose."),
+            tr("A history you can turn on, kept on this computer only, may come in a later version. It "
+               "will be off unless you turn it on."),
+        })));
     m_aboutPage = new AboutPage(*m_models);
     m_pages->addWidget(scrolled(m_aboutPage));
 }

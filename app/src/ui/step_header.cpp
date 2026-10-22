@@ -1,5 +1,6 @@
 #include "step_header.h"
 
+#include "widgets.h"
 #include "window_style.h"
 
 #include <QHBoxLayout>
@@ -16,7 +17,7 @@ StepHeader::StepHeader(const QString& title, const QStringList& steps, QWidget* 
     auto* row = new QHBoxLayout(this);
     row->setContentsMargins(24, 16, 24, 16);
     row->setSpacing(18);
-    row->addWidget(textLabel(title, u"title"_s));
+    row->addWidget(makeLabel(title, u"title"_s));
     row->addStretch();
     for (int i = 0; i < steps.size(); ++i) {
         auto* step = new QHBoxLayout;

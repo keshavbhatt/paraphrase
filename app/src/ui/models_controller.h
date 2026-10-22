@@ -51,8 +51,8 @@ public:
     QString setSpeedUp(bool on);
 
 Q_SIGNALS:
-    void changed();                     ///< the lists and the status were read again
-    void progress(const QString& id);   ///< bytes of a download moved on
+    void changed();                       ///< the lists and the status were read again
+    void progress(const QString& id);     ///< bytes of a download moved on
     void stateChanged(const QString& id); ///< a download started, paused, failed or finished
 
 private:

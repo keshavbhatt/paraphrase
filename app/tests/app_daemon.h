@@ -17,6 +17,11 @@ namespace paraphrase::testing {
 class AppDaemon
 {
 public:
+    AppDaemon() = default;
+    AppDaemon(const AppDaemon&) = delete;
+    AppDaemon& operator=(const AppDaemon&) = delete;
+    AppDaemon(AppDaemon&&) = delete;
+    AppDaemon& operator=(AppDaemon&&) = delete;
     static constexpr int kTimeoutMs = 10'000;
 
     /// Starts the daemon with `installed` models on a computer with `memoryGb`, and points
@@ -31,7 +36,8 @@ public:
         if (!install(catalog, m_dir->path() + u"/models"_s, installed)) {
             return false;
         }
-        auto skills = paraphrase::skills::SkillRegistry::load(QStringLiteral(PARAPHRASE_REPO_ROOT) + u"/skills"_s);
+        auto skills =
+            paraphrase::skills::SkillRegistry::load(QStringLiteral(PARAPHRASE_REPO_ROOT) + u"/skills"_s);
         if (!skills.ok()) {
             return false;
         }

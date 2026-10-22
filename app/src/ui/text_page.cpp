@@ -1,5 +1,6 @@
 #include "text_page.h"
 
+#include "widgets.h"
 #include "window_style.h"
 
 #include <QLabel>
@@ -15,9 +16,9 @@ TextPage::TextPage(const QString& title, const QStringList& paragraphs, QWidget*
 {
     m_column->setContentsMargins(0, 0, 0, 0);
     m_column->setSpacing(10);
-    m_column->addWidget(textLabel(title, u"h1"_s));
+    m_column->addWidget(makeLabel(title, u"h1"_s));
     for (qsizetype i = 0; i < paragraphs.size(); ++i) {
-        QLabel* p = textLabel(paragraphs.at(i), i == 0 ? QString() : u"muted"_s);
+        QLabel* p = makeLabel(paragraphs.at(i), i == 0 ? QString() : u"muted"_s);
         p->setWordWrap(true);
         p->setMaximumWidth(560);
         p->setTextFormat(Qt::RichText);

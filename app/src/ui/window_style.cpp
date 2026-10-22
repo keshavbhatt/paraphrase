@@ -1,8 +1,7 @@
 #include "window_style.h"
 
-#include <QLabel>
-#include <QPushButton>
 #include <QStyle>
+#include <QWidget>
 
 #include <utility>
 
@@ -21,9 +20,9 @@ QLabel[role="h2"] { font-size: 15px; font-weight: 600; }
 QLabel[role="title"] { font-size: 16px; font-weight: 600; }
 QLabel[role="mono"] { font-family: monospace; font-size: 12px; color: @text@; }
 QLabel[role="success"] { color: @success@; font-size: 12px; }
-QLabel[role="pill-accent"] { background: @accentSoft@; color: @accent@; border-radius: 11px; padding: 2px 9px; font-size: 12px; }
-QLabel[role="pill-ok"] { background: @successBg@; color: @success@; border-radius: 11px; padding: 2px 9px; font-size: 12px; }
-QLabel[role="pill-warn"] { background: @warningBg@; color: @warning@; border-radius: 11px; padding: 2px 9px; font-size: 12px; }
+QLabel[role="pill-accent"] { background: @accentSoft@; color: @accent@; border: 1px solid transparent; border-radius: 10px; padding: 1px 8px; font-size: 12px; }
+QLabel[role="pill-ok"] { background: @successBg@; color: @success@; border: 1px solid transparent; border-radius: 10px; padding: 1px 8px; font-size: 12px; }
+QLabel[role="pill-warn"] { background: @warningBg@; color: @warning@; border: 1px solid transparent; border-radius: 10px; padding: 1px 8px; font-size: 12px; }
 QLabel[role="th"] { color: @muted@; font-size: 11px; font-weight: 700; letter-spacing: 1px; }
 
 QLabel[step="todo"] { color: @muted@; font-size: 13px; }
@@ -47,7 +46,9 @@ QCheckBox::indicator { width: 18px; height: 18px; }
 
 QComboBox { background: @input@; color: @text@; border: 1px solid @border@; border-radius: 8px; padding: 0 10px; min-height: 36px; }
 QComboBox:focus { border: 1px solid @accent@; }
+QLabel[role="pill"] { border: 1px solid transparent; border-radius: 10px; padding: 1px 8px; }
 QComboBox::drop-down { border: none; background: transparent; width: 28px; }
+QComboBox::down-arrow { image: url(:/icons/down-@scheme@.svg); width: 14px; height: 14px; }
 QComboBox QAbstractItemView { background: @elevated@; color: @text@; selection-background-color: @hover@; selection-color: @text@; }
 
 QPushButton[kind="nav"] { text-align: left; background: transparent; border: none; border-radius: 8px; padding: 0 12px; min-height: 38px; }
@@ -87,26 +88,8 @@ QString windowStyleSheet(const Tokens& t)
     for (const auto& [name, colour] : colours) {
         css.replace(name.toString(), colour.name());
     }
+    css.replace(u"@scheme@"_s, t.dark ? u"dark"_s : u"light"_s);
     return Theme::styleSheet(t) + css;
-}
-
-QLabel* textLabel(const QString& text, const QString& role)
-{
-    auto* l = new QLabel(text);
-    if (!role.isEmpty()) {
-        l->setProperty("role", role);
-    }
-    return l;
-}
-
-QPushButton* plainButton(const QString& text, const QString& kind)
-{
-    auto* b = new QPushButton(text);
-    if (!kind.isEmpty()) {
-        b->setProperty("kind", kind);
-    }
-    b->setCursor(Qt::PointingHandCursor);
-    return b;
 }
 
 QString link(const QString& href, const QString& text, const Tokens& t)

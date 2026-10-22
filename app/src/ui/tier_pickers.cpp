@@ -1,6 +1,7 @@
 #include "tier_pickers.h"
 
 #include "models_controller.h"
+#include "widgets.h"
 #include "window_style.h"
 
 #include <QComboBox>
@@ -21,8 +22,8 @@ TierPickers::TierPickers(ModelsController& models, QWidget* parent)
     grid->setContentsMargins(0, 0, 0, 0);
     grid->setHorizontalSpacing(22);
     grid->setVerticalSpacing(6);
-    grid->addWidget(textLabel(tr("Fast: proofread, reply, format"), u"small"_s), 0, 0);
-    grid->addWidget(textLabel(tr("Quality: tone, summarize, translate, compose"), u"small"_s), 0, 1);
+    grid->addWidget(makeLabel(tr("Fast: proofread, reply, format"), u"small"_s), 0, 0);
+    grid->addWidget(makeLabel(tr("Quality: tone, summarize, translate, compose"), u"small"_s), 0, 1);
     m_fast->setObjectName(u"tierFast"_s);
     m_quality->setObjectName(u"tierQuality"_s);
     grid->addWidget(m_fast, 1, 0);

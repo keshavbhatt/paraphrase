@@ -50,8 +50,8 @@ private:
 
     Tokens m_tokens;
     ModelsController* m_models;
-    SettingsNav* m_nav = nullptr;
-    QStackedWidget* m_pages = nullptr;
+    SettingsNav* m_nav;
+    QStackedWidget* m_pages;
     ModelsSettingsPage* m_modelsPage = nullptr;
     AboutPage* m_aboutPage = nullptr;
 };

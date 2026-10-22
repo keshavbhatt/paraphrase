@@ -57,9 +57,9 @@ private:
     Tokens m_tokens;
     ModelsController* m_models;
     SampleRun* m_run;
-    StepHeader* m_header = nullptr;
-    QStackedWidget* m_pages = nullptr;
-    ModelPage* m_modelPage = nullptr;
+    StepHeader* m_header;
+    QStackedWidget* m_pages;
+    ModelPage* m_modelPage;
     QPushButton* m_back = nullptr;
     QLabel* m_footNote = nullptr;
     ChipButton* m_next = nullptr;

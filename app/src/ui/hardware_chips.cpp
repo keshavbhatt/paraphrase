@@ -1,5 +1,6 @@
 #include "hardware_chips.h"
 
+#include "widgets.h"
 #include "window_style.h"
 
 #include <QHBoxLayout>
@@ -19,13 +20,13 @@ HardwareChips::HardwareChips(QWidget* parent)
 
 void HardwareChips::setComputer(const QJsonObject& computer)
 {
-    while (QLayoutItem* item = m_row->takeAt(0)) {
+    while (const QLayoutItem* item = m_row->takeAt(0)) {
         if (QWidget* w = item->widget()) {
             w->deleteLater();
         }
         delete item;
     }
-    QLabel* lead = textLabel(tr("This computer:"));
+    QLabel* lead = makeLabel(tr("This computer:"));
     lead->setStyleSheet(u"font-size: 12px;"_s);
     m_row->addWidget(lead);
     const QStringList chips = {
@@ -35,7 +36,7 @@ void HardwareChips::setComputer(const QJsonObject& computer)
     };
     for (const QString& chip : chips) {
         if (!chip.trimmed().isEmpty()) {
-            m_row->addWidget(textLabel(chip, u"pill"_s));
+            m_row->addWidget(makeLabel(chip, u"pill"_s));
         }
     }
     m_row->addStretch();

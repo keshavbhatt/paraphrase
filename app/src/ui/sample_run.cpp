@@ -17,7 +17,8 @@ SampleRun::SampleRun(client::DaemonClient& client, QObject* parent)
     connect(&m_client, &client::DaemonClient::done, this, [this](const QString& id, const QString& result) {
         if (id == m_requestId) {
             m_requestId.clear();
-            Q_EMIT finished(QJsonDocument::fromJson(result.toUtf8()).object().value(u"output"_s).toString().trimmed());
+            Q_EMIT finished(
+                QJsonDocument::fromJson(result.toUtf8()).object().value(u"output"_s).toString().trimmed());
         }
     });
     connect(&m_client, &client::DaemonClient::error, this,
@@ -34,7 +35,8 @@ bool SampleRun::run(const QString& skillId, const QString& text)
     if (running() || text.trimmed().isEmpty()) {
         return false;
     }
-    const QDBusMessage reply = m_client.call(u"RunSkill"_s, {skillId, QVariantMap{{u"text"_s, text}}, QVariantMap()});
+    const QDBusMessage reply =
+        m_client.call(u"RunSkill"_s, {skillId, QVariantMap{{u"text"_s, text}}, QVariantMap()});
     if (reply.type() == QDBusMessage::ErrorMessage) {
         Q_EMIT failed(reply.errorMessage());
         return false;

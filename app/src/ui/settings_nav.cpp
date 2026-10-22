@@ -1,5 +1,6 @@
 #include "settings_nav.h"
 
+#include "widgets.h"
 #include "window_style.h"
 
 #include <QButtonGroup>
@@ -18,7 +19,7 @@ SettingsNav::SettingsNav(const QStringList& pages, QWidget* parent)
     col->setContentsMargins(0, 0, 0, 0);
     col->setSpacing(2);
     for (int i = 0; i < pages.size(); ++i) {
-        QPushButton* b = plainButton(pages.at(i), u"nav"_s);
+        QPushButton* b = makeButton(pages.at(i), u"nav"_s);
         b->setObjectName(u"nav%1"_s.arg(i));
         b->setCheckable(true);
         m_group->addButton(b, i);

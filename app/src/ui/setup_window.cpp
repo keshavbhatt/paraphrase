@@ -4,8 +4,10 @@
 #include "model_page.h"
 #include "models_controller.h"
 #include "sample_run.h"
+#include "shortcut_page.h"
 #include "step_header.h"
 #include "try_page.h"
+#include "widgets.h"
 #include "window_style.h"
 
 #include <QEvent>
@@ -26,6 +28,9 @@ SetupWindow::SetupWindow(client::DaemonClient& client, QWidget* parent)
     , m_tokens(Theme::current())
     , m_models(new ModelsController(client, this))
     , m_run(new SampleRun(client, this))
+    , m_header(new StepHeader(tr("Set up Paraphrase"), {tr("Shortcut (later)"), tr("Model"), tr("Try it")}))
+    , m_pages(new QStackedWidget)
+    , m_modelPage(new ModelPage(*m_models))
 {
     setObjectName(u"setupWindow"_s);
     setWindowTitle(tr("Set up Paraphrase"));
@@ -33,10 +38,7 @@ SetupWindow::SetupWindow(client::DaemonClient& client, QWidget* parent)
     auto* root = new QVBoxLayout(this);
     root->setContentsMargins(0, 0, 0, 0);
     root->setSpacing(0);
-    m_header = new StepHeader(tr("Set up Paraphrase"), {tr("Shortcut (later)"), tr("Model"), tr("Try it")});
     root->addWidget(m_header);
-    m_pages = new QStackedWidget;
-    m_modelPage = new ModelPage(*m_models);
     m_pages->addWidget(new ShortcutPage);
     m_pages->addWidget(m_modelPage);
     m_pages->addWidget(new TryPage(*m_run));
@@ -67,11 +69,11 @@ QWidget* SetupWindow::buildFooter()
     auto* row = new QHBoxLayout(band);
     row->setContentsMargins(24, 14, 24, 14);
     row->setSpacing(10);
-    m_back = plainButton(tr("Back"));
+    m_back = makeButton(tr("Back"));
     m_back->setProperty("size", u"big"_s);
     row->addWidget(m_back);
     row->addStretch();
-    m_footNote = textLabel(tr("You can change models later in Settings"), u"small"_s);
+    m_footNote = makeLabel(tr("You can change models later in Settings"), u"small"_s);
     row->addWidget(m_footNote);
     m_next = new ChipButton(tr("Continue when ready"));
     m_next->setObjectName(u"next"_s);

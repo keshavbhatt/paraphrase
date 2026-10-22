@@ -1,6 +1,7 @@
 #include "try_page.h"
 
 #include "sample_run.h"
+#include "widgets.h"
 #include "window_style.h"
 
 #include <QFrame>
@@ -18,14 +19,14 @@ TryPage::TryPage(SampleRun& run, QWidget* parent)
     : QWidget(parent)
     , m_run(run)
     , m_sample(new QLineEdit(tr("Their going to the market tomorow, dont be late.")))
-    , m_button(plainButton(tr("Proofread")))
-    , m_answer(textLabel(tr("The corrected sentence appears here."), u"muted"_s))
+    , m_button(makeButton(tr("Proofread")))
+    , m_answer(makeLabel(tr("The corrected sentence appears here."), u"muted"_s))
 {
     auto* col = new QVBoxLayout(this);
     col->setContentsMargins(24, 22, 24, 22);
     col->setSpacing(12);
-    col->addWidget(textLabel(tr("Try it"), u"h1"_s));
-    col->addWidget(textLabel(tr("Proofread one sentence, or write your own."), u"muted"_s));
+    col->addWidget(makeLabel(tr("Try it"), u"h1"_s));
+    col->addWidget(makeLabel(tr("Proofread one sentence, or write your own."), u"muted"_s));
     auto* row = new QHBoxLayout;
     m_sample->setObjectName(u"sample"_s);
     row->addWidget(m_sample, 1);
@@ -46,7 +47,8 @@ TryPage::TryPage(SampleRun& run, QWidget* parent)
     connect(m_button, &QPushButton::clicked, this, &TryPage::tryIt);
     connect(m_sample, &QLineEdit::returnPressed, this, &TryPage::tryIt);
     connect(&m_run, &SampleRun::finished, this, [this](const QString& text) { showAnswer(text, {}); });
-    connect(&m_run, &SampleRun::failed, this, [this](const QString& message) { showAnswer(message, u"danger"_s); });
+    connect(&m_run, &SampleRun::failed, this,
+            [this](const QString& message) { showAnswer(message, u"danger"_s); });
 }
 
 void TryPage::tryIt()
@@ -64,23 +66,6 @@ void TryPage::showAnswer(const QString& text, const QString& role)
     m_answer->setProperty("role", role);
     m_answer->setStyleSheet(u"font-size: 15px;"_s);
     repolish(m_answer);
-}
-
-ShortcutPage::ShortcutPage(QWidget* parent)
-    : QWidget(parent)
-{
-    auto* col = new QVBoxLayout(this);
-    col->setContentsMargins(24, 22, 24, 22);
-    col->setSpacing(12);
-    col->addWidget(textLabel(tr("A shortcut that opens Paraphrase over any app"), u"h1"_s));
-    QLabel* text = textLabel(tr("Select text anywhere, press the shortcut, pick an action. This comes in a later "
-                                "version of Paraphrase. Until then everything works in Paraphrase's own window: "
-                                "paste your text, pick an action, copy the result."),
-                             u"muted"_s);
-    text->setWordWrap(true);
-    text->setMaximumWidth(620);
-    col->addWidget(text);
-    col->addStretch();
 }
 
 } // namespace paraphrase::app

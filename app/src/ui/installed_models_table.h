@@ -36,7 +36,7 @@ private:
     void addRule(int row);
     void addModelRow(int row, const ModelInfo& m);
     void addSpeedUpRow(int row);
-    [[nodiscard]] QWidget* nameCell(const QString& name, const QString& detail) const;
+    [[nodiscard]] static QWidget* nameCell(const QString& name, const QString& detail);
     [[nodiscard]] QWidget* actionCell(const ModelInfo& m);
     [[nodiscard]] QWidget* confirmCell(const ModelInfo& m);
     [[nodiscard]] QString usedFor(const QString& modelId) const;

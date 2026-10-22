@@ -4,11 +4,14 @@
 #include "hardware_chips.h"
 #include "model_card.h"
 #include "models_controller.h"
+#include "widgets.h"
 #include "window_style.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QVBoxLayout>
+
+#include <algorithm>
 
 using namespace Qt::StringLiterals;
 
@@ -27,7 +30,7 @@ ModelPage::ModelPage(ModelsController& models, QWidget* parent)
     col->setSpacing(16);
     auto* head = new QVBoxLayout;
     head->setSpacing(8);
-    head->addWidget(textLabel(tr("Choose the model that writes for you"), u"h1"_s));
+    head->addWidget(makeLabel(tr("Choose the model that writes for you"), u"h1"_s));
     head->addWidget(m_chips);
     col->addLayout(head);
     m_cardsRow->setSpacing(14);
@@ -37,8 +40,9 @@ ModelPage::ModelPage(ModelsController& models, QWidget* parent)
     auto* privacy = new QHBoxLayout;
     privacy->setSpacing(10);
     privacy->addWidget(m_lock, 0, Qt::AlignTop);
-    QLabel* promise = textLabel(tr("Downloading models is the only time Paraphrase goes online. What you write "
-                                   "never leaves this computer, and there is no account."));
+    QLabel* promise =
+        makeLabel(tr("Downloading models is the only time Paraphrase goes online. What you write "
+                     "never leaves this computer, and there is no account."));
     promise->setStyleSheet(u"font-size: 12px;"_s);
     promise->setWordWrap(true);
     privacy->addWidget(promise, 1);
@@ -73,7 +77,8 @@ void ModelPage::load()
         m_cards.append(card);
         connect(card, &ModelCard::toggled, this, &ModelPage::onToggled);
         // Fast is preselected (note 2); a model already on its way stays ticked.
-        const bool tick = (kind == ModelCard::Tier::Fast && m->fits) || m->installed || !m->downloadState.isEmpty();
+        const bool tick =
+            (kind == ModelCard::Tier::Fast && m->fits) || m->installed || !m->downloadState.isEmpty();
         card->setChecked(tick);
     }
     Q_EMIT readyChanged(ready());
@@ -81,13 +86,10 @@ void ModelPage::load()
 
 bool ModelPage::ready() const
 {
-    for (const ModelCard* card : m_cards) {
+    return std::ranges::any_of(m_cards, [this](const ModelCard* card) {
         const ModelInfo* m = m_models.model(card->modelId());
-        if (card->isChecked() && m != nullptr && m->installed) {
-            return true;
-        }
-    }
-    return false;
+        return card->isChecked() && m != nullptr && m->installed;
+    });
 }
 
 void ModelPage::onToggled(const QString& modelId, bool on)
@@ -126,7 +128,8 @@ void ModelPage::onAction(const QString& modelId)
     const ModelInfo before = *found; // the calls below read the lists again
     const bool running = before.downloadState == u"downloading"_s || before.downloadState == u"waiting"_s;
     // Download, Resume and Retry: the user asked for it with this click.
-    if (const QString problem = running ? m_models.pause(modelId) : m_models.download(modelId); !problem.isEmpty()) {
+    if (const QString problem = running ? m_models.pause(modelId) : m_models.download(modelId);
+        !problem.isEmpty()) {
         ModelInfo failed = before;
         failed.downloadState = u"failed"_s;
         failed.downloadError = problem;

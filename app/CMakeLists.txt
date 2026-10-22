@@ -41,6 +41,7 @@ add_library(paraphrase_ui STATIC
     src/ui/settings_nav.cpp
     src/ui/settings_window.cpp
     src/ui/setup_window.cpp
+    src/ui/shortcut_page.cpp
     src/ui/skill_catalog.cpp
     src/ui/step_header.cpp
     src/ui/text_page.cpp
@@ -60,7 +61,7 @@ qt_add_resources(paraphrase_ui "icons"
     FILES
         icons/alert.svg icons/check.svg icons/copy.svg icons/down.svg icons/forward.svg
         icons/info.svg icons/lock.svg icons/pen.svg icons/refresh.svg icons/stop.svg
-        icons/undo.svg icons/x.svg
+        icons/undo.svg icons/x.svg icons/down-light.svg icons/down-dark.svg
 )
 
 qt_add_executable(paraphrase-app src/main.cpp)

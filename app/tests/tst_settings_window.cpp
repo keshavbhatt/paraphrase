@@ -25,7 +25,8 @@ namespace {
 
 QJsonObject status(DaemonClient& client)
 {
-    return QJsonDocument::fromJson(client.call(u"Status"_s, {}).arguments().value(0).toString().toUtf8()).object();
+    return QJsonDocument::fromJson(client.call(u"Status"_s, {}).arguments().value(0).toString().toUtf8())
+        .object();
 }
 
 bool installed(DaemonClient& client, const QString& id)
@@ -96,7 +97,8 @@ private Q_SLOTS:
         QVERIFY(fast >= 0);
         quality->setCurrentIndex(fast);
         Q_EMIT quality->activated(fast);
-        QCOMPARE(status(client).value(u"tier_models"_s).toObject().value(u"quality"_s).toString(), u"fast-model"_s);
+        QCOMPARE(status(client).value(u"tier_models"_s).toObject().value(u"quality"_s).toString(),
+                 u"fast-model"_s);
     }
 
     void savesScreenshots()

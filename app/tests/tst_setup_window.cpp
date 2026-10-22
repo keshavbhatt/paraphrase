@@ -33,7 +33,8 @@ constexpr int kTimeoutMs = AppDaemon::kTimeoutMs;
 bool installed(DaemonClient& client, const QString& id)
 {
     const QJsonArray models =
-        QJsonDocument::fromJson(client.call(u"ListModels"_s, {}).arguments().value(0).toString().toUtf8()).array();
+        QJsonDocument::fromJson(client.call(u"ListModels"_s, {}).arguments().value(0).toString().toUtf8())
+            .array();
     for (const auto& m : models) {
         if (m.toObject().value(u"id"_s).toString() == id) {
             return m.toObject().value(u"installed"_s).toBool();
@@ -96,8 +97,9 @@ private Q_SLOTS:
             m_daemon.state->answers = {u"They're going to the market tomorrow, don't be late."_s};
         }
         w.findChild<QPushButton*>(u"tryIt"_s)->click();
-        auto* result = w.findChild<QLabel*>(u"tryResult"_s);
-        QTRY_COMPARE_WITH_TIMEOUT(result->text(), u"They're going to the market tomorrow, don't be late."_s, kTimeoutMs);
+        const auto* result = w.findChild<QLabel*>(u"tryResult"_s);
+        QTRY_COMPARE_WITH_TIMEOUT(result->text(), u"They're going to the market tomorrow, don't be late."_s,
+                                  kTimeoutMs);
         const QSignalSpy finished(&w, &SetupWindow::finished);
         next->click();
         QCOMPARE(finished.size(), 1);
@@ -110,7 +112,7 @@ private Q_SLOTS:
         QVERIFY(client.connectToDaemon().isEmpty());
         SetupWindow w(client);
         w.start();
-        auto* quality = w.findChild<QCheckBox*>(u"tick-quality-model"_s);
+        const auto* quality = w.findChild<QCheckBox*>(u"tick-quality-model"_s);
         QVERIFY(quality != nullptr);
         QVERIFY(!quality->isEnabled());
         QVERIFY(!quality->isChecked());

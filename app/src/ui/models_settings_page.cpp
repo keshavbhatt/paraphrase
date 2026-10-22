@@ -4,6 +4,7 @@
 #include "languages_section.h"
 #include "models_controller.h"
 #include "tier_pickers.h"
+#include "widgets.h"
 #include "window_style.h"
 
 #include <QDesktopServices>
@@ -41,16 +42,17 @@ ModelsSettingsPage::ModelsSettingsPage(ModelsController& models, QWidget* parent
     auto* col = new QVBoxLayout(this);
     col->setContentsMargins(0, 0, 4, 0);
     col->setSpacing(18);
-    col->addWidget(textLabel(tr("Models"), u"h1"_s));
-    QLabel* intro = textLabel(tr("Paraphrase runs these models on this computer. Quick actions use the fast model; "
-                                 "tone changes and longer writing use the quality model when it is installed."),
-                              u"muted"_s);
+    col->addWidget(makeLabel(tr("Models"), u"h1"_s));
+    QLabel* intro =
+        makeLabel(tr("Paraphrase runs these models on this computer. Quick actions use the fast model; "
+                     "tone changes and longer writing use the quality model when it is installed."),
+                  u"muted"_s);
     intro->setWordWrap(true);
     intro->setMaximumWidth(560);
     col->addWidget(intro);
     QVBoxLayout* tiersCol = nullptr;
     col->addWidget(card(tiersCol));
-    tiersCol->addWidget(textLabel(tr("Which model does what"), u"h2"_s));
+    tiersCol->addWidget(makeLabel(tr("Which model does what"), u"h2"_s));
     tiersCol->addWidget(m_tiers);
     col->addWidget(buildInstalledCard());
     col->addWidget(new LanguagesSection);
@@ -69,18 +71,18 @@ QWidget* ModelsSettingsPage::buildInstalledCard()
     QFrame* frame = card(col);
     auto* head = new QHBoxLayout;
     head->setSpacing(8);
-    head->addWidget(textLabel(tr("Installed"), u"h2"_s));
-    m_diskUse = textLabel(QString(), u"small"_s);
+    head->addWidget(makeLabel(tr("Installed"), u"h2"_s));
+    m_diskUse = makeLabel(QString(), u"small"_s);
     head->addWidget(m_diskUse);
     head->addStretch();
-    m_add = plainButton(tr("+  Add a model"));
+    m_add = makeButton(tr("+  Add a model"));
     m_add->setObjectName(u"addModel"_s);
     m_addMenu = new QMenu(m_add);
     m_add->setMenu(m_addMenu);
     head->addWidget(m_add);
     col->addLayout(head);
     col->addWidget(m_table);
-    m_problem = textLabel(QString(), u"danger"_s);
+    m_problem = makeLabel(QString(), u"danger"_s);
     m_problem->setObjectName(u"modelsProblem"_s);
     m_problem->setWordWrap(true);
     m_problem->hide();
@@ -97,7 +99,7 @@ QWidget* ModelsSettingsPage::buildFolderLine()
     row->setSpacing(10);
     m_lock = new QLabel;
     row->addWidget(m_lock, 0, Qt::AlignTop);
-    m_folder = textLabel(QString());
+    m_folder = makeLabel(QString());
     m_folder->setObjectName(u"modelsFolder"_s);
     m_folder->setTextFormat(Qt::RichText);
     m_folder->setWordWrap(true);
@@ -125,9 +127,10 @@ void ModelsSettingsPage::reload()
         onDisk += m.installed ? m.size : 0;
     }
     m_diskUse->setText(tr("%1 used on disk").arg(formatSize(onDisk)));
-    m_folder->setText(tr("Models download only from their makers, at a fixed version, and are checked before use. "
-                         "They live in <span style=\"font-family: monospace\">%1</span> %2")
-                          .arg(m_models.modelsDir().toHtmlEscaped(), link(u"open"_s, tr("Open folder"), m_tokens)));
+    m_folder->setText(
+        tr("Models download only from their makers, at a fixed version, and are checked before use. "
+           "They live in <span style=\"font-family: monospace\">%1</span> %2")
+            .arg(m_models.modelsDir().toHtmlEscaped(), link(u"open"_s, tr("Open folder"), m_tokens)));
 }
 
 void ModelsSettingsPage::fillAddMenu()

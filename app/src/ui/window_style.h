@@ -4,8 +4,7 @@
 
 #include <QString>
 
-class QLabel;
-class QPushButton;
+class QWidget;
 
 namespace paraphrase::app {
 
@@ -14,9 +13,6 @@ namespace paraphrase::app {
 /// settings-models.html.
 [[nodiscard]] QString windowStyleSheet(const Tokens& t);
 
-/// Small builders shared by the two windows.
-[[nodiscard]] QLabel* textLabel(const QString& text, const QString& role = {});
-[[nodiscard]] QPushButton* plainButton(const QString& text, const QString& kind = {});
 /// Re-applies the style sheet to a widget whose dynamic property changed.
 void repolish(QWidget* w);
 /// A rich text link in the theme's accent: QLabel links otherwise take the palette's blue.
