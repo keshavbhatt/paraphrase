@@ -1,8 +1,10 @@
 # models: the built-in catalog, the models folder, downloads, the hardware probe and the tier
 # choice. QtCore, QtNetwork and util only (DOCS/CODING_STANDARDS.md 2).
 add_library(paraphrase_models STATIC
+    hardware_probe.cpp
     model_catalog.cpp
     model_store.cpp
+    tier_selector.cpp
 )
 paraphrase_set_warnings(paraphrase_models)
 target_include_directories(paraphrase_models PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/..")

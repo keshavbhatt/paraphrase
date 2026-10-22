@@ -3,10 +3,13 @@
 // installed only when its sha256 matches, and stays installed until the file changes. The
 // stamps are the ones scripts/fetch_model.py writes.
 
+#include "models/hardware_probe.h"
 #include "models/model_catalog.h"
 #include "models/model_store.h"
+#include "models/tier_selector.h"
 
 #include <QCryptographicHash>
+#include <QDir>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -15,10 +18,13 @@
 #include <QTest>
 
 using namespace Qt::StringLiterals;
+using paraphrase::models::HardwareInfo;
+using paraphrase::models::HardwareProbe;
 using paraphrase::models::ModelCatalog;
 using paraphrase::models::ModelEntry;
 using paraphrase::models::ModelFile;
 using paraphrase::models::ModelStore;
+using paraphrase::models::TierSelector;
 
 namespace {
 
@@ -74,6 +80,52 @@ ModelEntry entryFor(const QByteArray& content)
         },
     };
     return e;
+}
+
+/// One logical CPU in a fake /sys tree.
+struct FakeCpu
+{
+    int core = 0;
+    bool l3 = true;
+};
+
+/// A fake root with /proc/meminfo, /proc/cpuinfo and the CPU topology under /sys.
+bool writeTree(const QString& root, const QList<FakeCpu>& cpus, const QByteArray& meminfo,
+               const QByteArray& cpuinfo = "flags\t\t: fpu sse2 avx avx2 fma f16c avx_vnni\n")
+{
+    bool ok = QDir().mkpath(root + u"/proc"_s) && writeFile(root + u"/proc/meminfo"_s, meminfo) &&
+              writeFile(root + u"/proc/cpuinfo"_s, cpuinfo);
+    for (qsizetype i = 0; i < cpus.size(); ++i) {
+        const QString base = root + u"/sys/devices/system/cpu/cpu%1"_s.arg(i);
+        ok = ok && QDir().mkpath(base + u"/topology"_s) && QDir().mkpath(base + u"/cache/index2"_s) &&
+             writeFile(base + u"/topology/core_id"_s, QByteArray::number(cpus.at(i).core)) &&
+             writeFile(base + u"/topology/physical_package_id"_s, "0") &&
+             writeFile(base + u"/cache/index2/level"_s, "2");
+        if (cpus.at(i).l3) {
+            ok = ok && QDir().mkpath(base + u"/cache/index3"_s) &&
+                 writeFile(base + u"/cache/index3/level"_s, "3");
+        }
+    }
+    return ok;
+}
+
+/// Machine B: Core Ultra 7 255U, 2 P-cores with hyper-threads, 8 E-cores, 2 LP E-cores.
+QList<FakeCpu> ultra255u()
+{
+    QList<FakeCpu> cpus = {{.core = 8}, {.core = 8}, {.core = 12}, {.core = 12}};
+    for (int i = 0; i < 8; ++i) {
+        cpus.append({.core = i});
+    }
+    cpus.append({.core = 32, .l3 = false});
+    cpus.append({.core = 33, .l3 = false});
+    return cpus;
+}
+
+HardwareInfo withMemoryGb(double gb)
+{
+    HardwareInfo hw;
+    hw.totalMemory = static_cast<qint64>(gb * 1024 * 1024 * 1024);
+    return hw;
 }
 
 } // namespace
@@ -277,6 +329,91 @@ private Q_SLOTS:
         QCOMPARE(ModelStore::defaultRoot(), u"/home/u/snap/paraphrase/common/models"_s);
         qunsetenv("SNAP_USER_COMMON");
         QVERIFY(ModelStore::defaultRoot().endsWith(u"/paraphrase/models"_s));
+    }
+
+    void probeLeavesOutLowPowerCores()
+    {
+        const QTemporaryDir dir;
+        QVERIFY(
+            writeTree(dir.path(), ultra255u(), "MemTotal:       32294020 kB\nMemAvailable:   18490300 kB\n"));
+        const HardwareInfo hw = HardwareProbe::probe(dir.path(), 14);
+        QCOMPARE(hw.logicalCpus, 14);
+        QCOMPARE(hw.physicalCores, 12);
+        QCOMPARE(hw.threads, 10); // the fastest in the M0 sweep
+        QCOMPARE(hw.totalMemory, qint64{32294020} * 1024);
+        QCOMPARE(hw.availableMemory, qint64{18490300} * 1024);
+        QCOMPARE(hw.cpuFeatures, (QStringList{u"avx"_s, u"avx2"_s, u"fma"_s, u"f16c"_s, u"avx_vnni"_s}));
+        // Pinned to 4 CPUs, as M0 emulated machine A.
+        QCOMPARE(HardwareProbe::probe(dir.path(), 4).threads, 4);
+    }
+
+    void probeCountsPhysicalCores()
+    {
+        const QTemporaryDir dir;
+        // 4 cores with hyper-threads; no cache information at all (some VMs) counts the same.
+        const QList<FakeCpu> cpus = {
+            {.core = 0}, {.core = 1}, {.core = 2}, {.core = 3},
+            {.core = 0}, {.core = 1}, {.core = 2}, {.core = 3},
+        };
+        QVERIFY(writeTree(dir.path(), cpus, "MemTotal: 8000000 kB\n"));
+        QCOMPARE(HardwareProbe::probe(dir.path(), 8).threads, 4);
+        const QTemporaryDir vm;
+        QVERIFY(writeTree(vm.path(), {{.core = 0, .l3 = false}, {.core = 1, .l3 = false}},
+                          "MemTotal: 8000000 kB\n"));
+        QCOMPARE(HardwareProbe::probe(vm.path(), 2).threads, 2);
+    }
+
+    void probeHonoursACgroupMemoryLimit()
+    {
+        const QTemporaryDir dir;
+        QVERIFY(writeTree(dir.path(), ultra255u(), "MemTotal: 32294020 kB\nMemAvailable: 18490300 kB\n"));
+        QVERIFY(QDir().mkpath(dir.path() + u"/proc/self"_s));
+        QVERIFY(writeFile(dir.path() + u"/proc/self/cgroup"_s, "0::/user.slice/emulated-a.scope\n"));
+        QVERIFY(QDir().mkpath(dir.path() + u"/sys/fs/cgroup/user.slice/emulated-a.scope"_s));
+        QVERIFY(writeFile(dir.path() + u"/sys/fs/cgroup/user.slice/memory.max"_s, "max\n"));
+        QVERIFY(writeFile(dir.path() + u"/sys/fs/cgroup/user.slice/emulated-a.scope/memory.max"_s,
+                          "8589934592\n"));
+        const HardwareInfo hw = HardwareProbe::probe(dir.path(), 4);
+        QCOMPARE(hw.totalMemory, qint64{8589934592});
+        QCOMPARE(hw.totalMemoryGb(), 8.0);
+    }
+
+    void probesThisComputer()
+    {
+        const HardwareInfo hw = HardwareProbe::probe();
+        QVERIFY(hw.totalMemory > 0);
+        QVERIFY(hw.threads >= 1 && hw.threads <= hw.logicalCpus);
+        qInfo("%s: %.1f GB, %d threads of %d CPUs", qPrintable(hw.cpuModel), hw.totalMemoryGb(), hw.threads,
+              hw.logicalCpus);
+    }
+
+    void qualityTierNeedsSixteenGb()
+    {
+        const ModelCatalog catalog = ModelCatalog::builtIn();
+        const QSet<QString> both = {u"gemma-4-e2b-qat-q4_0"_s, u"gemma-4-e4b-qat-q4_0"_s};
+        const QString fast = u"gemma-4-e2b-qat-q4_0"_s;
+        const QString quality = u"gemma-4-e4b-qat-q4_0"_s;
+
+        const TierSelector small(catalog, withMemoryGb(7.6)); // an "8 GB" laptop
+        const auto offers = small.offers();
+        QCOMPARE(offers.size(), 2);
+        QCOMPARE(offers.at(0).model->id, fast);
+        QVERIFY(offers.at(0).fits && offers.at(0).recommended);
+        QVERIFY(!offers.at(1).fits && !offers.at(1).recommended);
+        QCOMPARE(small.modelFor(u"quality"_s, both)->id, fast); // rewrite runs on the fast tier
+
+        const TierSelector big(catalog, withMemoryGb(15.3)); // a "16 GB" one
+        QVERIFY(big.offers().at(1).fits);
+        QCOMPARE(big.modelFor(u"quality"_s, both)->id, quality);
+        QCOMPARE(big.modelFor(u"fast"_s, both)->id, fast);
+        QCOMPARE(big.modelFor(u"any"_s, both)->id, fast);
+        QCOMPARE(big.modelFor(u"quality"_s, {fast})->id, fast);
+        QCOMPARE(big.modelFor(u"fast"_s, {quality})->id, quality); // only the quality one installed
+        QVERIFY(big.modelFor(u"fast"_s, {}) == nullptr);
+        QVERIFY(small.modelFor(u"fast"_s, {quality}) == nullptr); // installed, but too large
+
+        // Below its guide the fast model still runs (ADR-003): it is the only choice.
+        QCOMPARE(TierSelector(catalog, withMemoryGb(5.8)).modelFor(u"fast"_s, both)->id, fast);
     }
 };
 

@@ -284,3 +284,26 @@ models arrive with an app update.
 **Consequences.** No signing or update channel for the catalog is needed. A model fix waits
 for a release. The eval harness and the daemon read the same file (`models.json` at the
 repository root), so what is measured is what ships.
+
+---
+
+## ADR-016: Hardware probe defaults: threads, CPU only, quality tier from 16 GB (2026-10-22)
+
+**Status.** Accepted for M1; the GPU choice is revisited with the first-run timing run (M3).
+
+**Context.** llama.cpp's default thread count on Intel hybrid CPUs is the number of
+performance cores: 2 on machine B, where the M0 sweep (2 to 14 threads) found 10 fastest.
+Machine B's 10 are its 2 P-cores and 8 E-cores; its 2 low-power E-cores sit outside the L3
+cache and slow every step down to their pace. M0 also found the Intel iGPU (Vulkan) slower
+than the CPU. The quality tier needs about 9 GB in use (DOCS/models.md).
+
+**Decision.** `HardwareProbe` reads `/proc` and `/sys` only. Threads: one per physical core
+that shares the L3 cache (all physical cores when the CPU reports no L3), capped by the CPUs
+the process may use. Memory: RAM, or a lower cgroup limit. The engine runs on the CPU. The
+quality model is offered when the computer has 16 GB (`ram_required`, with 10% tolerance
+because computers report less than their nominal size); a skill that asks for the quality
+tier runs on the fast model otherwise. The fast model runs on any computer, as ADR-003 says.
+
+**Consequences.** The rule is measured on one CPU; the bench on a real older laptop (before
+M5) checks it there. Settings can override the thread count. GPU offload waits for the
+timing run the first-run mock describes, which names a GPU it does not use.

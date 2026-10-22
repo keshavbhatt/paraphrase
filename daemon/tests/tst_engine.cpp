@@ -6,6 +6,7 @@
 
 #include "engine/llama_engine.h"
 #include "engine/skill_runner.h"
+#include "models/hardware_probe.h"
 #include "skills/skill_registry.h"
 
 #include <QFile>
@@ -46,7 +47,7 @@ EngineConfig config(int maxVariants, const QString& draft)
     return {
         .modelPath = modelPath(),
         .draftModelPath = draft,
-        .threads = 0,
+        .threads = paraphrase::models::HardwareProbe::probe().threads,
         .gpuLayers = 0,
         .contextSize = 4096,
         .maxVariants = maxVariants,
