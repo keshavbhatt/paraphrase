@@ -4,7 +4,7 @@ using namespace Qt::StringLiterals;
 
 namespace paraphrase::skills {
 
-Values buildInputs(const QString& baseSkillId, const RequestFields& fields,
+Values buildInputs(const QString& mainInput, const RequestFields& fields,
                    const util::LanguageDetector& detector)
 {
     Values inputs;
@@ -20,7 +20,7 @@ Values buildInputs(const QString& baseSkillId, const RequestFields& fields,
     if (!fields.tone.trimmed().isEmpty()) {
         inputs.insert(u"tone"_s, fields.tone);
     }
-    if (baseSkillId == u"reply"_s) {
+    if (mainInput == u"context"_s) {
         inputs.insert(u"context"_s, fields.context);
         inputs.insert(u"text"_s, fields.text);
         addLanguage(fields.context);

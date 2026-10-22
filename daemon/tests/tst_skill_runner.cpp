@@ -128,7 +128,7 @@ private:
 
     [[nodiscard]] paraphrase::skills::Values inputs(const QString& id, const RequestFields& fields) const
     {
-        return buildInputs(skill(id).baseId, fields, m_detector);
+        return buildInputs(skill(id).mainInput(), fields, m_detector);
     }
 
 private Q_SLOTS:

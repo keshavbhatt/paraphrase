@@ -19,10 +19,11 @@ struct RequestFields
 };
 
 /// The template values the engine adds to a request: `lang` and `lang_name` from the
-/// detector (run on `context` for reply, on `text` otherwise), and with a user-chosen
+/// detector (run on `context` for a skill that answers a message, its `mainInput` being
+/// "context", on `text` otherwise), and with a user-chosen
 /// `target_lang` the plain names of both languages (DOCS/skills.md). A port of
 /// eval/paraeval/common.skill_inputs.
-[[nodiscard]] Values buildInputs(const QString& baseSkillId, const RequestFields& fields,
+[[nodiscard]] Values buildInputs(const QString& mainInput, const RequestFields& fields,
                                  const util::LanguageDetector& detector);
 
 } // namespace paraphrase::skills

@@ -177,7 +177,7 @@ QString DaemonService::buildJob(const QString& skillId, const QVariantMap& input
         return problem;
     }
     job.skill = *skill;
-    job.inputs = skills::buildInputs(skill->baseId, fields, m_detector);
+    job.inputs = skills::buildInputs(skill->mainInput(), fields, m_detector);
     return {};
 }
 
