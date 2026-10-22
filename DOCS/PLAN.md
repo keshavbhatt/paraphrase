@@ -1,4 +1,4 @@
-# Local AI Writing Assistant — Project Plan
+# Local AI Writing Assistant: Project Plan
 
 > Name: **Paraphrase** (owner's decision, Oct 2026). It is a generic English word, so the brand rests on the full store title, the logo and "by KTechpit", not on the word alone. Known risk: a live US registration for PARAPHRASE in class 9 ("word processing random text generator", Life Systems Software, Inc., reg. renewed 2015), and many App Store apps named "Paraphrase AI". Mitigations are in §13.
 > This document is the source of truth for scope and architecture. It is written for Claude Code.
@@ -58,7 +58,7 @@ What makes this product different: **nothing leaves the machine**. There is no a
 | Skill id | What it does | Input | Output | Default tier |
 |---|---|---|---|---|
 | `proofread` | Fix spelling, grammar and punctuation; keep meaning, voice and language | text | corrected text → diff view | fast |
-| `rewrite.<tone>` | Tones: professional, casual, polite, friendly, confident, concise, elaborate, social, emojify | text | 1–3 variants | quality |
+| `rewrite.<tone>` | Tones: professional, casual, polite, friendly, confident, concise, elaborate, social, emojify | text | 1 to 3 variants | quality |
 | `reply` | Smart replies to a received message or thread | received text (+ optional draft) | 3 short chips (JSON) | fast |
 | `reply.draft` | Full reply from an intent ("accept, ask to move to Tuesday") | thread + intent + tone | draft | quality |
 | `compose` | Write from scratch: type (email, message, post, note) + tone + description | instruction | draft | quality |
@@ -77,7 +77,7 @@ Languages: English first-class; Hindi and Hinglish (Latin-script Hindi) as a sta
 4. **CLI** (`paraphrase proofread < file`, `paraphrase reply --json`). Useful for scripting and as the hotkey fallback (§6).
 5. **Browser extension (M4).** Gmail-style reply chips inside webmail (Gmail, Outlook web, Zimbra/Carbonio, Proton). Also a selection menu in any text field. Talks to the daemon via native messaging.
 5. **Thunderbird add-on (M4).** Reply chips in the message view; tone/proofread in the composer.
-6. **Input-method addon (M6).** Fcitx5 first, then IBus. Works inside every app on Wayland, can read surrounding text and commit text natively. This is the Samsung Keyboard–style experience and the long-term best answer to Wayland limits.
+6. **Input-method addon (M6).** Fcitx5 first, then IBus. Works inside every app on Wayland, can read surrounding text and commit text natively. This is the Samsung Keyboard style experience and the long-term best answer to Wayland limits.
 
 ---
 
@@ -92,7 +92,7 @@ paraphrase/
 │   ├── models.md                   # model catalog notes, licences, benchmark results
 │   └── platform-matrix.md          # capture/inject support per DE/compositor (kept current)
 ├── third_party/llama.cpp/          # git submodule, pinned commit
-├── daemon/                         # paraphrase-daemon — C++20, QtCore + QtDBus, no GUI
+├── daemon/                         # paraphrase-daemon: C++20, QtCore + QtDBus, no GUI
 │   ├── src/
 │   │   ├── engine/                 # LlamaEngine: load/unload, sessions, batching, prompt cache, grammars
 │   │   ├── skills/                 # SkillRegistry, YAML loader, template rendering, validation
@@ -179,7 +179,7 @@ Validation in CI: every skill renders for sample inputs, every grammar compiles,
 
 | Technique | Where | Notes |
 |---|---|---|
-| Right-sized model per machine | TierSelector | Two tiers: **fast** (~1–2B) for proofread/reply/format; **quality** (~4B) for rewrite/compose/translate/summarize. Low-RAM machines run everything on the fast tier |
+| Right-sized model per machine | TierSelector | Two tiers: **fast** (~1 to 2B) for proofread/reply/format; **quality** (~4B) for rewrite/compose/translate/summarize. Low-RAM machines run everything on the fast tier |
 | Quantisation | catalog | Q4_K_M default; Q5/Q6 offered when RAM allows |
 | GPU offload | engine | Vulkan backend by default (AMD/Intel/NVIDIA in one build); CPU fallback with AVX2/AVX-512 detection |
 | mmap + lazy load + keep-warm | engine | Load on first request or on `Warm()`; unload after idle timeout (default 10 min) or on memory pressure |
@@ -236,11 +236,11 @@ The popup flow needs three things: a **global hotkey**, the **text** the user me
 | Capability | X11 | Wayland: KDE Plasma | Wayland: GNOME | Wayland: wlroots (Sway, Hyprland…) |
 |---|---|---|---|---|
 | Global hotkey | XGrabKey | GlobalShortcuts portal | GlobalShortcuts portal (recent GNOME) | portal where available; else fallback |
-| Hotkey fallback | — | "Bind this command" (`paraphrase popup`) via the DE's custom shortcuts, guided in Settings | same | same (bind in compositor config) |
+| Hotkey fallback | none needed | "Bind this command" (`paraphrase popup`) via the DE's custom shortcuts, guided in Settings | same | same (bind in compositor config) |
 | Read selected text | PRIMARY selection | data-control protocol | not available → clipboard flow | data-control protocol |
 | Read copied text | CLIPBOARD | CLIPBOARD | CLIPBOARD (when our window has focus) | CLIPBOARD |
 | Put result back | XTest Ctrl+V after setting clipboard | RemoteDesktop portal (one-time permission, persisted) | RemoteDesktop portal | portal, or `wtype` if present |
-| Fallback | — | result on clipboard + "Press Ctrl+V" toast | same | same |
+| Fallback | none needed | result on clipboard + "Press Ctrl+V" toast | same | same |
 
 Rules:
 - **Standalone first (D14):** every backend may be missing. The app checks what works at start-up, shows it in Settings, and when the user reaches for a missing one it says what to do instead (copy first, paste the result, or use the main window). No feature is reachable only through an integration.
@@ -295,13 +295,13 @@ Rules:
 | **M4: Mail** | Browser extension + native host + Gmail/Outlook/Zimbra-Carbonio adapters; Thunderbird add-on | Reply chips appear in each supported webmail and insert correctly |
 | **M5: Release** | Snap, Flatpak, AppImage (DOCS/packaging.md); snap D-Bus name declaration; store listings; promo video | Installs and runs on a clean Ubuntu LTS, Fedora and Arch in each format, and every skill works from the main window in each |
 | **M6: IME + Windows** | Fcitx5 addon (inline suggestions, a Writing Assist panel), then IBus, shipped as distro packages (ADR-012); Windows build of the capture/inject layer | Inline proofread/tone in any app via the input method |
-| **v2** | "Write like me" style profile from opt-in samples (few-shot first, LoRA later); opt-in BYO cloud key; more languages | — |
+| **v2** | "Write like me" style profile from opt-in samples (few-shot first, LoRA later); opt-in BYO cloud key; more languages | none |
 
-Order: **M0 before anything else.** If a ~1–2B model on reference machine A can't do proofread and reply well enough, the product shape changes. For example, it might require a GPU or accept slower targets, and that must be known before the UI is built.
+Order: **M0 before anything else.** If a ~1 to 2B model on reference machine A can't do proofread and reply well enough, the product shape changes. For example, it might require a GPU or accept slower targets, and that must be known before the UI is built.
 
 ---
 
-## 11. Open questions (OPEN — ask the owner)
+## 11. Open questions (OPEN: ask the owner)
 
 1. Name: Paraphrase (decided). Still to do: reserve the snap name (`snapcraft register paraphrase`, or `paraphrase-ai` if taken), confirm `com.ktechpit.Paraphrase` on Flathub, register a domain, and get a short opinion from an IP lawyer on the US PARAPHRASE registration before a US launch
 2. Licence and business model: open source (GPL), or proprietary with a free tier + one-time Pro (like TypingTutor)? If Pro, which features are Pro?
@@ -320,7 +320,7 @@ Order: **M0 before anything else.** If a ~1–2B model on reference machine A ca
 ## 12. Suggested `CLAUDE.md`
 
 ```markdown
-# Paraphrase — agent instructions
+# Paraphrase: agent instructions
 
 Read PLAN.md first. §2 lists settled decisions; §11 lists open questions. Ask, don't assume.
 
@@ -342,8 +342,8 @@ Rules:
 Brand name + keyword-rich title: the brand stays protectable and unique, and the keywords do the search work.
 
 - Snap name: `paraphrase` · Flatpak ID: `com.ktechpit.Paraphrase`
-- Store title: **Paraphrase – Offline AI Writing Assistant**
-- Always present the name with its qualifier: "Paraphrase – Offline AI Writing Assistant" in stores, "Paraphrase by KTechpit" on the website and About box. Never use the bare word as a stylised logo-only mark.
+- Store title: **Paraphrase - Offline AI Writing Assistant**
+- Always present the name with its qualifier: "Paraphrase - Offline AI Writing Assistant" in stores, "Paraphrase by KTechpit" on the website and About box. Never use the bare word as a stylised logo-only mark.
 - Trademark precautions: do not file a trademark on the bare word (it would be refused as descriptive, and it collides with the existing US registration); if a mark is wanted later, file the logo + "KTechpit" combination. Do not describe the app as a "random text generator" or "word processor" (the registered goods).
 - Store search: the name itself now matches the high-volume query "paraphrase"; keep "grammar checker", "proofread", "smart reply" and "rewrite" in the summary and keywords so the other features are found too.
 - Summary (Snap: max 78 chars): `Private AI grammar checker, rewriter and smart reply writer that runs offline`

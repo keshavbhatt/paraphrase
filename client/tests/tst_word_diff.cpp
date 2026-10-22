@@ -30,7 +30,7 @@ class TestWordDiff : public QObject
 private Q_SLOTS:
     void tokensGiveTheTextBack()
     {
-        const QString text = u"Hello,  world!\nIt's 5pm — मेरी बहन आ रही है।"_s;
+        const QString text = u"Hello,  world!\nIt's 5pm: मेरी बहन आ रही है।"_s;
         QCOMPARE(WordDiff::tokens(text).join(QString()), text);
         QCOMPARE(WordDiff::tokens(u"It's 5pm."_s), (QStringList{u"It's"_s, u" "_s, u"5pm"_s, u"."_s}));
     }
