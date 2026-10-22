@@ -14,6 +14,24 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-23 - Fixes from the owner's CLI suite: daemon and CLI, proofread 10
+
+- Ctrl+C during a model load: the daemon answers Cancel at once instead of after the load
+  (17.5 s to 2 s); the next request still waits for the load.
+- Skill schema v4: `output.min_length`. Proofread (revision 10, 0.7) retries an answer that
+  left out text and refuses it with the error `incomplete` if the retry is short too, so a
+  shortened text never replaces the user's. A cancelled answer is not checked or retried.
+- A skill's main input (`text`, or `context` for a skill that answers a message) comes from
+  its template instead of a hardcoded reply check; `ListSkills` reports it as `main_input`.
+- CLI: `batch` takes `"input"` as a plain string, reports a broken line as `InvalidJson` with
+  its line number, and adds `line` to every result; `run reply TEXT` treats the text as the
+  message. The version hash follows git HEAD on every build.
+- Checked and not changed: Vulkan on this iGPU is slower than the CPU and 10 threads stays
+  best (M0); the CLI starts in 5 ms (the 1 s is `scripts/dev-run.sh`); a pipe gets the
+  finished answer by design; proofread keeps fixing capitals and full stops (owner decision).
+- Next: per-skill prompt caching and keeping both models loaded when memory allows (the ~5 s
+  pause on a proofread/rewrite switch); then M2 part 2.
+
 ## 2026-10-22 - Fixes from the owner's CLI suite: proofread 9, rewrite 10
 
 - The owner's suite (`paraphrase-tests`, 123 cases) found: "teh cat" proofread into the prompt's
