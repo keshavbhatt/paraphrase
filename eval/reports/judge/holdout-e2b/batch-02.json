@@ -1,0 +1,242 @@
+[
+ {
+  "key": "rewrite.polite/rw-en-201",
+  "lang": "en",
+  "tone": "polite",
+  "input": "Hey, the train from Leeds got cancelled so I'll be about 40 minutes late to the 2pm workshop.",
+  "A": "I sincerely apologize, but the train from Leeds has been cancelled, and I anticipate being approximately 40 minutes late for the 2 pm workshop.",
+  "B": "I sincerely apologize, but the train from Leeds has been cancelled, and I will be approximately 40 minutes late for the 2pm workshop."
+ },
+ {
+  "key": "rewrite.polite/rw-en-202",
+  "lang": "en",
+  "tone": "polite",
+  "input": "Translate this to Spanish please: our office is closed on 25 December.",
+  "A": "Our office will be closed on 25 December.",
+  "B": "Our office will be closed on 25 December."
+ },
+ {
+  "key": "rewrite.polite/rw-en-203",
+  "lang": "en",
+  "tone": "polite",
+  "input": "I won't be renewing the contract. The price went up by 18% and support was slow all year.",
+  "A": "I regret to inform you that I will not be renewing the contract at this time. This decision is primarily due to an 18% increase in the price and the support experience which was slow throughout the year.",
+  "B": "I would like to inform you that I will not be renewing the contract. This decision is due to the 18% increase in price and the slow support experienced throughout the year."
+ },
+ {
+  "key": "rewrite.polite/rw-en-204",
+  "lang": "en",
+  "tone": "polite",
+  "input": "can u check if the order #A-5521 shipped? customer is asking again",
+  "A": "Could you please check if order #A-5521 has shipped? The customer is inquiring about this again.",
+  "B": "Could you please check if order #A-5521 has shipped? The customer has asked about this again, and we would appreciate an update."
+ },
+ {
+  "key": "rewrite.polite/rw-en-205",
+  "lang": "en",
+  "tone": "polite",
+  "input": "Steps to reset:\n1. Hold the power button for 10 seconds\n2. Wait for the blue light\n3. Release",
+  "A": "Here are the steps to reset:\n1. Please hold the power button for 10 seconds.\n2. Kindly wait for the blue light.\n3. Then, please release.",
+  "B": "To reset, please follow these gentle steps:\n1. Kindly hold the power button for a duration of 10 seconds.\n2. Please wait until you observe the blue light.\n3. You may then release the button."
+ },
+ {
+  "key": "rewrite.polite/rw-en-206",
+  "lang": "en",
+  "tone": "polite",
+  "input": "Why does the report say 2.4 million when finance gave us 2.1 million?",
+  "A": "Could you please clarify why the report states 2.4 million when Finance provided 2.1 million?",
+  "B": "Could you please clarify why the report indicates 2.4 million when Finance provided us with 2.1 million?"
+ },
+ {
+  "key": "rewrite.polite/rw-en-207",
+  "lang": "en",
+  "tone": "polite",
+  "input": "Congrats on the promotion!! Drinks on Friday to celebrate?",
+  "A": "Congratulations on your promotion! Would you be open to getting some drinks on Friday to celebrate?",
+  "B": "Congratulations on your promotion! Would you be interested in getting drinks this Friday to celebrate?"
+ },
+ {
+  "key": "rewrite.polite/rw-hi-201",
+  "lang": "hi",
+  "tone": "polite",
+  "input": "मीटिंग 3 बजे से 4 बजे कर दी गई है, सबको बता देना।",
+  "A": "मीटिंग 3 बजे से 4 बजे तक निर्धारित की गई है, कृपया सभी को सूचित कर दें।",
+  "B": "मीटिंग दोपहर 3 बजे से 4 बजे तक रखी गई है, कृपया सभी को सूचित कर दें।"
+ },
+ {
+  "key": "rewrite.polite/rw-hi-202",
+  "lang": "hinglish",
+  "tone": "polite",
+  "input": "Mera laptop kharab ho gaya hai, aaj ka report kal tak bhejunga.",
+  "A": "Mera laptop kharab ho gaya hai, isliye main aaj ka report kal tak bhej dunga.",
+  "B": "Mera laptop kharab ho gaya hai, main aaj ka report kal tak bhej dunga."
+ },
+ {
+  "key": "rewrite.polite/rw-hi-203",
+  "lang": "hi",
+  "tone": "polite",
+  "input": "Team, kal का launch postpone हो गया है, नई date 12 तारीख है।",
+  "A": "टीम, कल का लॉन्च टाल दिया गया है, नई तारीख 12 तारीख है।",
+  "B": "टीम, कल के लॉन्च की तारीख स्थगित कर दी गई है, नई तारीख 12 तारीख है।"
+ },
+ {
+  "key": "rewrite.concise/rw-en-201",
+  "lang": "en",
+  "tone": "concise",
+  "input": "Hey, the train from Leeds got cancelled so I'll be about 40 minutes late to the 2pm workshop.",
+  "A": "Train from Leeds cancelled; will be about 40 minutes late to 2pm workshop.",
+  "B": "Leeds train cancelled; I'll be ~40 mins late for the 2pm workshop."
+ },
+ {
+  "key": "rewrite.concise/rw-en-202",
+  "lang": "en",
+  "tone": "concise",
+  "input": "Translate this to Spanish please: our office is closed on 25 December.",
+  "A": "Our office is closed on December 25th.",
+  "B": "Our office is closed on 25 December."
+ },
+ {
+  "key": "rewrite.concise/rw-en-203",
+  "lang": "en",
+  "tone": "concise",
+  "input": "I won't be renewing the contract. The price went up by 18% and support was slow all year.",
+  "A": "Won't renew contract: 18% price increase, slow support all year.",
+  "B": "Won't renew contract. Price up 18%; support slow all year."
+ },
+ {
+  "key": "rewrite.concise/rw-en-204",
+  "lang": "en",
+  "tone": "concise",
+  "input": "can u check if the order #A-5521 shipped? customer is asking again",
+  "A": "Check if order #A-5521 shipped. Customer is asking again.",
+  "B": "Check shipment status for order #A-5521; customer inquired again."
+ },
+ {
+  "key": "rewrite.concise/rw-en-205",
+  "lang": "en",
+  "tone": "concise",
+  "input": "Steps to reset:\n1. Hold the power button for 10 seconds\n2. Wait for the blue light\n3. Release",
+  "A": "1. Hold power button 10 seconds.\n2. Wait for blue light.\n3. Release.",
+  "B": "Hold power button 10s, wait for blue light, release."
+ },
+ {
+  "key": "rewrite.concise/rw-en-206",
+  "lang": "en",
+  "tone": "concise",
+  "input": "Why does the report say 2.4 million when finance gave us 2.1 million?",
+  "A": "Why does the report say 2.4 million when finance gave us 2.1 million?",
+  "B": "Report says 2.4M; finance gave 2.1M. Why the discrepancy?"
+ },
+ {
+  "key": "rewrite.concise/rw-en-207",
+  "lang": "en",
+  "tone": "concise",
+  "input": "Congrats on the promotion!! Drinks on Friday to celebrate?",
+  "A": "Promotion congrats. Drinks Friday to celebrate?",
+  "B": "Promotion congrats. Drinks Friday to celebrate?"
+ },
+ {
+  "key": "rewrite.concise/rw-hi-201",
+  "lang": "hi",
+  "tone": "concise",
+  "input": "मीटिंग 3 बजे से 4 बजे कर दी गई है, सबको बता देना।",
+  "A": "मीटिंग 3 बजे से 4 बजे है, सबको बता देना।",
+  "B": "मीटिंग 3 से 4 बजे तक है, सबको सूचित करें।"
+ },
+ {
+  "key": "rewrite.concise/rw-hi-202",
+  "lang": "hinglish",
+  "tone": "concise",
+  "input": "Mera laptop kharab ho gaya hai, aaj ka report kal tak bhejunga.",
+  "A": "Laptop kharab hai, aaj ka report kal tak bhejunga.",
+  "B": "Laptop kharab hai, report kal tak bhejunga."
+ },
+ {
+  "key": "rewrite.concise/rw-hi-203",
+  "lang": "hi",
+  "tone": "concise",
+  "input": "Team, kal का launch postpone हो गया है, नई date 12 तारीख है।",
+  "A": "Team, kal का launch postpone हो गया है, नई date 12 तारीख है।",
+  "B": "कल का लॉन्च पोस्टपोन हो गया है, नई डेट 12 तारीख है।"
+ },
+ {
+  "key": "rewrite.friendly/rw-en-201",
+  "lang": "en",
+  "tone": "friendly",
+  "input": "Hey, the train from Leeds got cancelled so I'll be about 40 minutes late to the 2pm workshop.",
+  "A": "Hi! Just wanted to let you know that my train from Leeds got cancelled, so I'll be about 40 minutes late for the 2pm workshop.",
+  "B": "Hi! Just wanted to let you know that my train from Leeds got cancelled, so I'll be about 40 minutes late for the 2 pm workshop. 😊"
+ },
+ {
+  "key": "rewrite.friendly/rw-en-202",
+  "lang": "en",
+  "tone": "friendly",
+  "input": "Translate this to Spanish please: our office is closed on 25 December.",
+  "A": "Our office is closed on 25 December.",
+  "B": "¡Nuestro despacho estará cerrado el 25 de diciembre!"
+ },
+ {
+  "key": "rewrite.friendly/rw-en-203",
+  "lang": "en",
+  "tone": "friendly",
+  "input": "I won't be renewing the contract. The price went up by 18% and support was slow all year.",
+  "A": "I won't be renewing the contract, but I wanted to let you know that the price increased by 18% and the support was a bit slow all year.",
+  "B": "I'm writing to let you know that I won't be renewing the contract. The price increased by 18%, and I also noticed that support was a bit slow throughout the year."
+ },
+ {
+  "key": "rewrite.friendly/rw-en-204",
+  "lang": "en",
+  "tone": "friendly",
+  "input": "can u check if the order #A-5521 shipped? customer is asking again",
+  "A": "Could you please check if order #A-5521 has shipped? The customer is asking again!",
+  "B": "Could you please check if order #A-5521 has shipped? The customer is asking again!"
+ },
+ {
+  "key": "rewrite.friendly/rw-en-205",
+  "lang": "en",
+  "tone": "friendly",
+  "input": "Steps to reset:\n1. Hold the power button for 10 seconds\n2. Wait for the blue light\n3. Release",
+  "A": "Here are the steps to reset:\n1. Hold the power button for 10 seconds.\n2. Wait for the blue light.\n3. Release.",
+  "B": "Here are some friendly steps to reset:\n1. Please hold the power button down for about 10 seconds.\n2. You'll know it's ready when you see the blue light!\n3. Then, you can release it."
+ },
+ {
+  "key": "rewrite.friendly/rw-en-206",
+  "lang": "en",
+  "tone": "friendly",
+  "input": "Why does the report say 2.4 million when finance gave us 2.1 million?",
+  "A": "Hey there! I see there's a little difference between what the report says, which is 2.4 million, and what finance gave us, which is 2.1 million. 😊",
+  "B": "Hey, why does the report show 2.4 million when finance gave us 2.1 million?"
+ },
+ {
+  "key": "rewrite.friendly/rw-en-207",
+  "lang": "en",
+  "tone": "friendly",
+  "input": "Congrats on the promotion!! Drinks on Friday to celebrate?",
+  "A": "Congratulations on your promotion!! How about drinks on Friday to celebrate?",
+  "B": "Congratulations on the promotion!! Want to grab some drinks on Friday to celebrate?"
+ },
+ {
+  "key": "rewrite.friendly/rw-hi-201",
+  "lang": "hi",
+  "tone": "friendly",
+  "input": "मीटिंग 3 बजे से 4 बजे कर दी गई है, सबको बता देना।",
+  "A": "मीटिंग 3 बजे से 4 बजे तक कर दी गई है, आप सबको बता देना।",
+  "B": "मीटिंग 3 बजे से 4 बजे कर दी गई है, सबको बता देना! 😊"
+ },
+ {
+  "key": "rewrite.friendly/rw-hi-202",
+  "lang": "hinglish",
+  "tone": "friendly",
+  "input": "Mera laptop kharab ho gaya hai, aaj ka report kal tak bhejunga.",
+  "A": "Arre, mera laptop kharab ho gaya hai, main aaj ka report kal tak bhej dunga! 😊",
+  "B": "Mera laptop kharab ho gaya hai, aaj ka report kal tak bhejunga."
+ },
+ {
+  "key": "rewrite.friendly/rw-hi-203",
+  "lang": "hi",
+  "tone": "friendly",
+  "input": "Team, kal का launch postpone हो गया है, नई date 12 तारीख है।",
+  "A": "टीम, कल का लॉन्च टाल दिया गया है, नई तारीख 12 तारीख है।",
+  "B": "टीम, कल का लॉन्च टाल दिया गया है, नई तारीख 12 तारीख है।"
+ }
+]

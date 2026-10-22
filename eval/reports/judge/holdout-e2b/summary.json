@@ -1,0 +1,54 @@
+{
+ "acceptable_pct": {
+  "q-rr-hold-base": 46.7,
+  "q-rr-hold-new": 70.0
+ },
+ "judged": {
+  "q-rr-hold-base": 60,
+  "q-rr-hold-new": 60
+ },
+ "better": {
+  "q-rr-hold-new": 31,
+  "q-rr-hold-base": 12,
+  "tie": 17
+ },
+ "problems": {
+  "q-rr-hold-base": {
+   "meaning_changed": 13,
+   "unnatural": 11,
+   "fact_changed": 6,
+   "generic": 5,
+   "wrong_language": 5,
+   "info_added": 5,
+   "contradicts_draft": 2,
+   "obeyed_instruction": 2,
+   "tone_missed": 2,
+   "format_lost": 2,
+   "not_distinct": 1,
+   "unsafe": 1,
+   "asks_known_info": 1
+  },
+  "q-rr-hold-new": {
+   "meaning_changed": 10,
+   "unnatural": 8,
+   "tone_missed": 6,
+   "wrong_language": 3,
+   "unsafe": 1,
+   "not_distinct": 1
+  }
+ },
+ "acceptable_by_skill": {
+  "reply q-rr-hold-base": "6/10",
+  "reply q-rr-hold-new": "8/10",
+  "rewrite.casual q-rr-hold-base": "6/10",
+  "rewrite.casual q-rr-hold-new": "9/10",
+  "rewrite.concise q-rr-hold-base": "4/10",
+  "rewrite.concise q-rr-hold-new": "7/10",
+  "rewrite.friendly q-rr-hold-base": "4/10",
+  "rewrite.friendly q-rr-hold-new": "6/10",
+  "rewrite.polite q-rr-hold-base": "3/10",
+  "rewrite.polite q-rr-hold-new": "6/10",
+  "rewrite.professional q-rr-hold-base": "5/10",
+  "rewrite.professional q-rr-hold-new": "6/10"
+ }
+}

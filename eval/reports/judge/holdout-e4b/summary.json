@@ -1,0 +1,46 @@
+{
+ "acceptable_pct": {
+  "q-rr-hold-base": 50.0,
+  "q-rr-hold-new": 74.0
+ },
+ "judged": {
+  "q-rr-hold-base": 50,
+  "q-rr-hold-new": 50
+ },
+ "better": {
+  "q-rr-hold-new": 23,
+  "tie": 14,
+  "q-rr-hold-base": 13
+ },
+ "problems": {
+  "q-rr-hold-base": {
+   "meaning_changed": 13,
+   "fact_changed": 8,
+   "unnatural": 7,
+   "wrong_language": 4,
+   "info_added": 4,
+   "tone_missed": 1,
+   "format_lost": 1
+  },
+  "q-rr-hold-new": {
+   "unnatural": 6,
+   "meaning_changed": 5,
+   "wrong_language": 5,
+   "tone_missed": 3,
+   "obeyed_instruction": 1,
+   "info_added": 1
+  }
+ },
+ "acceptable_by_skill": {
+  "rewrite.casual q-rr-hold-base": "6/10",
+  "rewrite.casual q-rr-hold-new": "10/10",
+  "rewrite.concise q-rr-hold-base": "5/10",
+  "rewrite.concise q-rr-hold-new": "6/10",
+  "rewrite.friendly q-rr-hold-base": "5/10",
+  "rewrite.friendly q-rr-hold-new": "7/10",
+  "rewrite.polite q-rr-hold-base": "6/10",
+  "rewrite.polite q-rr-hold-new": "7/10",
+  "rewrite.professional q-rr-hold-base": "3/10",
+  "rewrite.professional q-rr-hold-new": "7/10"
+ }
+}

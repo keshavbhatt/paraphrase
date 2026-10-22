@@ -1,0 +1,48 @@
+{
+ "acceptable_pct": {
+  "q-rr-base": 47.8,
+  "q-rr-new2": 67.7
+ },
+ "judged": {
+  "q-rr-base": 201,
+  "q-rr-new2": 201
+ },
+ "better": {
+  "q-rr-new2": 101,
+  "tie": 60,
+  "q-rr-base": 40
+ },
+ "problems": {
+  "q-rr-base": {
+   "fact_changed": 53,
+   "meaning_changed": 47,
+   "unnatural": 14,
+   "format_lost": 9,
+   "info_added": 8,
+   "obeyed_instruction": 7,
+   "tone_missed": 6,
+   "wrong_language": 5
+  },
+  "q-rr-new2": {
+   "meaning_changed": 31,
+   "unnatural": 25,
+   "tone_missed": 18,
+   "fact_changed": 9,
+   "info_added": 5,
+   "format_lost": 2,
+   "wrong_language": 2
+  }
+ },
+ "acceptable_by_skill": {
+  "rewrite.casual q-rr-base": "13/24",
+  "rewrite.casual q-rr-new2": "20/24",
+  "rewrite.concise q-rr-base": "12/24",
+  "rewrite.concise q-rr-new2": "16/24",
+  "rewrite.friendly q-rr-base": "8/24",
+  "rewrite.friendly q-rr-new2": "14/24",
+  "rewrite.polite q-rr-base": "7/24",
+  "rewrite.polite q-rr-new2": "12/24",
+  "rewrite.professional q-rr-base": "56/105",
+  "rewrite.professional q-rr-new2": "74/105"
+ }
+}

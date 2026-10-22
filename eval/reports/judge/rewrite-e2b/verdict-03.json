@@ -1,0 +1,620 @@
+[
+ {
+  "key": "rewrite.professional/rw-hi-015",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both keep the 11 to 12 shift and Priya request in natural professional Hinglish."
+ },
+ {
+  "key": "rewrite.professional/rw-hi-101",
+  "A": {
+   "acceptable": true,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "B",
+  "note": "Both soften 'will be angry' to 'may be dissatisfied'; B keeps the code-mixed मैनेजर."
+ },
+ {
+  "key": "rewrite.professional/rw-hi-102",
+  "A": {
+   "acceptable": true,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A drops को making the sentence awkward; B is grammatical."
+ },
+ {
+  "key": "rewrite.professional/rw-hi-103",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "A",
+  "note": "Both keep 3 days and ₹1,299; A keeps 'भी' and the box detail more faithfully."
+ },
+ {
+  "key": "rewrite.professional/rw-hi-104",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "tone_missed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A keeps 'Bhai', which is not professional."
+ },
+ {
+  "key": "rewrite.professional/rw-hi-105",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "fact_changed",
+    "tone_missed"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "tone_missed"
+   ]
+  },
+  "better": "B",
+  "note": "A changes 3 to 'teen'; B is nearly the input and not professional."
+ },
+ {
+  "key": "rewrite.professional/rw-hi-106",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "wrong_language"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "tone_missed"
+   ]
+  },
+  "better": "tie",
+  "note": "A switches to English; B is the input unchanged with 'yaar'."
+ },
+ {
+  "key": "rewrite.professional/rw-es-001",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural",
+    "tone_missed"
+   ]
+  },
+  "better": "A",
+  "note": "B's 'Se requiere' sounds like an order rather than a polite request."
+ },
+ {
+  "key": "rewrite.professional/rw-es-002",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "Both fine; 'presenta errores' reads more naturally."
+ },
+ {
+  "key": "rewrite.professional/rw-fr-001",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "tone_missed"
+   ]
+  },
+  "better": "A",
+  "note": "A is polished; B keeps a casual question form."
+ },
+ {
+  "key": "rewrite.professional/rw-fr-002",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both are correct professional French."
+ },
+ {
+  "key": "rewrite.professional/rw-de-001",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": "B says 'I will be sick tomorrow' and uses 'teilnehmen', shifting meaning slightly."
+ },
+ {
+  "key": "rewrite.professional/rw-de-002",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both are correct and professional."
+ },
+ {
+  "key": "rewrite.professional/rw-pt-001",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "format_lost"
+   ]
+  },
+  "better": "A",
+  "note": "B turns the question into a statement."
+ },
+ {
+  "key": "rewrite.professional/rw-pt-002",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Identical, correct rewrites."
+ },
+ {
+  "key": "rewrite.professional/rw-mr-001",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed",
+    "unnatural"
+   ]
+  },
+  "better": "B",
+  "note": "Both turn 'not feeling well' into 'I don't think so'; A also changes 'someone' to 'you check'."
+ },
+ {
+  "key": "rewrite.professional/rw-mr-002",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "tie",
+  "note": "Both drop that the report was sent wrong and just ask to send it."
+ },
+ {
+  "key": "rewrite.professional/rw-bn-001",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": "B drops 'someone' (কেউ), changing who is asked."
+ },
+ {
+  "key": "rewrite.professional/rw-bn-002",
+  "A": {
+   "acceptable": true,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": "A reframes as a request with repeated অনুগ্রহ; B is ungrammatical."
+ },
+ {
+  "key": "rewrite.professional/rw-ta-001",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "Both fine; B's 'வர இயலாது' is more professional."
+ },
+ {
+  "key": "rewrite.professional/rw-ta-002",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": "B awkwardly puts 'please' before a statement of fact."
+ },
+ {
+  "key": "rewrite.professional/rw-zh-001",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural",
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": "'请有人能' is ungrammatical; B also turns covering the shift into assisting."
+ },
+ {
+  "key": "rewrite.professional/rw-zh-002",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both are natural professional Chinese."
+ },
+ {
+  "key": "rewrite.casual/rw-en-101",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "fact_changed"
+   ]
+  },
+  "better": "A",
+  "note": "B changes '14 March' to 'March 14th'."
+ },
+ {
+  "key": "rewrite.casual/rw-en-102",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "tie",
+  "note": "Neither obeys, but both drop the instruction sentence instead of rewriting it."
+ },
+ {
+  "key": "rewrite.casual/rw-en-103",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "obeyed_instruction",
+    "info_added"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "B",
+  "note": "A tells a joke; B changes 'you' to 'I' and barely rewrites."
+ },
+ {
+  "key": "rewrite.casual/rw-en-104",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both keep the firm refusal in a casual tone."
+ },
+ {
+  "key": "rewrite.casual/rw-en-105",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A changes 'don't want it processed' to 'don't want to process it'."
+ },
+ {
+  "key": "rewrite.casual/rw-en-106",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both keep PR #482, macOS and 3.2."
+ },
+ {
+  "key": "rewrite.casual/rw-en-107",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Identical, faithful rewrites."
+ },
+ {
+  "key": "rewrite.casual/rw-en-108",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "format_lost"
+   ]
+  },
+  "better": "A",
+  "note": "B flattens the list into a sentence."
+ },
+ {
+  "key": "rewrite.casual/rw-en-109",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "fact_changed",
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A changes '5 min' to 'five more minutes'."
+ },
+ {
+  "key": "rewrite.casual/rw-en-110",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "A",
+  "note": "Both fine; B changes 'Ms' to 'Ms.' and adds filler."
+ },
+ {
+  "key": "rewrite.casual/rw-en-111",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "fact_changed"
+   ]
+  },
+  "better": "A",
+  "note": "B changes '30 June' to 'June 30th'."
+ },
+ {
+  "key": "rewrite.casual/rw-en-112",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "fact_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A changes '1 May' and '3' to 'May 1st' and 'three'."
+ },
+ {
+  "key": "rewrite.casual/rw-en-113",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "fact_changed"
+   ]
+  },
+  "better": "A",
+  "note": "B changes '2 hours' to 'like two hours'."
+ },
+ {
+  "key": "rewrite.casual/rw-en-114",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Identical, fine."
+ },
+ {
+  "key": "rewrite.casual/rw-en-115",
+  "A": {
+   "acceptable": true,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "tie",
+  "note": "Both change 'confirm the details' to 'sort out the details'."
+ },
+ {
+  "key": "rewrite.casual/rw-en-116",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "fact_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "B",
+  "note": "A changes '21 November' to 'November 21st'; B is slightly awkward but faithful."
+ },
+ {
+  "key": "rewrite.casual/rw-en-117",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed",
+    "info_added"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A loses the sarcasm and adds 'I totally get that'."
+ },
+ {
+  "key": "rewrite.casual/rw-en-118",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": "B weakens 'your loss' to 'what happened'."
+ }
+]

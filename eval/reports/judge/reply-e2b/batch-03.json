@@ -1,0 +1,563 @@
+[
+ {
+  "key": "reply/rp-hi-005",
+  "lang": "hi",
+  "message": "Hi team, कल का deadline बहुत important है। सभी लोग अपना code आज रात तक push कर दें और कोई issue हो तो मुझे बता दें।",
+  "expect": "ठीक है, आज रात तक कर दूँगा / एक issue है, बात करें / हो गया",
+  "A": [
+   "ठीक है, मैं कोशिश करता हूँ।",
+   "क्या कोई खास प्राथमिकता है?",
+   "मैं अभी थोड़ा व्यस्त हूँ।"
+  ],
+  "B": [
+   "ठीक है, मैं आज रात तक push कर दूँगा।",
+   "कोई issue नहीं है अभी।",
+   "ज़रूर, मैं अपडेट देता रहूँगा।"
+  ]
+ },
+ {
+  "key": "reply/rp-hi-006",
+  "lang": "hi",
+  "message": "मम्मी: बेटा, तुम्हारी तबीयत कैसी है अब? दवाई टाइम पर ले रहे हो ना?",
+  "expect": "अब ठीक हूँ / हाँ, ले रहा हूँ / चिंता मत करो",
+  "A": [
+   "मैं ठीक हूँ, मम्मी। हाँ, ले रहा हूँ।",
+   "सब ठीक है, बस थोड़ी थकान है।",
+   "बस ठीक हूँ, आप चिंता मत कीजिये।"
+  ],
+  "B": [
+   "हाँ मम्मी, ठीक हूँ। दवाइयाँ ले रहा हूँ।",
+   "सब बढ़िया है मम्मी, आप चिंता मत करो।",
+   "बस थोड़ा आराम कर रहा हूँ मम्मी।"
+  ]
+ },
+ {
+  "key": "reply/rp-hi-007",
+  "lang": "hi",
+  "message": "बधाई हो! सुना है तुम्हारा प्रमोशन हो गया। पार्टी कब दे रहे हो? 🎉",
+  "expect": "धन्यवाद / जल्दी पार्टी देंगे / इस शनिवार को",
+  "A": [
+   "धन्यवाद! अगले हफ्ते प्लान करते हैं।",
+   "शुक्रिया! पार्टी तो ज़रूर होगी।",
+   "मज़ेदार रहेगा! डिटेल्स बाद में बताना।"
+  ],
+  "B": [
+   "शुक्रिया! जल्द ही प्लान करता हूँ।",
+   "पार्टी का मेन्यू क्या है?",
+   "अभी तो थोड़ा व्यस्त हूँ। बाद में बताना।"
+  ]
+ },
+ {
+  "key": "reply/rp-hi-008",
+  "lang": "hi",
+  "message": "पड़ोसी: भाई साहब, कल सुबह पानी की टंकी की सफाई होगी, तो 8 से 11 बजे तक पानी नहीं आएगा। पहले से पानी भर लेना।",
+  "expect": "धन्यवाद, बता दिया / ठीक है, भर लेंगे / कितने बजे तक",
+  "A": [
+   "ठीक है, ध्यान रखूँगा।",
+   "क्या मैं खुद भर लूँ?",
+   "कोई और जानकारी है क्या?"
+  ],
+  "B": [
+   "ठीक है, ध्यान रखूंगा।",
+   "हाँ, 8 से 11 बजे तक नहीं आएगा।",
+   "कोई बात नहीं, पहले भर लूंगा।"
+  ]
+ },
+ {
+  "key": "reply/rp-hi-009",
+  "lang": "hinglish",
+  "message": "bhai kal ka plan pakka hai na? 7 baje tak aa jaana, late mat karna is baar 😂",
+  "expect": "haan pakka / thoda late ho jayega / kahan milna hai",
+  "A": [
+   "Haan bhai, pakka hai! 7 baje milte hain.",
+   "Sure yaar, no tension. Kal dekhte hain.",
+   "Ok, kal time pe aa jaunga, tension mat le."
+  ],
+  "B": [
+   "Haan bhai, pakka hai! Kal milte hain.",
+   "Kya plan hai exactly? Details bata de.",
+   "Sorry yaar, shayad late ho jaunga."
+  ]
+ },
+ {
+  "key": "reply/rp-hi-010",
+  "lang": "hinglish",
+  "message": "mummy: beta khana kha liya? aur kal papa ka checkup hai, tu saath chalega kya?",
+  "expect": "haan kha liya / haan chalunga / kal office hai, shaam ko",
+  "A": [
+   "Haan mummy, main saath chalunga.",
+   "Kal doctor ka time kya hai?",
+   "Abhi thoda kaam khatam kar leta hoon."
+  ],
+  "B": [
+   "Haan mummy, main chalunga.",
+   "Papa ka checkup hai? Kab hai?",
+   "Aaj main busy hoon, kal milte hain."
+  ]
+ },
+ {
+  "key": "reply/rp-hi-011",
+  "lang": "hinglish",
+  "message": "sir aaj thoda late ho jaunga, traffic bahut hai. 10:30 tak pahunch jaunga",
+  "expect": "koi baat nahi / theek hai, aa jao / meeting 11 baje shift kar dete hain",
+  "A": [
+   "Okay, koi problem nahi.",
+   "Kya main kuch pehle kar loon?",
+   "Theek hai, milte hain phir."
+  ],
+  "B": [
+   "Okay no problem, take your time.",
+   "Sure, let me know when you reach.",
+   "No worries, drive safe please."
+  ]
+ },
+ {
+  "key": "reply/rp-hi-012",
+  "lang": "hinglish",
+  "message": "yaar wo notes bhej de na jo kal class mein diye the, exam parso hai 😭",
+  "expect": "abhi bhejta hoon / photo bhej deta hoon / shaam tak",
+  "A": [
+   "Haan, main bhej deta hoon.",
+   "Kya tumne check kiya?",
+   "Abhi time nahi hai yaar."
+  ],
+  "B": [
+   "Haan, main abhi bhejta hoon.",
+   "Kal class mein kya topics tha?",
+   "Sorry, main woh notes nahi bhej sakta."
+  ]
+ },
+ {
+  "key": "reply/rp-hi-013",
+  "lang": "hinglish",
+  "message": "bhaiya parcel aapke ghar ke bahar rakh du? koi phone nahi utha raha",
+  "expect": "haan bahar rakh do / guard ko de do / 5 min mein aata hoon",
+  "A": [
+   "Haan, rakh do main check karta hoon.",
+   "Kyun nahi utha rahe ho? Kya hua?",
+   "Abhi thoda time lagega yaar."
+  ],
+  "B": [
+   "Haan, main bahar rakh deta hoon.",
+   "Kahan rakhe? Address batao.",
+   "Abhi main free nahi hoon."
+  ]
+ },
+ {
+  "key": "reply/rp-hi-014",
+  "lang": "hinglish",
+  "message": "Anu: kal shopping chalein? Diwali ke liye kapde lene hain\nMe: kaunse mall?\nAnu: Phoenix chalte hain, 4 baje?",
+  "expect": "done, 4 baje / 5 baje chalega / kal nahi ho payega",
+  "A": [
+   "Haan, Phoenix chalte hain! Sounds good.",
+   "4 baje theek hai, phir milte hain.",
+   "Chalo, main ready hoon! See you there."
+  ],
+  "B": [
+   "Haan, theek hai!",
+   "4 baje sahi hai, main ready hoon.",
+   "Aaj thoda busy hoon, shayad baad mein?"
+  ]
+ },
+ {
+  "key": "reply/rp-hi-015",
+  "lang": "hinglish",
+  "message": "bhai party mein aa raha hai na shaam ko? sab log aa rahe hain",
+  "expect": "continue in Hinglish: aaj nahi aa paunga / kaam hai / next time pakka",
+  "draft": "sorry yaar, ",
+  "A": [
+   "sorry yaar, main thoda late ho jaunga.",
+   "sorry yaar, kya time hai party ki?",
+   "sorry yaar, kab meeting hai wo?"
+  ],
+  "B": [
+   "Sorry yaar, main late ho jaunga.",
+   "Kya time hai party ka?",
+   "Abhi details batao."
+  ]
+ },
+ {
+  "key": "reply/rp-hi-101",
+  "lang": "hi",
+  "message": "बेटा, रविवार को दादी का जन्मदिन है। सब लोग दोपहर 12 बजे तक घर आ जाना।",
+  "expect": "warm agreement, maybe ask what to bring; never 'मुझे देखना होगा' style vagueness",
+  "A": [
+   "हाँ, ठीक है दादी।",
+   "ठीक है, मैं आ जाऊँगा।",
+   "देखता हूँ, शायद थोड़ा लेट हो जाऊँ।"
+  ],
+  "B": [
+   "ठीक है, मैं आ जाऊँगा।",
+   "दादी को जन्मदिन मुबारक हो!",
+   "12 बजे तक पहुँच जाएँगे।"
+  ]
+ },
+ {
+  "key": "reply/rp-hi-102",
+  "lang": "hi",
+  "message": "सर, कल की मीटिंग 11 बजे की जगह 12 बजे होगी।",
+  "expect": "acknowledge politely in Hindi; never ask the time",
+  "A": [
+   "ठीक है, धन्यवाद।",
+   "क्या कोई एजेंडा बदला?",
+   "मैं कल देखूंगा।"
+  ],
+  "B": [
+   "ठीक है, कल 12 बजे।",
+   "कोई दिक्कत नहीं, मैं तैयार हूँ।",
+   "हाँ, 12 बजे ठीक रहेगा।"
+  ]
+ },
+ {
+  "key": "reply/rp-hi-103",
+  "lang": "hi",
+  "message": "आपका ऑर्डर कल शाम 6 बजे तक पहुँच जाएगा।",
+  "expect": "thanks / ask to change time; never ask when",
+  "A": [
+   "ठीक है, धन्यवाद!",
+   "क्या डिलीवरी का पता है?",
+   "कल शाम 6 बजे सही है।"
+  ],
+  "B": [
+   "ठीक है, धन्यवाद।",
+   "क्या डिलीवरी का अनुमानित समय है?",
+   "मैं इंतज़ार करूँगा।"
+  ]
+ },
+ {
+  "key": "reply/rp-hi-104",
+  "lang": "hinglish",
+  "message": "Bhai kal cricket khelne chalega? Subah 7 baje ground pe",
+  "expect": "Hinglish replies in Latin letters, specific to cricket at 7",
+  "A": [
+   "Haan yaar, kal chalega! Subah 7 baje pakka.",
+   "Kya time final hai bhai? Ground pe milte hain.",
+   "Ok, kal subah 7 baje set hai. Ready hai?"
+  ],
+  "B": [
+   "Haan, chalega! Kab milega?",
+   "Aaj time nahi hai yaar.",
+   "Kal thoda busy hoon."
+  ]
+ },
+ {
+  "key": "reply/rp-hi-105",
+  "lang": "hinglish",
+  "message": "Maine tumhe 500 rupaye bheje hain, check karke batana",
+  "expect": "Hinglish: got it / will check / thanks; amount as written",
+  "A": [
+   "Okay, check kar raha hoon.",
+   "Thoda time do.",
+   "Abhi nahi kar sakta."
+  ],
+  "B": [
+   "Haan, check kar raha hoon.",
+   "Ok, main abhi check karta hoon.",
+   "Thanks for sending the money."
+  ]
+ },
+ {
+  "key": "reply/rp-hi-106",
+  "lang": "hinglish",
+  "message": "Kal office aa rahe ho ya WFH?",
+  "expect": "each reply answers office or WFH",
+  "A": [
+   "Office aa raha hoon.",
+   "Kya koi specific plan hai?",
+   "Main WFH karunga."
+  ],
+  "B": [
+   "Office aa raha hoon.",
+   "WFH karunga aaj.",
+   "Dekhte hain, baad mein batata hoon."
+  ]
+ },
+ {
+  "key": "reply/rp-hi-107",
+  "lang": "hinglish",
+  "message": "Happy birthday yaar! Party kab de raha hai? 🎂",
+  "expect": "thanks + party answer, Hinglish",
+  "A": [
+   "Party toh hogi yaar! Details baad mein batata hoon.",
+   "Kab ki baat hai? Mujhe confirm karna hai.",
+   "Abhi details clear nahi hain, main check karke batata hoon."
+  ],
+  "B": [
+   "Party toh next weekend hai yaar!",
+   "Abhi finalize nahi hua, dekh leta hoon.",
+   "Chill kar, details soon batata hoon."
+  ]
+ },
+ {
+  "key": "reply/rp-hi-108",
+  "lang": "hi",
+  "message": "Team, कल का deadline बहुत important है, सब लोग code आज रात तक push कर दें।",
+  "expect": "code-mixed replies like the message, specific to pushing code tonight",
+  "A": [
+   "ठीक है, मैं कर दूँगा।",
+   "क्या कोई issue है?",
+   "हाँ, मैं पूरी कोशिश करूँगा।"
+  ],
+  "B": [
+   "ठीक है, मैं कोशिश करता हूँ।",
+   "क्या कोई दिक्कत है?",
+   "अभी थोड़ा काम बाकी है।"
+  ]
+ },
+ {
+  "key": "reply/rp-es-001",
+  "lang": "es",
+  "message": "¿Vienes a cenar el sábado? Cocino paella a las nueve.",
+  "expect": "",
+  "A": [
+   "Sí, claro que voy.",
+   "¿A qué hora exactamente?",
+   "Ahora no puedo, gracias."
+  ],
+  "B": [
+   "Sí, claro, nos vemos a las nueve.",
+   "No puedo, tengo otro plan ese día.",
+   "Qué bien, ¿a qué hora exactamente?"
+  ]
+ },
+ {
+  "key": "reply/rp-es-002",
+  "lang": "es",
+  "message": "Hola, el técnico llega mañana entre las 9 y las 12. ¿Alguien estará en casa?",
+  "expect": "",
+  "A": [
+   "Yo estaré",
+   "No estoy seguro",
+   "Quizás no"
+  ],
+  "B": [
+   "Sí, estaré",
+   "¿Necesitas algo más?",
+   "No estoy seguro"
+  ]
+ },
+ {
+  "key": "reply/rp-fr-001",
+  "lang": "fr",
+  "message": "Salut ! On se retrouve au café demain à 15 h ?",
+  "expect": "",
+  "A": [
+   "Oui, ça me va !",
+   "Demain à 15h, ok.",
+   "Peut-être un autre moment ?"
+  ],
+  "B": [
+   "Oui, ça me va !",
+   "Qu'est-ce qu'on boit ?",
+   "Demain, je ne suis pas sûr."
+  ]
+ },
+ {
+  "key": "reply/rp-fr-002",
+  "lang": "fr",
+  "message": "Bonjour, votre colis sera livré jeudi. Merci de confirmer votre adresse.",
+  "expect": "",
+  "A": [
+   "C'est noté, merci.",
+   "Quelle est mon adresse ?",
+   "Je dois vérifier ça."
+  ],
+  "B": [
+   "Je confirme l'adresse. Merci.",
+   "Je peux vous donner mon numéro ?",
+   "Quand est-ce que je peux le récupérer ?"
+  ]
+ },
+ {
+  "key": "reply/rp-de-001",
+  "lang": "de",
+  "message": "Hast du am Wochenende Zeit, mir beim Umzug zu helfen?",
+  "expect": "",
+  "A": [
+   "Klar, mach ich! Wann brauchst du?",
+   "Am Samstag passt es mir gut.",
+   "Ich kann leider nicht, tut mir leid."
+  ],
+  "B": [
+   "Ja, ich kann helfen.",
+   "Wann genau brauchst du Hilfe?",
+   "Am Wochenende passt es nicht."
+  ]
+ },
+ {
+  "key": "reply/rp-de-002",
+  "lang": "de",
+  "message": "Die Besprechung wurde auf Donnerstag um 14 Uhr verschoben. Passt dir das?",
+  "expect": "",
+  "A": [
+   "Passt mir gut.",
+   "Wann genau ist es?",
+   "Nein, da passt es nicht."
+  ],
+  "B": [
+   "Ja, passt für mich.",
+   "Donnerstag um 14 Uhr, kein Problem.",
+   "Klar, ich bin dabei!"
+  ]
+ },
+ {
+  "key": "reply/rp-pt-001",
+  "lang": "pt",
+  "message": "Oi! Vamos ao cinema hoje à noite?",
+  "expect": "",
+  "A": [
+   "Podemos, que filme?",
+   "Que tal amanhã?",
+   "Não posso hoje, desculpa."
+  ],
+  "B": [
+   "Claro, que ótimo!",
+   "Que horas?",
+   "Podemos ir lá."
+  ]
+ },
+ {
+  "key": "reply/rp-pt-002",
+  "lang": "pt",
+  "message": "Bom dia, a sua consulta está marcada para segunda às 10h. Pode confirmar?",
+  "expect": "",
+  "A": [
+   "Sim, confirma! Até segunda!",
+   "Ok, segunda às 10h tá certo.",
+   "Verifique no meu calendário, sim."
+  ],
+  "B": [
+   "Sim, confirmo.",
+   "Podemos mudar o horário?",
+   "Vou verificar agora."
+  ]
+ },
+ {
+  "key": "reply/rp-mr-001",
+  "lang": "mr",
+  "message": "उद्या संध्याकाळी चहाला येतोस का?",
+  "expect": "",
+  "A": [
+   "हो, नक्की! किती वाजता?",
+   "संध्याकाळी ठीक आहे, पण कुठे भेटायचं?",
+   "माफ कर, उद्या मी येऊ शकत नाही."
+  ],
+  "B": [
+   "हो, नक्की येतो.",
+   "किती वाजता भेटायचे?",
+   "आज वेळ नाही जमणार."
+  ]
+ },
+ {
+  "key": "reply/rp-mr-002",
+  "lang": "mr",
+  "message": "तुमचं पार्सल दाराबाहेर ठेवू का? कोणीही फोन उचलत नाही.",
+  "expect": "",
+  "A": [
+   "हो, मी ठेवतो.",
+   "मी चेक करतो काय करायचे?",
+   "मी नंतर बघतो."
+  ],
+  "B": [
+   "मी ठेवतो, काळजी करू नको.",
+   "नाही, मी ते स्वतः घेईन.",
+   "तुझ्यासाठी काही करू शकतो का?"
+  ]
+ },
+ {
+  "key": "reply/rp-bn-001",
+  "lang": "bn",
+  "message": "শনিবার সিনেমা দেখতে যাবি? সন্ধ্যা ছ'টার শো।",
+  "expect": "",
+  "A": [
+   "হ্যাঁ, যাবো! দারুণ হবে।",
+   "সন্ধ্যা ৬টা শো ঠিক আছে। তুমি কি টিকিট বুক করবে?",
+   "শনিবার সিনেমা দেখতে যাবো, অবশ্যই! খুব মজা হবে।"
+  ],
+  "B": [
+   "হ্যাঁ, যাব!",
+   "অন্য কোনো দিন কি সম্ভব?",
+   "আজ পারছি না"
+  ]
+ },
+ {
+  "key": "reply/rp-bn-002",
+  "lang": "bn",
+  "message": "আপনার অর্ডারটি আগামীকাল পৌঁছাবে। ঠিকানাটা কি ঠিক আছে?",
+  "expect": "",
+  "A": [
+   "হ্যাঁ, ঠিকানাটা ঠিক আছে। ধন্যবাদ!",
+   "ঠিক আছে, কোনো সমস্যা নেই।",
+   "ঠিক আছে, আমি চেক করে দেখেছি।"
+  ],
+  "B": [
+   "হ্যাঁ, ঠিকানা ঠিক আছে। ধন্যবাদ।",
+   "ঠিক আছে, কিন্তু ডেলিভারি কখন আশা করতে পারি?",
+   "আমি এখনই চেক করে দিচ্ছি।"
+  ]
+ },
+ {
+  "key": "reply/rp-ta-001",
+  "lang": "ta",
+  "message": "நாளை மாலை காபி குடிக்க வருகிறாயா?",
+  "expect": "",
+  "A": [
+   "நிச்சயமாக, வரலாம்.",
+   "நேரம் சொல்ல முடியுமா?",
+   "இல்லை, என்னால் வர முடியாது."
+  ],
+  "B": [
+   "நிச்சயமா! நான் வரேன்.",
+   "என்ன நேரம்?",
+   "அது எனக்கு கொஞ்சம் வேலை இருக்கு."
+  ]
+ },
+ {
+  "key": "reply/rp-ta-002",
+  "lang": "ta",
+  "message": "உங்கள் பார்சல் நாளை வரும். முகவரி சரியா?",
+  "expect": "",
+  "A": [
+   "ஆம், சரியா இருக்கு.",
+   "முகவரி இதுதான்.",
+   "நாளை வந்துடும், worry pannadha."
+  ],
+  "B": [
+   "ஆமாம், சரியா.",
+   "முகவரி என்ன என்று சொல்லுங்கள்.",
+   "இப்போது பார்த்துவிட்டு சொல்றேன்."
+  ]
+ },
+ {
+  "key": "reply/rp-zh-001",
+  "lang": "zh",
+  "message": "周六一起去看电影吗？晚上七点的场次。",
+  "expect": "",
+  "A": [
+   "好呀，我正好有空！",
+   "七点可以啊，你定在哪家？",
+   "周六晚上我可能有点事"
+  ],
+  "B": [
+   "好啊，没问题！",
+   "我看看我的时间。",
+   "周六我可能不方便。"
+  ]
+ },
+ {
+  "key": "reply/rp-zh-002",
+  "lang": "zh",
+  "message": "您好，您的快递明天送到，请问家里有人吗？",
+  "expect": "",
+  "A": [
+   "明天有我，没问题。",
+   "我明天去拿了，谢谢！",
+   "家里没人，不用担心。"
+  ],
+  "B": [
+   "有，谢谢！",
+   "我不在家，可以帮我签收吗？",
+   "不用麻烦了"
+  ]
+ }
+]

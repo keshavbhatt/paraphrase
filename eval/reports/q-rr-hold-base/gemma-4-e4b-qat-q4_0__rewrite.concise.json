@@ -1,0 +1,91 @@
+{
+  "model": "gemma-4-e4b-qat-q4_0",
+  "skill": "rewrite.concise",
+  "skill_version": 3,
+  "skill_revision": 4,
+  "profile": "B-cpu",
+  "load_s": 5.22,
+  "peak_rss_mb": 7724,
+  "backend": "daemon",
+  "tag": "q-rr-hold-base",
+  "when": "2026-10-22 19:59",
+  "groups": {
+    "all": {
+      "n": 10,
+      "lang_floor_fail": [
+        "rw-hi-203"
+      ],
+      "ttft_s_median": 1.215,
+      "total_s_median": 1.978,
+      "gen_tps_median": 16.9,
+      "retried_pct": 10.0,
+      "lang_warned": [
+        "rw-hi-203"
+      ],
+      "changed_pct": 100.0,
+      "protected_kept_pct": 81.2,
+      "preamble_pct": 0.0,
+      "length_ratio_median": 0.64
+    },
+    "lang=en": {
+      "n": 7,
+      "lang_floor_fail": [],
+      "ttft_s_median": 1.01,
+      "total_s_median": 1.973,
+      "gen_tps_median": 16.9,
+      "retried_pct": 0.0,
+      "lang_warned": [],
+      "changed_pct": 100.0,
+      "protected_kept_pct": 77.3,
+      "preamble_pct": 0.0,
+      "length_ratio_median": 0.67
+    },
+    "lang=hi": {
+      "n": 2,
+      "lang_floor_fail": [
+        "rw-hi-203"
+      ],
+      "ttft_s_median": 1.224,
+      "total_s_median": 2.87,
+      "gen_tps_median": 15.0,
+      "retried_pct": 50.0,
+      "lang_warned": [
+        "rw-hi-203"
+      ],
+      "changed_pct": 100.0,
+      "protected_kept_pct": 90.0,
+      "preamble_pct": 0.0,
+      "length_ratio_median": 0.62
+    },
+    "lang=hinglish": {
+      "n": 1,
+      "lang_floor_fail": [],
+      "ttft_s_median": 1.545,
+      "total_s_median": 1.977,
+      "gen_tps_median": 30.1,
+      "retried_pct": 0.0,
+      "lang_warned": [],
+      "changed_pct": 100.0,
+      "protected_kept_pct": 0.0,
+      "preamble_pct": 0.0,
+      "length_ratio_median": 0.58
+    },
+    "set=holdout": {
+      "n": 10,
+      "lang_floor_fail": [
+        "rw-hi-203"
+      ],
+      "ttft_s_median": 1.215,
+      "total_s_median": 1.978,
+      "gen_tps_median": 16.9,
+      "retried_pct": 10.0,
+      "lang_warned": [
+        "rw-hi-203"
+      ],
+      "changed_pct": 100.0,
+      "protected_kept_pct": 81.2,
+      "preamble_pct": 0.0,
+      "length_ratio_median": 0.64
+    }
+  }
+}
