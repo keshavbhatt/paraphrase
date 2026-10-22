@@ -1,0 +1,1011 @@
+[
+ {
+  "key": "rewrite.professional/rw-en-101",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-en-102",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "tone_missed"
+   ]
+  },
+  "better": "A",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-en-103",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed",
+    "obeyed_instruction"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-en-104",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "B",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-en-105",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-en-106",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-en-107",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "fact_changed"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "fact_changed"
+   ]
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-en-108",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-en-109",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-en-110",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-en-111",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-en-112",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-en-113",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-en-114",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-en-115",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-en-116",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-en-117",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-en-118",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-hi-101",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-hi-102",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "wrong_language"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "wrong_language"
+   ]
+  },
+  "better": "A",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-hi-103",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-hi-104",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-hi-105",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "tone_missed"
+   ]
+  },
+  "better": "A",
+  "note": ""
+ },
+ {
+  "key": "rewrite.professional/rw-hi-106",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-en-101",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-en-102",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-en-103",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-en-104",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-en-105",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-en-106",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-en-107",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-en-108",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-en-109",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-en-110",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-en-111",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-en-112",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-en-113",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-en-114",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-en-115",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-en-116",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-en-117",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-en-118",
+  "A": {
+   "acceptable": true,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-hi-101",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-hi-102",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-hi-103",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-hi-104",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-hi-105",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.casual/rw-hi-106",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-en-101",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-en-102",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-en-103",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-en-104",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-en-105",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-en-106",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-en-107",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-en-108",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-en-109",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-en-110",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-en-111",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-en-112",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "format_lost"
+   ]
+  },
+  "better": "A",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-en-113",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-en-114",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-en-115",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-en-116",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-en-117",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "info_added"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-en-118",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-hi-101",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-hi-102",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-hi-103",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-hi-104",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-hi-105",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.concise/rw-hi-106",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": ""
+ }
+]

@@ -1,0 +1,296 @@
+{
+ "tags": [
+  "q-rr-new2",
+  "q-rw-t03"
+ ],
+ "labels": {
+  "rewrite.professional/rw-en-101": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.professional/rw-en-102": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.professional/rw-en-103": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.professional/rw-en-104": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.professional/rw-en-105": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.professional/rw-en-106": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.professional/rw-en-107": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.professional/rw-en-108": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.professional/rw-en-109": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.professional/rw-en-110": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.professional/rw-en-111": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.professional/rw-en-112": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.professional/rw-en-113": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.professional/rw-en-114": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.professional/rw-en-115": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.professional/rw-en-116": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.professional/rw-en-117": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.professional/rw-en-118": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.professional/rw-hi-101": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.professional/rw-hi-102": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.professional/rw-hi-103": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.professional/rw-hi-104": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.professional/rw-hi-105": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.professional/rw-hi-106": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.casual/rw-en-101": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.casual/rw-en-102": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.casual/rw-en-103": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.casual/rw-en-104": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.casual/rw-en-105": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.casual/rw-en-106": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.casual/rw-en-107": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.casual/rw-en-108": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.casual/rw-en-109": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.casual/rw-en-110": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.casual/rw-en-111": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.casual/rw-en-112": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.casual/rw-en-113": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.casual/rw-en-114": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.casual/rw-en-115": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.casual/rw-en-116": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.casual/rw-en-117": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.casual/rw-en-118": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.casual/rw-hi-101": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.casual/rw-hi-102": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.casual/rw-hi-103": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.casual/rw-hi-104": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.casual/rw-hi-105": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.casual/rw-hi-106": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.concise/rw-en-101": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.concise/rw-en-102": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.concise/rw-en-103": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.concise/rw-en-104": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.concise/rw-en-105": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.concise/rw-en-106": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.concise/rw-en-107": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.concise/rw-en-108": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.concise/rw-en-109": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.concise/rw-en-110": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.concise/rw-en-111": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.concise/rw-en-112": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.concise/rw-en-113": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.concise/rw-en-114": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.concise/rw-en-115": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.concise/rw-en-116": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.concise/rw-en-117": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.concise/rw-en-118": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.concise/rw-hi-101": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.concise/rw-hi-102": {
+   "A": "q-rw-t03",
+   "B": "q-rr-new2"
+  },
+  "rewrite.concise/rw-hi-103": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.concise/rw-hi-104": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.concise/rw-hi-105": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  },
+  "rewrite.concise/rw-hi-106": {
+   "A": "q-rr-new2",
+   "B": "q-rw-t03"
+  }
+ }
+}

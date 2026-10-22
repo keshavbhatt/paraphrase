@@ -1,0 +1,88 @@
+{
+ "tags": [
+  "q-rr-hold-new",
+  "q-rw-hold-r9"
+ ],
+ "labels": {
+  "rewrite.polite/rw-en-201": {
+   "A": "q-rr-hold-new",
+   "B": "q-rw-hold-r9"
+  },
+  "rewrite.polite/rw-en-202": {
+   "A": "q-rw-hold-r9",
+   "B": "q-rr-hold-new"
+  },
+  "rewrite.polite/rw-en-203": {
+   "A": "q-rw-hold-r9",
+   "B": "q-rr-hold-new"
+  },
+  "rewrite.polite/rw-en-204": {
+   "A": "q-rw-hold-r9",
+   "B": "q-rr-hold-new"
+  },
+  "rewrite.polite/rw-en-205": {
+   "A": "q-rw-hold-r9",
+   "B": "q-rr-hold-new"
+  },
+  "rewrite.polite/rw-en-206": {
+   "A": "q-rw-hold-r9",
+   "B": "q-rr-hold-new"
+  },
+  "rewrite.polite/rw-en-207": {
+   "A": "q-rw-hold-r9",
+   "B": "q-rr-hold-new"
+  },
+  "rewrite.polite/rw-hi-201": {
+   "A": "q-rr-hold-new",
+   "B": "q-rw-hold-r9"
+  },
+  "rewrite.polite/rw-hi-202": {
+   "A": "q-rw-hold-r9",
+   "B": "q-rr-hold-new"
+  },
+  "rewrite.polite/rw-hi-203": {
+   "A": "q-rw-hold-r9",
+   "B": "q-rr-hold-new"
+  },
+  "rewrite.friendly/rw-en-201": {
+   "A": "q-rw-hold-r9",
+   "B": "q-rr-hold-new"
+  },
+  "rewrite.friendly/rw-en-202": {
+   "A": "q-rw-hold-r9",
+   "B": "q-rr-hold-new"
+  },
+  "rewrite.friendly/rw-en-203": {
+   "A": "q-rr-hold-new",
+   "B": "q-rw-hold-r9"
+  },
+  "rewrite.friendly/rw-en-204": {
+   "A": "q-rr-hold-new",
+   "B": "q-rw-hold-r9"
+  },
+  "rewrite.friendly/rw-en-205": {
+   "A": "q-rr-hold-new",
+   "B": "q-rw-hold-r9"
+  },
+  "rewrite.friendly/rw-en-206": {
+   "A": "q-rw-hold-r9",
+   "B": "q-rr-hold-new"
+  },
+  "rewrite.friendly/rw-en-207": {
+   "A": "q-rw-hold-r9",
+   "B": "q-rr-hold-new"
+  },
+  "rewrite.friendly/rw-hi-201": {
+   "A": "q-rw-hold-r9",
+   "B": "q-rr-hold-new"
+  },
+  "rewrite.friendly/rw-hi-202": {
+   "A": "q-rw-hold-r9",
+   "B": "q-rr-hold-new"
+  },
+  "rewrite.friendly/rw-hi-203": {
+   "A": "q-rw-hold-r9",
+   "B": "q-rr-hold-new"
+  }
+ }
+}

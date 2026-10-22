@@ -1,0 +1,694 @@
+[
+ {
+  "key": "rewrite.polite/rw-en-101",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-en-102",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-en-103",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-en-104",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-en-105",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-en-106",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-en-107",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-en-108",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-en-109",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-en-110",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-en-111",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-en-112",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-en-113",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-en-114",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-en-115",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-en-116",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-en-117",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-en-118",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-hi-101",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-hi-102",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "wrong_language"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-hi-103",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-hi-104",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-hi-105",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": ""
+ },
+ {
+  "key": "rewrite.polite/rw-hi-106",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-en-101",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-en-102",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-en-103",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-en-104",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-en-105",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-en-106",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-en-107",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-en-108",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-en-109",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-en-110",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-en-111",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "A",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-en-112",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-en-113",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-en-114",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-en-115",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-en-116",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-en-117",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-en-118",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-hi-101",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-hi-102",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "wrong_language"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "wrong_language"
+   ]
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-hi-103",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "tone_missed"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-hi-104",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-hi-105",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": ""
+ },
+ {
+  "key": "rewrite.friendly/rw-hi-106",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": ""
+ }
+]
