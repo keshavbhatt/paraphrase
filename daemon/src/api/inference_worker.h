@@ -71,11 +71,12 @@ private:
     /// The slot to load `job`'s model into: a free one when two may stay loaded, else the one
     /// used longest ago (the others are unloaded when only one may stay).
     [[nodiscard]] std::size_t slotFor(const Job& job);
+    [[nodiscard]] static std::array<std::unique_ptr<engine::Engine>, 2>
+    makeEngines(const EngineFactory& factory);
     [[nodiscard]] static bool holds(const engine::Engine& engine, const engine::EngineConfig& model);
 
     EngineFactory m_factory;
     const util::LanguageDetector& m_detector;
-    static constexpr std::size_t kSlots = 2;
     /// Created up front and never replaced: cancel() reaches them from another thread.
     std::array<std::unique_ptr<engine::Engine>, kSlots> m_engines;
     std::array<QString, kSlots> m_slotModels; ///< model id loaded in each slot

@@ -58,11 +58,18 @@ QString resultJson(const Job& job, const engine::SkillResult& r, double loadSeco
 InferenceWorker::InferenceWorker(EngineFactory factory, const util::LanguageDetector& detector)
     : m_factory(std::move(factory))
     , m_detector(detector)
+    , m_engines(makeEngines(m_factory))
+    , m_engine(m_engines.front().get())
+{}
+
+std::array<std::unique_ptr<engine::Engine>, InferenceWorker::kSlots>
+InferenceWorker::makeEngines(const EngineFactory& factory)
 {
-    for (auto& engine : m_engines) {
-        engine = m_factory();
+    std::array<std::unique_ptr<engine::Engine>, kSlots> engines;
+    for (auto& engine : engines) {
+        engine = factory();
     }
-    m_engine = m_engines.front().get();
+    return engines;
 }
 
 InferenceWorker::~InferenceWorker() = default;
