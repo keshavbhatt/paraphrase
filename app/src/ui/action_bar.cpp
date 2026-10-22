@@ -1,6 +1,7 @@
 #include "action_bar.h"
 
 #include "chip_button.h"
+#include "flow_layout.h"
 #include "languages.h"
 #include "util/language_detector.h"
 
@@ -19,13 +20,19 @@ constexpr int kArrowSize = 14;
 
 } // namespace
 
-ActionBar::ActionBar(const util::LanguageDetector& detector, QWidget* parent)
+ActionBar::ActionBar(const util::LanguageDetector& detector, Keys keys, QWidget* parent)
     : QWidget(parent)
     , m_detector(detector)
-    , m_row(new QHBoxLayout(this))
+    , m_keys(keys)
 {
-    m_row->setContentsMargins(0, 0, 0, 0);
-    m_row->setSpacing(8);
+    if (keys == Keys::Digits) {
+        m_row = new FlowLayout(this);
+    } else {
+        auto* row = new QHBoxLayout(this);
+        row->setContentsMargins(0, 0, 0, 0);
+        row->setSpacing(8);
+        m_row = row;
+    }
 }
 
 void ActionBar::setCatalog(const SkillCatalog* catalog)
@@ -40,13 +47,19 @@ void ActionBar::setCatalog(const SkillCatalog* catalog)
         m_row->addWidget(b);
         m_buttons.insert(base, b);
     }
-    m_row->addStretch();
+    if (auto* row = qobject_cast<QHBoxLayout*>(m_row)) {
+        row->addStretch();
+    }
     updateArrows();
 }
 
 ChipButton* ActionBar::addAction(int number, const QString& base)
 {
-    const QString chip = number <= kMaxShortcuts ? tr("Ctrl %1").arg(number) : QString();
+    const bool digits = m_keys == Keys::Digits;
+    QString chip;
+    if (number <= kMaxShortcuts) {
+        chip = digits ? QString::number(number) : tr("Ctrl %1").arg(number);
+    }
     auto* b = new ChipButton(m_catalog->actionTitle(base), chip);
     b->setProperty("kind", u"action"_s);
     b->setObjectName(u"action-"_s + base);
@@ -63,7 +76,8 @@ ChipButton* ActionBar::addAction(int number, const QString& base)
         connect(b, &QPushButton::clicked, this, [this, id] { Q_EMIT chosen(id, {}); });
     }
     if (number <= kMaxShortcuts) {
-        const auto* shortcut = new QShortcut(QKeySequence(u"Ctrl+%1"_s.arg(number)), window());
+        const QKeySequence keys(digits ? QString::number(number) : u"Ctrl+%1"_s.arg(number));
+        const auto* shortcut = new QShortcut(keys, window());
         connect(shortcut, &QShortcut::activated, b, [b] {
             if (b->menu() != nullptr) {
                 b->showMenu();
@@ -113,6 +127,15 @@ void ActionBar::fillLanguages(QMenu* menu, const QString& skillId)
         item->setObjectName(u"lang-"_s + lang.code);
         const QString code = lang.code;
         connect(item, &QAction::triggered, this, [this, skillId, code] { Q_EMIT chosen(skillId, code); });
+    }
+}
+
+void ActionBar::highlight(const QString& base)
+{
+    if (ChipButton* b = m_buttons.value(base)) {
+        b->setChecked(true);
+        b->setFocus();
+        updateArrows();
     }
 }
 

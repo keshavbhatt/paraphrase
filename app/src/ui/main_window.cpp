@@ -7,6 +7,7 @@
 #include "languages.h"
 #include "output_pane.h"
 #include "request_runner.h"
+#include "result_summary.h"
 #include "result_views.h"
 
 #include <QApplication>
@@ -62,7 +63,7 @@ void MainWindow::buildUi()
     m_notice->setNotice(
         tr("This desktop gives Paraphrase no global shortcut, so it cannot open over other apps. "
            "Everything works here: paste your text, pick an action, copy the result."));
-    m_actions = new ActionBar(m_detector);
+    m_actions = new ActionBar(m_detector, ActionBar::Keys::Ctrl);
     m_input = new InputPane(m_detector);
     m_output = new OutputPane;
     m_status = new StatusBar;
@@ -155,6 +156,26 @@ void MainWindow::resizeEvent(QResizeEvent* event)
 {
     m_panes->setOrientation(event->size().width() < kNarrowWidth ? Qt::Vertical : Qt::Horizontal);
     QWidget::resizeEvent(event);
+}
+
+void MainWindow::takeText(const QString& text)
+{
+    if (m_catalog.kindOf(m_skill) != SkillKind::Text && !m_catalog.isEmpty()) {
+        selectSkill(m_catalog.skills().front().id);
+    }
+    m_input->page()->setSubject(text);
+}
+
+void MainWindow::setGlobalShortcut(bool available)
+{
+    if (available) {
+        m_notice->setNotice({});
+        return;
+    }
+    m_notice->setNotice(
+        tr("This desktop gives Paraphrase no global shortcut, so it cannot open over other apps. "
+           "Everything works here: paste your text, pick an action, copy the result."),
+        tr("Add a shortcut by hand"));
 }
 
 void MainWindow::start()
@@ -359,31 +380,22 @@ void MainWindow::showResult(const QJsonObject& result)
     // The line after the title: what happened, in which language.
     const SkillInfo* s = m_catalog.find(m_skill);
     const SkillKind kind = m_catalog.kindOf(m_skill);
-    const bool translated = s != nullptr && !m_targetLang.isEmpty() && m_catalog.picksLanguage(s->base);
-    const QString language = translated ? languageName(m_detector, m_targetLang) : inputLanguageName();
-    QString info;
-    if (kind == SkillKind::Text && m_output->textView()->hasDiff()) {
-        const qsizetype n = m_output->textView()->changeCount();
-        // Plurals written out: tr()'s %n needs a loaded translation to pluralise.
-        if (n == 0) {
-            info = tr("· nothing to fix");
-        } else {
-            info = n == 1 ? tr("· 1 change") : tr("· %1 changes").arg(n);
-        }
-    }
-    if (!language.isEmpty() && info != tr("· nothing to fix")) {
-        info += translated || kind != SkillKind::Text ? tr(" · in %1").arg(language)
-                                                      : tr(" · kept in %1").arg(language);
-    }
+    const bool chosen = s != nullptr && !m_targetLang.isEmpty() && m_catalog.picksLanguage(s->base);
+    QString replyKind;
     if (kind == SkillKind::FullReply) {
-        info = (m_input->fullReplyInput()->chat() ? tr("· chat message") : tr("· email")) + info;
+        replyKind = m_input->fullReplyInput()->chat() ? tr("chat message") : tr("email");
     }
-    m_output->setInfo(info.trimmed());
-    // A failed language check is shown in words, the result never hidden (ADR-006).
+    const ResultFacts facts{
+        .kind = kind,
+        .proofread = kind == SkillKind::Text && m_output->textView()->hasDiff(),
+        .changes = m_output->textView()->changeCount(),
+        .language = chosen ? languageName(m_detector, m_targetLang) : inputLanguageName(),
+        .chosenLanguage = chosen,
+        .replyKind = replyKind,
+    };
+    m_output->setInfo(resultSummary(facts));
     if (!result.value(u"warning"_s).toString().isEmpty()) {
-        m_output->setInfo(tr("· may not be in %1: check before using it")
-                              .arg(language.isEmpty() ? tr("the right language") : language),
-                          u"warning"_s);
+        m_output->setInfo(languageWarning(facts.language), u"warning"_s);
     }
 }
 

@@ -87,6 +87,19 @@ QLabel[chip="ins"] { color: @ins@; background: @insBg@; border-radius: 3px; padd
 QLabel[chip="pill"] { color: @muted@; background: @hover@; border-radius: 9px; padding: 0 8px;
     font-family: monospace; font-size: 12px; }
 
+QFrame#popup { background: @panel@; border: 1px solid @border@; border-radius: 14px; }
+QFrame#popupHead { border: none; border-bottom: 1px solid @border@; }
+QFrame#popupFoot { border: none; border-top: 1px solid @border@; background: @bar@;
+    border-bottom-left-radius: 14px; border-bottom-right-radius: 14px; }
+QLabel#source { background: @sunk@; border-radius: 10px; padding: 10px 14px; font-size: 15px; }
+QWidget#resultBox QTextBrowser#output { border: 1px solid @border@; border-radius: 10px; padding: 10px 12px; }
+QLabel#popupTitle { font-weight: 600; }
+QLabel[role="kbd"] { border: 1px solid @border@; border-bottom-width: 2px; border-radius: 5px;
+    padding: 0 6px; font-size: 12px; }
+QPushButton[kind="tone"] { border-radius: 16px; min-height: 30px; padding: 0 12px; font-size: 13px; }
+QPushButton[kind="tone"]:checked { background: @accentStrong@; border-color: @accentStrong@; color: @accentText@;
+    font-weight: 500; }
+
 QMenu { background: @elevated@; color: @text@; border: 1px solid @border@; padding: 4px; }
 QMenu::item { padding: 6px 18px; border-radius: 6px; }
 QMenu::item:selected { background: @hover@; }
@@ -183,6 +196,7 @@ QString Theme::styleSheet(const Tokens& t)
         {u"@panel@", t.panel},
         {u"@elevated@", t.elevated},
         {u"@hover@", t.hover},
+        {u"@sunk@", t.sunk},
         {u"@input@", t.input},
         {u"@border@", t.border},
         {u"@text@", t.text},

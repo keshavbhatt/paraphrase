@@ -40,6 +40,11 @@ public:
 
     /// Connects to the daemon (starting it when needed) and loads the actions.
     void start();
+    /// Text handed over from the popup ("Open in window"): it becomes your text.
+    void takeText(const QString& text);
+    /// With a global shortcut there is nothing to say; without one the notice explains how
+    /// to add one by hand (ADR-013).
+    void setGlobalShortcut(bool available);
 
     // What the window shows, for tests and screenshots.
     [[nodiscard]] QString resultText() const;
