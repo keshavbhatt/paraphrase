@@ -15,3 +15,4 @@
 {"id": "pr-en-215", "lang": "en", "source": "holdout", "text": "lol that video was hilarious 😂", "reference": "Lol that video was hilarious 😂", "protected": [], "notes": "capital only; no full stop after a final emoji"}
 {"id": "pr-en-216", "lang": "en", "source": "holdout", "text": "wierd", "reference": "Weird", "protected": [], "notes": "one word, spelling"}
 {"id": "pr-en-217", "lang": "en", "source": "holdout", "text": "teh dog barked", "reference": "The dog barked.", "protected": [], "notes": "three words, spelling"}
+{"id": "pr-en-218", "lang": "en", "source": "holdout", "text": "Day\tTask\nMon\tsend the invoce\nTue\tcall the bank", "reference": "Day\tTask\nMon\tsend the invoice\nTue\tcall the bank", "protected": [], "notes": "tab-separated task table"}

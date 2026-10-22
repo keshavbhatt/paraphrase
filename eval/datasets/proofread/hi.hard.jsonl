@@ -15,3 +15,5 @@
 {"id": "pr-hi-115", "lang": "hi", "source": "hard", "text": "मेरा माँ", "reference": "मेरी माँ", "protected": [], "notes": "two words, gender agreement"}
 {"id": "pr-hi-116", "lang": "hinglish", "source": "hard", "text": "thik h", "reference": "thik h", "protected": [], "notes": "two clean chat words: no change"}
 {"id": "pr-hi-117", "lang": "hinglish", "source": "hard", "text": "meri bhai aa raha hai", "reference": "Mera bhai aa raha hai.", "protected": [], "notes": "short Hinglish, gender agreement"}
+{"id": "pr-hi-118", "lang": "hi", "source": "hard", "text": "नाम:\tसीमा\nटिप्पणी:\tमेरी बेटी कल स्कूल नहीं आएगा", "reference": "नाम:\tसीमा\nटिप्पणी:\tमेरी बेटी कल स्कूल नहीं आएगी।", "protected": [], "notes": "Devanagari form with tabs, agreement"}
+{"id": "pr-hi-119", "lang": "hinglish", "source": "hard", "text": "Naam:\tRohit\nMessage:\tkal meeting 5 baje hai, late mat hona", "reference": "Naam:\tRohit\nMessage:\tKal meeting 5 baje hai, late mat hona.", "protected": [], "notes": "Hinglish form with tabs"}

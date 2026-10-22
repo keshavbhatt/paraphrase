@@ -10,3 +10,4 @@
 {"id": "pr-hi-210", "lang": "hinglish", "source": "holdout", "text": "usne mujhe ek kitab diya", "reference": "Usne mujhe ek kitab di.", "protected": [], "notes": "object agreement, capital, full stop"}
 {"id": "pr-hi-211", "lang": "hi", "source": "holdout", "text": "मेरा बहन", "reference": "मेरी बहन", "protected": [], "notes": "two words, gender agreement"}
 {"id": "pr-hi-212", "lang": "hinglish", "source": "holdout", "text": "meri papa", "reference": "Mere papa", "protected": [], "notes": "two Hinglish words, agreement"}
+{"id": "pr-hi-213", "lang": "hi", "source": "holdout", "text": "शहर:\tदिल्ली\nपता:\tराजीव चौक के पास\nसमय:\tशाम 6 बजे", "reference": "शहर:\tदिल्ली\nपता:\tराजीव चौक के पास\nसमय:\tशाम 6 बजे", "protected": [], "notes": "clean Devanagari form: no change"}
