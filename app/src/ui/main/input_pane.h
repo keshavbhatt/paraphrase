@@ -15,6 +15,7 @@ class LanguageDetector;
 
 namespace paraphrase::app {
 
+class ComposeInput;
 class FullReplyInput;
 class InputPage;
 
@@ -33,6 +34,7 @@ public:
     void showKind(SkillKind kind);
     [[nodiscard]] InputPage* page() const;
     [[nodiscard]] FullReplyInput* fullReplyInput() const { return m_full; }
+    [[nodiscard]] ComposeInput* composeInput() const { return m_compose; }
     /// The language code of the text on the current page.
     [[nodiscard]] QString language() const;
 
@@ -56,6 +58,8 @@ private:
     QStackedWidget* m_pages = nullptr;
     QHash<SkillKind, InputPage*> m_byKind;
     FullReplyInput* m_full = nullptr;
+    ComposeInput* m_compose = nullptr;
+    QLabel* m_hint = nullptr;
     SkillKind m_kind = SkillKind::Text;
     bool m_fullAvailable = false;
 };

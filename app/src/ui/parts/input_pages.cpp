@@ -1,6 +1,7 @@
 #include "ui/parts/input_pages.h"
 
 #include "ui/common/widgets.h"
+#include "ui/parts/tone_picker.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -9,6 +10,9 @@
 #include <QPushButton>
 #include <QSettings>
 #include <QVBoxLayout>
+
+#include <algorithm>
+#include <array>
 
 using namespace Qt::StringLiterals;
 
@@ -20,6 +24,10 @@ constexpr int kDraftHeight = 70;    ///< two lines
 constexpr int kIntentHeight = 76;
 const QString kKindKey = u"reply/kind"_s;
 const QString kToneKey = u"reply/tone"_s;
+const QString kComposeKindKey = u"compose/kind"_s;
+const QString kComposeToneKey = u"compose/tone"_s;
+/// The compose presets, in the order of the switch (main-window-compose.html).
+constexpr std::array<QStringView, 4> kComposeKinds = {u"email", u"message", u"post", u"note"};
 
 QPlainTextEdit* field(const QString& name, const QString& placeholder)
 {
@@ -135,7 +143,7 @@ FullReplyInput::FullReplyInput(QWidget* parent)
           {.name = u"asEmail"_s, .text = tr("Email")},
           {.name = u"asChat"_s, .text = tr("Chat message")},
       }))
-    , m_tone(makeButton(QString()))
+    , m_tone(new TonePicker(kToneKey, u"professional"_s))
 {
     QVBoxLayout* layout = pageLayout(this);
     layout->addWidget(makeLabel(tr("The email or chat you are answering"), u"small"_s));
@@ -149,8 +157,6 @@ FullReplyInput::FullReplyInput(QWidget* parent)
     options->addWidget(m_kind);
     options->addSpacing(8);
     options->addWidget(makeLabel(tr("Tone"), u"small"_s));
-    m_tone->setObjectName(u"toneChoice"_s);
-    m_tone->setMenu(new QMenu(m_tone));
     options->addWidget(m_tone);
     options->addStretch();
     layout->addLayout(options);
@@ -184,8 +190,8 @@ QVariantMap FullReplyInput::input(const SkillInfo& skill, const QString& /*targe
     if (const QString intent = m_intent->toPlainText(); filled(intent) && skill.takes(u"intent"_s)) {
         in.insert(u"intent"_s, intent);
     }
-    if (!m_toneValue.isEmpty() && skill.takes(u"tone"_s)) {
-        in.insert(u"tone"_s, m_toneValue);
+    if (!m_tone->tone().isEmpty() && skill.takes(u"tone"_s)) {
+        in.insert(u"tone"_s, m_tone->tone());
     }
     return in;
 }
@@ -198,38 +204,98 @@ void FullReplyInput::clear()
 
 void FullReplyInput::setTones(const QList<std::pair<QString, QString>>& tones)
 {
-    QMenu* menu = m_tone->menu();
-    menu->clear();
-    const QString saved = QSettings().value(kToneKey, u"professional"_s).toString();
-    for (const auto& [tone, title] : tones) {
-        QAction* item = menu->addAction(title);
-        item->setObjectName(u"tone-"_s + tone);
-        connect(item, &QAction::triggered, this, [this, tone, title] { chooseTone(tone, title); });
-        if (tone == saved || m_toneValue.isEmpty()) {
-            m_toneValue = tone;
-            m_tone->setText(title);
-        }
-    }
-    m_tone->setVisible(!tones.isEmpty());
-}
-
-void FullReplyInput::chooseTone(const QString& tone, const QString& title)
-{
-    m_toneValue = tone;
-    m_tone->setText(title);
-    QSettings().setValue(kToneKey, tone);
+    m_tone->setTones(tones);
 }
 
 void FullReplyInput::applyTheme(const Tokens& t)
 {
-    // The menu arrow after the tone's name, as on the actions.
-    m_tone->setLayoutDirection(Qt::RightToLeft);
-    m_tone->setIcon(Theme::icon(u"down"_s, t.muted, 14));
+    m_tone->applyTheme(t);
 }
 
 bool FullReplyInput::chat() const
 {
     return m_kind->current() == 1;
+}
+
+ComposeInput::ComposeInput(QWidget* parent)
+    : InputPage(parent)
+    , m_description(field(u"composeText"_s, tr("For example: tell the team the office is closed on Monday")))
+    , m_kind(new SegmentedControl({
+          {.name = u"composeEmail"_s, .text = tr("Email")},
+          {.name = u"composeMessage"_s, .text = tr("Message")},
+          {.name = u"composePost"_s, .text = tr("Social post")},
+          {.name = u"composeNote"_s, .text = tr("Note")},
+      }))
+    , m_tone(new TonePicker(kComposeToneKey, u"friendly"_s))
+{
+    QVBoxLayout* layout = pageLayout(this);
+    layout->addWidget(
+        makeLabel(tr("Describe it in your own words, in the language you want it in"), u"small"_s));
+    layout->addWidget(m_description, 1);
+    auto* kinds = new QHBoxLayout;
+    kinds->setSpacing(8);
+    kinds->addWidget(makeLabel(tr("Write it as"), u"small"_s));
+    kinds->addWidget(m_kind);
+    kinds->addStretch();
+    layout->addLayout(kinds);
+    auto* tones = new QHBoxLayout;
+    tones->setSpacing(8);
+    tones->addWidget(makeLabel(tr("Tone"), u"small"_s));
+    tones->addWidget(m_tone);
+    tones->addStretch();
+    layout->addLayout(tones);
+    const QString saved = QSettings().value(kComposeKindKey).toString();
+    const auto* const found = std::ranges::find(kComposeKinds, saved);
+    m_kind->setCurrent(found == kComposeKinds.end() ? 0 : static_cast<int>(found - kComposeKinds.begin()));
+    connect(m_kind, &SegmentedControl::changed, this, [this] {
+        QSettings().setValue(kComposeKindKey, kind());
+        Q_EMIT kindChanged();
+    });
+    connect(m_description, &QPlainTextEdit::textChanged, this, &InputPage::edited);
+}
+
+QString ComposeInput::subject() const
+{
+    return m_description->toPlainText();
+}
+
+void ComposeInput::setSubject(const QString& text)
+{
+    m_description->setPlainText(text);
+}
+
+QVariantMap ComposeInput::input(const SkillInfo& skill, const QString& /*targetLang*/) const
+{
+    if (!filled(subject())) {
+        return {};
+    }
+    QVariantMap in{{u"text"_s, subject()}};
+    if (!m_tone->tone().isEmpty() && skill.takes(u"tone"_s)) {
+        in.insert(u"tone"_s, m_tone->tone());
+    }
+    return in;
+}
+
+void ComposeInput::clear()
+{
+    m_description->clear();
+}
+
+void ComposeInput::setTones(const QList<std::pair<QString, QString>>& tones)
+{
+    m_tone->setTones(tones);
+}
+
+void ComposeInput::applyTheme(const Tokens& t)
+{
+    m_tone->applyTheme(t);
+}
+
+QString ComposeInput::kind() const
+{
+    const auto i = static_cast<std::size_t>(
+        std::clamp(m_kind->current(), 0, static_cast<int>(kComposeKinds.size()) - 1));
+    return kComposeKinds.at(i).toString();
 }
 
 } // namespace paraphrase::app

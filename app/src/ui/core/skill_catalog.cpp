@@ -15,13 +15,14 @@ namespace {
 int rank(const QString& base)
 {
     static const QStringList kOrder = {
-        u"proofread"_s, u"rewrite"_s, u"reply"_s, u"summarize"_s, u"format"_s, u"translate"_s,
+        u"proofread"_s, u"rewrite"_s, u"reply"_s, u"summarize"_s, u"format"_s, u"translate"_s, u"compose"_s,
     };
     const qsizetype i = kOrder.indexOf(base);
     return static_cast<int>(i < 0 ? kOrder.size() : i);
 }
 
 const QString kFullReplyBase = u"draft"_s;
+const QString kComposeBase = u"compose"_s;
 
 } // namespace
 
@@ -67,6 +68,9 @@ SkillKind SkillCatalog::kindOf(const QString& id) const
     if (s->base == kFullReplyBase) {
         return SkillKind::FullReply;
     }
+    if (s->base == kComposeBase) {
+        return SkillKind::Compose;
+    }
     return s->base == u"reply"_s ? SkillKind::QuickReply : SkillKind::Text;
 }
 
@@ -111,6 +115,21 @@ QString SkillCatalog::fullReplyId(bool chat) const
     return v.isEmpty() ? QString() : v.front()->id;
 }
 
+QString SkillCatalog::composeId(const QString& kind) const
+{
+    QString wanted = kComposeBase + u'.' + kind;
+    if (find(wanted) != nullptr) {
+        return wanted;
+    }
+    const auto v = variants(kComposeBase);
+    return v.isEmpty() ? QString() : v.front()->id;
+}
+
+bool SkillCatalog::opensPage(const QString& base)
+{
+    return base == u"reply"_s || base == kComposeBase;
+}
+
 QList<std::pair<QString, QString>> SkillCatalog::tones() const
 {
     QList<std::pair<QString, QString>> out;
@@ -127,6 +146,9 @@ QString SkillCatalog::actionTitle(const QString& base) const
     }
     if (base == u"reply"_s) {
         return QObject::tr("Reply");
+    }
+    if (base == kComposeBase) {
+        return QObject::tr("Write");
     }
     if (base == m_userActionsBase) {
         return QObject::tr("My actions");

@@ -32,6 +32,12 @@ ButtonTexts textsFor(SkillKind kind, bool running)
             .secondary = OutputPane::tr("3 new ones"),
             .retry = OutputPane::tr("Make it polite"),
         };
+    case SkillKind::Compose:
+        return {
+            .copy = OutputPane::tr("Copy"),
+            .secondary = OutputPane::tr("Another version"),
+            .retry = running ? OutputPane::tr("Stop") : OutputPane::tr("Shorter"),
+        };
     case SkillKind::FullReply:
         return {
             .copy = OutputPane::tr("Copy reply"),
@@ -119,7 +125,13 @@ void OutputPane::buildFoot()
 void OutputPane::showKind(SkillKind kind, const QString& title, bool proofread)
 {
     m_kind = kind;
-    m_pages->setCurrentIndex(static_cast<int>(kind));
+    if (kind == SkillKind::Text) {
+        m_pages->setCurrentWidget(m_text);
+    } else if (kind == SkillKind::QuickReply) {
+        m_pages->setCurrentWidget(m_replies);
+    } else {
+        m_pages->setCurrentWidget(m_full); // a full reply and Write share the draft view
+    }
     m_title->setText(title.toUpper());
     m_view->setVisible(proofread);
     if (proofread) {
@@ -155,6 +167,7 @@ QString OutputPane::result() const
     case SkillKind::QuickReply:
         return m_replies->chosen();
     case SkillKind::FullReply:
+    case SkillKind::Compose:
         return m_full->text();
     case SkillKind::Text:
         break;
@@ -187,14 +200,14 @@ void OutputPane::updateButtons()
     if (m_kind == SkillKind::Text) {
         m_retry->setIcon(m_running ? stop : refresh);
     } else {
-        m_retry->setIcon(m_running && m_kind == SkillKind::FullReply ? stop : QIcon());
+        m_retry->setIcon(m_running && m_kind != SkillKind::QuickReply ? stop : QIcon());
     }
 }
 
 void OutputPane::updateVersions()
 {
     const qsizetype count = m_full->versionCount();
-    const bool shown = m_kind == SkillKind::FullReply && count > 1;
+    const bool shown = (m_kind == SkillKind::FullReply || m_kind == SkillKind::Compose) && count > 1;
     m_versionInfo->setVisible(shown);
     m_prev->setVisible(shown);
     m_next->setVisible(shown);

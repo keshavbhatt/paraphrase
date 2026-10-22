@@ -32,7 +32,7 @@ QString resultSummary(const ResultFacts& facts)
 
 bool keepsFacts(const QString& base)
 {
-    return base == u"rewrite"_s || base == u"format"_s;
+    return base == u"rewrite"_s || base == u"format"_s || base == u"compose"_s;
 }
 
 QString languageWarning(const QString& language)

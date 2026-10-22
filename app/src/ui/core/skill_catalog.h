@@ -18,6 +18,8 @@ struct SkillInfo
     QStringList inputs; ///< the request inputs its prompt uses
 
     [[nodiscard]] bool takes(const QString& input) const { return inputs.contains(input); }
+    /// A skill that answers a message reads it from `context` (ListSkills `main_input`).
+    [[nodiscard]] bool mainInputIsContext() const { return takes(QStringLiteral("context")); }
 };
 
 /// What the window shows for a skill: the input and the output it needs.
@@ -26,7 +28,14 @@ enum class SkillKind : std::uint8_t
     Text,       ///< text in, text out: proofread, tones, summarize, format, translate
     QuickReply, ///< a message in, three short replies out (reply)
     FullReply,  ///< a message and what to say in, one full reply out (draft.*)
+    Compose,    ///< a description in, text written from scratch out (compose.*)
 };
+
+/// A full reply and Write both end in one editable draft with versions.
+[[nodiscard]] inline bool writesDraft(SkillKind kind)
+{
+    return kind == SkillKind::FullReply || kind == SkillKind::Compose;
+}
 
 /// The daemon's skills and what the window derives from them: the actions in their order,
 /// presets, titles and kinds. No widgets: the action bar and the window read it.
@@ -49,6 +58,10 @@ public:
     [[nodiscard]] bool picksLanguage(const QString& base) const;
     /// The full reply skill for an email or a chat message, or "" without one.
     [[nodiscard]] QString fullReplyId(bool chat) const;
+    /// The compose skill for a kind ("email", "message", "post", "note"), or "" without one.
+    [[nodiscard]] QString composeId(const QString& kind) const;
+    /// Bases whose button opens their own page instead of a menu: reply, compose.
+    [[nodiscard]] static bool opensPage(const QString& base);
     /// The Tone action's presets as (tone, title): what a full reply can be written in.
     [[nodiscard]] QList<std::pair<QString, QString>> tones() const;
 

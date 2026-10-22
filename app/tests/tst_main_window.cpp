@@ -16,6 +16,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QMenu>
+#include <QMutexLocker>
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QSignalSpy>
@@ -194,6 +195,34 @@ private Q_SLOTS:
         QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 1, kTimeoutMs);
         QCOMPARE(translate->label(), u"Translate: French"_s);
         QVERIFY(w.findChild<QLabel*>(u"outInfo"_s)->text().contains(u"French"_s));
+    }
+
+    void writesFromScratch()
+    {
+        // main-window-compose.html: Write takes a description, a kind and a tone, and keeps
+        // its versions like the full reply.
+        QVERIFY(m_daemon.start({u"fast-model"_s, u"quality-model"_s}, 32, true));
+        MainWindow w;
+        w.start();
+        auto* write = w.findChild<paraphrase::app::ChipButton*>(u"action-compose"_s);
+        QVERIFY(write != nullptr);
+        QCOMPARE(write->label(), u"Write"_s);
+        write->click(); // nothing described yet: it says so
+        w.findChild<QPushButton*>(u"composeMessage"_s)->click();
+        QCOMPARE(w.currentSkill(), u"compose.message"_s);
+        w.findChild<QPlainTextEdit*>(u"composeText"_s)
+            ->setPlainText(u"office closed Monday, standup at 10 am"_s);
+        setAnswers({u"Heads up: the office is closed on Monday. Standup at 10 am on video."_s});
+        runAndWait(w);
+        QVERIFY(w.resultText().contains(u"Monday"_s));
+        {
+            const QMutexLocker lock(&m_daemon.state->lock);
+            // The description and the remembered tone reach the model, whatever the prompt's wording.
+            QVERIFY(m_daemon.state->prompts.last().contains(u"office closed Monday"_s));
+            QVERIFY(m_daemon.state->prompts.last().contains(u"friendly"_s, Qt::CaseInsensitive));
+        }
+        const QString info = w.findChild<QLabel*>(u"outInfo"_s)->text();
+        QVERIFY2(info.contains(u"kept: "_s) && info.contains(u"Monday"_s), qPrintable(info));
     }
 
     void listsMyActionsAndNewAction()

@@ -21,12 +21,15 @@ InputPane::InputPane(const util::LanguageDetector& detector, QWidget* parent)
     , m_detector(detector)
     , m_pages(new QStackedWidget)
     , m_full(new FullReplyInput)
+    , m_compose(new ComposeInput)
 {
     buildHead();
     m_byKind.insert(SkillKind::Text, new TextInput);
     m_byKind.insert(SkillKind::QuickReply, new QuickReplyInput);
     m_byKind.insert(SkillKind::FullReply, m_full);
-    for (const SkillKind kind : {SkillKind::Text, SkillKind::QuickReply, SkillKind::FullReply}) {
+    m_byKind.insert(SkillKind::Compose, m_compose);
+    for (const SkillKind kind :
+         {SkillKind::Text, SkillKind::QuickReply, SkillKind::FullReply, SkillKind::Compose}) {
         InputPage* p = m_byKind.value(kind);
         m_pages->addWidget(p);
         connect(p, &InputPage::edited, this, [this] {
@@ -35,8 +38,9 @@ InputPane::InputPane(const util::LanguageDetector& detector, QWidget* parent)
         });
     }
     setBody(m_pages);
-    footRow()->addWidget(
-        makeLabel(tr("Type or paste anything. Ctrl+Enter runs the selected action."), u"small"_s));
+    m_hint = makeLabel(QString(), u"small"_s);
+    m_hint->setWordWrap(true);
+    footRow()->addWidget(m_hint);
     showKind(SkillKind::Text);
 }
 
@@ -81,11 +85,18 @@ void InputPane::showKind(SkillKind kind)
     }
     m_pages->setCurrentWidget(next);
     const bool text = kind == SkillKind::Text;
-    m_title->setText(text ? tr("YOUR TEXT") : tr("MESSAGE YOU GOT"));
+    const bool compose = kind == SkillKind::Compose;
+    if (compose) {
+        m_title->setText(tr("WHAT TO WRITE"));
+        m_hint->setText(tr("Ctrl+Enter writes it. Names, dates and numbers come only from what you wrote."));
+    } else {
+        m_title->setText(text ? tr("YOUR TEXT") : tr("MESSAGE YOU GOT"));
+        m_hint->setText(tr("Type or paste anything. Ctrl+Enter runs the selected action."));
+    }
     // main-window-reply.html: the language as a pill, no word count, no Clear, no hint line.
     m_clear->setVisible(text);
-    foot()->setVisible(text);
-    m_replyKind->setVisible(!text && m_fullAvailable);
+    foot()->setVisible(text || compose);
+    m_replyKind->setVisible(!text && !compose && m_fullAvailable);
     m_replyKind->setCurrent(kind == SkillKind::FullReply ? 1 : 0);
     updateInfo();
 }

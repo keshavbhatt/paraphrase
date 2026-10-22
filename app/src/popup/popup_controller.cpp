@@ -109,6 +109,7 @@ bool PopupController::ensureCatalog()
     if (actions.load()) {
         m_catalog.setUserActionsBase(actions.templateSkill());
     }
+    m_window->actionsPage()->actionBar()->setHiddenBases({u"compose"_s}); // Write starts from nothing
     m_window->actionsPage()->actionBar()->setCatalog(&m_catalog);
     m_window->applyTheme();
     return !m_catalog.isEmpty();

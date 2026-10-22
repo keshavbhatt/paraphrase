@@ -110,6 +110,11 @@ void MainWindow::connectParts()
     m_actions->setTextLanguage([this] { return m_input->language(); });
     connect(m_input, &InputPane::fullReplyToggled, this, &MainWindow::chooseReply);
     connect(m_input->fullReplyInput(), &FullReplyInput::kindChanged, this, [this] { chooseReply(true); });
+    connect(m_actions, &ActionBar::composeChosen, this, [this] {
+        chooseCompose();
+        run();
+    });
+    connect(m_input->composeInput(), &ComposeInput::kindChanged, this, &MainWindow::chooseCompose);
     connect(m_input, &InputPane::edited, this, [this] {
         if (const SkillInfo* s = m_catalog.find(m_skill)) {
             m_runner->warmLater(m_skill, m_input->page()->input(*s, m_targetLang));
@@ -144,6 +149,7 @@ void MainWindow::applyTheme()
     m_notice->applyTheme(m_tokens);
     m_actions->applyTheme(m_tokens);
     m_input->fullReplyInput()->applyTheme(m_tokens);
+    m_input->composeInput()->applyTheme(m_tokens);
     m_output->applyTheme(m_tokens);
     m_status->applyTheme(m_tokens);
 }
@@ -215,6 +221,7 @@ void MainWindow::loadSkills()
     m_actions->setCatalog(&m_catalog);
     m_actions->applyTheme(m_tokens);
     m_input->fullReplyInput()->setTones(m_catalog.tones());
+    m_input->composeInput()->setTones(m_catalog.tones());
     m_input->setFullReplyAvailable(!m_catalog.fullReplyId(false).isEmpty());
     if (const SkillInfo* current = m_catalog.find(m_skill)) {
         m_actions->setCurrent(*current, m_targetLang);
@@ -227,6 +234,11 @@ void MainWindow::loadStatus()
     const QDBusMessage models = m_client.call(u"ListModels"_s, {});
     m_status->showModels(parseJson(status.arguments().value(0).toString()).toObject(),
                          parseJson(models.arguments().value(0).toString()).toArray());
+}
+
+void MainWindow::chooseCompose()
+{
+    selectSkill(m_catalog.composeId(m_input->composeInput()->kind()));
 }
 
 void MainWindow::chooseReply(bool full)
@@ -253,6 +265,8 @@ void MainWindow::selectSkill(const QString& skillId)
         title = tr("Replies");
     } else if (kind == SkillKind::FullReply) {
         title = tr("Your reply");
+    } else if (kind == SkillKind::Compose) {
+        title = tr("Your text");
     }
     m_output->showKind(kind, title, s->base == u"proofread"_s);
     m_output->setRunning(busy());
@@ -272,9 +286,13 @@ void MainWindow::run()
     const SkillKind kind = m_catalog.kindOf(m_skill);
     const QVariantMap in = m_input->page()->input(*s, m_targetLang);
     if (in.isEmpty()) {
-        m_output->textView()->showMessage(kind == SkillKind::Text ? tr("Type or paste some text first.")
-                                                                  : tr("Paste the message you got first."),
-                                          false);
+        QString hint = tr("Paste the message you got first.");
+        if (kind == SkillKind::Text) {
+            hint = tr("Type or paste some text first.");
+        } else if (kind == SkillKind::Compose) {
+            hint = tr("Say what to write first.");
+        }
+        m_output->textView()->showMessage(hint, false);
         m_output->showKind(SkillKind::Text, s->title.section(u':', 0, 0), false);
         return;
     }
@@ -283,7 +301,7 @@ void MainWindow::run()
         Q_EMIT finished();
         return;
     }
-    m_requestInput = in.value(kind == SkillKind::Text ? u"text"_s : u"context"_s).toString();
+    m_requestInput = in.value(s->mainInputIsContext() ? u"context"_s : u"text"_s).toString();
     m_rewriting = false;
     m_streamed.clear();
     selectSkill(m_skill); // the right view, also after a message was shown
@@ -291,8 +309,9 @@ void MainWindow::run()
         m_output->textView()->clear();
     } else if (kind == SkillKind::QuickReply) {
         m_output->repliesView()->setReplies({});
-    } else if (const QString key = m_requestInput + in.value(u"intent"_s).toString(); key != m_fullReplyKey) {
-        m_fullReplyKey = key; // a new message: start the versions again
+    } else if (const QString key = m_skill + m_requestInput + in.value(u"intent"_s).toString();
+               key != m_fullReplyKey) {
+        m_fullReplyKey = key; // a new message or kind: start the versions again
         m_output->fullView()->reset();
     }
     m_output->setInfo(tr("· writing..."));
@@ -323,7 +342,7 @@ void MainWindow::onRetry()
         cancel();
     } else if (kind == SkillKind::QuickReply) {
         rewriteResult(u"rewrite.polite"_s);
-    } else if (kind == SkillKind::FullReply) {
+    } else if (writesDraft(kind)) {
         rewriteResult(u"rewrite.concise"_s);
     } else {
         run();
@@ -354,7 +373,7 @@ void MainWindow::onToken(const QString& piece)
     if (m_rewriting || kind == SkillKind::QuickReply) {
         return;
     }
-    if (kind == SkillKind::FullReply) {
+    if (writesDraft(kind)) {
         m_output->fullView()->stream(m_streamed);
     } else {
         m_output->textView()->stream(m_streamed);
@@ -384,7 +403,7 @@ void MainWindow::onFinished(const QJsonObject& result)
             replies.append(v.toString());
         }
         m_output->repliesView()->setReplies(replies);
-    } else if (kind == SkillKind::FullReply) {
+    } else if (writesDraft(kind)) {
         m_output->fullView()->addVersion(output);
     } else if (m_catalog.find(m_skill)->base == u"proofread"_s) {
         m_output->textView()->showProofread(m_requestInput, result.value(u"output"_s).toString());
@@ -405,6 +424,8 @@ void MainWindow::showResult(const QJsonObject& result)
     QString replyKind;
     if (kind == SkillKind::FullReply) {
         replyKind = m_input->fullReplyInput()->chat() ? tr("chat message") : tr("email");
+    } else if (kind == SkillKind::Compose && s != nullptr) {
+        replyKind = SkillCatalog::presetTitle(*s).toLower();
     }
     const ResultFacts facts{
         .kind = kind,

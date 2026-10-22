@@ -45,6 +45,9 @@ void ActionBar::setCatalog(const SkillCatalog* catalog)
     group->setExclusive(true);
     int number = 0;
     for (const QString& base : catalog->actionBases()) {
+        if (m_hidden.contains(base)) {
+            continue;
+        }
         ChipButton* b = addAction(++number, base);
         group->addButton(b);
         m_row->addWidget(b);
@@ -68,6 +71,8 @@ ChipButton* ActionBar::addAction(int number, const QString& base)
     const auto variants = m_catalog->variants(base);
     if (base == u"reply"_s) {
         connect(b, &QPushButton::clicked, this, &ActionBar::replyChosen);
+    } else if (SkillCatalog::opensPage(base)) {
+        connect(b, &QPushButton::clicked, this, &ActionBar::composeChosen);
     } else if (base == m_catalog->userActionsBase()) {
         QMenu* menu = presetMenu(b, base);
         if (!menu->isEmpty()) {
@@ -153,6 +158,13 @@ void ActionBar::highlight(const QString& base)
 void ActionBar::setCurrent(const SkillInfo& skill, const QString& targetLang)
 {
     const QString base = m_catalog->kindOf(skill.id) == SkillKind::FullReply ? u"reply"_s : skill.base;
+    if (SkillCatalog::opensPage(base)) {
+        if (ChipButton* b = m_buttons.value(base)) {
+            b->setChecked(true);
+            updateArrows();
+        }
+        return;
+    }
     ChipButton* b = m_buttons.value(base);
     if (b == nullptr) {
         return;

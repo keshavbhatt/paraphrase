@@ -16,6 +16,7 @@ class QPushButton;
 namespace paraphrase::app {
 
 class SegmentedControl;
+class TonePicker;
 
 /// What a kind of action needs from the user, as one page of the input pane. Each page owns
 /// its fields and turns them into the request's inputs (DOCS/api.md, `input`).
@@ -105,13 +106,40 @@ Q_SIGNALS:
     void kindChanged(); ///< email or chat message
 
 private:
-    void chooseTone(const QString& tone, const QString& title);
-
     QPlainTextEdit* m_message = nullptr;
     QPlainTextEdit* m_intent = nullptr;
     SegmentedControl* m_kind = nullptr;
-    QPushButton* m_tone = nullptr;
-    QString m_toneValue;
+    TonePicker* m_tone = nullptr;
+};
+
+/// What to write from scratch (main-window-compose.html): a description in the user's words,
+/// Email, Message, Social post or Note, and a tone. The kind and the tone are remembered.
+class ComposeInput : public InputPage
+{
+    Q_OBJECT
+    Q_DISABLE_COPY_MOVE(ComposeInput)
+
+public:
+    explicit ComposeInput(QWidget* parent = nullptr);
+    ~ComposeInput() override = default;
+
+    [[nodiscard]] QString subject() const override;
+    void setSubject(const QString& text) override;
+    [[nodiscard]] QVariantMap input(const SkillInfo& skill, const QString& targetLang) const override;
+    void clear() override;
+
+    void setTones(const QList<std::pair<QString, QString>>& tones);
+    void applyTheme(const Tokens& t);
+    /// "email", "message", "post" or "note": the compose preset to run.
+    [[nodiscard]] QString kind() const;
+
+Q_SIGNALS:
+    void kindChanged();
+
+private:
+    QPlainTextEdit* m_description = nullptr;
+    SegmentedControl* m_kind = nullptr;
+    TonePicker* m_tone = nullptr;
 };
 
 } // namespace paraphrase::app

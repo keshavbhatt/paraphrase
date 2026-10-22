@@ -91,7 +91,8 @@ public:
 
     ~AppDaemon() { stop(); }
 
-    /// The shipped skills plus a small skill that takes the user's own actions (schema v5).
+    /// The shipped skills plus small test skills that take the user's own actions (schema v5)
+    /// and write from scratch (compose), when the tree does not ship them yet.
     [[nodiscard]] QString skillsWithUserActions() const
     {
         using namespace Qt::StringLiterals;
@@ -111,6 +112,18 @@ public:
                 "max_output_tokens: 200\nsampling: { temperature: 0.2 }\noutput: { type: text }\n"
                 "user_presets: { values: [instruction] }\nsystem: Do what the user asks with the text.\n"
                 "template: |\n  {{instruction}}\n  <text>\n  {{text}}\n  </text>\n");
+        }
+        if (!QFile::exists(dir + u"/compose.yaml"_s)) {
+            (void)writeFile(dir + u"/compose.yaml"_s,
+                            "id: compose\nversion: 5\ntitle: Write\ntier: quality\nmax_input_tokens: 500\n"
+                            "max_output_tokens: 300\nsampling: { temperature: 0.7 }\noutput: { type: text }\n"
+                            "system: Write what the user describes.\n"
+                            "template: |\n  Write {{kind}} in a {{#if tone}}{{tone}}{{/if}} tone.\n  "
+                            "<text>\n  {{text}}\n  </text>\n"
+                            "presets:\n  email: { title: Email, kind: an email }\n  message: { title: "
+                            "Message, kind: a message }\n"
+                            "  post: { title: Social post, kind: a social post }\n  note: { title: Note, "
+                            "kind: a note }\n");
         }
         return dir;
     }

@@ -91,6 +91,7 @@ add_library(paraphrase_ui STATIC
     src/ui/core/request_runner.cpp
     src/ui/core/result_summary.cpp
     src/ui/parts/result_views.cpp
+    src/ui/parts/tone_picker.cpp
     src/ui/setup/sample_run.cpp
     src/ui/settings/settings_nav.cpp
     src/ui/settings/settings_window.cpp

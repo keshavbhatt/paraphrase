@@ -47,6 +47,8 @@ public:
     void setCurrent(const SkillInfo& skill, const QString& targetLang);
     /// The language of the text now, left out of the language menu.
     void setTextLanguage(std::function<QString()> currentLanguage);
+    /// Bases left out of this bar (the popup has no Write: it starts from selected text).
+    void setHiddenBases(const QStringList& bases) { m_hidden = bases; }
     /// Marks an action without running it: the popup's likely action (popup-actions.html).
     void highlight(const QString& base);
     void applyTheme(const Tokens& t);
@@ -54,6 +56,7 @@ public:
 Q_SIGNALS:
     void chosen(const QString& skillId, const QString& targetLang);
     void replyChosen();
+    void composeChosen();
     void newActionRequested(); ///< "New action..." under My actions
 
 private:
@@ -70,6 +73,7 @@ private:
     QHash<QString, ChipButton*> m_buttons; ///< base -> button
     QList<QObject*> m_built;               ///< buttons, shortcuts and groups to remove on rebuild
     std::function<QString()> m_textLanguage;
+    QStringList m_hidden;
     Tokens m_tokens;
 };
 

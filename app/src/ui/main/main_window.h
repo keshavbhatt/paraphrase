@@ -78,6 +78,7 @@ private:
     void loadSkills();
     void loadStatus();
     void chooseReply(bool full);
+    void chooseCompose();
     void onSecondary();
     void onRetry();
     /// Runs a Tone preset on the result: "Make it polite", "Shorter".
