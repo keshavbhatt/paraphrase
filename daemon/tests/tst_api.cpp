@@ -233,6 +233,11 @@ private Q_SLOTS:
         QCOMPARE(
             runSkill(c, u"rewrite.professional"_s, {{u"text"_s, u"x"_s}, {u"target_lang"_s, u"klingon"_s}}),
             invalid);
+        // intent and tone reach only prompts that use them; a preset's tone cannot be replaced.
+        QCOMPARE(runSkill(c, u"proofread"_s, {{u"text"_s, u"hi"_s}, {u"intent"_s, u"say no"_s}}), invalid);
+        QCOMPARE(runSkill(c, u"proofread"_s, {{u"text"_s, u"hi"_s}, {u"tone"_s, u"casual"_s}}), invalid);
+        QCOMPARE(runSkill(c, u"rewrite.professional"_s, {{u"text"_s, u"hi"_s}, {u"tone"_s, u"rude"_s}}),
+                 invalid);
     }
 
     void saysWhenNoModelIsInstalled()

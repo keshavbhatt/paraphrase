@@ -49,7 +49,9 @@ daemon exits; never while a download runs).
 **`input`** (all strings): `text` (what to work on; required unless the skill's
 `main_input` is `context`), `context` (the message to reply to; required when it is), `target_lang` (a language code the user
 chose, for example `fr`; otherwise the output keeps the input's language; only skills whose
-prompt takes it, today rewrite, accept it). Any other key is
+prompt takes it, today rewrite, accept it), `intent` (what the user wants to say, in their own
+words, for a full reply) and `tone` (a tone the user picked, such as `professional`); each of
+the last two only for a skill whose prompt uses it, and never to replace a preset's own tone. Any other key is
 an error. **`options`**: `model` (a model id from `ListModels` with role `model`) runs the
 request on that model instead of the tier's (the eval harness, and a future Settings choice);
 any other key is an error.

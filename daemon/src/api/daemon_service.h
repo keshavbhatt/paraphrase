@@ -5,6 +5,7 @@
 #include "models/model_catalog.h"
 #include "models/model_downloader.h"
 #include "models/model_store.h"
+#include "skills/request_inputs.h"
 #include "skills/skill_registry.h"
 #include "util/language_detector.h"
 
@@ -111,6 +112,9 @@ private:
     void replyError(const QString& name, const QString& message);
     /// Checks the input and builds the skill's values; an error message when it is wrong.
     [[nodiscard]] QString buildJob(const QString& skillId, const QVariantMap& input, Job& job) const;
+    /// Why these inputs do not fit the skill, or "" when they do.
+    [[nodiscard]] QString checkFields(const skills::Skill& skill, const skills::RequestFields& fields) const;
+    static constexpr qsizetype kMaxToneLength = 40;
     [[nodiscard]] QSet<QString> installedModels() const;
     /// The requested model, or the one for the job's tier (TierSelector), with its draft
     /// head when installed.

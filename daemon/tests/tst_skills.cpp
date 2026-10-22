@@ -130,6 +130,8 @@ private Q_SLOTS:
                 .text = f.value(u"text"_s).toString(),
                 .context = f.value(u"context"_s).toString(),
                 .targetLang = f.value(u"target_lang"_s).toString(),
+                .intent = f.value(u"intent"_s).toString(),
+                .tone = f.value(u"tone"_s).toString(),
             };
             const Values got = buildInputs(o.value(u"base_id"_s).toString(), fields, detector);
             QCOMPARE(toJson(got), o.value(u"inputs"_s).toObject());

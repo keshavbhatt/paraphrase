@@ -159,34 +159,57 @@ QString DaemonService::buildJob(const QString& skillId, const QVariantMap& input
     if (skill == nullptr) {
         return tr("Unknown skill \"%1\".").arg(skillId);
     }
-    static const QSet<QString> kKeys = {u"text"_s, u"context"_s, u"target_lang"_s};
+    static const QSet<QString> kKeys = {u"text"_s, u"context"_s, u"target_lang"_s, u"intent"_s, u"tone"_s};
     for (auto it = input.begin(); it != input.end(); ++it) {
         if (!kKeys.contains(it.key()) || it.value().typeId() != QMetaType::QString) {
-            return tr("Unknown input \"%1\": text, context and target_lang are strings.").arg(it.key());
+            return tr("Unknown input \"%1\": text, context, target_lang, intent and tone are strings.")
+                .arg(it.key());
         }
     }
     const skills::RequestFields fields{
         .text = input.value(u"text"_s).toString(),
         .context = input.value(u"context"_s).toString(),
         .targetLang = input.value(u"target_lang"_s).toString(),
+        .intent = input.value(u"intent"_s).toString(),
+        .tone = input.value(u"tone"_s).toString(),
     };
-    if (skill->mainInput() == u"context"_s) {
+    if (const QString problem = checkFields(*skill, fields); !problem.isEmpty()) {
+        return problem;
+    }
+    job.skill = *skill;
+    job.inputs = skills::buildInputs(skill->baseId, fields, m_detector);
+    return {};
+}
+
+QString DaemonService::checkFields(const skills::Skill& s, const skills::RequestFields& fields) const
+{
+    // intent and tone reach only a prompt that uses them; a preset's own tone is fixed.
+    if (!fields.intent.isEmpty() && !s.templ.contains(u"{{intent}}"_s) &&
+        !s.templ.contains(u"{{#if intent}}"_s)) {
+        return tr("%1 does not take what you want to say (intent).").arg(s.title);
+    }
+    if (!fields.tone.isEmpty() &&
+        ((!s.templ.contains(u"{{tone}}"_s) && !s.templ.contains(u"{{#if tone}}"_s)) ||
+         s.preset.contains(u"tone"_s))) {
+        return tr("%1 does not take a tone.").arg(s.title);
+    }
+    if (fields.tone.size() > kMaxToneLength) {
+        return tr("The tone is too long: at most %1 characters.").arg(kMaxToneLength);
+    }
+    if (s.mainInput() == u"context"_s) {
         if (fields.context.trimmed().isEmpty()) {
-            return tr("%1 needs the message to reply to (context).").arg(skill->title);
+            return tr("%1 needs the message to reply to (context).").arg(s.title);
         }
     } else if (fields.text.trimmed().isEmpty()) {
-        return tr("%1 needs some text.").arg(skill->title);
+        return tr("%1 needs some text.").arg(s.title);
     }
     // Only a skill whose prompt names the target language can write in another one.
-    if (!fields.targetLang.isEmpty() && !skill->templ.contains(u"target_lang"_s)) {
-        return tr("%1 keeps the language of the text; it cannot write in another language.")
-            .arg(skill->title);
+    if (!fields.targetLang.isEmpty() && !s.templ.contains(u"target_lang"_s)) {
+        return tr("%1 keeps the language of the text; it cannot write in another language.").arg(s.title);
     }
     if (!fields.targetLang.isEmpty() && m_detector.plainName(fields.targetLang).isEmpty()) {
         return tr("Unknown language \"%1\".").arg(fields.targetLang);
     }
-    job.skill = *skill;
-    job.inputs = skills::buildInputs(skill->baseId, fields, m_detector);
     return {};
 }
 

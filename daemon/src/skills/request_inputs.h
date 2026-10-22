@@ -14,6 +14,8 @@ struct RequestFields
     QString text;
     QString context;
     QString targetLang;
+    QString intent; ///< what the user wants to say, in their words (a full reply)
+    QString tone;   ///< a tone the user picked, for a skill whose prompt takes one
 };
 
 /// The template values the engine adds to a request: `lang` and `lang_name` from the

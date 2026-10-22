@@ -13,6 +13,13 @@ Values buildInputs(const QString& baseSkillId, const RequestFields& fields,
         inputs.insert(u"lang"_s, lang);
         inputs.insert(u"lang_name"_s, detector.promptName(lang));
     };
+    // What the user chose besides the text: only set when given, so prompts can test them.
+    if (!fields.intent.trimmed().isEmpty()) {
+        inputs.insert(u"intent"_s, fields.intent);
+    }
+    if (!fields.tone.trimmed().isEmpty()) {
+        inputs.insert(u"tone"_s, fields.tone);
+    }
     if (baseSkillId == u"reply"_s) {
         inputs.insert(u"context"_s, fields.context);
         inputs.insert(u"text"_s, fields.text);

@@ -90,12 +90,12 @@ private:
 
 RequestFields textField(const QString& text, const QString& targetLang = {})
 {
-    return {.text = text, .context = {}, .targetLang = targetLang};
+    return {.text = text, .context = {}, .targetLang = targetLang, .intent = {}, .tone = {}};
 }
 
 RequestFields contextField(const QString& context)
 {
-    return {.text = {}, .context = context, .targetLang = {}};
+    return {.text = {}, .context = context, .targetLang = {}, .intent = {}, .tone = {}};
 }
 
 SkillRegistry shippedSkills()
