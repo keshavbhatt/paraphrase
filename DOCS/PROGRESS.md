@@ -14,6 +14,25 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-22 - M1 step 7: the CLI
+
+- `paraphrase proofread | rewrite --tone T | reply [--draft D] | run SKILL`, with `--to`,
+  `--json` and `--no-stream`, plus `skills`, `status` and `models list | download | pause |
+  delete` (README, "Using the CLI"). Text from the arguments or standard input; answers stream
+  into a terminal, a pipe gets the finished answer; reply prints one suggestion per line.
+  Ctrl+C cancels the request (exit 130).
+- It finds the daemon on the bus, starts it detached, or runs it privately (ADR-010).
+  tst_cli runs the real binary through the private path with the real model (proofread, reply,
+  rewrite with JSON); by hand on the session bus: started the daemon, streamed a rewrite in a
+  terminal, reused the daemon, Ctrl+C left it idle.
+- Fixed on the way: the detached daemon wrote its log into the CLI's terminal, mid-answer
+  (now discarded); `--to` was silently ignored by reply and proofread, which cannot write in
+  another language (now refused for any skill whose prompt does not take it).
+- Observed: rewrite runs on E4B on this 30 GB machine (quality tier, ADR-016), so switching
+  between proofread and rewrite reloads a model (about 6 s each way). To weigh in step 8.
+- M1 acceptance: proofread, reply and rewrite work from the CLI; tests green. Left: step 8,
+  eval reports and the latency bench through the daemon, and the portable-build re-bench.
+
 ## 2026-10-22 - M1 step 6: the D-Bus API
 
 - `paraphrase_api` and `paraphrase-daemon`: the API in DOCS/api.md on the session bus, or on

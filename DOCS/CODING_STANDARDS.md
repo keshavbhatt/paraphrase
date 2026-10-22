@@ -38,7 +38,7 @@ paraphrase/
       models/     ModelCatalog, Downloader, HardwareProbe, TierSelector
       api/        D-Bus adaptor, request queue, native-messaging socket (M4)
     tests/        Qt Test, one tst_<module>.cpp per module
-  cli/          paraphrase CLI, a D-Bus client
+  cli/          paraphrase CLI, a D-Bus client (src/, tests/: the real binary end to end)
   app/          Qt Widgets desktop client (from M2): main window, popup, settings
   eval/         Python harness: datasets, metrics, eval and latency runs (the reference
                 implementation of the engine's text logic, see section 12)
