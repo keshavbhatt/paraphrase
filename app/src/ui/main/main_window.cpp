@@ -1,5 +1,6 @@
 #include "ui/main/main_window.h"
 
+#include "ui/core/facts_check.h"
 #include "ui/core/languages.h"
 #include "ui/core/request_runner.h"
 #include "ui/core/result_summary.h"
@@ -411,8 +412,15 @@ void MainWindow::showResult(const QJsonObject& result)
         .language = chosen ? languageName(m_detector, m_targetLang) : inputLanguageName(),
         .chosenLanguage = chosen,
         .replyKind = replyKind,
+        .facts = {},
     };
-    m_output->setInfo(resultSummary(facts));
+    ResultFacts shown = facts;
+    FactsCheck check;
+    if (s != nullptr && keepsFacts(s->base)) {
+        check = checkFacts(m_requestInput, m_output->result());
+        shown.facts = factsLine(check);
+    }
+    m_output->setInfo(resultSummary(shown), check.missing.isEmpty() ? u"small"_s : u"warning"_s);
     if (!result.value(u"warning"_s).toString().isEmpty()) {
         m_output->setInfo(languageWarning(facts.language), u"warning"_s);
     }

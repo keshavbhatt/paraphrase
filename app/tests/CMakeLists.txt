@@ -23,3 +23,6 @@ foreach(test tst_main_window tst_setup_window tst_settings_window tst_popup)
         "${PROJECT_SOURCE_DIR}/daemon/tests/test_http_server.h" # Q_OBJECT: automoc must see it
         app_daemon.h)
 endforeach()
+
+# The facts a rewrite must keep, checked like the eval's protected tokens.
+paraphrase_add_test(tst_facts_check tst_facts_check.cpp paraphrase_ui)

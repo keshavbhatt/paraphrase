@@ -15,7 +15,11 @@ struct ResultFacts
     QString language;            ///< plain name of the result's language, may be empty
     bool chosenLanguage = false; ///< the user picked the language (Translate)
     QString replyKind;           ///< "email" or "chat message" for a full reply
+    QString facts;               ///< "kept: Sam, Friday" or "check: Friday is missing" (facts_check.h)
 };
+
+/// Skills whose result must keep the text's facts: the line names them, a missing one warns.
+[[nodiscard]] bool keepsFacts(const QString& base);
 
 /// "· 4 changes · kept in English", "· in Hindi", "· email · in English", "· nothing to fix".
 [[nodiscard]] QString resultSummary(const ResultFacts& facts);

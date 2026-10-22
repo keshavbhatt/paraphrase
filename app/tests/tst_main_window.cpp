@@ -133,6 +133,11 @@ private Q_SLOTS:
         QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 1, kTimeoutMs);
         QCOMPARE(w.currentSkill(), u"rewrite.polite"_s);
         QCOMPARE(w.resultText(), u"Could you send me the file, please?"_s);
+        // A rewrite that drops a fact says so (popup-rewrite.html, note 4).
+        w.findChild<QPlainTextEdit*>(u"text"_s)->setPlainText(u"tell Priya the report is due Friday"_s);
+        setAnswers({u"Could you let her know the report is due soon?"_s});
+        runAndWait(w);
+        QVERIFY(w.findChild<QLabel*>(u"outInfo"_s)->text().contains(u"check: Priya, Friday are missing"_s));
         QCOMPARE(tone->label(), u"Tone: Polite"_s);
     }
 

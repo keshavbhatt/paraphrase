@@ -24,7 +24,15 @@ QString resultSummary(const ResultFacts& facts)
         const bool kept = facts.kind == SkillKind::Text && !facts.chosenLanguage;
         line += (kept ? QObject::tr(" · kept in %1") : QObject::tr(" · in %1")).arg(facts.language);
     }
+    if (!facts.facts.isEmpty()) {
+        line += u" · "_s + facts.facts;
+    }
     return line.trimmed();
+}
+
+bool keepsFacts(const QString& base)
+{
+    return base == u"rewrite"_s || base == u"format"_s;
 }
 
 QString languageWarning(const QString& language)

@@ -3,6 +3,7 @@
 #include "integration/integrations.h"
 #include "popup/popup_pages.h"
 #include "popup/popup_window.h"
+#include "ui/core/facts_check.h"
 #include "ui/core/languages.h"
 #include "ui/core/request_runner.h"
 #include "ui/core/result_summary.h"
@@ -213,6 +214,7 @@ void PopupController::onFinished(const QJsonObject& result)
         page->textView()->showText(output);
     }
     const bool chosen = !m_targetLang.isEmpty();
+    const FactsCheck check = keepsFacts(skill->base) ? checkFacts(m_text.text, page->result()) : FactsCheck{};
     const QString language = languageName(m_detector, chosen ? m_targetLang : m_detector.detect(m_text.text));
     const ResultFacts facts{
         .kind = kind,
@@ -221,8 +223,9 @@ void PopupController::onFinished(const QJsonObject& result)
         .language = language,
         .chosenLanguage = chosen,
         .replyKind = {},
+        .facts = factsLine(check),
     };
-    page->setInfo(resultSummary(facts));
+    page->setInfo(resultSummary(facts), check.missing.isEmpty() ? u"small"_s : u"warning"_s);
     if (facts.proofread && facts.changes == 0) {
         page->showNothingToFix();
     }
