@@ -32,8 +32,11 @@ public:
     /// Reads the request's prompt into the cache without generating (ADR-005): if the same
     /// request follows, only its last token is read again.
     [[nodiscard]] virtual util::Result<bool> warm(const GenerationRequest& request) = 0;
-    /// Stops the current generation at the next token; its finish reason is "cancelled".
+    /// Stops the current generation at the next token; its finish reason is "cancelled". The
+    /// flag stays set, so every later generate() stops at once, until resetCancel(): a cancel
+    /// that arrives between a job's model calls (the language retry) still counts.
     virtual void cancel() = 0;
+    virtual void resetCancel() = 0;
 };
 
 } // namespace paraphrase::engine

@@ -55,6 +55,7 @@ public:
     [[nodiscard]] std::vector<int> promptTokens(const GenerationRequest& request) const;
 
     void cancel() override;
+    void resetCancel() override;
 
 private:
     struct TemplatesDeleter

@@ -143,8 +143,10 @@ private Q_SLOTS:
         const auto& proofread = skill(u"proofread"_s);
         const auto in = inputs(u"proofread"_s, textField(kHindi));
 
-        const auto result = runner.run(proofread, in);
+        QStringList retries;
+        const auto result = runner.run(proofread, in, {}, [&](const QString& why) { retries.append(why); });
         QVERIFY(result.ok());
+        QCOMPARE(retries, QStringList{u"Hindi answered outside Devanagari"_s});
         QCOMPARE(result.value().output, kHindi);
         QVERIFY(result.value().retried);
         QVERIFY(result.value().warning.isEmpty());

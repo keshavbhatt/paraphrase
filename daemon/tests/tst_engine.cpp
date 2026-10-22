@@ -225,7 +225,10 @@ private Q_SLOTS:
         QVERIFY(result.ok());
         QCOMPARE(result.value().finishReason, u"cancelled"_s);
         QVERIFY(result.value().generatedTokens < 5);
-        // The next request runs normally.
+        // Cancelled stays cancelled until the next job resets it.
+        QCOMPARE(m_engine.generate(request(u"proofread/pr-en-001"_s), {}).value().finishReason,
+                 u"cancelled"_s);
+        m_engine.resetCancel();
         const auto next = m_engine.generate(request(u"proofread/pr-en-001"_s), {});
         QVERIFY(next.ok());
         QCOMPARE(next.value().finishReason, u"stop"_s);

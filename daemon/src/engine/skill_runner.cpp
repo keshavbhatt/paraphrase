@@ -94,7 +94,7 @@ QString SkillRunner::languageProblem(const skills::Skill& skill, const skills::V
 }
 
 util::Result<SkillResult> SkillRunner::run(const skills::Skill& skill, const skills::Values& inputs,
-                                           const TextSink& sink)
+                                           const TextSink& sink, const RetryHook& onRetry)
 {
     const auto prompt = skill.render(inputs);
     GenerationRequest request{
@@ -110,6 +110,9 @@ util::Result<SkillResult> SkillRunner::run(const skills::Skill& skill, const ski
     QString problem;
     for (int attempt = 0; attempt < 2; ++attempt) {
         if (attempt == 1) {
+            if (onRetry) {
+                onRetry(problem);
+            }
             request.user = prompt.user + u"\n\n"_s + retryHint(inputs);
             request.sampling = retrySampling(skill.sampling);
         }

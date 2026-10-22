@@ -8,6 +8,7 @@
 #include <QString>
 #include <QStringList>
 
+#include <functional>
 #include <optional>
 
 namespace paraphrase::engine {
@@ -34,8 +35,12 @@ public:
 
     SkillRunner(Generator& generator, const util::LanguageDetector& detector);
 
+    /// Called with the reason when the first answer failed the language check and the
+    /// retry starts: a client clears what was streamed so far.
+    using RetryHook = std::function<void(const QString& reason)>;
+
     [[nodiscard]] util::Result<SkillResult> run(const skills::Skill& skill, const skills::Values& inputs,
-                                                const TextSink& sink = {});
+                                                const TextSink& sink = {}, const RetryHook& onRetry = {});
 
     /// The line the retry adds after the prompt: the language the answer must be in.
     [[nodiscard]] QString retryHint(const skills::Values& inputs) const;

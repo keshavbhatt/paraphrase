@@ -612,7 +612,6 @@ util::Result<Generation> LlamaEngine::generate(const GenerationRequest& request,
         return util::Result<Generation>::failure(
             QCoreApplication::translate("LlamaEngine", "No model is loaded."));
     }
-    m_cancel.store(false);
     Run run(*this, request, sink);
     return run.execute();
 }
@@ -632,7 +631,6 @@ util::Result<bool> LlamaEngine::warm(const GenerationRequest& request)
     if (!isLoaded()) {
         return util::Result<bool>::failure(QCoreApplication::translate("LlamaEngine", "No model is loaded."));
     }
-    m_cancel.store(false);
     const TextSink none; // Run keeps a reference
     Run run(*this, request, none);
     return run.prefill();
@@ -667,6 +665,11 @@ EngineConfig LlamaEngine::loadedConfig() const
 void LlamaEngine::cancel()
 {
     m_cancel.store(true);
+}
+
+void LlamaEngine::resetCancel()
+{
+    m_cancel.store(false);
 }
 
 } // namespace paraphrase::engine
