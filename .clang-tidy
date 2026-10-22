@@ -34,6 +34,8 @@ CheckOptions:
   readability-function-size.StatementThreshold: 80
   readability-identifier-naming.ClassCase: CamelCase
   readability-identifier-naming.StructCase: CamelCase
+  # Forward declarations of llama.cpp's types keep its names.
+  readability-identifier-naming.StructIgnoredRegexp: '^(llama|common|ggml)_.*'
   readability-identifier-naming.EnumCase: CamelCase
   readability-identifier-naming.EnumConstantCase: CamelCase
   readability-identifier-naming.FunctionCase: camelBack

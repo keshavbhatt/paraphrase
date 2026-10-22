@@ -229,6 +229,11 @@ class LlamaServer:
             raise RuntimeError(f"{path}: HTTP {resp.status}: {resp.read()[:2000]!r}")
         return resp
 
+    def post_json(self, path: str, body: dict[str, Any]) -> dict[str, Any]:
+        """Any other endpoint (`/apply-template`, `/tokenize`): its JSON answer."""
+        data: dict[str, Any] = json.loads(self._post(path, body).read())
+        return data
+
     def chat(
         self,
         system: str,

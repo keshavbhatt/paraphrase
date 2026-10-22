@@ -205,6 +205,9 @@ One class per file pair. Header guards: `#pragma once`.
 * The contract is `tests/vectors/*.json`, generated from the Python code by
   `eval/export_vectors.py` and read by both test suites. Any change to that logic changes the
   vectors in the same commit, and the diff is reviewed like code.
+* `tests/vectors/prompt_tokens.json` holds the engine to llama-server instead, the server the
+  M0 measurements used: the tokens it feeds the model for rendered prompts, written by
+  `eval/export_prompt_tokens.py`. Regenerate it with any llama.cpp or fast tier model update.
 * Golden files are regenerated only deliberately, never to make a failing test pass without
   reading why it failed.
 
