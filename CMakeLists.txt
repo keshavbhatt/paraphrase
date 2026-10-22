@@ -57,6 +57,7 @@ add_compile_definitions(
 
 if(PARAPHRASE_BUILD_TESTS)
     enable_testing()
+    include(Testing)
 endif()
 
 add_subdirectory(daemon)
