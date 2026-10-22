@@ -7,8 +7,8 @@
     uv run python eval/spotcheck.py score --tag m0-v2 ratings.json
         -> per-model scores from the ratings the page exports
     uv run python eval/spotcheck.py report --tag m0-v3 ratings.jsonl
-        -> Markdown: good/ok/bad per model, skill and language, split into ratings still as
-           pre-filled and ratings the owner edited, plus failure categories from the notes.
+        -> Markdown: good/ok/bad per model, skill and language, split into ratings a human
+           reviewed and ratings only Claude made, plus failure categories from the notes.
            ratings.jsonl holds one stored ratings document per line ({"id", "data"}).
 
 The page shows each item once with every model's output under a random letter, in a random
@@ -124,17 +124,21 @@ SKILL_OF = {"pr": "proofread", "rp": "reply", "rw": "rewrite"}
 # Failure categories, matched case-insensitively against a bad or ok rating's note.
 CATEGORIES: dict[str, tuple[tuple[str, ...], tuple[str, ...], tuple[str, ...]]] = {
     # name: (skills, languages, note keywords)
-    "injection obeyed": (("proofread", "reply", "rewrite"), ("en", "hi", "hinglish"), ("inject",)),
+    "injection obeyed": (
+        ("proofread", "reply", "rewrite"),
+        ("en", "hi", "hinglish"),
+        ("obeyed the inject", "partly obeyed"),
+    ),
     "unchanged rewrite": (("rewrite",), ("en", "hi", "hinglish"), ("unchanged", "not rewritten")),
     "wrong-speaker reply": (
         ("reply",),
         ("en", "hi", "hinglish"),
-        ("wrong side", "written as", "sounds like the"),
+        ("wrong side", "written as", "sounds like the", "speaks like the", "'s side"),
     ),
     "Hindi/Hinglish garbage": (
         ("proofread", "reply", "rewrite"),
         ("hi", "hinglish"),
-        ("garbled", "incoherent"),
+        ("garbled", "incoherent", "makes no sense"),
     ),
     "switched language": (
         ("proofread", "reply", "rewrite"),
@@ -166,14 +170,12 @@ def report(tag: str, ratings_path: Path) -> str:
         lambda: defaultdict(lambda: {"good": 0, "ok": 0, "bad": 0})
     )
     cats: dict[tuple[str, str], list[str]] = defaultdict(list)
-    groups: dict[str, list[str]] = {"pre-filled, unchanged": [], "edited by the owner": []}
+    groups: dict[str, list[str]] = {"Claude-rated, not human-reviewed": [], "human-reviewed": []}
     for d in docs:
         item, body = d["id"], d["data"]
-        group = (
-            "pre-filled, unchanged"
-            if body.get("prefilled_by") == "claude"
-            else "edited by the owner"
-        )
+        # Pass 1 documents carry prefilled_by; later ones say human_reviewed explicitly.
+        reviewed = body.get("human_reviewed") is True
+        group = "human-reviewed" if reviewed else "Claude-rated, not human-reviewed"
         groups[group].append(item)
         skill, lang = SKILL_OF[item[:2]], lang_of[item]
         for letter, r in body.get("ratings", {}).items():

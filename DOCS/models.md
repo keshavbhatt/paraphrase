@@ -105,45 +105,61 @@ real typing, typos, Hinglish); reports score those separately from the generated
 
 Pending: the owner reviews the results table before the recommendation is written.
 
-### Spot-check (2026-10-22)
+### Spot-check (2026-10-22): Claude-rated (2 passes), not human-reviewed: independent of the judge model, not of the item writer
 
 20 items per model (7 proofread, 7 reply, 6 rewrite; 3 Hindi, 3 Hinglish), five blind
-answers per item, rated on the page from `eval/spotcheck.py` (proofread at revision 4, reply
-and rewrite at revision 3). Claude pre-filled every rating with a note starting "[Claude]";
-the owner then reviewed the page, and both groups count as final (owner, 2026-10-22). Items
-still marked `prefilled_by: claude` were not changed by the owner.
+answers per item, rated on the page built by `eval/spotcheck.py` (proofread at revision 4,
+reply and rewrite at revision 3). **Claude rated all 100 answers in two passes; no human
+reviewed or edited any rating** (every stored item has `rated_by: claude`,
+`human_reviewed: false`, `review_passes: 2`; owner, 2026-10-22). Claude is from a different
+family than the candidates and than the judge (Sarvam-30B), so these ratings are independent
+of the judge model. They are not independent of the item writer: the eval items were also
+written with Claude. PLAN 11 makes the owner's own spot-check the final word on quality;
+these ratings are not that, and the owner breaks any tie below.
 
 | group | items | answers |
 |---|---|---|
-| pre-filled by Claude, not changed by the owner | 20 | 100 |
-| changed by the owner | 0 | 0 |
+| Claude-rated, not human-reviewed | 20 | 100 |
+| human-reviewed | 0 | 0 |
 
-The owner overrode **0 of 20** drafts, so every rating below is Claude's draft as accepted
-by the owner. Raw ratings: `eval/reports/m0-v3/spotcheck/ratings.jsonl` (notes transcribed
-as stored, with dashes replaced by commas); full table by skill and language:
-`eval/reports/m0-v3/spotcheck/report.md` (`spotcheck.py report`).
+The second pass changed 8 of 100 ratings from the first: 4 up (pr-en-038 C, rp-en-007 B,
+rp-en-010 A, rp-en-030 E) and 4 down (rp-en-007 A, rp-hi-013 A and C, rw-en-004 E).
+Ratings: `eval/reports/m0-v3/spotcheck/ratings.jsonl` (final) and `ratings-pass1.jsonl`
+(first pass), with dashes in notes replaced by commas; full table by skill and language in
+`report.md` (`spotcheck.py report`).
 
-Good / ok / bad counts (all ratings are in the pre-filled group):
+Good / ok / bad counts:
 
-| model | total | proofread | reply | rewrite | Hindi (3 items) | Hinglish (3 items) |
-|---|---|---|---|---|---|---|
-| gemma-4-e4b-qat-q4_0 | 14 / 6 / 0 | 5 / 2 / 0 | 4 / 3 / 0 | 5 / 1 / 0 | 2 / 1 / 0 | 2 / 1 / 0 |
-| qwen3.5-4b-q4km | 14 / 6 / 0 | 5 / 2 / 0 | 4 / 3 / 0 | 5 / 1 / 0 | 3 / 0 / 0 | 1 / 2 / 0 |
-| gemma-4-e2b-qat-q4_0 | 12 / 5 / 3 | 3 / 3 / 1 | 5 / 1 / 1 | 4 / 1 / 1 | 1 / 1 / 1 | 2 / 0 / 1 |
-| qwen3.5-2b-q4km | 3 / 6 / 11 | 3 / 2 / 2 | 0 / 3 / 4 | 0 / 1 / 5 | 0 / 0 / 3 | 0 / 0 / 3 |
-| qwen3.5-0.8b-q4km | 1 / 4 / 15 | 1 / 2 / 4 | 0 / 1 / 6 | 0 / 1 / 5 | 0 / 0 / 3 | 0 / 0 / 3 |
+| model | total | proofread | reply | rewrite | English (14) | Hindi (3) | Hinglish (3) |
+|---|---|---|---|---|---|---|---|
+| gemma-4-e4b-qat-q4_0 | 14 / 5 / 1 | 5 / 2 / 0 | 4 / 2 / 1 | 5 / 1 / 0 | 10 / 4 / 0 | 2 / 1 / 0 | 2 / 0 / 1 |
+| qwen3.5-4b-q4km | 14 / 5 / 1 | 5 / 2 / 0 | 5 / 1 / 1 | 4 / 2 / 0 | 10 / 4 / 0 | 3 / 0 / 0 | 1 / 1 / 1 |
+| gemma-4-e2b-qat-q4_0 | 12 / 6 / 2 | 4 / 2 / 1 | 4 / 3 / 0 | 4 / 1 / 1 | 9 / 5 / 0 | 1 / 1 / 1 | 2 / 0 / 1 |
+| qwen3.5-2b-q4km | 3 / 7 / 10 | 3 / 2 / 2 | 0 / 4 / 3 | 0 / 1 / 5 | 3 / 7 / 4 | 0 / 0 / 3 | 0 / 0 / 3 |
+| qwen3.5-0.8b-q4km | 1 / 4 / 15 | 1 / 2 / 4 | 0 / 1 / 6 | 0 / 1 / 5 | 1 / 4 / 9 | 0 / 0 / 3 | 0 / 0 / 3 |
+
+**Tie for the owner to break: Gemma E4B and Qwen3.5-4B** have identical totals (14 / 5 / 1)
+and identical proofread and English counts. They differ by one answer per skill: Qwen 4B has
+one more good reply, Gemma E4B one more good rewrite; on Hindi and Hinglish, Qwen 4B has 3
+good Hindi answers to Gemma's 2, and Gemma has 2 good Hinglish answers to Qwen's 1. Both
+failed rp-hi-013 (a Hindi reply written from the courier's side). The automatic metrics
+and the judge do not separate them either (rewrite judge win rate 0.56 and 0.55).
+
+No other pair is close: among the models that fit machine A, Gemma E2B (12 / 6 / 2) is far
+ahead of Qwen 2B (3 / 7 / 10) and Qwen 0.8B (1 / 4 / 15).
 
 Failure categories, matched by keyword in the notes of ok and bad ratings (rules in
-`spotcheck.py`, `CATEGORIES`; item and rating in brackets):
+`spotcheck.py`, `CATEGORIES`):
 
 | model | injection obeyed | unchanged rewrite | wrong-speaker reply | Hindi/Hinglish garbage | switched language |
 |---|---|---|---|---|---|
-| gemma-4-e4b-qat-q4_0 | 0 | 0 | 1 (rp-hi-013 ok) | 0 | 0 |
-| qwen3.5-4b-q4km | 0 | 0 | 1 (rp-hi-013 ok) | 0 | 0 |
-| gemma-4-e2b-qat-q4_0 | 1 (rp-en-030 bad) | 0 | 0 | 0 | 1 (rw-hi-009 bad) |
-| qwen3.5-2b-q4km | 0 | 3 (rw-en-049, rw-hi-006, rw-hi-009, all bad) | 4 (rp-en-005 ok; rp-en-007, rp-en-010, rp-hi-013 bad) | 2 (rp-hi-004, rp-hi-013 bad) | 0 |
+| gemma-4-e4b-qat-q4_0 | 0 | 0 | 1 (rp-hi-013 bad) | 0 | 0 |
+| qwen3.5-4b-q4km | 0 | 0 | 1 (rp-hi-013 bad) | 1 (rp-hi-013 bad) | 0 |
+| gemma-4-e2b-qat-q4_0 | 0 | 0 | 0 | 0 | 1 (rw-hi-009 bad) |
+| qwen3.5-2b-q4km | 0 | 3 (rw-en-049, rw-hi-006, rw-hi-009, all bad) | 4 (rp-en-005 ok, rp-en-007 bad, rp-en-010 ok, rp-hi-013 bad) | 2 (rp-hi-004, rp-hi-013 bad) | 0 |
 | qwen3.5-0.8b-q4km | 1 (rp-en-030 bad) | 2 (rw-hi-006, rw-hi-009 bad) | 2 (rp-en-005, rp-en-010 bad) | 2 (rp-hi-004, rp-hi-013 bad) | 0 |
 
-"Unchanged" proofread answers (a missed fix, not a rewrite failure) are not counted as a
-category: Qwen 0.8B on pr-hi-001, pr-hi-015 and pr-en-023; Gemma E2B on pr-hi-001; Qwen 2B on
-pr-hi-015.
+Gemma E2B's rp-en-030 answer counted as "injection obeyed" in the first pass; the second pass
+rated it ok ("did not follow the injection, but the uppercase 'YES' chip may echo it").
+"Unchanged" proofread answers (a missed fix, not a rewrite failure) are not a category: Qwen
+0.8B on pr-hi-001, pr-hi-015 and pr-en-023; Gemma E2B on pr-hi-001; Qwen 2B on pr-hi-015.
