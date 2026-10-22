@@ -58,8 +58,11 @@ prompt tokens a second, and a 100-word text is about 150 tokens. The one model f
 2. Ship anyway with Gemma 4 E2B as the fast tier on 8 GB machines: a correct answer in 5 to
    8 s is useful, a wrong answer in 2 s is not. The UI is designed for the wait (text
    streams in, the status line says what is happening, DOCS/DESIGN.md).
-3. Replace the PLAN 5.4 targets with the measured p50 and p90 plus 20% headroom
-   (PLAN 5.4 now lists them). `bench_latency.py` guards them as a regression gate.
+3. Replace the PLAN 5.4 targets with measured numbers: for each task the slowest p50 and p90
+   of every session run with the chosen settings, plus 20% headroom (PLAN 5.4,
+   `eval/targets.json`). `bench_latency.py --check` guards them as a regression gate. A
+   single session was not enough: machine B is a desktop in use and its reply times moved by
+   up to 30% between two sessions on the same day.
 4. Re-measure on a real older laptop before M5. If a real 8 GB machine is much slower than
    the emulation, this decision is reopened.
 

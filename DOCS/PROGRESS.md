@@ -6,13 +6,41 @@ Newest first. One entry per working session.
 
 | Milestone | Status |
 |---|---|
-| M0 Feasibility spike | in progress |
+| M0 Feasibility spike | done: go (DOCS/models.md, 2026-10-22) |
 | M1 Daemon | todo |
 | M2 Popup on X11 + KDE Wayland | todo |
 | M3 Polish + GNOME/wlroots | todo |
 | M4 Mail | todo |
 | M5 Release | todo |
 | M6 IME + Windows | todo |
+
+## 2026-10-22 - M0 decided: go with Gemma 4 E2B (fast) and E4B (quality)
+
+- Owner's answers: quality-tier tie to Gemma E4B (family consistency with E2B); apply
+  every speed lever before judging machine A; Hindi/Hinglish floor over all 15 items per
+  language at 10%; an engine-level language check; rewrites keep the input language. The
+  owner then asked Claude to decide the open product questions (ADR-003 to ADR-006).
+- Spot-check: Claude rated all 100 answers in two passes plus a final check (3 changes);
+  no human rated. E4B 14/5/1, Qwen 4B 14/4/2, E2B 11/7/2 (good/ok/bad).
+- Speed levers measured (DOCS/models.md, Latency): only the Gemma MTP draft heads help
+  (proofread -26% on A, -42% to -46% on B); n-gram drafting, Q4_K_M, Vulkan on the iGPU,
+  more threads, E2B as a draft model and batched reply variants do not. llama-server
+  v0.7.0 ignores per-request speculative settings, so the bench times reply and the other
+  skills on two server setups; the daemon switches per request (M1).
+- Strict result: the fast tier on machine A misses twice the old targets (first token about
+  3 s against 1.6 s). ADR-003 ships it anyway with targets from measurements (PLAN 5.4,
+  `eval/targets.json`, `bench_latency.py --check`).
+- Engine (`eval/paraeval/engine.py`): language check with one retry that names the language
+  (E2B Hinglish rewrites into English: 5 of 7 before, 1 of 7 after), per-skill speculative
+  decoding (skill schema v3), batched variants. Both models pass the floor (2% and 7%);
+  Claude read all 90 Hindi and Hinglish outputs, none garbled.
+- Other languages: the detector called every language English or Hindi; it now names about
+  40 and says "its own language" when unsure, without changing any existing item's
+  detection. Eight-language smoke set: 48 of 48 outputs kept their language for both models.
+- Mocks (DOCS/DESIGN.md, DOCS/mocks/, proposed, waiting for the owner): popup actions,
+  proofread, reply, change tone, first-run setup, settings. Also on a design canvas.
+- Waiting on the owner: mock approval; human-written eval items; a real older laptop for
+  the bench before M5.
 
 ## 2026-10-22 - M0 measurements
 

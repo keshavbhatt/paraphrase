@@ -192,17 +192,19 @@ Validation in CI: every skill renders for sample inputs, every grammar compiles,
 Reference machines: **(A)** 8 GB RAM, 4-core laptop CPU, no GPU; **(B)** 16 GB + mid-range Vulkan GPU.
 In M0 (owner, 2026-10-21): B is the development laptop (Intel Core Ultra 7 255U, 30 GB, Intel Arrow Lake iGPU via Vulkan; an integrated GPU, so weaker than "mid-range"). A is emulated on the same laptop (4 E-core threads, CPU only, 8 GB memory cap) and its numbers are optimistic. Re-run the bench on a real older laptop before M5.
 
-**Targets after M0 (ADR-003, 2026-10-22).** The measured p50 and p90 of the chosen models and
-settings (flash attention; MTP draft head for proofread and rewrite, ADR-004) plus 20%
-headroom, in seconds. `bench_latency.py` fails when a run exceeds them. Measurements:
-`docs/models.md`, Latency.
+**Targets after M0 (ADR-003, 2026-10-22).** For each task, the slowest p50 and p90 of every
+session measured with the chosen settings (flash attention; the MTP draft head for
+proofread and rewrite, none for reply, ADR-004), plus 20% headroom, in seconds. Machine B is
+a desktop in use, so its numbers move by up to 30% between sessions; one quiet session is
+not enough. `bench_latency.py --check` fails when a run exceeds them (`eval/targets.json`).
+Measurements: `docs/models.md`, Latency.
 
 | Task (typical input, 100 words) | Fast tier on A: first token / total (p50, p90) | Fast tier on B: total (p50, p90) | Quality tier on B: total (p50, p90) |
 |---|---|---|---|
-| reply, 3 chips | 3.7, 3.9 / 6.0, 7.1 | 3.3, 3.6 | 6.6, 7.6 |
-| proofread | 4.0, 4.4 / 9.5, 10.7 | 4.9, 7.4 | 8.6, 15.9 |
-| rewrite one tone | 4.5, 4.9 / 14.4, 15.8 | 8.0, 12.2 | 17.2, 18.7 |
-| cold model load | 7.2 | 5.9 | 7.4 |
+| reply, 3 chips | 3.7, 3.9 / 6.0, 7.1 | 4.0, 4.5 | 7.4, 9.1 |
+| proofread | 4.0, 4.5 / 9.5, 10.7 | 5.2, 7.4 | 9.5, 15.9 |
+| rewrite one tone | 4.6, 5.0 / 14.4, 16.0 | 8.5, 12.2 | 18.6, 22.9 |
+| cold model load | 8.1 | 6.9 | 7.9 |
 | daemon idle RAM (model unloaded) | < 40 MB | < 40 MB | < 40 MB |
 
 Fast tier: Gemma 4 E2B. Quality tier: Gemma 4 E4B, "16 GB recommended"; on A it is a slow

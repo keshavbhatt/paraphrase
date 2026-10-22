@@ -109,7 +109,60 @@ languages English or Hindi; 16 items cannot rank models on them.
 
 ## Results
 
-Pending: the owner reviews the results table before the recommendation is written.
+### Go/no-go (2026-10-22)
+
+**Go, with Gemma 4 E2B as the fast tier and Gemma 4 E4B as the quality tier.**
+
+- Quality: both pass every hard check and the Hindi and Hinglish floor (below); E4B is the
+  better writer, E2B the better speed for its quality. Qwen3.5-0.8B and 2B fail the
+  spot-check (15 and 9 of 20 answers bad); Qwen3.5-4B ties E4B on quality and lost the tie
+  to family consistency (owner, 2026-10-22).
+- Speed: no candidate meets the original PLAN 5.4 targets, and by the owner's rule the
+  fast tier on machine A is a no-go (Latency, below). ADR-003 overrides that rule: a
+  correct answer in 5 to 8 s on an 8 GB laptop beats a wrong one in 2 s. PLAN 5.4 now holds
+  targets from these measurements.
+- Settings: flash attention; the MTP draft head for proofread and rewrite (ADR-004); the
+  engine's language check with one retry that names the language (ADR-006); read-ahead in
+  the daemon (ADR-005, M1).
+- Before M5: re-run the bench on a real older laptop (ADR-003), and add the owner's own
+  items to the `*.human.jsonl` files.
+
+### Quality of the chosen models (2026-10-22)
+
+Skills at proofread revision 4, reply revision 3, rewrite revision 4, skill schema v3, run
+through the engine (`eval/paraeval/engine.py`) with its language retry. Proofread from
+`eval/reports/m0-v5/`, reply and rewrite from `eval/reports/m0-v6/` (the retry that names the
+language). 81 items per skill: 50 English, 8 Hindi, 7 Hinglish, 16 in eight other languages.
+
+| | Gemma 4 E2B (fast) | Gemma 4 E4B (quality) |
+|---|---|---|
+| proofread F0.5, English / Hindi / Hinglish | 0.886 / 0.833 / 0.714 | 0.916 / 0.900 / 0.714 |
+| proofread exact match, false alarms on 15 clean texts | 63% · 1 of 15 | 68% · 0 of 15 |
+| proofread protected tokens kept | 100% | 100% |
+| reply valid JSON, 3 distinct replies, any over 15 words | 100% · 100% · 0% | 100% · 100% · 0% |
+| rewrite changed, protected facts kept, preamble | 100% · 89% · 0% | 100% · 88% · 0% |
+| outputs retried by the language check (reply, rewrite) | 2.5%, 4.9% | 6.2%, 2.5% |
+| other languages: language kept (48 outputs) | 48 of 48 | 48 of 48 |
+| spot-check, good / ok / bad of 20 | 11 / 7 / 2 | 14 / 5 / 1 |
+
+**Hindi and Hinglish floor** (owner, 2026-10-22: over all 15 Hindi and Hinglish items per
+skill, reject a model only if more than 10% of its outputs switch language or are garbled;
+`eval/reports/m0-v6/floor.md`). Claude read all 90 outputs of both models against their
+inputs and found none garbled (`floor-review.json`).
+
+| | proofread | reply | rewrite | total | verdict |
+|---|---|---|---|---|---|
+| Gemma 4 E2B | 0 of 15 | 0 of 15 | 1 of 15 (Hinglish into English) | 1 of 45 (2%) | pass |
+| Gemma 4 E4B | 0 of 15 | 2 of 15 (code-mixed Hindi into Hinglish, Hinglish into English) | 1 of 15 (Hinglish into English) | 3 of 45 (7%) | pass |
+
+Before the retry named the language (`m0-v5`), E2B turned 5 of 7 Hinglish professional
+rewrites into English (13%, a reject); with it, 1 of 7. Every remaining switch reaches the
+user with a language warning, never silently (ADR-006).
+
+**Rejected candidate: reply variants batched from one prompt** (`eval/reports/m0-v5-variants/`):
+only 48% (E2B) and 38% (E4B) of reply sets had three different replies, against 100% when
+one sequence writes all three. Reply keeps one sequence.
+
 
 ### Latency (2026-10-22)
 
@@ -146,6 +199,16 @@ alone would, so it cannot change quality; with sampling it keeps the same distri
 | Gemma 4 E4B, A (emulated, no MTP measured) | 6.06 / 6.40 | 10.13 / 10.95 | 6.36 / 7.00 | 20.22 / 22.43 | 7.38 / 7.95 | 23.96 / 27.03 | 4.3 / 3.1 | 8.5 GB |
 
 Loading the MTP head adds about 1 to 2 s to a model load.
+
+These numbers are from the first session. A second session on the same day, with reply on
+a server without the draft head and proofread and rewrite on one with it (the setting the
+daemon will use), is in `eval/reports/m0-v6/bench/` (`chosen-reply`, `chosen-draft`): machine A
+repeated within 2%; machine B, a desktop in use with a browser open, was up to 30% slower
+on reply (E2B reply 1.48 s first token, 3.32 s total; E4B reply first token p90 3.96 s) and
+slightly faster on proofread and rewrite (E2B proofread 3.84 s, E4B rewrite 13.46 s). The
+PLAN 5.4 targets use the slowest session. llama-server v0.7.0 ignores per-request
+speculative settings, so per-skill drafting is measured on two server setups; the daemon
+switches per request.
 
 **Against the original PLAN 5.4 targets** no candidate of acceptable quality meets them.
 The fast tier on machine A (the owner's must-have, PLAN 11 Q4) was to be reported as a
