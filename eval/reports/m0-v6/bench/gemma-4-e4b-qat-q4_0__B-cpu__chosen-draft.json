@@ -1,0 +1,56 @@
+{
+  "model": "gemma-4-e4b-qat-q4_0",
+  "profile": "B-cpu",
+  "label": "B, CPU only: Core Ultra 7 255U, 10 threads (fastest in a 2-14 sweep), 30 GB",
+  "when": "2026-10-22 13:23",
+  "server_args": [
+    "-fa",
+    "on",
+    "--spec-type",
+    "draft-mtp",
+    "-md",
+    "models/gemma-4-e4b-mtp-q4_0/mtp-gemma-4-E4B-it-Q4_0.gguf"
+  ],
+  "skill_revisions": {
+    "proofread": 4,
+    "rewrite.professional": 4
+  },
+  "load_cold_s": 5.72,
+  "load_warm_s": 4.53,
+  "tasks": {
+    "proofread": {
+      "runs": 10,
+      "input_words": 98.0,
+      "ttft_s": 2.673,
+      "ttft_s_p90": 3.134,
+      "total_s": 6.918,
+      "total_s_p90": 12.334,
+      "total_s_max": 14.269,
+      "retried": 0,
+      "draft_accept_pct": 93.3,
+      "gen_tps": 28.003,
+      "prompt_tps": 56.485,
+      "prompt_tokens": 149.5,
+      "cached_tokens": 192.0,
+      "gen_tokens": 119.5
+    },
+    "rewrite.professional": {
+      "runs": 10,
+      "input_words": 97.5,
+      "ttft_s": 3.059,
+      "ttft_s_p90": 4.278,
+      "total_s": 13.457,
+      "total_s_p90": 16.258,
+      "total_s_max": 17.569,
+      "retried": 0,
+      "draft_accept_pct": 52.0,
+      "gen_tps": 15.176,
+      "prompt_tps": 56.704,
+      "prompt_tokens": 176.0,
+      "cached_tokens": 85.0,
+      "gen_tokens": 138.0
+    }
+  },
+  "peak_rss_mb": 8454,
+  "variant": "chosen-draft"
+}

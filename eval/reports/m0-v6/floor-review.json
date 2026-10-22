@@ -1,0 +1,5 @@
+{
+  "reviewed_by": "Claude, 2026-10-22: all 90 Hindi and Hinglish outputs of Gemma 4 E2B and E4B (proofread from m0-v5, reply and rewrite from m0-v6), read against their inputs; none garbled",
+  "gemma-4-e2b-qat-q4_0": {},
+  "gemma-4-e4b-qat-q4_0": {}
+}
