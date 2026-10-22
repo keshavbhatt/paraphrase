@@ -1,0 +1,5 @@
+---
+# Qt Test runs only member slots, so they can never be static.
+InheritParentConfig: true
+Checks: >
+  -readability-convert-member-functions-to-static
