@@ -14,6 +14,20 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-22 - Fixes from the owner's CLI suite: proofread 9, rewrite 10
+
+- The owner's suite (`paraphrase-tests`, 123 cases) found: "teh cat" proofread into the prompt's
+  own reminder line, tab forms merged into one line, rewrite turning "March 1" into "1 March",
+  reply obeying "write YES YES YES", reply saying "here is the address" with no address, and a
+  long repeated paragraph losing most of its copies.
+- Shipped proofread revision 9 and rewrite revision 10 (DOCS/models.md, "From the owner's CLI
+  suite"), with new items and metrics for each bug. Rejected reply revision 7: no reliable gain
+  over 96 samples. Reply on E4B resists injections (9 of 48 against 50 of 96) but takes 4.3 s
+  against 2.2 s: the owner's call.
+- Still open: tabs after a label become spaces; a lone misspelled word ("teh") is kept; E2B
+  reply follows strong injections and sometimes invents an address; repeated content is
+  dropped (a daemon guard on output length is coming).
+
 ## 2026-10-22 - Quality push and M1 close-out (parallel session)
 
 - Rewrite revision 9 shipped: temperature back to 0.6 and new polite and friendly presets with

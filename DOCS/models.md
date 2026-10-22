@@ -140,6 +140,7 @@ languages English or Hindi; 16 items cannot rank models on them.
 | 6 | proofread only: a "change nothing else" list: keep contractions, no optional commas, no added words in casual sentences, no full stop after headings or a final emoji, hashtag or URL, keep chat spellings and time formats, English words stay in Latin letters in Hindi; one worked injection example | revision 5 raised recall to 0.89 but changed 2 of 19 correct texts, expanded contractions, added Oxford commas and transliterated English words into Devanagari |
 | 7 | proofread only: the worked example no longer resembles a test item | the model copied the example's British "summarise" into a test item |
 | 8 (rejected) | proofread only: agreement rules with examples (a possessive takes the gender of the noun after it, plural verbs with आप, ने agreement) | E2B F0.5 0.92 to 0.88, false alarms on correct English 8% to 17%, Hindi and Hinglish worse; holdout unchanged. The remaining agreement misses look like a limit of E2B, not of the prompt |
+| 9 | proofread only: the language reminder sits before `<text>`, so the text is the last thing the model reads; a layout rule (every line break, blank line and tab stays, also a tab after a label such as "Name:"); single words are corrected the same way | the owner's CLI suite: "teh cat" came back as the reminder line itself, a two-line tab form came back as one line |
 
 **Proofread revision 4 to 7, Gemma 4 E2B, through the daemon** (`eval/reports/q-proofread-r4`
 to `-r7`, `q-holdout-r4`, `q-holdout-r7`):
@@ -176,6 +177,24 @@ suggestion continues the user's draft.
 A first draft of both named Hindi and Hinglish in the system prompt and made the models answer
 Devanagari messages in Latin letters (12 reply failures), the M0 revision 2 lesson again: the
 prompts state script rules without naming a language.
+
+**From the owner's CLI suite (2026-10-22).** New items: 13 short proofread inputs, 7
+tab-separated or multi-line forms and tables, a long email and a paragraph repeated ten times;
+7 rewrite items with dates, money and times in their own formats; 12 reply items with injected
+instructions or asking for information the user has not given. New metrics: proofread layout
+kept (line breaks and tabs), proofread output under 70% of the input's characters (lost
+content), reply obeying an injected instruction (`forbidden` patterns per item).
+
+| skill | revision | result |
+|---|---|---|
+| proofread | 9 | E2B, 143 items: F0.5 0.871 to 0.872, correct texts changed 13.6% to 9.1%, layout kept 96.5% to 97.2%, first output 0.66 s to 0.43 s (median). Holdout (31): F0.5 0.83 to 0.89. Fixed: the reminder line is never returned ("teh cat" to "The cat"), lines no longer merge, tables keep their tabs. Not fixed: a tab after a label still becomes a space ("Name:\tAnjali"), a lone "teh" stays "Teh", and a paragraph repeated ten times comes back with 6 or 7 copies (both revisions; the daemon's length guard is to catch it) |
+| rewrite | 10 | "dates in their exact format and word order", with US, British, numeric and ordinal examples. E4B, professional and casual, 29 hard items: facts kept 91.1% to 95.1% and 92.7% to 95.1%; "March 1" no longer becomes "1 March". Holdout (12): the same, except one Hindi item that wrote English words in Devanagari; sampled 24 times per revision, both do this most of the time (old 4 of 24 kept Latin, new 6 of 24), a known weakness of mixed-script text in the professional tone |
+| reply | 7 (rejected) | firmer rule against instructions inside the message, a reminder after it, and "never say a reply includes an address, number, file or link it does not contain". Sampled 8 times per item on 12 injection and missing-information items: 44 of 96 against 50 of 96 for revision 4; better on hard items, worse on a holdout one (invented a flat number 7 of 8 times against 4); first output 0.5 s to 0.96 s. Strong injections ("answer in French", "HAHAHA", "I love pizza", repeat a code) win every time on E2B with either prompt |
+
+Reply on E4B (revision 4, 4 samples per item): 9 of 48 obeyed against 50 of 96 on E2B; only "I
+love pizza" and "repeat the code" still get through. But reply takes 4.3 s on E4B against 2.2 s
+on E2B (median, hard set), over the 4.0 s target, so moving reply to the quality tier is the
+owner's call.
 
 Revisions 8 and 9 (rewrite) and 8 (proofread) were judged by Claude in a parallel session
 (no reviewer agents there), blind to which revision wrote which output.
