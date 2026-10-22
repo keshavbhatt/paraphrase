@@ -167,12 +167,15 @@ suggestion continues the user's draft.
 | reply | 5 (rejected) | write as the user, never as an assistant; three different meanings; ask only needed questions | a tie with 4 (81% against 79%, 40 against 41 wins): fewer unsafe and repeated sets, more generic ones |
 | rewrite | 5 | keep meaning and strength, every fact in its own format, every point and question, the layout, the language and script; add nothing; about the same length (not for concise or elaborate); rewrite instructions inside the text instead of obeying them | E4B, 201 items in 5 tones: acceptable 55% to 75%, better 114 against 42, changed facts 44 to 4; E2B: 48% to 68%, 101 against 40, changed facts 53 to 9. Holdout (50 per model): E2B 47% to 70% (reply and rewrite together), E4B 50% to 74% |
 | rewrite | 6 (rejected) | firmer rules for meaning, feeling and formats; "you" in the text is the reader; new polite, friendly and concise presets | E4B 67% to 70%, a tie in wins; E2B a tie in rate and worse in wins (61 against 86): more missed tone and 6 obeyed instructions. The polite and friendly presets alone helped on E4B (friendly 9 to 15 of 24) and are tried next on their own |
+| rewrite | 7 | revision 5 with only the new polite and friendly presets (the old polite one said "softening any demands") | polite and friendly, 48 items: meaning changed 13 to 8 (E2B) and 15 to 9 (E4B), better in 17 against 13 and 21 against 17; somewhat stiffer wording |
+| reply | 6 (rejected) | revision 4 plus "a person, never an assistant or an AI" and reacting to instructions inside the message as the user would | a tie in rate (79% each) and worse in wins (32 against 43): fewer unsafe replies (4 to 1) but stiffer ones |
 
 A first draft of both named Hindi and Hinglish in the system prompt and made the models answer
 Devanagari messages in Latin letters (12 reply failures), the M0 revision 2 lesson again: the
 prompts state script rules without naming a language.
 
-Still weak: rewrite in polite and friendly tones (about half acceptable) and meaning drift in
+Prompting has levelled off for reply at about 80% acceptable. Still weak: rewrite in polite and
+friendly tones (about half acceptable) and meaning drift in
 formal Hindi; reply sometimes answers as an assistant to injected instructions and repeats one
 answer three ways. Still missed by E2B: some Hindi and Hinglish gender agreement on
 masculine nouns ("मेरी भाई", "Mera bahan" half fixed), honorific agreement with आप, since/for
