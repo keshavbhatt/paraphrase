@@ -1,6 +1,6 @@
 id: rewrite
 version: 3
-revision: 5
+revision: 7
 title: Change tone
 tier: quality
 max_input_tokens: 1500
@@ -12,8 +12,8 @@ output: { type: text, language: same }
 presets:
   professional: { title: Professional, tone: "professional: clear, courteous and businesslike, no slang" }
   casual: { title: Casual, tone: "casual: relaxed and conversational, like talking to a friend" }
-  polite: { title: Polite, tone: "polite: respectful and considerate, softening any demands" }
-  friendly: { title: Friendly, tone: "friendly: warm and positive" }
+  polite: { title: Polite, tone: "polite: respectful and considerate, with please and thank you where they fit; decisions, deadlines and warnings stay just as firm" }
+  friendly: { title: Friendly, tone: "friendly: warm and kind, like a helpful colleague; complaints and bad news stay honest" }
   confident: { title: Confident, tone: "confident: direct and assured, without hedging" }
   concise: { title: Concise, tone: "concise: as short as possible while keeping every point" }
   elaborate: { title: Elaborate, tone: "elaborate: fuller and more detailed, without inventing facts" }
