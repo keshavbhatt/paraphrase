@@ -1,3 +1,5 @@
+add_subdirectory(util)
+
 configure_file(app/version.h.in "${CMAKE_CURRENT_BINARY_DIR}/generated/paraphrase/version.h" @ONLY)
 
 # The daemon's entry point. For now it reports its version and llama.cpp's view of the CPU,
