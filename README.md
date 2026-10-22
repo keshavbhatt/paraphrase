@@ -40,7 +40,7 @@ the cmake snap and the KDE Qt snap SDK. On a host other than Ubuntu 24.04, `make
 
 ```sh
 git submodule update --init
-make build                     # the daemon, the CLI and their tests, warnings as errors (build/dev)
+make build                     # the daemon, the CLI, the app and their tests, warnings as errors (build/dev)
 make test                      # eval harness tests, skill validation, daemon build and ctest
 make lint                      # ruff, mypy, clang-format, clang-tidy, shellcheck, reuse
 make fetch MODEL=<id>          # downloads a model from models.json and checks its sha256
@@ -48,6 +48,22 @@ make smoke MODEL=<id>          # 5 items per skill through the real model
 scripts/dev-run.sh -- --help   # run the daemon against the runtime snap
 make llama                     # M0 tools: llama-server and llama-bench (build/llama-cpu, -vulkan)
 ```
+
+## Using the app (development build)
+
+```sh
+export PARAPHRASE_MODELS_DIR=$PWD/models          # the models make fetch downloaded
+PARAPHRASE_RUN=app/paraphrase-app scripts/dev-run.sh --          # the window
+PARAPHRASE_RUN=app/paraphrase-app scripts/dev-run.sh -- --popup  # the popup on the selection
+```
+
+The window works everywhere: paste or type, pick an action (Ctrl+1 to Ctrl+8), copy the result.
+Without an installed model it opens the first-run setup. One copy runs at a time: starting it
+again, or with `--popup`, hands over to the running one, so a desktop shortcut can run
+`paraphrase-app --popup`. On KDE Wayland and X11 the app also asks for a global shortcut
+(Ctrl+Alt+Space by default) and, the first time it pastes, for permission to type into other
+apps; Settings, Shortcut says what works on the desktop in use (DOCS/platform-matrix.md).
+`PARAPHRASE_NO_INTEGRATIONS=1` switches the desktop backends off.
 
 ## Using the CLI (development build)
 
