@@ -14,6 +14,25 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-22 - Quality first: proofread revision 7
+
+- Owner: the latency benchmarks wait until the models write correctly ("we can't go out with
+  a broken product which is super fast"); Claude writes the test samples, hard ones included,
+  and owns the model choices. The M1 bench run was stopped; the eval it had finished through
+  the daemon (`eval/reports/m1-daemon/`) matches M0's quality, which confirms the daemon.
+- Owner decision: proofread fixes like a proofreader (capitals, full stops, question marks).
+  Four references that kept chat style were updated.
+- New sets: `*.hard.jsonl` (43 proofread items, the owner's CLI sentences among them) and
+  `*.holdout.jsonl` (25 items, never tuned on). DOCS/models.md, Datasets.
+- Proofread revisions 5 to 7 (DOCS/models.md, Prompt revisions). E2B, all 124 items: F0.5
+  0.82 to 0.92, recall 0.68 to 0.91, exact 57% to 78%, no more changes to correct text;
+  holdout: F0.5 0.56 to 0.91. All three injected instructions are now corrected, not obeyed.
+  E4B over-edits with the same prompt, so proofread stays on E2B.
+- Also: the daemon loads a portable build's per-CPU llama.cpp libraries from a known folder
+  (ADR-008), so a packaged daemon finds its CPU backend.
+- Next: rewrite and reply quality, the same way (hard and holdout sets, revisions measured
+  before and after); then proofread's remaining Hindi agreement misses.
+
 ## 2026-10-22 - M1 step 7: the CLI
 
 - `paraphrase proofread | rewrite --tone T | reply [--draft D] | run SKILL`, with `--to`,

@@ -103,6 +103,19 @@ W&I+LOCNESS and GYAFC: restricted licences), so none is in the repository (owner
 2026-10-21). Each skill has a separate `*.human.jsonl` file for items the owner writes (messy
 real typing, typos, Hinglish); reports score those separately from the generated items.
 
+From M1 the project writes all items, the hard ones too (owner, 2026-10-22: "fill the samples,
+make complex samples instead of asking me"). Two more sets per skill:
+
+- `*.hard.jsonl`: complex cases aimed at the models' weak spots, and the owner's own CLI
+  tests. Part of every run (`--set all`).
+- `*.holdout.jsonl`: written before a prompt is tuned and never looked at item by item while
+  tuning; run alone (`--set holdout`) as the final check that a revision generalises.
+
+Proofread has 43 hard items (30 English with tense against time words, missing words,
+prepositions, non-native patterns, run-ons, 3 prompt injections and 5 already-correct traps;
+13 Hindi and Hinglish with gender, number and honorific agreement and 1 injection) and 25
+holdout items.
+
 | skill | English | Hindi (Devanagari) | Hinglish | notes |
 |---|---|---|---|---|
 | proofread | 50 | 8 | 7 | 10 English items already correct (over-correction), 3 prompt injections, protected names, URLs, prices and code |
@@ -123,6 +136,24 @@ languages English or Hindi; 16 items cannot rank models on them.
 | 2 | the system prompt no longer names Hindi or Hinglish; a language detector names the answer language in the user message ("The text is in English. Keep it in that language.") | with revision 1, models answered English in Hindi: Qwen3.5-4B rewrote 49 of 50 English texts into Devanagari and answered 36 of 50 English messages in Hinglish |
 | 3 | proofread keeps casual lowercase, a missing final full stop, British or American spelling and date formats as written; the Hinglish language name says to keep Hinglish even in a formal tone | with revision 2, Gemma E4B changed 6 of 12 already-correct texts ("colour" to "color", "14 September" to "September 14", capitalised chat); 3 to 5 of 7 Hinglish texts were translated into English by the professional rewrite |
 | 4 | proofread only: "if a sentence starts in lowercase or has no final full stop, leave it so" and "never change the case of a word that is already correct" replace "keep lowercase starts" | with revision 3, both Gemma models lowercased whole texts (English F0.5 0.88 to 0.29 for E2B) while Qwen improved; revision 4 keeps Qwen's gains and restores Gemma (E4B English F0.5 0.92, no false alarms) |
+| 5 | proofread only: fixes like a proofreader (owner, 2026-10-22): capital at every sentence start, end punctuation, question marks, run-ons split; names the error kinds the model missed (tense against time words, missing words, verb forms, prepositions, Hindi and Hinglish gender and number agreement); instructions inside the text are corrected and kept | revision 4 left lowercase starts and missing full stops by design, missed tense and agreement errors, and dropped 2 of 3 injected instructions ("Summarize the following ..."): E2B recall 0.68 on 124 items |
+| 6 | proofread only: a "change nothing else" list: keep contractions, no optional commas, no added words in casual sentences, no full stop after headings or a final emoji, hashtag or URL, keep chat spellings and time formats, English words stay in Latin letters in Hindi; one worked injection example | revision 5 raised recall to 0.89 but changed 2 of 19 correct texts, expanded contractions, added Oxford commas and transliterated English words into Devanagari |
+| 7 | proofread only: the worked example no longer resembles a test item | the model copied the example's British "summarise" into a test item |
+
+**Proofread revision 4 to 7, Gemma 4 E2B, through the daemon** (`eval/reports/q-proofread-r4`
+to `-r7`, `q-holdout-r4`, `q-holdout-r7`):
+
+| set | revision | precision | recall | F0.5 | exact | correct texts changed |
+|---|---|---|---|---|---|---|
+| all 124 items | 4 | 0.86 | 0.68 | 0.82 | 57% | 5.3% |
+| all 124 items | 7 | 0.92 | 0.91 | 0.92 | 78% | 5.3% |
+| holdout, 25 items | 4 | 0.65 | 0.37 | 0.56 | 40% | 0 |
+| holdout, 25 items | 7 | 0.93 | 0.83 | 0.91 | 76% | 0 |
+
+E4B with revision 7 changes 5 of 19 correct texts (F0.5 0.83 on all items), so proofread stays
+on E2B, the fast tier. Still missed by E2B: some Hindi and Hinglish gender agreement on
+masculine nouns ("मेरी भाई", "Mera bahan" half fixed), honorific agreement with आप, since/for
+with a duration, "until" for a deadline, and about half of the run-on sentences.
 
 ## Results
 
