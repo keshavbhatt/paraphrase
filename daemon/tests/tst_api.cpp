@@ -412,6 +412,9 @@ private Q_SLOTS:
         QCOMPARE(runSkill(c, u"proofread"_s, {{u"text"_s, 5}}), invalid);
         QCOMPARE(runSkill(c, u"proofread"_s, {{u"text"_s, u"  "_s}}), invalid);
         QCOMPARE(runSkill(c, u"reply"_s, {{u"text"_s, u"ok"_s}}), invalid); // needs the message
+        // Only rewrite's prompt takes a target language; the others would ignore it silently.
+        QCOMPARE(runSkill(c, u"reply"_s, {{u"context"_s, u"hi"_s}, {u"target_lang"_s, u"fr"_s}}), invalid);
+        QCOMPARE(runSkill(c, u"proofread"_s, {{u"text"_s, u"hi"_s}, {u"target_lang"_s, u"fr"_s}}), invalid);
         QCOMPARE(
             runSkill(c, u"rewrite.professional"_s, {{u"text"_s, u"x"_s}, {u"target_lang"_s, u"klingon"_s}}),
             invalid);

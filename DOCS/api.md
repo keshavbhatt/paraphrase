@@ -48,7 +48,8 @@ daemon exits; never while a download runs).
 
 **`input`** (all strings): `text` (what to work on; required except for reply), `context`
 (the message to reply to; required for reply), `target_lang` (a language code the user
-chose, for example `fr`; otherwise the output keeps the input's language). Any other key is
+chose, for example `fr`; otherwise the output keeps the input's language; only skills whose
+prompt takes it, today rewrite, accept it). Any other key is
 an error. **`options`** is reserved; pass an empty map.
 
 Skill ids are those `ListSkills` returns: `proofread`, `reply`, and a preset as
@@ -71,7 +72,7 @@ Problems known when a request is submitted come back as D-Bus errors on the call
 
 | Error name | When |
 |---|---|
-| `com.ktechpit.paraphrase.Error.InvalidInput` | Unknown skill, model or input key; a missing text or context; an unknown `target_lang` |
+| `com.ktechpit.paraphrase.Error.InvalidInput` | Unknown skill, model or input key; a missing text or context; a `target_lang` the skill does not take, or an unknown one |
 | `com.ktechpit.paraphrase.Error.NoModel` | No model for the skill's tier is installed |
 | `com.ktechpit.paraphrase.Error.Busy` | `DeleteModel` on a model in use or downloading |
 | `com.ktechpit.paraphrase.Error.Failed` | `DeleteModel` could not remove the files |

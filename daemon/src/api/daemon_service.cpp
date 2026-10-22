@@ -174,6 +174,11 @@ QString DaemonService::buildJob(const QString& skillId, const QVariantMap& input
         return skill->baseId == u"reply"_s ? tr("Reply needs the message to reply to (context).")
                                            : tr("%1 needs some text.").arg(skill->title);
     }
+    // Only a skill whose prompt names the target language can write in another one.
+    if (!fields.targetLang.isEmpty() && !skill->templ.contains(u"target_lang"_s)) {
+        return tr("%1 keeps the language of the text; it cannot write in another language.")
+            .arg(skill->title);
+    }
     if (!fields.targetLang.isEmpty() && m_detector.plainName(fields.targetLang).isEmpty()) {
         return tr("Unknown language \"%1\".").arg(fields.targetLang);
     }
