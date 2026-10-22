@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Blind spot-check for the owner: 20 items per model, the same items for every model.
 
-    uv run python eval/spotcheck.py build --tag m0-v2
+    uv run python eval/spotcheck.py build --tag m0-v3 [--skill-tag proofread=m0-v4]
         -> eval/reports/<tag>/spotcheck/index.html (blind) and key.json (which model is which)
+        --skill-tag takes one skill's outputs from another run (its newest prompt revision).
     uv run python eval/spotcheck.py score --tag m0-v2 ratings.json
         -> per-model scores from the ratings the page exports
 
@@ -54,10 +55,11 @@ def show(skill: str, output: str) -> str:
     return output
 
 
-def build(tag: str, models: list[str]) -> Path:
+def build(tag: str, models: list[str], skill_tags: dict[str, str] | None = None) -> Path:
     rng = random.Random(SEED)
+    src = {s: (skill_tags or {}).get(s, tag) for s in PLAN}
     raw = {
-        (m, s): {r["id"]: r for r in common.load_jsonl(common.RAW_DIR / tag / f"{m}__{s}.jsonl")}
+        (m, s): {r["id"]: r for r in common.load_jsonl(common.RAW_DIR / src[s] / f"{m}__{s}.jsonl")}
         for m in models
         for s in PLAN
     }
@@ -87,6 +89,7 @@ def build(tag: str, models: list[str]) -> Path:
     out_dir = common.REPORTS_DIR / tag / "spotcheck"
     out_dir.mkdir(parents=True, exist_ok=True)
     (out_dir / "key.json").write_text(json.dumps(key, indent=2) + "\n")
+    (out_dir / "sources.json").write_text(json.dumps(src, indent=2) + "\n")
     data = json.dumps({"tag": tag, "cards": cards}, ensure_ascii=False).replace("</", "<\\/")
     page = PAGE.replace("__DATA__", data).replace("__TITLE__", html.escape(f"Spot-check {tag}"))
     (out_dir / "index.html").write_text(page, encoding="utf-8")
@@ -121,13 +124,18 @@ def main(argv: list[str] | None = None) -> int:
     sub = ap.add_subparsers(dest="cmd", required=True)
     b = sub.add_parser("build")
     b.add_argument("--tag", default="m0-v2")
+    b.add_argument("--skill-tag", action="append", default=[], metavar="SKILL=TAG")
     s = sub.add_parser("score")
     s.add_argument("--tag", default="m0-v2")
     s.add_argument("ratings", type=Path)
     args = ap.parse_args(argv)
     if args.cmd == "build":
         models = [m.id for m in common.catalog().values() if m.role == "candidate"]
-        print(build(args.tag, models) / "index.html")
+        skill_tags = dict(x.split("=", 1) for x in args.skill_tag)
+        unknown = set(skill_tags) - set(PLAN)
+        if unknown:
+            ap.error(f"unknown skill in --skill-tag: {', '.join(sorted(unknown))}")
+        print(build(args.tag, models, skill_tags) / "index.html")
     else:
         score(args.tag, args.ratings)
     return 0
