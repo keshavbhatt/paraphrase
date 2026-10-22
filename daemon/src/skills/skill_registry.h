@@ -8,6 +8,8 @@
 #include <QString>
 #include <QStringList>
 
+#include <algorithm>
+
 namespace paraphrase::skills {
 
 inline constexpr int kSchemaVersion = 5;
@@ -33,6 +35,12 @@ public:
 
     /// Whether a skill takes the user's own actions (schema v5 `user_presets`).
     [[nodiscard]] bool takesUserActions() const { return !m_userBases.isEmpty(); }
+    /// A skill that takes user presets, by id: it runs only with its values given (Try it).
+    [[nodiscard]] const Skill* findUserBase(const QString& id) const
+    {
+        const auto it = std::ranges::find(m_userBases, id, &Skill::id);
+        return it == m_userBases.end() ? nullptr : &*it;
+    }
     /// The skill id of a user action: `<skill>.<action id>`.
     [[nodiscard]] QString userActionSkillId(const QString& actionId) const
     {

@@ -166,12 +166,17 @@ QSet<QString> DaemonService::installedModels() const
 QString DaemonService::buildJob(const QString& skillId, const QVariantMap& input, Job& job) const
 {
     const skills::Skill* skill = m_setup.skills.find(skillId);
+    // A template for the user's actions runs too, with its values as inputs: Settings' Try it.
+    const skills::Skill* userBase = skill == nullptr ? m_setup.skills.findUserBase(skillId) : nullptr;
+    skill = skill != nullptr ? skill : userBase;
     if (skill == nullptr) {
         return tr("Unknown skill \"%1\".").arg(skillId);
     }
     static const QSet<QString> kKeys = {u"text"_s, u"context"_s, u"target_lang"_s, u"intent"_s, u"tone"_s};
     for (auto it = input.begin(); it != input.end(); ++it) {
-        if (!kKeys.contains(it.key()) || it.value().typeId() != QMetaType::QString) {
+        const bool known =
+            kKeys.contains(it.key()) || (userBase != nullptr && userBase->userValues.contains(it.key()));
+        if (!known || it.value().typeId() != QMetaType::QString) {
             return tr("Unknown input \"%1\": text, context, target_lang, intent and tone are strings.")
                 .arg(it.key());
         }
@@ -188,6 +193,19 @@ QString DaemonService::buildJob(const QString& skillId, const QVariantMap& input
     }
     job.skill = *skill;
     job.inputs = skills::buildInputs(skill->mainInput(), fields, m_detector);
+    return userBase != nullptr ? addUserValues(*userBase, input, job) : QString();
+}
+
+QString DaemonService::addUserValues(const skills::Skill& base, const QVariantMap& input, Job& job)
+{
+    for (const QString& key : base.userValues) {
+        const QString value = input.value(key).toString().trimmed();
+        if (value.isEmpty() || value.size() > skills::UserActions::kMaxInstruction) {
+            return tr("Say what the action does, in at most %1 characters.")
+                .arg(skills::UserActions::kMaxInstruction);
+        }
+        job.skill.preset.insert(key, value);
+    }
     return {};
 }
 
@@ -265,10 +283,18 @@ QString DaemonService::RunSkill(const QString& skillId, const QVariantMap& input
         }
     }
     for (auto it = options.begin(); it != options.end(); ++it) {
-        if (it.key() != u"model"_s) {
+        if (it.key() != u"model"_s && it.key() != u"tier"_s) {
             replyError(u"InvalidInput"_s, tr("Unknown option \"%1\".").arg(it.key()));
             return {};
         }
+    }
+    // options.tier: run on this tier's model (Settings' Try it for an action not saved yet).
+    if (const QString tier = options.value(u"tier"_s).toString(); !tier.isEmpty()) {
+        if (tier != u"fast"_s && tier != u"quality"_s) {
+            replyError(u"InvalidInput"_s, tr("The tier must be fast or quality."));
+            return {};
+        }
+        job.skill.tier = tier;
     }
     if (!chooseModel(job, requested)) {
         replyError(u"NoModel"_s, tr("No model is installed. Download one in Settings, or run "

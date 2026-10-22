@@ -130,6 +130,7 @@ private:
     /// Checks the input and builds the skill's values; an error message when it is wrong.
     [[nodiscard]] QString buildJob(const QString& skillId, const QVariantMap& input, Job& job) const;
     /// Why these inputs do not fit the skill, or "" when they do.
+    [[nodiscard]] static QString addUserValues(const skills::Skill& base, const QVariantMap& input, Job& job);
     [[nodiscard]] QString checkFields(const skills::Skill& skill, const skills::RequestFields& fields) const;
     static constexpr qsizetype kMaxToneLength = 40;
     [[nodiscard]] QSet<QString> installedModels() const;

@@ -159,7 +159,8 @@ bool DaemonClient::subscribe()
         m_connection.connect(service, kPath, kInterface, u"Error"_s, this,
                              SLOT(onError(QString, QString, QString))) &&
         m_connection.connect(service, kPath, kInterface, u"DownloadProgress"_s, this,
-                             SLOT(onDownloadProgress(QString)));
+                             SLOT(onDownloadProgress(QString))) &&
+        m_connection.connect(service, kPath, kInterface, u"SkillsChanged"_s, this, SLOT(onSkillsChanged()));
     return m_subscribed;
 }
 
@@ -189,6 +190,11 @@ void DaemonClient::onDone(const QString& requestId, const QString& result)
 void DaemonClient::onError(const QString& requestId, const QString& code, const QString& message)
 {
     Q_EMIT error(requestId, code, message);
+}
+
+void DaemonClient::onSkillsChanged()
+{
+    Q_EMIT skillsChanged();
 }
 
 void DaemonClient::onDownloadProgress(const QString& status)

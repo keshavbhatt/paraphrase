@@ -58,8 +58,10 @@ prompt takes it, today rewrite, accept it), `intent` (what the user wants to say
 words, for a full reply) and `tone` (a tone the user picked, such as `professional`); each of
 the last two only for a skill whose prompt uses it, and never to replace a preset's own tone. Any other key is
 an error. **`options`**: `model` (a model id from `ListModels` with role `model`) runs the
-request on that model instead of the tier's (the eval harness, and a future Settings choice);
-any other key is an error.
+request on that model instead of the tier's (the eval harness); `tier` (`fast` or `quality`)
+runs it on that tier's model; any other key is an error. The skill that takes the user's
+actions (`custom`) also runs by itself with its values as inputs (`instruction`): Settings'
+Try it, before an action is saved.
 
 Skill ids are those `ListSkills` returns: `proofread`, `reply`, and a preset as
 `<skill>.<preset>` (`rewrite.professional`).

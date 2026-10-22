@@ -402,8 +402,24 @@ private Q_SLOTS:
                 .object()
                 .value(u"supported"_s)
                 .toBool());
-        // The template itself is not a skill until there is an action.
+        // The template itself is not listed, but runs with an instruction: Try it before saving.
         QVERIFY(!call(c, u"ListSkills"_s, {}).arguments().value(0).toString().contains(u"\"custom\""_s));
+        {
+            Listener l;
+            QVERIFY(l.listen(c));
+            const QDBusMessage tried = call(
+                c, u"RunSkill"_s,
+                {u"custom"_s,
+                 QVariantMap{{u"text"_s, u"Launch on March 12."_s}, {u"instruction"_s, u"Make it a haiku"_s}},
+                 QVariantMap{{u"tier"_s, u"fast"_s}}});
+            const QString triedId = tried.arguments().value(0).toString();
+            QTRY_VERIFY_WITH_TIMEOUT(l.done.contains(triedId), kTimeoutMs);
+            QCOMPARE(l.done.value(triedId).value(u"model"_s).toString(), u"fast-model"_s);
+            const QMutexLocker lock(&m_state->lock);
+            QVERIFY(m_state->prompts.last().contains(u"Make it a haiku"_s));
+        }
+        const QString invalid = u"com.ktechpit.paraphrase.Error.InvalidInput"_s;
+        QCOMPARE(runSkill(c, u"custom"_s, {{u"text"_s, u"x"_s}}), invalid); // no instruction
         const QDBusMessage saved =
             call(c, u"SaveAction"_s, {QString(), u"Tweet"_s, u"Turn this into a tweet"_s, u"quality"_s});
         QCOMPARE(saved.arguments().value(0).toString(), u"custom.tweet"_s);

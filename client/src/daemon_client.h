@@ -38,6 +38,7 @@ Q_SIGNALS:
     void done(const QString& requestId, const QString& result);
     void error(const QString& requestId, const QString& code, const QString& message);
     void downloadProgress(const QString& status);
+    void skillsChanged(); ///< an action was saved or deleted: ListSkills again
 
 private Q_SLOTS:
     // QtDBus delivers signals to slots named in strings, so these forward to the signals above.
@@ -46,6 +47,7 @@ private Q_SLOTS:
     void onDone(const QString& requestId, const QString& result);
     void onError(const QString& requestId, const QString& code, const QString& message);
     void onDownloadProgress(const QString& status);
+    void onSkillsChanged();
 
 private:
     [[nodiscard]] static QString daemonProgram();
