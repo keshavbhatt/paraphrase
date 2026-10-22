@@ -339,6 +339,24 @@ private Q_SLOTS:
                     QVERIFY(w.grab().save(dir +
                                           u"/main-window-full-reply-%1.png"_s.arg(QLatin1StringView(theme))));
                 }
+                if (auto* write = w.findChild<paraphrase::app::ChipButton*>(u"action-compose"_s)) {
+                    write->click();
+                    w.findChild<QPlainTextEdit*>(u"composeText"_s)
+                        ->setPlainText(
+                            u"Tell the team the office is closed on Monday for the plumbing repair. Everyone "
+                            "works from home; the standup moves to the video call at 10 am. Thank Ravi for "
+                            "sorting it out."_s);
+                    setAnswers({
+                        u"Subject: Office closed on Monday\n\nHi everyone,\n\nThe office will be closed on "
+                        u"Monday "
+                        "for a plumbing repair, so we will all work from home that day. The standup moves to "
+                        "the "
+                        "video call at 10 am.\n\nMany thanks to Ravi for sorting this out.\n\nBest,\n[Your name]"_s,
+                    });
+                    runAndWait(w);
+                    QVERIFY(
+                        w.grab().save(dir + u"/main-window-write-%1.png"_s.arg(QLatin1StringView(theme))));
+                }
             }
             cleanup();
         }
