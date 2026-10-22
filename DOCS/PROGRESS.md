@@ -7,12 +7,21 @@ Newest first. One entry per working session.
 | Milestone | Status |
 |---|---|
 | M0 Feasibility spike | done: go (DOCS/models.md, 2026-10-22) |
-| M1 Daemon | todo |
+| M1 Daemon | in progress |
 | M2 Popup on X11 + KDE Wayland | todo |
 | M3 Polish + GNOME/wlroots | todo |
 | M4 Mail | todo |
 | M5 Release | todo |
 | M6 IME + Windows | todo |
+
+## 2026-10-22 - Mocks approved, packaging decided, M1 started
+
+- Owner approved all eight mocks (DOCS/mocks/index.html): main window proofread and reply,
+  popup actions, proofread, reply and change tone, first-run setup, settings.
+- Packaging analysis (DOCS/packaging.md) and ADR-007 to ADR-013: app ID
+  `com.ktechpit.paraphrase`, portable llama.cpp build, data folders per format, clients start
+  the daemon, D-Bus as the API, one package per format, standalone first (owner: every
+  feature works without desktop integration). PLAN D14, D15, M2 and M5 updated.
 
 ## 2026-10-22 - M0 decided: go with Gemma 4 E2B (fast) and E4B (quality)
 
