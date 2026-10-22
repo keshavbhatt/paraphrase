@@ -26,7 +26,11 @@ def test_catalog_entries_are_pinned() -> None:
         assert m["licence"] and m["licence_url"].startswith("https://")
         for f in m["files"]:
             assert len(f["sha256"]) == 64 and f["size"] > 0
-    assert {m["role"] for m in data["models"]} == {"candidate", "judge"}
+    assert {m["role"] for m in data["models"]} <= {"candidate", "judge", "experiment", "draft"}
+    ids_set = set(ids)
+    for m in data["models"]:
+        if m["role"] == "draft":
+            assert m["draft_for"] and set(m["draft_for"]) <= ids_set, m["id"]
 
 
 def test_verified_stamp_tracks_changes(tmp_path: Path) -> None:

@@ -176,6 +176,90 @@
       "chat_template": "embedded",
       "tiers": [],
       "languages": {}
+    },
+    {
+      "id": "gemma-4-e2b-q4km",
+      "role": "experiment",
+      "family": "gemma",
+      "params": "E2B (5.1B with per-layer embeddings)",
+      "quant": "Q4_K_M (imatrix)",
+      "hf_repo": "bartowski/google_gemma-4-E2B-it-GGUF",
+      "revision": "81012ba3538e061d5ee003f11f25335b17f82e2d",
+      "files": [
+        {
+          "file": "google_gemma-4-E2B-it-Q4_K_M.gguf",
+          "size": 3462680032,
+          "sha256": "923c4c86177d2ee173a7f5b4fa3d0ac65f5962ab15e6d6a5bc250aec4fd7bf7e"
+        }
+      ],
+      "upstream": "google/gemma-4-E2B-it",
+      "ram_required": null,
+      "vram_recommended": null,
+      "ctx": 4096,
+      "licence": "Apache-2.0",
+      "licence_url": "https://ai.google.dev/gemma/docs/gemma_4_license",
+      "chat_template": "embedded",
+      "tiers": [],
+      "languages": {},
+      "notes": "M0 speed comparison only: Q4_K_M against the QAT Q4_0 file"
+    },
+    {
+      "id": "gemma-4-e2b-mtp-q4_0",
+      "role": "draft",
+      "family": "gemma",
+      "params": "multi-token-prediction head for E2B",
+      "quant": "Q4_0",
+      "hf_repo": "ggml-org/gemma-4-E2B-it-GGUF",
+      "revision": "6938c58e698502037401a5f19f6905f2fb2f7dee",
+      "files": [
+        {
+          "file": "mtp-gemma-4-E2B-it-Q4_0.gguf",
+          "size": 59235872,
+          "sha256": "718d3a44057924d5840c65a0aeedf7929366adeeda92a2006955ccabaf645ef4"
+        }
+      ],
+      "upstream": "google/gemma-4-E2B-it",
+      "ram_required": null,
+      "vram_recommended": null,
+      "ctx": 4096,
+      "licence": "Apache-2.0",
+      "licence_url": "https://ai.google.dev/gemma/docs/gemma_4_license",
+      "chat_template": "embedded",
+      "tiers": [],
+      "languages": {},
+      "draft_for": [
+        "gemma-4-e2b-qat-q4_0"
+      ],
+      "notes": "speculative decoding draft (--spec-type draft-mtp)"
+    },
+    {
+      "id": "gemma-4-e4b-mtp-q4_0",
+      "role": "draft",
+      "family": "gemma",
+      "params": "multi-token-prediction head for E4B",
+      "quant": "Q4_0",
+      "hf_repo": "ggml-org/gemma-4-E4B-it-GGUF",
+      "revision": "a69f018d7678a2b9f5e705f8903d6fb29b9b25dc",
+      "files": [
+        {
+          "file": "mtp-gemma-4-E4B-it-Q4_0.gguf",
+          "size": 59678240,
+          "sha256": "d19a11e4fd5019967d9296f77f4d3e139c8903909f70c3a9cf009c9af4b9b88d"
+        }
+      ],
+      "upstream": "google/gemma-4-E4B-it",
+      "ram_required": null,
+      "vram_recommended": null,
+      "ctx": 4096,
+      "licence": "Apache-2.0",
+      "licence_url": "https://ai.google.dev/gemma/docs/gemma_4_license",
+      "chat_template": "embedded",
+      "tiers": [],
+      "languages": {},
+      "draft_for": [
+        "gemma-4-e4b-qat-q4_0"
+      ],
+      "notes": "speculative decoding draft (--spec-type draft-mtp)"
     }
   ]
 }
