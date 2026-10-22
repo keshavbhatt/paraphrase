@@ -105,48 +105,60 @@ real typing, typos, Hinglish); reports score those separately from the generated
 
 Pending: the owner reviews the results table before the recommendation is written.
 
-### Spot-check (2026-10-22): Claude-rated (2 passes), not human-reviewed: independent of the judge model, not of the item writer
+### Spot-check (2026-10-22): Claude-rated (2 passes and a final check), not human-reviewed: independent of the judge model, not of the item writer
 
 20 items per model (7 proofread, 7 reply, 6 rewrite; 3 Hindi, 3 Hinglish), five blind
 answers per item, rated on the page built by `eval/spotcheck.py` (proofread at revision 4,
-reply and rewrite at revision 3). **Claude rated all 100 answers in two passes; no human
-reviewed or edited any rating** (every stored item has `rated_by: claude`,
-`human_reviewed: false`, `review_passes: 2`; owner, 2026-10-22). Claude is from a different
-family than the candidates and than the judge (Sarvam-30B), so these ratings are independent
-of the judge model. They are not independent of the item writer: the eval items were also
-written with Claude. PLAN 11 makes the owner's own spot-check the final word on quality;
-these ratings are not that, and the owner breaks any tie below.
+reply and rewrite at revision 3). **Claude rated all 100 answers; no human reviewed or
+edited any rating** (owner, 2026-10-22). Claude is from a different family than the
+candidates and than the judge (Sarvam-30B), so these ratings are independent of the judge
+model. They are not independent of the item writer: the eval items were also written with
+Claude. PLAN 11 makes the owner's own spot-check the final word on quality; these ratings
+are not that.
+
+Item ids use `hi` for every item from the `hi.*.jsonl` files, Hindi and Hinglish alike; the
+language comes from each item's `lang` field. Hinglish items here: pr-hi-015, rp-hi-013,
+rw-hi-009.
 
 | group | items | answers |
 |---|---|---|
 | Claude-rated, not human-reviewed | 20 | 100 |
 | human-reviewed | 0 | 0 |
 
-The second pass changed 8 of 100 ratings from the first: 4 up (pr-en-038 C, rp-en-007 B,
-rp-en-010 A, rp-en-030 E) and 4 down (rp-en-007 A, rp-hi-013 A and C, rw-en-004 E).
-Ratings: `eval/reports/m0-v3/spotcheck/ratings.jsonl` (final) and `ratings-pass1.jsonl`
-(first pass), with dashes in notes replaced by commas; full table by skill and language in
-`report.md` (`spotcheck.py report`).
+How the ratings were made, each step on all 100 answers:
 
-Good / ok / bad counts:
+| step | ratings changed | details |
+|---|---|---|
+| pass 1 | (first draft) | `ratings-pass1.jsonl` |
+| pass 2 | 8 of 100 | 4 up (pr-en-038 C, rp-en-007 B, rp-en-010 A, rp-en-030 E), 4 down (rp-en-007 A, rp-hi-013 A and C, rw-en-004 E); `ratings-pass2.jsonl` |
+| final check (owner asked Claude to check the result, 2026-10-22) | 3 of 100 | pr-en-038 C good to ok (an unrequested Oxford comma is a style edit, which proofread must not make); rw-en-048 B bad to ok (facts kept, one unprofessional phrase); rw-en-004 E ok to bad (asks for "time off this weekend" instead of Friday, the same lost fact that makes A bad); `ratings.jsonl` |
+
+The final check applied one rule for reply consistently: one wrong chip of three is ok, two
+or more is bad. Notes are transcribed as stored, with dashes replaced by commas. Full table
+by skill and language: `eval/reports/m0-v3/spotcheck/report.md` (`spotcheck.py report`).
+
+Good / ok / bad counts (final):
 
 | model | total | proofread | reply | rewrite | English (14) | Hindi (3) | Hinglish (3) |
 |---|---|---|---|---|---|---|---|
 | gemma-4-e4b-qat-q4_0 | 14 / 5 / 1 | 5 / 2 / 0 | 4 / 2 / 1 | 5 / 1 / 0 | 10 / 4 / 0 | 2 / 1 / 0 | 2 / 0 / 1 |
-| qwen3.5-4b-q4km | 14 / 5 / 1 | 5 / 2 / 0 | 5 / 1 / 1 | 4 / 2 / 0 | 10 / 4 / 0 | 3 / 0 / 0 | 1 / 1 / 1 |
-| gemma-4-e2b-qat-q4_0 | 12 / 6 / 2 | 4 / 2 / 1 | 4 / 3 / 0 | 4 / 1 / 1 | 9 / 5 / 0 | 1 / 1 / 1 | 2 / 0 / 1 |
-| qwen3.5-2b-q4km | 3 / 7 / 10 | 3 / 2 / 2 | 0 / 4 / 3 | 0 / 1 / 5 | 3 / 7 / 4 | 0 / 0 / 3 | 0 / 0 / 3 |
+| qwen3.5-4b-q4km | 14 / 4 / 2 | 5 / 2 / 0 | 5 / 1 / 1 | 4 / 1 / 1 | 10 / 3 / 1 | 3 / 0 / 0 | 1 / 1 / 1 |
+| gemma-4-e2b-qat-q4_0 | 11 / 7 / 2 | 3 / 3 / 1 | 4 / 3 / 0 | 4 / 1 / 1 | 8 / 6 / 0 | 1 / 1 / 1 | 2 / 0 / 1 |
+| qwen3.5-2b-q4km | 3 / 8 / 9 | 3 / 2 / 2 | 0 / 4 / 3 | 0 / 2 / 4 | 3 / 8 / 3 | 0 / 0 / 3 | 0 / 0 / 3 |
 | qwen3.5-0.8b-q4km | 1 / 4 / 15 | 1 / 2 / 4 | 0 / 1 / 6 | 0 / 1 / 5 | 1 / 4 / 9 | 0 / 0 / 3 | 0 / 0 / 3 |
 
-**Tie for the owner to break: Gemma E4B and Qwen3.5-4B** have identical totals (14 / 5 / 1)
-and identical proofread and English counts. They differ by one answer per skill: Qwen 4B has
-one more good reply, Gemma E4B one more good rewrite; on Hindi and Hinglish, Qwen 4B has 3
-good Hindi answers to Gemma's 2, and Gemma has 2 good Hinglish answers to Qwen's 1. Both
-failed rp-hi-013 (a Hindi reply written from the courier's side). The automatic metrics
-and the judge do not separate them either (rewrite judge win rate 0.56 and 0.55).
+**Quality tier: Gemma E4B (owner, 2026-10-22).** After pass 2 Gemma E4B and Qwen3.5-4B were
+tied at 14 / 5 / 1; the final check leaves Gemma one answer ahead. **On a 20-item sample this
+is within noise**, and the automatic metrics and the judge do not separate them either
+(rewrite judge win rate 0.56 and 0.55). The owner chose Gemma E4B for consistency with the
+fast tier (Gemma E2B): one set of per-family prompt overrides, one style across tiers, and E2B
+as a possible speculative-decoding draft for E4B (the two files have the same 262,144-token
+vocabulary, checked 2026-10-22). Fallback: Qwen3.5-4B, only if E4B does not fit comfortably in
+16 GB by the measured RAM. Both failed rp-hi-013, a Hinglish reply written from the
+courier's side.
 
-No other pair is close: among the models that fit machine A, Gemma E2B (12 / 6 / 2) is far
-ahead of Qwen 2B (3 / 7 / 10) and Qwen 0.8B (1 / 4 / 15).
+No other pair is close: among the models that fit machine A, Gemma E2B (11 / 7 / 2) is far
+ahead of Qwen 2B (3 / 8 / 9) and Qwen 0.8B (1 / 4 / 15).
 
 Failure categories, matched by keyword in the notes of ok and bad ratings (rules in
 `spotcheck.py`, `CATEGORIES`):
