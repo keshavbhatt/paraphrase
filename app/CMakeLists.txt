@@ -4,9 +4,20 @@
 find_package(Qt6 ${PARAPHRASE_QT_MIN_VERSION} REQUIRED COMPONENTS Gui Widgets Svg)
 
 add_library(paraphrase_ui STATIC
+    src/ui/action_bar.cpp
+    src/ui/bars.cpp
+    src/ui/change_list.cpp
     src/ui/chip_button.cpp
+    src/ui/input_pages.cpp
+    src/ui/input_pane.cpp
+    src/ui/languages.cpp
     src/ui/main_window.cpp
+    src/ui/output_pane.cpp
+    src/ui/request_runner.cpp
+    src/ui/result_views.cpp
+    src/ui/skill_catalog.cpp
     src/ui/theme.cpp
+    src/ui/widgets.cpp
 )
 paraphrase_set_warnings(paraphrase_ui)
 target_include_directories(paraphrase_ui PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")

@@ -178,6 +178,61 @@ private Q_SLOTS:
         QCOMPARE(tone->label(), u"Tone: Polite"_s);
     }
 
+    void writesAFullReplyAndKeepsItsVersions()
+    {
+        startDaemon({u"fast-model"_s, u"quality-model"_s});
+        MainWindow w;
+        w.start();
+        w.selectSkill(u"reply"_s);
+        auto* full = w.findChild<QPushButton*>(u"fullReply"_s);
+        if (full == nullptr || full->parentWidget()->isHidden()) {
+            QSKIP("no full reply skill (skills/draft.yaml) in this tree");
+        }
+        full->click();
+        QVERIFY(w.currentSkill().startsWith(u"draft."_s));
+        w.findChild<QPlainTextEdit*>(u"fullMessage"_s)->setPlainText(u"Can we meet on Thursday at 3 pm?"_s);
+        w.findChild<QPlainTextEdit*>(u"intent"_s)->setPlainText(u"Thursday is bad, offer Friday 11 am"_s);
+        setAnswers({
+            u"Hi Dan, Thursday does not work for me. Would Friday at 11 am suit you? Best, Priya"_s,
+            u"Hi Dan, could we do Friday at 11 am instead? Thanks, Priya"_s,
+        });
+        runAndWait(w);
+        QVERIFY(w.resultText().contains(u"Friday at 11 am"_s));
+        {
+            const QMutexLocker lock(&m_state->lock);
+            QVERIFY(
+                m_state->prompts.last().contains(u"offer Friday 11 am"_s)); // the intent reached the model
+        }
+        // "Another version" keeps the first one behind ‹ ›.
+        const QSignalSpy finished(&w, &MainWindow::finished);
+        w.run();
+        QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 1, kTimeoutMs);
+        QCOMPARE(w.findChild<QLabel*>(u"versionInfo"_s)->text(), u"Version 2 of 2"_s);
+        QVERIFY(w.resultText().startsWith(u"Hi Dan, could we"_s));
+    }
+
+    void translatesIntoTheChosenLanguage()
+    {
+        startDaemon({u"fast-model"_s, u"quality-model"_s});
+        MainWindow w;
+        w.start();
+        const auto* translate = w.findChild<paraphrase::app::ChipButton*>(u"action-translate"_s);
+        if (translate == nullptr) {
+            QSKIP("no translate skill in this tree");
+        }
+        w.findChild<QPlainTextEdit*>(u"text"_s)->setPlainText(u"The meeting moved to Friday."_s);
+        setAnswers({u"La réunion a été déplacée à vendredi."_s});
+        Q_EMIT translate->menu()->aboutToShow(); // the menu fills itself when it opens
+        auto* french = translate->menu()->findChild<QAction*>(u"lang-fr"_s);
+        QVERIFY(french != nullptr);
+        QVERIFY(translate->menu()->findChild<QAction*>(u"lang-en"_s) == nullptr); // the text's own language
+        const QSignalSpy finished(&w, &MainWindow::finished);
+        french->trigger();
+        QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 1, kTimeoutMs);
+        QCOMPARE(translate->label(), u"Translate: French"_s);
+        QVERIFY(w.findChild<QLabel*>(u"outInfo"_s)->text().contains(u"French"_s));
+    }
+
     void saysWhenNoModelIsInstalled()
     {
         startDaemon({});
@@ -243,6 +298,28 @@ private Q_SLOTS:
                     {uR"({"replies": ["ठीक है, मैं 12 बजे तक आ जाऊँगा।", "क्या मैं कुछ लेकर आऊँ?", "ज़रूर, दादी को मेरी ओर से बधाई!"]})"_s});
                 runAndWait(w);
                 QVERIFY(w.grab().save(dir + u"/main-window-reply-%1.png"_s.arg(QLatin1StringView(theme))));
+                if (auto* full = w.findChild<QPushButton*>(u"fullReply"_s);
+                    full != nullptr && !full->parentWidget()->isHidden()) {
+                    full->click();
+                    w.findChild<QPlainTextEdit*>(u"fullMessage"_s)
+                        ->setPlainText(u"Hi Priya,\n\nThanks for sending the Q3 vendor report. Could we get "
+                                       u"on a call this "
+                                       "Thursday at 3 pm to go through the delivery delays? I'd also like "
+                                       "the updated cost "
+                                       "sheet before then, if possible.\n\nBest,\nDaniel"_s);
+                    w.findChild<QPlainTextEdit*>(u"intent"_s)
+                        ->setPlainText(
+                            u"Thursday doesn't work, offer Friday 11 am. Cost sheet by Wednesday."_s);
+                    setAnswers({
+                        u"Hi Daniel,\n\nThanks for your email. Unfortunately, Thursday at 3 pm doesn't work "
+                        u"for "
+                        "me. Would Friday at 11 am suit you instead?\n\nI'll send the updated cost sheet by "
+                        "Wednesday, so you'll have it well before we speak.\n\nBest regards,\nPriya"_s,
+                    });
+                    runAndWait(w);
+                    QVERIFY(w.grab().save(dir +
+                                          u"/main-window-full-reply-%1.png"_s.arg(QLatin1StringView(theme))));
+                }
             }
             cleanup();
         }

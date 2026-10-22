@@ -50,6 +50,7 @@ ChipButton::ChipButton(const QString& label, const QString& chip, ChipSide side,
     setLabel(label);
     setChip(chip);
     setCursor(Qt::PointingHandCursor);
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed); // as wide as its parts
     connect(this, &QPushButton::toggled, this, &ChipButton::restyle);
     restyle();
 }

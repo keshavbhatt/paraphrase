@@ -1,0 +1,135 @@
+#include "input_pane.h"
+
+#include "input_pages.h"
+#include "languages.h"
+#include "util/language_detector.h"
+
+#include <QApplication>
+#include <QClipboard>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QRegularExpression>
+#include <QStackedWidget>
+
+using namespace Qt::StringLiterals;
+
+namespace paraphrase::app {
+
+InputPane::InputPane(const util::LanguageDetector& detector, QWidget* parent)
+    : Pane(parent)
+    , m_detector(detector)
+    , m_pages(new QStackedWidget)
+    , m_full(new FullReplyInput)
+{
+    buildHead();
+    m_byKind.insert(SkillKind::Text, new TextInput);
+    m_byKind.insert(SkillKind::QuickReply, new QuickReplyInput);
+    m_byKind.insert(SkillKind::FullReply, m_full);
+    for (const SkillKind kind : {SkillKind::Text, SkillKind::QuickReply, SkillKind::FullReply}) {
+        InputPage* p = m_byKind.value(kind);
+        m_pages->addWidget(p);
+        connect(p, &InputPage::edited, this, [this] {
+            updateInfo();
+            Q_EMIT edited();
+        });
+    }
+    setBody(m_pages);
+    footRow()->addWidget(
+        makeLabel(tr("Type or paste anything. Ctrl+Enter runs the selected action."), u"small"_s));
+    showKind(SkillKind::Text);
+}
+
+void InputPane::buildHead()
+{
+    m_title = makeLabel(QString(), u"caption"_s);
+    m_info = makeLabel(QString(), u"small"_s);
+    m_pill = makeLabel(QString(), u"pill"_s);
+    m_pill->setObjectName(u"langPill"_s);
+    m_replyKind = new SegmentedControl({
+        {.name = u"quickReplies"_s, .text = tr("Quick replies")},
+        {.name = u"fullReply"_s, .text = tr("Full reply")},
+    });
+    QPushButton* paste = makeButton(tr("Paste"), u"flat"_s);
+    m_clear = makeButton(tr("Clear"), u"flat"_s);
+    head()->addWidget(m_title);
+    head()->addWidget(m_info);
+    head()->addStretch();
+    head()->addWidget(m_pill);
+    head()->addWidget(m_replyKind);
+    head()->addWidget(paste);
+    head()->addWidget(m_clear);
+    connect(m_replyKind, &SegmentedControl::changed, this,
+            [this](int index) { Q_EMIT fullReplyToggled(index == 1); });
+    connect(paste, &QPushButton::clicked, this,
+            [this] { page()->setSubject(QApplication::clipboard()->text()); });
+    connect(m_clear, &QPushButton::clicked, this, [this] {
+        for (InputPage* p : std::as_const(m_byKind)) {
+            p->clear();
+        }
+    });
+}
+
+void InputPane::showKind(SkillKind kind)
+{
+    // The text moves with the user, so switching actions keeps what was typed.
+    const QString carried = page() != nullptr ? page()->subject() : QString();
+    m_kind = kind;
+    InputPage* next = m_byKind.value(kind);
+    if (next->subject().isEmpty() && !carried.isEmpty()) {
+        next->setSubject(carried);
+    }
+    m_pages->setCurrentWidget(next);
+    const bool text = kind == SkillKind::Text;
+    m_title->setText(text ? tr("YOUR TEXT") : tr("MESSAGE YOU GOT"));
+    // main-window-reply.html: the language as a pill, no word count, no Clear, no hint line.
+    m_clear->setVisible(text);
+    foot()->setVisible(text);
+    m_replyKind->setVisible(!text && m_fullAvailable);
+    m_replyKind->setCurrent(kind == SkillKind::FullReply ? 1 : 0);
+    updateInfo();
+}
+
+InputPage* InputPane::page() const
+{
+    return qobject_cast<InputPage*>(m_pages->currentWidget());
+}
+
+QString InputPane::language() const
+{
+    return m_detector.detect(page()->subject());
+}
+
+void InputPane::setFullReplyAvailable(bool available)
+{
+    m_fullAvailable = available;
+    m_replyKind->setVisible(m_kind != SkillKind::Text && available);
+}
+
+void InputPane::setFullReply(bool full)
+{
+    m_replyKind->setCurrent(full ? 1 : 0);
+}
+
+void InputPane::updateInfo()
+{
+    const QString text = page()->subject();
+    const QString name = text.trimmed().isEmpty() ? QString() : languageName(m_detector, language());
+    if (m_kind != SkillKind::Text) {
+        m_info->clear();
+        m_pill->setText(name.isEmpty() ? tr("Best effort") : name);
+        m_pill->setVisible(!text.trimmed().isEmpty());
+        return;
+    }
+    m_pill->setVisible(false);
+    if (text.trimmed().isEmpty()) {
+        m_info->clear();
+        return;
+    }
+    const auto words = text.split(QRegularExpression(u"\\s+"_s), Qt::SkipEmptyParts).size();
+    // Plurals written out: tr()'s %n needs a loaded translation to pluralise.
+    const QString count = words == 1 ? tr("1 word") : tr("%1 words").arg(words);
+    m_info->setText(name.isEmpty() ? u"· "_s + count : u"· %1 · %2"_s.arg(count, name));
+}
+
+} // namespace paraphrase::app
