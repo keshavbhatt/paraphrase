@@ -1,0 +1,2 @@
+# One short reply on one line: 1 to 160 characters, no control characters.
+root ::= [^\x00-\x1F]{1,160}
