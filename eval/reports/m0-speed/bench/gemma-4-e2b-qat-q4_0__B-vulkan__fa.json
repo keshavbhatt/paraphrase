@@ -1,0 +1,69 @@
+{
+  "model": "gemma-4-e2b-qat-q4_0",
+  "profile": "B-vulkan",
+  "label": "B, Vulkan: Core Ultra 7 255U + Intel Graphics (Arrow Lake iGPU, Mesa), 30 GB",
+  "when": "2026-10-22 10:57",
+  "server_args": [
+    "-fa",
+    "on"
+  ],
+  "skill_revisions": {
+    "reply": 3,
+    "proofread": 4,
+    "rewrite.professional": 4
+  },
+  "load_cold_s": 4.94,
+  "load_warm_s": 3.35,
+  "tasks": {
+    "reply": {
+      "runs": 10,
+      "input_words": 88.0,
+      "ttft_s": 1.926,
+      "ttft_s_p90": 2.03,
+      "total_s": 4.778,
+      "total_s_p90": 4.955,
+      "total_s_max": 5.049,
+      "retried": 0,
+      "draft_accept_pct": 0.0,
+      "gen_tps": 12.342,
+      "prompt_tps": 77.723,
+      "prompt_tokens": 146.0,
+      "cached_tokens": 120.0,
+      "gen_tokens": 35.5
+    },
+    "proofread": {
+      "runs": 10,
+      "input_words": 98.0,
+      "ttft_s": 2.027,
+      "ttft_s_p90": 2.153,
+      "total_s": 11.81,
+      "total_s_p90": 13.189,
+      "total_s_max": 14.662,
+      "retried": 0,
+      "draft_accept_pct": 0.0,
+      "gen_tps": 12.327,
+      "prompt_tps": 77.839,
+      "prompt_tokens": 149.5,
+      "cached_tokens": 192.0,
+      "gen_tokens": 120.5
+    },
+    "rewrite.professional": {
+      "runs": 10,
+      "input_words": 97.5,
+      "ttft_s": 2.146,
+      "ttft_s_p90": 2.282,
+      "total_s": 13.807,
+      "total_s_p90": 15.646,
+      "total_s_max": 16.285,
+      "retried": 0,
+      "draft_accept_pct": 0.0,
+      "gen_tps": 12.111,
+      "prompt_tps": 86.099,
+      "prompt_tokens": 176.0,
+      "cached_tokens": 85.0,
+      "gen_tokens": 139.5
+    }
+  },
+  "peak_rss_mb": 572,
+  "variant": "fa"
+}

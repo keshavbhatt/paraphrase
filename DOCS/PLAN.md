@@ -192,15 +192,27 @@ Validation in CI: every skill renders for sample inputs, every grammar compiles,
 Reference machines: **(A)** 8 GB RAM, 4-core laptop CPU, no GPU; **(B)** 16 GB + mid-range Vulkan GPU.
 In M0 (owner, 2026-10-21): B is the development laptop (Intel Core Ultra 7 255U, 30 GB, Intel Arrow Lake iGPU via Vulkan; an integrated GPU, so weaker than "mid-range"). A is emulated on the same laptop (4 E-core threads, CPU only, 8 GB memory cap) and its numbers are optimistic. Re-run the bench on a real older laptop before M5.
 
-| Task (typical input) | A: time to first token / total | B: total |
-|---|---|---|
-| reply, 3 chips (100-word message) | < 0.8 s / < 2.0 s | < 0.8 s |
-| proofread (100 words) | < 0.8 s / < 3.5 s | < 1.2 s |
-| rewrite one tone (100 words) | < 1.2 s / < 5 s | < 1.5 s |
-| cold model load | < 3 s | < 2 s |
-| daemon idle RAM (model unloaded) | < 40 MB | < 40 MB |
+**Targets after M0 (ADR-003, 2026-10-22).** The measured p50 and p90 of the chosen models and
+settings (flash attention; MTP draft head for proofread and rewrite, ADR-004) plus 20%
+headroom, in seconds. `bench_latency.py` fails when a run exceeds them. Measurements:
+`docs/models.md`, Latency.
 
-These are targets, not promises. M0 decides whether they are achievable and revises them with real numbers.
+| Task (typical input, 100 words) | Fast tier on A: first token / total (p50, p90) | Fast tier on B: total (p50, p90) | Quality tier on B: total (p50, p90) |
+|---|---|---|---|
+| reply, 3 chips | 3.7, 3.9 / 6.0, 7.1 | 3.3, 3.6 | 6.6, 7.6 |
+| proofread | 4.0, 4.4 / 9.5, 10.7 | 4.9, 7.4 | 8.6, 15.9 |
+| rewrite one tone | 4.5, 4.9 / 14.4, 15.8 | 8.0, 12.2 | 17.2, 18.7 |
+| cold model load | 7.2 | 5.9 | 7.4 |
+| daemon idle RAM (model unloaded) | < 40 MB | < 40 MB | < 40 MB |
+
+Fast tier: Gemma 4 E2B. Quality tier: Gemma 4 E4B, "16 GB recommended"; on A it is a slow
+fallback (about 6 s to the first token, 24 s for a rewrite). Machine A is emulated, so its
+numbers are optimistic; re-measure on a real older laptop before M5 (ADR-003).
+
+The targets before M0 were: reply < 0.8 s first token / < 2.0 s total on A and < 0.8 s on B;
+proofread < 0.8 s / < 3.5 s on A and < 1.2 s on B; rewrite < 1.2 s / < 5 s on A and < 1.5 s on
+B; cold load < 3 s on A and < 2 s on B. No candidate of acceptable quality met them; by the
+owner's rule (section 11, Q4) the fast tier on A was a no-go, overridden by ADR-003.
 
 ### 5.5 Model catalog (`models.json`)
 

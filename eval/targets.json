@@ -1,0 +1,23 @@
+{
+  "notes": "PLAN 5.4 after M0 (ADR-003): measured p50 and p90 plus 20% headroom, seconds. Keys: <model>__<profile>. bench_latency.py --check fails when a run exceeds them.",
+  "targets": {
+    "gemma-4-e2b-qat-q4_0__A-emulated": {
+      "reply": {"ttft_s": 3.7, "ttft_s_p90": 3.9, "total_s": 6.0, "total_s_p90": 7.1},
+      "proofread": {"ttft_s": 4.0, "ttft_s_p90": 4.4, "total_s": 9.5, "total_s_p90": 10.7},
+      "rewrite.professional": {"ttft_s": 4.5, "ttft_s_p90": 4.9, "total_s": 14.4, "total_s_p90": 15.8},
+      "load_cold_s": 7.2
+    },
+    "gemma-4-e2b-qat-q4_0__B-cpu": {
+      "reply": {"ttft_s": 1.4, "ttft_s_p90": 1.5, "total_s": 3.3, "total_s_p90": 3.6},
+      "proofread": {"ttft_s": 1.8, "ttft_s_p90": 2.5, "total_s": 4.9, "total_s_p90": 7.4},
+      "rewrite.professional": {"ttft_s": 1.8, "ttft_s_p90": 3.3, "total_s": 8.0, "total_s_p90": 12.2},
+      "load_cold_s": 5.9
+    },
+    "gemma-4-e4b-qat-q4_0__B-cpu": {
+      "reply": {"ttft_s": 2.9, "ttft_s_p90": 3.0, "total_s": 6.6, "total_s_p90": 7.6},
+      "proofread": {"ttft_s": 3.4, "ttft_s_p90": 6.7, "total_s": 8.6, "total_s_p90": 15.9},
+      "rewrite.professional": {"ttft_s": 3.9, "ttft_s_p90": 6.1, "total_s": 17.2, "total_s_p90": 18.7},
+      "load_cold_s": 7.4
+    }
+  }
+}

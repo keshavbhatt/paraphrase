@@ -111,6 +111,59 @@ languages English or Hindi; 16 items cannot rank models on them.
 
 Pending: the owner reviews the results table before the recommendation is written.
 
+### Latency (2026-10-22)
+
+Measured with `eval/bench_latency.py` on the five English items closest to 100 words per
+task (see Method), here 10 timed requests per task after one warm-up, p50 / p90, in
+seconds. Raw files: `eval/reports/m0-speed/bench/` (one per model, profile and setting) and
+`eval/reports/m0-v3/bench/` (all five candidates, prompt revision 3). Laptop on AC, balanced
+power profile.
+
+**What each lever did** (Gemma 4 E2B on machine A, emulated; p50 totals):
+
+| setting | reply first token | reply total | proofread total | rewrite total | kept? |
+|---|---|---|---|---|---|
+| baseline (prompt-prefix cache on, as in every run) | 3.04 | 5.24 | 10.57 | 12.24 | |
+| flash attention | 3.06 | 5.00 | 10.66 | 11.90 | yes (neutral; never slower) |
+| speculative decoding, n-gram from the input | 3.02 | 5.04 | 11.97 | 12.79 | no: the check costs more than it saves on 4 cores |
+| **speculative decoding, Gemma MTP draft head (59 MB)** | 3.10 | 5.45 | **7.85** | 11.96 | **yes, for proofread and rewrite**; off for reply (its p90 gets worse) |
+| reply variants batched from one prompt (`n_cmpl`) | 2.96 | 4.58 | | | no: the three replies come out nearly identical (quality eval below) |
+| more threads | | | | | no: 4 threads already uses all of A's cores; on B 10 threads stays best (E2B prompt 146 tok/s at 10, 136 at 12) |
+| Q4_K_M instead of the QAT Q4_0 | | | | | no: same prompt speed on A, slower on B (125 vs 154 prompt tok/s, 20 vs 22 output tok/s) |
+| Vulkan on the Arrow Lake iGPU | | | | | no: slower than the CPU for both models on B (E2B proofread 11.8 vs 7.1 s) |
+| Gemma E2B as draft model for E4B | | | | | no: 13.3 GB resident and slower than E4B alone (proofread 18.6 vs 13.4 s on B) |
+
+With a greedy skill (proofread) speculative decoding returns exactly the output the model
+alone would, so it cannot change quality; with sampling it keeps the same distribution.
+
+**Chosen setup** (flash attention; MTP draft head for proofread and rewrite):
+
+| model, machine | reply first token | reply total | proofread first token | proofread total | rewrite first token | rewrite total | load cold / warm | peak RSS |
+|---|---|---|---|---|---|---|---|---|
+| Gemma 4 E2B, A (emulated) | 3.06 / 3.23 | 5.00 / 5.84 | 3.31 / 3.63 | 7.85 / 8.85 | 3.70 / 4.04 | 11.96 / 13.09 | 5.9 / 5.0 | 5.0 GB |
+| Gemma 4 E2B, B (CPU) | 1.12 / 1.18 | 2.71 / 2.98 | 1.47 / 2.00 | 4.07 / 6.10 | 1.49 / 2.72 | 6.58 / 10.16 | 4.9 / 4.0 | 5.0 GB |
+| Gemma 4 E4B, B (CPU) | 2.36 / 2.44 | 5.49 / 6.28 | 2.76 / 5.51 | 7.16 / 13.18 | 3.22 / 5.07 | 14.28 / 15.55 | 6.1 / 4.7 | 8.8 GB |
+| Gemma 4 E4B, A (emulated, no MTP measured) | 6.06 / 6.40 | 10.13 / 10.95 | 6.36 / 7.00 | 20.22 / 22.43 | 7.38 / 7.95 | 23.96 / 27.03 | 4.3 / 3.1 | 8.5 GB |
+
+Loading the MTP head adds about 1 to 2 s to a model load.
+
+**Against the original PLAN 5.4 targets** no candidate of acceptable quality meets them.
+The fast tier on machine A (the owner's must-have, PLAN 11 Q4) was to be reported as a
+no-go if, after these levers, it was still worse than twice the target:
+
+| fast tier on A (Gemma E2B), p50 | measured | 2 x target | verdict |
+|---|---|---|---|
+| reply, first token | 3.06 | 1.6 | over |
+| reply, total | 5.00 | 4.0 | over |
+| proofread, first token | 3.31 | 1.6 | over |
+| proofread, total | 7.85 | 7.0 | over |
+
+**By that rule the fast tier on machine A is a no-go.** The cause is reading the input:
+on four cores Gemma E2B processes about 48 prompt tokens a second, so a 100-word text
+(about 150 tokens) takes about 3 s before the first word, and no setting changes that. The
+only candidate fast enough (Qwen3.5-0.8B: reply 2.4 s, first token 1.0 s on A) has 15 of 20
+spot-check answers rated bad. The decision taken on this is ADR-003 (DOCS/DECISIONS.md).
+
 ### Spot-check (2026-10-22): Claude-rated (2 passes and a final check), not human-reviewed: independent of the judge model, not of the item writer
 
 20 items per model (7 proofread, 7 reply, 6 rewrite; 3 Hindi, 3 Hinglish), five blind

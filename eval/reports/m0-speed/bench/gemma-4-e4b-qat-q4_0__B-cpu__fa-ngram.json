@@ -1,0 +1,71 @@
+{
+  "model": "gemma-4-e4b-qat-q4_0",
+  "profile": "B-cpu",
+  "label": "B, CPU only: Core Ultra 7 255U, 10 threads (fastest in a 2-14 sweep), 30 GB",
+  "when": "2026-10-22 11:09",
+  "server_args": [
+    "-fa",
+    "on",
+    "--spec-type",
+    "ngram-simple"
+  ],
+  "skill_revisions": {
+    "reply": 3,
+    "proofread": 4,
+    "rewrite.professional": 4
+  },
+  "load_cold_s": 3.65,
+  "load_warm_s": 2.47,
+  "tasks": {
+    "reply": {
+      "runs": 10,
+      "input_words": 88.0,
+      "ttft_s": 2.375,
+      "ttft_s_p90": 3.142,
+      "total_s": 5.804,
+      "total_s_p90": 9.453,
+      "total_s_max": 11.794,
+      "retried": 0,
+      "draft_accept_pct": 0.0,
+      "gen_tps": 11.57,
+      "prompt_tps": 61.024,
+      "prompt_tokens": 146.0,
+      "cached_tokens": 120.0,
+      "gen_tokens": 36.0
+    },
+    "proofread": {
+      "runs": 10,
+      "input_words": 98.0,
+      "ttft_s": 2.559,
+      "ttft_s_p90": 3.169,
+      "total_s": 11.497,
+      "total_s_p90": 16.87,
+      "total_s_max": 17.248,
+      "retried": 0,
+      "draft_accept_pct": 44.5,
+      "gen_tps": 14.396,
+      "prompt_tps": 60.417,
+      "prompt_tokens": 149.5,
+      "cached_tokens": 192.0,
+      "gen_tokens": 119.5
+    },
+    "rewrite.professional": {
+      "runs": 10,
+      "input_words": 97.5,
+      "ttft_s": 2.823,
+      "ttft_s_p90": 3.269,
+      "total_s": 17.648,
+      "total_s_p90": 19.68,
+      "total_s_max": 25.102,
+      "retried": 0,
+      "draft_accept_pct": 11.1,
+      "gen_tps": 10.478,
+      "prompt_tps": 64.112,
+      "prompt_tokens": 176.0,
+      "cached_tokens": 85.0,
+      "gen_tokens": 141.0
+    }
+  },
+  "peak_rss_mb": 8690,
+  "variant": "fa-ngram"
+}

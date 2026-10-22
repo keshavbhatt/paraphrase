@@ -36,6 +36,7 @@ from paraeval.llama import LlamaServer, evict_page_cache
 from paraeval.skills import load_skills
 
 TASKS = ("reply", "proofread", "rewrite.professional")
+TARGETS = Path(__file__).resolve().parent / "targets.json"
 TARGET_WORDS = 100
 
 
@@ -149,7 +150,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--server-args", default="", help="extra llama-server flags, one string")
     ap.add_argument("--variant", default="", help="names an experiment in the output file")
     ap.add_argument("--skill-override", type=Path, action="append", default=[])
+    ap.add_argument(
+        "--check", action="store_true", help="fail when a result exceeds eval/targets.json"
+    )
     args = ap.parse_args(argv)
+    misses: list[str] = []
     out_dir = common.REPORTS_DIR / args.tag / "bench"
     out_dir.mkdir(parents=True, exist_ok=True)
     for model_id in args.model:
@@ -166,7 +171,29 @@ def main(argv: list[str] | None = None) -> int:
             suffix = f"__{args.variant}" if args.variant else ""
             path = out_dir / f"{model_id}__{profile}{suffix}.json"
             path.write_text(json.dumps(res, indent=2) + "\n")
-    return 0
+            if args.check:
+                misses += check(model_id, profile, res)
+    for m in misses:
+        print("over target:", m)
+    return 1 if misses else 0
+
+
+def check(model_id: str, profile: str, res: dict[str, Any]) -> list[str]:
+    """Results over the PLAN 5.4 targets (eval/targets.json); a pair with no target passes."""
+    targets = json.loads(TARGETS.read_text())["targets"].get(f"{model_id}__{profile}")
+    if not targets:
+        print(f"  no targets for {model_id} on {profile}")
+        return []
+    out = []
+    for key, limit in targets.items():
+        if isinstance(limit, dict):
+            for metric, cap in limit.items():
+                got = res["tasks"][key][metric]
+                if got > cap:
+                    out.append(f"{model_id} {profile} {key} {metric} {got} > {cap}")
+        elif res[key] > limit:
+            out.append(f"{model_id} {profile} {key} {res[key]} > {limit}")
+    return out
 
 
 if __name__ == "__main__":
