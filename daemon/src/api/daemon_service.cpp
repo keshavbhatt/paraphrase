@@ -5,6 +5,7 @@
 
 #include <QCoreApplication>
 #include <QDBusMessage>
+#include <QDateTime>
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -20,6 +21,27 @@ namespace paraphrase::api {
 namespace {
 
 const QString kErrorPrefix = u"com.ktechpit.paraphrase.Error."_s;
+constexpr qint64 kProgressIntervalMs = 250;
+
+QString stateName(models::DownloadStatus::State state)
+{
+    using State = models::DownloadStatus::State;
+    switch (state) {
+    case State::Waiting:
+        return u"waiting"_s;
+    case State::Downloading:
+        return u"downloading"_s;
+    case State::Verifying:
+        return u"verifying"_s;
+    case State::Paused:
+        return u"paused"_s;
+    case State::Failed:
+        return u"failed"_s;
+    case State::Installed:
+        return u"installed"_s;
+    }
+    return {};
+}
 
 /// Resident memory of this process in MB (VmRSS), for Status.
 double residentMb()
@@ -44,7 +66,9 @@ DaemonService::DaemonService(ServiceSetup setup, QObject* parent)
     , m_detector(util::LanguageData::builtIn())
     , m_store(m_setup.modelsRoot)
     , m_worker(new InferenceWorker(m_setup.engineFactory, m_detector))
+    , m_downloader(m_store, nullptr, m_setup.urlResolver)
 {
+    connect(&m_downloader, &models::ModelDownloader::changed, this, &DaemonService::onDownloadChanged);
     for (const auto& s : m_setup.skills.skills()) {
         m_maxVariants = std::max(m_maxVariants, s.variants);
     }
@@ -285,7 +309,140 @@ void DaemonService::onIdle()
 void DaemonService::restartIdleTimers()
 {
     m_unloadTimer.start();
-    m_exitTimer.start();
+    if (!downloading()) { // a download keeps the daemon up
+        m_exitTimer.start();
+    }
+}
+
+bool DaemonService::downloading() const
+{
+    return std::ranges::any_of(m_downloader.downloads(), [](const models::DownloadStatus& s) {
+        return s.state == models::DownloadStatus::State::Waiting ||
+               s.state == models::DownloadStatus::State::Downloading ||
+               s.state == models::DownloadStatus::State::Verifying;
+    });
+}
+
+void DaemonService::onDownloadChanged(const models::DownloadStatus& status)
+{
+    using State = models::DownloadStatus::State;
+    const qint64 now = QDateTime::currentMSecsSinceEpoch();
+    // Bytes arrive many times a second; state changes always go out.
+    if (status.state == State::Downloading &&
+        now - m_lastProgressMs.value(status.modelId) < kProgressIntervalMs) {
+        return;
+    }
+    m_lastProgressMs.insert(status.modelId, now);
+    if (downloading()) {
+        m_exitTimer.stop();
+    } else if (!m_busy) {
+        restartIdleTimers();
+    }
+    const QJsonObject o{
+        {u"model"_s, status.modelId}, {u"state"_s, stateName(status.state)}, {u"received"_s, status.received},
+        {u"total"_s, status.total},   {u"verified"_s, status.verified},      {u"error"_s, status.error},
+    };
+    Q_EMIT DownloadProgress(QString::fromUtf8(QJsonDocument(o).toJson(QJsonDocument::Compact)));
+}
+
+QJsonObject DaemonService::modelJson(const models::ModelEntry& m) const
+{
+    const models::TierSelector selector(m_setup.catalog, m_setup.hardware);
+    const auto& file = m.files.front();
+    QJsonObject o{
+        {u"id"_s, m.id},
+        {u"name"_s, m.name},
+        {u"role"_s, m.role},
+        {u"tiers"_s, QJsonArray::fromStringList(m.tiers)},
+        {u"draft_for"_s, QJsonArray::fromStringList(m.draftFor)},
+        {u"installed"_s, m_store.isInstalled(m)},
+        {u"fits"_s, m.role != u"model"_s || selector.fits(m)},
+        {u"recommended"_s, m.tiers.contains(u"fast"_s)},
+        {u"size"_s, m.downloadSize()},
+        {u"on_disk"_s, m_store.usedBytes(m)},
+        {u"ram_required_gb"_s, m.ramRequiredGb},
+        {u"memory_gb"_s, m.memoryGb},
+        {u"licence"_s, m.licence},
+        {u"licence_url"_s, m.licenceUrl},
+        // PLAN 8: the exact source, so a careful user can check the download.
+        {u"source"_s, m.url(file).toString()},
+        {u"revision"_s, m.revision},
+        {u"sha256"_s, file.sha256},
+        {u"path"_s, m_store.modelPath(m)},
+    };
+    for (const auto& d : m_downloader.downloads()) {
+        if (d.modelId == m.id) {
+            o.insert(u"download"_s, QJsonObject{
+                                        {u"state"_s, stateName(d.state)},
+                                        {u"received"_s, d.received},
+                                        {u"total"_s, d.total},
+                                        {u"error"_s, d.error},
+                                    });
+        }
+    }
+    return o;
+}
+
+QString DaemonService::ListModels() const
+{
+    QJsonArray out;
+    for (const auto& m : m_setup.catalog.models) {
+        if (m.isOffered()) {
+            out.append(modelJson(m));
+        }
+    }
+    return QString::fromUtf8(QJsonDocument(out).toJson(QJsonDocument::Compact));
+}
+
+void DaemonService::DownloadModel(const QString& modelId)
+{
+    const models::ModelEntry* m = m_setup.catalog.find(modelId);
+    if (m == nullptr || m->role != u"model"_s) {
+        replyError(u"InvalidInput"_s, tr("Unknown model \"%1\".").arg(modelId));
+        return;
+    }
+    qCInfo(lcApi) << "download" << modelId;
+    m_exitTimer.stop();
+    m_downloader.start(*m);
+    if (const models::ModelEntry* draft = m_setup.catalog.draftFor(modelId)) {
+        m_downloader.start(*draft); // the speed-up comes with it (ADR-004)
+    }
+}
+
+void DaemonService::PauseDownload(const QString& modelId)
+{
+    m_downloader.pause(modelId);
+    if (const models::ModelEntry* draft = m_setup.catalog.draftFor(modelId)) {
+        m_downloader.pause(draft->id);
+    }
+}
+
+void DaemonService::DeleteModel(const QString& modelId)
+{
+    const models::ModelEntry* m = m_setup.catalog.find(modelId);
+    if (m == nullptr || m->role != u"model"_s) {
+        replyError(u"InvalidInput"_s, tr("Unknown model \"%1\".").arg(modelId));
+        return;
+    }
+    const models::ModelEntry* draft = m_setup.catalog.draftFor(modelId);
+    const bool active = std::ranges::any_of(m_downloader.downloads(), [&](const models::DownloadStatus& s) {
+        return s.modelId == modelId || (draft != nullptr && s.modelId == draft->id);
+    });
+    if (modelId == m_loadedModel || active ||
+        std::ranges::any_of(m_queue, [&](const Job& j) { return j.modelId == modelId; })) {
+        replyError(u"Busy"_s, tr("%1 is in use or downloading; try again when it is idle.").arg(m->name));
+        return;
+    }
+    qCInfo(lcApi) << "delete" << modelId;
+    for (const models::ModelEntry* e : {m, draft}) {
+        if (e == nullptr) {
+            continue;
+        }
+        if (const auto removed = m_store.remove(*e); !removed.ok()) {
+            replyError(u"Failed"_s, removed.error());
+            return;
+        }
+    }
 }
 
 void DaemonService::onToken(const QString& id, int variant, const QString& text)

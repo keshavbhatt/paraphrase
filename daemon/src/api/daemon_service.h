@@ -3,6 +3,7 @@
 #include "inference_worker.h"
 #include "models/hardware_probe.h"
 #include "models/model_catalog.h"
+#include "models/model_downloader.h"
 #include "models/model_store.h"
 #include "skills/skill_registry.h"
 #include "util/language_detector.h"
@@ -10,6 +11,7 @@
 #include <QDBusConnection>
 #include <QDBusContext>
 #include <QHash>
+#include <QJsonObject>
 #include <QList>
 #include <QObject>
 #include <QSet>
@@ -28,8 +30,9 @@ struct ServiceSetup
     QString modelsRoot;
     models::HardwareInfo hardware;
     InferenceWorker::EngineFactory engineFactory;
-    int idleUnloadMs = 10 * 60 * 1000; ///< PLAN 5.3: unload the model after 10 quiet minutes
-    int idleExitMs = 30 * 60 * 1000;   ///< ADR-010: exit after a quiet period
+    models::ModelDownloader::UrlResolver urlResolver; ///< tests: a local server; else Hugging Face
+    int idleUnloadMs = 10 * 60 * 1000;                ///< PLAN 5.3: unload the model after 10 quiet minutes
+    int idleExitMs = 30 * 60 * 1000;                  ///< ADR-010: exit after a quiet period
 };
 
 /// The daemon's D-Bus API (PLAN 5.1, DOCS/api.md): `com.ktechpit.paraphrase.Daemon1` at
@@ -72,12 +75,24 @@ public Q_SLOTS:
     [[nodiscard]] Q_SCRIPTABLE QString ListSkills() const;
     Q_SCRIPTABLE QString Status();
 
+    /// The models this computer is offered, installed or not, with their source and any
+    /// download in progress (DOCS/api.md).
+    [[nodiscard]] Q_SCRIPTABLE QString ListModels() const;
+    /// Downloads a model and its draft head; progress comes as DownloadProgress.
+    Q_SCRIPTABLE void DownloadModel(const QString& modelId);
+    Q_SCRIPTABLE void PauseDownload(const QString& modelId);
+    /// Deletes a model and its draft head; refused while it is loaded or downloading.
+    Q_SCRIPTABLE void DeleteModel(const QString& modelId);
+
 Q_SIGNALS:
     // Declared for introspection; sent as targeted signals to the requesting client only.
     Q_SCRIPTABLE void Token(const QString& requestId, int variant, const QString& text);
     Q_SCRIPTABLE void Retrying(const QString& requestId, const QString& reason);
     Q_SCRIPTABLE void Done(const QString& requestId, const QString& result);
     Q_SCRIPTABLE void Error(const QString& requestId, const QString& code, const QString& message);
+    /// Broadcast to every client (it holds no user text):
+    /// {"model", "state", "received", "total", "verified", "error"}.
+    Q_SCRIPTABLE void DownloadProgress(const QString& status);
     // NOLINTEND(readability-identifier-naming)
 
     /// Nothing happened for idleExitMs: the daemon may exit (not on D-Bus).
@@ -103,6 +118,9 @@ private:
     void cancelClientRequests(const Client& client);
     void finishRequest(const QString& id);
     void onIdle();
+    void onDownloadChanged(const models::DownloadStatus& status);
+    [[nodiscard]] bool downloading() const;
+    [[nodiscard]] QJsonObject modelJson(const models::ModelEntry& m) const;
     void restartIdleTimers();
 
     void onToken(const QString& id, int variant, const QString& text);
@@ -122,6 +140,8 @@ private:
     bool m_busy = false;
     QHash<QString, Client> m_clients; ///< open requests
     QString m_loadedModel;
+    models::ModelDownloader m_downloader;
+    QHash<QString, qint64> m_lastProgressMs; ///< throttles DownloadProgress per model
 
     QTimer m_unloadTimer;
     QTimer m_exitTimer;

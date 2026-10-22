@@ -5,6 +5,7 @@
 // warms the cache, and idle timers unload the model and end the daemon.
 
 #include "api/daemon_service.h"
+#include "test_http_server.h"
 
 #include <QCryptographicHash>
 #include <QDBusConnection>
@@ -234,6 +235,7 @@ public:
     QStringList retries;
     QHash<QString, QJsonObject> done;
     QHash<QString, QString> errors; ///< request id -> code
+    QList<QJsonObject> progress;
 
     bool listen(QDBusConnection& c)
     {
@@ -243,7 +245,8 @@ public:
         return c.connect({}, path, iface, u"Token"_s, this, SLOT(onToken(QString, int, QString))) &&
                c.connect({}, path, iface, u"Retrying"_s, this, SLOT(onRetrying(QString, QString))) &&
                c.connect({}, path, iface, u"Done"_s, this, SLOT(onDone(QString, QString))) &&
-               c.connect({}, path, iface, u"Error"_s, this, SLOT(onError(QString, QString, QString)));
+               c.connect({}, path, iface, u"Error"_s, this, SLOT(onError(QString, QString, QString))) &&
+               c.connect({}, path, iface, u"DownloadProgress"_s, this, SLOT(onProgress(QString)));
     }
 
 public Q_SLOTS:
@@ -256,6 +259,10 @@ public Q_SLOTS:
     void onDone(const QString& id, const QString& result)
     {
         done.insert(id, QJsonDocument::fromJson(result.toUtf8()).object());
+    }
+    void onProgress(const QString& status)
+    {
+        progress.append(QJsonDocument::fromJson(status.toUtf8()).object());
     }
     void onError(const QString& id, const QString& code, const QString& message)
     {
@@ -274,6 +281,7 @@ private:
     std::unique_ptr<QTemporaryDir> m_dir;
     std::shared_ptr<FakeState> m_state;
     std::unique_ptr<ServerThread> m_server;
+    std::unique_ptr<TestHttpServer> m_http; ///< where the tiny models download from
     paraphrase::models::ModelCatalog m_catalog;
     int m_peers = 0;
 
@@ -290,14 +298,22 @@ private:
         paraphrase::models::HardwareInfo hw;
         hw.totalMemory = static_cast<qint64>(memoryGb * 1024 * 1024 * 1024);
         hw.threads = 4;
-        const auto state = m_state;
+        m_http = std::make_unique<TestHttpServer>();
+        for (const auto& m : m_catalog.models) {
+            m_http->addRoute(u'/' + m.files.front().file, {.body = m.id.toUtf8(), .supportsRange = true});
+        }
+        const QUrl base = m_http->urlFor(u"/"_s);
         m_server = std::make_unique<ServerThread>(
             ServiceSetup{
                 .skills = std::move(skills).value(),
                 .catalog = m_catalog,
                 .modelsRoot = m_dir->path() + u"/models"_s,
                 .hardware = hw,
-                .engineFactory = [state] { return std::make_unique<FakeEngine>(state); },
+                .engineFactory = [state = m_state] { return std::make_unique<FakeEngine>(state); },
+                .urlResolver =
+                    [base](const paraphrase::models::ModelEntry&, const paraphrase::models::ModelFile& f) {
+                        return base.resolved(QUrl(f.file));
+                    },
                 .idleUnloadMs = idleUnloadMs,
                 .idleExitMs = idleExitMs,
             },
@@ -339,6 +355,7 @@ private Q_SLOTS:
             m_server->wait();
             m_server.reset();
         }
+        m_http.reset();
     }
 
     void listsSkills()
@@ -544,6 +561,64 @@ private Q_SLOTS:
         QCOMPARE(status.value(u"model"_s).toString(), QString());
         QCOMPARE(status.value(u"installed"_s).toArray(), QJsonArray{u"fast-model"_s});
         QTRY_VERIFY_WITH_TIMEOUT(m_server->idleTimedOut.load(), kTimeoutMs);
+    }
+
+    void managesModels()
+    {
+        startServer(32, {});
+        QDBusConnection c = connect();
+        Listener l;
+        QVERIFY(l.listen(c));
+        const auto models = [&] {
+            QHash<QString, QJsonObject> out;
+            const auto list = QJsonDocument::fromJson(
+                call(c, u"ListModels"_s, {}).arguments().value(0).toString().toUtf8());
+            for (const auto& m : list.array()) {
+                out.insert(m.toObject().value(u"id"_s).toString(), m.toObject());
+            }
+            return out;
+        };
+        const auto listed = models();
+        QCOMPARE(listed.size(), 3);
+        QVERIFY(!listed.value(u"fast-model"_s).value(u"installed"_s).toBool());
+        QVERIFY(listed.value(u"fast-model"_s).value(u"recommended"_s).toBool());
+        QVERIFY(listed.value(u"fast-model"_s)
+                    .value(u"source"_s)
+                    .toString()
+                    .startsWith(u"https://huggingface.co/"_s));
+
+        // The model and its draft head download, are checked, and are installed.
+        call(c, u"DownloadModel"_s, {u"fast-model"_s});
+        QTRY_VERIFY_WITH_TIMEOUT(models().value(u"fast-model"_s).value(u"installed"_s).toBool() &&
+                                     models().value(u"fast-draft"_s).value(u"installed"_s).toBool(),
+                                 kTimeoutMs);
+        QTRY_VERIFY_WITH_TIMEOUT(std::ranges::any_of(l.progress,
+                                                     [](const QJsonObject& p) {
+                                                         return p.value(u"model"_s) == u"fast-model"_s &&
+                                                                p.value(u"state"_s) == u"installed"_s;
+                                                     }),
+                                 kTimeoutMs);
+        QCOMPARE(call(c, u"DownloadModel"_s, {u"nonsense"_s}).errorName(),
+                 u"com.ktechpit.paraphrase.Error.InvalidInput"_s);
+
+        // In use: not deleted.
+        Listener l2;
+        QVERIFY(l2.listen(c));
+        const QString id = runSkill(c, u"proofread"_s, {{u"text"_s, u"Their going home."_s}});
+        QTRY_VERIFY_WITH_TIMEOUT(l.done.contains(id), kTimeoutMs);
+        QCOMPARE(call(c, u"DeleteModel"_s, {u"fast-model"_s}).errorName(),
+                 u"com.ktechpit.paraphrase.Error.Busy"_s);
+    }
+
+    void deletesAModelNotInUse()
+    {
+        startServer(32, {u"fast-model"_s, u"fast-draft"_s});
+        QDBusConnection c = connect();
+        QCOMPARE(call(c, u"DeleteModel"_s, {u"fast-model"_s}).type(), QDBusMessage::ReplyMessage);
+        QVERIFY(!QFile::exists(m_dir->path() + u"/models/fast-model"_s));
+        QVERIFY(!QFile::exists(m_dir->path() + u"/models/fast-draft"_s));
+        QCOMPARE(runSkill(c, u"proofread"_s, {{u"text"_s, u"x"_s}}),
+                 u"com.ktechpit.paraphrase.Error.NoModel"_s);
     }
 };
 

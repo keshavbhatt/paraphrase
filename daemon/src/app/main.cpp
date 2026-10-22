@@ -114,6 +114,7 @@ std::optional<paraphrase::api::ServiceSetup> setupFrom(const Options& options)
             options.modelsDir.isEmpty() ? paraphrase::models::ModelStore::defaultRoot() : options.modelsDir,
         .hardware = paraphrase::models::HardwareProbe::probe(),
         .engineFactory = [] { return std::make_unique<paraphrase::engine::LlamaEngine>(); },
+        .urlResolver = {}, // Hugging Face at the pinned revision
         .idleUnloadMs = options.idleUnloadS * 1000,
         .idleExitMs = options.idleExitS * 1000,
     };
