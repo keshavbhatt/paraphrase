@@ -14,9 +14,6 @@ export PATH := $(HOME)/.local/bin:$(PATH)
 PY := uv run python
 MODEL ?=
 BUILD_DIR ?= build/dev
-CXX_DIRS := daemon client cli
-CXX_SOURCES := $(shell find $(CXX_DIRS) -name '*.cpp' -o -name '*.h')
-TIDY_SOURCES := $(shell find $(CXX_DIRS) -name '*.cpp')
 
 .PHONY: all build test test-eval test-daemon lint lint-eval lint-daemon format llama fetch smoke clean
 
@@ -43,8 +40,7 @@ lint-eval:
 	uv run mypy eval scripts
 
 lint-daemon: build
-	clang-format --dry-run --Werror $(CXX_SOURCES)
-	clang-tidy -p $(BUILD_DIR) --quiet --warnings-as-errors='*' $(TIDY_SOURCES)
+	PARAPHRASE_BUILD_DIR=$(abspath $(BUILD_DIR)) scripts/lint-cxx.sh
 
 # reuse scans git-ignored trees such as .venv, so lint what git tracks plus new files.
 lint: lint-eval lint-daemon
@@ -53,7 +49,7 @@ lint: lint-eval lint-daemon
 
 format:
 	uv run ruff format .
-	clang-format -i $(CXX_SOURCES)
+	scripts/lint-cxx.sh --fix
 
 llama:
 	scripts/build-llama.sh
