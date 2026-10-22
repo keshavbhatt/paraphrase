@@ -3,6 +3,17 @@
 # it never links the engine.
 find_package(Qt6 ${PARAPHRASE_QT_MIN_VERSION} REQUIRED COMPONENTS Gui Widgets Svg)
 
+# Capture, insert and shortcut backends (PLAN 6): interfaces, ranking and the fallbacks that
+# work everywhere; session-specific backends join here.
+add_library(paraphrase_integration STATIC
+    src/integration/backends.h
+    src/integration/clipboard_backends.cpp
+    src/integration/integrations.cpp
+)
+paraphrase_set_warnings(paraphrase_integration)
+target_include_directories(paraphrase_integration PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
+target_link_libraries(paraphrase_integration PUBLIC Qt6::Gui)
+
 add_library(paraphrase_ui STATIC
     src/ui/action_bar.cpp
     src/ui/bars.cpp
