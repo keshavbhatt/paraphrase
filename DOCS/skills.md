@@ -38,9 +38,14 @@ Values come from the request input (PLAN 5.1: `text`, `context`, `lang`, `tone`,
 `target_lang`), from the engine, and from the chosen preset. The validator rejects any other
 variable name.
 
-The engine adds `lang` (`en`, `hi` or `hinglish`) and `lang_name` (a short description of
-that language for the prompt) from its language detector, run on `text`, or on `context`
-for skills that answer a message. Prompts name the language only through `lang_name`, in the
+The engine adds `lang` and `lang_name` (a short description of that language for the
+prompt) from its language detector, run on `text`, or on `context` for skills that answer a
+message. `lang` is `en`, `hi` or `hinglish` (the languages the eval covers in depth),
+another language code (`fr`, `es`, `mr`, `ta`, `zh`, ... from `eval/paraeval/scripts.py`:
+by script, by common words for Latin-script languages, by marker words for Marathi and
+Nepali against Hindi), or `und` when the language is not clear. For `und` the prompt names
+no language ("its own language: keep that language and script"): a wrong name makes the
+model translate. Other languages are best effort (PLAN 1). Prompts name the language only through `lang_name`, in the
 user message: in M0, naming Hindi and Hinglish in a shared system prompt made small models
 answer English text in Hindi (`DOCS/models.md`, prompt revisions).
 

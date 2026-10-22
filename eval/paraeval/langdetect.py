@@ -1,4 +1,5 @@
-"""Tiny language detector for the three launch languages (en, hi, hinglish).
+"""Tiny language detector: English, Hindi and Hinglish in depth, other languages by script
+and common words (paraeval.scripts).
 
 The engine passes its result to skills as `lang` and `lang_name` (DOCS/skills.md), so a
 prompt can say which language to answer in without naming other languages; naming Hindi
@@ -9,6 +10,7 @@ same rules to C++ (daemon/src/util/ from M1), sharing test vectors with this mod
 
 from __future__ import annotations
 
+from paraeval import scripts
 from paraeval.metrics import hinglish_ratio, script_shares
 
 LANG_NAMES = {
@@ -17,23 +19,38 @@ LANG_NAMES = {
     "hinglish": "Hinglish: Hindi written in Latin letters as in chat messages. Keep it Hinglish "
     "even in a formal tone: do not translate it into English or Devanagari",
 }
+# A language the detector cannot name. The prompt must not guess a name: a wrong one makes
+# the model translate (and naming Hindi pulls small models into Hindi, M0 v1).
+UNKNOWN_NAME = "its own language: keep that language and script, do not translate it"
 
 # Plain names, used when the user chose the output language: LANG_NAMES above also tells
 # the model to keep the input's language, which would contradict that choice.
-LANG_SHORT = {"en": "English", "hi": "Hindi", "hinglish": "Hinglish (Hindi in Latin letters)"}
+LANG_SHORT = scripts.NAMES
 
 HINGLISH_MIN_RATIO = 0.15
 
 
 def detect(text: str) -> str:
+    """en, hi or hinglish (the languages the eval covers in depth), another language code
+    from scripts.NAMES, or "und" when the language is not clear."""
     deva, latin = script_shares(text)
     if deva >= 0.3:
-        return "hi"
+        return scripts.devanagari_language(text) or "hi"
+    script = scripts.dominant_script(text)
+    if script and script not in ("LATIN", "DEVANAGARI"):
+        return scripts.other_language(text, script)
     if latin > 0 and hinglish_ratio(text) >= HINGLISH_MIN_RATIO:
         return "hinglish"
-    return "en"
+    return scripts.latin_language(text) or "en"
+
+
+def name_for(lang: str) -> str:
+    """The language as the prompt names it (`lang_name`)."""
+    if lang in LANG_NAMES:
+        return LANG_NAMES[lang]
+    return scripts.NAMES.get(lang, UNKNOWN_NAME)
 
 
 def inputs_for(text: str) -> dict[str, str]:
     lang = detect(text)
-    return {"lang": lang, "lang_name": LANG_NAMES[lang]}
+    return {"lang": lang, "lang_name": name_for(lang)}

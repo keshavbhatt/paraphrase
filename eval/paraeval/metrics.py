@@ -214,6 +214,24 @@ def language_check(lang: str, source: str, output: str) -> tuple[bool, str]:
             return False, "English answered in Devanagari"
         if hinglish_ratio(output) >= 0.2 and hinglish_ratio(source) < 0.05:
             return False, "English answered in Hinglish"
+    else:
+        return _other_language_check(lang, source, output)
+    return True, ""
+
+
+def _other_language_check(lang: str, source: str, output: str) -> tuple[bool, str]:
+    """Best-effort languages (PLAN 1): fail only on clear evidence of a switch, so a short
+    reply without common words is never failed by guesswork."""
+    from paraeval import scripts  # local: scripts is shared with langdetect
+
+    name = scripts.NAMES.get(lang, "the input language")
+    src, out = scripts.dominant_script(source), scripts.dominant_script(output)
+    if src and out and src != out:
+        return False, f"{name} answered in {out.title()} script"
+    if src == "LATIN" and lang != "und":
+        en, own = scripts.word_share(output, "en"), scripts.word_share(output, lang)
+        if en >= 0.2 and en > own + 0.05:
+            return False, f"{name} answered in English"
     return True, ""
 
 

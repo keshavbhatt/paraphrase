@@ -28,6 +28,11 @@ extend-exclude = ["third_party", "models"]
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "SIM", "C4", "PTH", "RUF", "N", "ANN"]
 
+[tool.ruff.lint.per-file-ignores]
+# Word lists of other languages: non-ASCII letters and quote marks are the point there.
+"eval/paraeval/scripts.py" = ["SIM905", "RUF001"]
+"eval/tests/test_langdetect.py" = ["RUF001"]
+
 [tool.mypy]
 strict = true
 python_version = "3.11"

@@ -89,7 +89,7 @@ def skill_inputs(base_skill: str, item: dict[str, Any]) -> dict[str, str]:
     inputs = {"text": item["text"]} | langdetect.inputs_for(item["text"])
     if item.get("target_lang"):  # the user explicitly chose the output language
         inputs |= {
-            "lang_name": langdetect.LANG_SHORT[inputs["lang"]],
+            "lang_name": langdetect.LANG_SHORT.get(inputs["lang"], "its own language"),
             "target_lang": item["target_lang"],
             "target_lang_name": langdetect.LANG_SHORT[item["target_lang"]],
         }
