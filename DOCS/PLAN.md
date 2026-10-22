@@ -286,7 +286,7 @@ Rules:
 
 | M | Deliverable | Acceptance |
 |---|---|---|
-| **M0: Feasibility spike** | llama.cpp + 3–5 candidate models; prototype prompts for proofread, reply and rewrite; latency bench on reference machines A and B; first eval sets (50 items per skill) | A written go/no-go in `docs/models.md` with measured numbers; default fast/quality models chosen; §5.4 targets revised |
+| **M0: Feasibility spike** | llama.cpp + 3 to 5 candidate models; prototype prompts for proofread, reply and rewrite; latency bench on reference machines A and B; first eval sets (50 items per skill) | A written go/no-go in `docs/models.md` with measured numbers; default fast/quality models chosen; §5.4 targets revised |
 | **M1: Daemon** | paraphrase-daemon: engine, skill registry, D-Bus API, model catalog + downloader + hardware probe, CLI, eval harness | `paraphrase proofread`, `reply` and `rewrite` work from the CLI; eval reports generated; unit tests green |
 | **M2: Main window + popup on X11 + KDE Wayland** | Main window with every skill (D14), streaming, diff view, variants, Copy; then tray, hotkey (all three backends), capture, popup UI, Replace | Every skill works from the main window with all hotkey, capture and inject backends switched off; the popup flow works in Telegram Desktop, a browser text field, LibreOffice and a terminal editor on X11 and KDE Wayland |
 | **M3: Polish + GNOME/wlroots** | Clipboard-flow fallback with guidance, RemoteDesktop portal paste, settings, model manager UI, custom actions, compose, optional history, login autostart per format (ADR-010) | Works on GNOME Wayland via the documented fallback; first-run setup takes under 2 minutes on reference machine A |
