@@ -11,3 +11,7 @@
 {"id": "pr-hi-111", "lang": "hinglish", "source": "hard", "text": "Yaar wo log kal party mein aaya tha kya?", "reference": "Yaar wo log kal party mein aaye the kya?", "protected": [], "notes": "plural agreement (aaya tha/aaye the)"}
 {"id": "pr-hi-112", "lang": "hinglish", "source": "hard", "text": "Haan bhai, sab set hai. Kal milte hain!", "reference": "Haan bhai, sab set hai. Kal milte hain!", "protected": [], "notes": "clean"}
 {"id": "pr-hi-113", "lang": "hinglish", "source": "hard", "text": "Plz file send kar do, boss bohot gussa hai", "reference": "Plz file send kar do, boss bohot gusse mein hai.", "protected": [], "notes": "gussa hai/gusse mein hai, full stop; plz stays"}
+{"id": "pr-hi-114", "lang": "hi", "source": "hard", "text": "धन्यवाद", "reference": "धन्यवाद", "protected": [], "notes": "one clean word: no change"}
+{"id": "pr-hi-115", "lang": "hi", "source": "hard", "text": "मेरा माँ", "reference": "मेरी माँ", "protected": [], "notes": "two words, gender agreement"}
+{"id": "pr-hi-116", "lang": "hinglish", "source": "hard", "text": "thik h", "reference": "thik h", "protected": [], "notes": "two clean chat words: no change"}
+{"id": "pr-hi-117", "lang": "hinglish", "source": "hard", "text": "meri bhai aa raha hai", "reference": "Mera bhai aa raha hai.", "protected": [], "notes": "short Hinglish, gender agreement"}

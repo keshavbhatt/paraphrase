@@ -28,3 +28,10 @@
 {"id": "pr-en-128", "lang": "en", "source": "hard", "text": "Who's laptop is this? It was laying on the table since morning.", "reference": "Whose laptop is this? It has been lying on the table since morning.", "protected": [], "notes": "whose, lie/lay, present perfect with 'since'"}
 {"id": "pr-en-129", "lang": "en", "source": "hard", "text": "Run `make test` before you push. If CI fails on the lint step, run `make format` and commit the changes.", "reference": "Run `make test` before you push. If CI fails on the lint step, run `make format` and commit the changes.", "protected": ["`make test`", "`make format`"], "notes": "clean: code spans must stay"}
 {"id": "pr-en-130", "lang": "en", "source": "hard", "text": "Neither the manager nor the employees was informed about the change.", "reference": "Neither the manager nor the employees were informed about the change.", "protected": [], "notes": "neither/nor agrees with the nearer subject"}
+{"id": "pr-en-131", "lang": "en", "source": "hard", "text": "teh", "reference": "The", "protected": [], "notes": "one word: the owner's CLI suite got 'Teh.'"}
+{"id": "pr-en-132", "lang": "en", "source": "hard", "text": "teh cat", "reference": "The cat", "protected": [], "notes": "two words: the model corrected the template's reminder line instead"}
+{"id": "pr-en-133", "lang": "en", "source": "hard", "text": "recieved, thx", "reference": "Received, thx", "protected": [], "notes": "two words, chat word kept"}
+{"id": "pr-en-134", "lang": "en", "source": "hard", "text": "its fine", "reference": "It's fine.", "protected": [], "notes": "two words, contraction"}
+{"id": "pr-en-135", "lang": "en", "source": "hard", "text": "Thanks", "reference": "Thanks", "protected": [], "notes": "one clean word: no change"}
+{"id": "pr-en-136", "lang": "en", "source": "hard", "text": "definately", "reference": "Definitely", "protected": [], "notes": "one word, spelling"}
+{"id": "pr-en-137", "lang": "en", "source": "hard", "text": "see you tomorow", "reference": "See you tomorrow.", "protected": [], "notes": "three words, spelling"}

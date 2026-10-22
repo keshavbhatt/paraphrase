@@ -8,3 +8,5 @@
 {"id": "pr-hi-208", "lang": "hinglish", "source": "holdout", "text": "Bachche park mein khel raha hai", "reference": "Bachche park mein khel rahe hain.", "protected": [], "notes": "plural agreement, full stop"}
 {"id": "pr-hi-209", "lang": "hinglish", "source": "holdout", "text": "Theek hai, main 5 baje call karta hoon.", "reference": "Theek hai, main 5 baje call karta hoon.", "protected": [], "notes": "clean"}
 {"id": "pr-hi-210", "lang": "hinglish", "source": "holdout", "text": "usne mujhe ek kitab diya", "reference": "Usne mujhe ek kitab di.", "protected": [], "notes": "object agreement, capital, full stop"}
+{"id": "pr-hi-211", "lang": "hi", "source": "holdout", "text": "मेरा बहन", "reference": "मेरी बहन", "protected": [], "notes": "two words, gender agreement"}
+{"id": "pr-hi-212", "lang": "hinglish", "source": "holdout", "text": "meri papa", "reference": "Mere papa", "protected": [], "notes": "two Hinglish words, agreement"}

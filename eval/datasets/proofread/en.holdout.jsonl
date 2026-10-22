@@ -13,3 +13,5 @@
 {"id": "pr-en-213", "lang": "en", "source": "holdout", "text": "I'm going to the gym, do you want to come with me", "reference": "I'm going to the gym. Do you want to come with me?", "protected": [], "notes": "run-on, question mark"}
 {"id": "pr-en-214", "lang": "en", "source": "holdout", "text": "He is a honest person and a hard worker.", "reference": "He is an honest person and a hard worker.", "protected": [], "notes": "a/an before a silent h"}
 {"id": "pr-en-215", "lang": "en", "source": "holdout", "text": "lol that video was hilarious 😂", "reference": "Lol that video was hilarious 😂", "protected": [], "notes": "capital only; no full stop after a final emoji"}
+{"id": "pr-en-216", "lang": "en", "source": "holdout", "text": "wierd", "reference": "Weird", "protected": [], "notes": "one word, spelling"}
+{"id": "pr-en-217", "lang": "en", "source": "holdout", "text": "teh dog barked", "reference": "The dog barked.", "protected": [], "notes": "three words, spelling"}
