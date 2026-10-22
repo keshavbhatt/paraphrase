@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Paraphrase mock: Settings, general and shortcut</title><link rel="stylesheet" href="mock.css"><script src="mock.js"></script>
+<style>
+  .opt { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .opt:last-child { border-bottom: 0; }
+  .opt .what { flex: 1; min-width: 0; }
+  .switch { width: 38px; height: 22px; border-radius: 11px; background: var(--border); position: relative; flex: none; margin-top: 2px; }
+  .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 8px; background: var(--panel); }
+  .switch.on { background: var(--accent-strong); }
+  .switch.on::after { left: 19px; }
+  .keys { display: flex; gap: 6px; align-items: center; }
+  .cmd { font: 13px ui-monospace, monospace; background: var(--sunk); border-radius: 8px; padding: 8px 10px; }
+</style></head>
+<body>
+<div class="window">
+  <div class="titlebar"><div class="lights"><i></i><i></i><i></i></div><div class="title">Paraphrase settings</div><div class="wc"><span>−</span><span>□</span><span>✕</span></div></div>
+  <div class="settings">
+    <nav aria-label="Settings sections">
+      <a class="on" href="#" aria-current="page">General</a><a href="#">Shortcut</a><a href="#">My actions</a>
+      <a href="#">Models</a><a href="#">Privacy</a><a href="#">About</a>
+    </nav>
+    <main>
+      <h1>General</h1>
+      <section class="card">
+        <div class="opt"><div class="what"><b>Start Paraphrase when I log in</b><p class="small muted">It waits in the tray, so the shortcut works at once. It loads a model only when you use it.</p></div><span class="switch on" role="switch" aria-checked="true"></span></div>
+        <div class="opt"><div class="what"><b>Keep running in the tray when I close the window</b><p class="small muted">The shortcut keeps working. Quit from the tray icon.</p></div><span class="switch on" role="switch" aria-checked="true"></span></div>
+        <div class="opt"><div class="what"><b>Appearance</b><p class="small muted">Follows your desktop unless you choose.</p></div><span class="seg"><span class="on">System</span><span>Light</span><span>Dark</span></span></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div class="window">
+  <div class="titlebar"><div class="lights"><i></i><i></i><i></i></div><div class="title">Paraphrase settings</div><div class="wc"><span>−</span><span>□</span><span>✕</span></div></div>
+  <div class="settings">
+    <nav aria-label="Settings sections">
+      <a href="#">General</a><a class="on" href="#" aria-current="page">Shortcut</a><a href="#">My actions</a>
+      <a href="#">Models</a><a href="#">Privacy</a><a href="#">About</a>
+    </nav>
+    <main>
+      <h1>Shortcut</h1>
+      <section class="card stack" style="gap: 12px">
+        <div class="row"><h2>Open Paraphrase over any app</h2><span class="grow"></span><span class="pill ok">Works</span></div>
+        <div class="keys"><span class="kbd">Ctrl</span><span class="kbd">Alt</span><span class="kbd">Space</span></div>
+        <p class="small muted">Select text in any app and press the shortcut. To change it, open System Settings, Shortcuts, and look for Paraphrase.</p>
+      </section>
+      <section class="card stack" style="gap: 10px">
+        <h2>Bind it by hand</h2>
+        <p class="small muted">Where the desktop offers no shortcut to apps, add a custom shortcut in its settings that runs this command:</p>
+        <div class="row"><span class="cmd grow">paraphrase-app --popup</span><button class="btn"><svg class="ic s"><use href="#i-copy"/></svg>Copy</button></div>
+      </section>
+      <section class="card">
+        <h2 style="margin-bottom: 8px">What works on this desktop</h2>
+        <table class="list">
+          <tr><th>Step</th><th>How</th><th>Status</th></tr>
+          <tr><td>Open over any app</td><td>Shortcut from the desktop (portal)</td><td><span class="pill ok">Works</span></td></tr>
+          <tr><td>Read the selected text</td><td>The selection, without copying</td><td><span class="pill ok">Works</span></td></tr>
+          <tr><td>Put the result back</td><td>Pasted into the app, after you allow it once</td><td><span class="pill warn">Asks once</span></td></tr>
+        </table>
+        <p class="small muted" style="margin-top: 10px">When a step does not work here, Paraphrase says so and offers the next best way: copy first, or paste the result yourself. The window always works.</p>
+      </section>
+    </main>
+  </div>
+</div>
+<span class="pin" style="left: 300px; top: 140px">1</span>
+<span class="pin" style="left: 300px; top: 620px">2</span>
+<section class="notes"><h2>Notes</h2><ol>
+  <li><b>General</b>: login start (ADR-010: the Background portal in a Flatpak, the snap's autostart key, ~/.config/autostart elsewhere) starts hidden in the tray; closing the window keeps the app in the tray only when a tray exists; Appearance overrides the desktop's light or dark.</li>
+  <li><b>Shortcut</b>: the shortcut and whether it works here, from the backends the app found (DOCS/platform-matrix.md). Without a global shortcut the "bind it by hand" card comes first. The table lists each step with what this desktop allows, in plain words, never backend names.</li>
+</ol></section>
+</body></html>
