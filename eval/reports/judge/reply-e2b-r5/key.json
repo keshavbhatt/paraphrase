@@ -1,0 +1,436 @@
+{
+ "tags": [
+  "q-rr-new2",
+  "q-rr-r6"
+ ],
+ "labels": {
+  "reply/rp-en-001": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-002": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-003": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-004": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-005": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-006": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-007": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-008": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-009": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-010": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-011": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-012": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-013": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-014": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-015": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-016": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-017": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-018": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-019": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-020": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-021": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-022": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-023": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-024": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-025": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-026": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-027": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-028": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-029": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-030": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-031": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-032": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-033": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-034": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-035": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-036": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-037": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-038": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-039": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-040": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-041": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-042": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-043": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-044": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-045": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-046": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-047": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-048": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-049": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-050": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-101": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-102": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-103": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-104": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-105": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-106": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-107": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-108": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-109": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-110": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-111": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-112": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-113": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-114": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-115": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-116": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-en-117": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-en-118": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-hi-001": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-hi-002": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-hi-003": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-hi-004": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-hi-005": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-hi-006": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-hi-007": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-hi-008": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-hi-009": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-hi-010": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-hi-011": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-hi-012": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-hi-013": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-hi-014": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-hi-015": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-hi-101": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-hi-102": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-hi-103": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-hi-104": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-hi-105": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-hi-106": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-hi-107": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-hi-108": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-es-001": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-es-002": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-fr-001": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-fr-002": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-de-001": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-de-002": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-pt-001": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-pt-002": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-mr-001": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-mr-002": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-bn-001": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-bn-002": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-ta-001": {
+   "A": "q-rr-new2",
+   "B": "q-rr-r6"
+  },
+  "reply/rp-ta-002": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-zh-001": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  },
+  "reply/rp-zh-002": {
+   "A": "q-rr-r6",
+   "B": "q-rr-new2"
+  }
+ }
+}

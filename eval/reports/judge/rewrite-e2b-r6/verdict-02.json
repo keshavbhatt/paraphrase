@@ -1,0 +1,609 @@
+[
+ {
+  "key": "rewrite.professional/rw-en-042",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "format_lost"
+   ]
+  },
+  "better": "A",
+  "note": "B turns the angry question into a statement."
+ },
+ {
+  "key": "rewrite.professional/rw-en-043",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural",
+    "info_added"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "B",
+  "note": "A adds 'I confirm' and is stiffer; both use awkward 'I possess the receipt'."
+ },
+ {
+  "key": "rewrite.professional/rw-en-044",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "A",
+  "note": "A keeps 'still'; B softens slightly but is fine."
+ },
+ {
+  "key": "rewrite.professional/rw-en-045",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A switches the speaker to 'we'."
+ },
+ {
+  "key": "rewrite.professional/rw-en-046",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed",
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": "B's 'this is not an exception' garbles 'no exceptions'."
+ },
+ {
+  "key": "rewrite.professional/rw-en-047",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "fact_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A changes 'Nov 20' to 'November 20' and drops the question."
+ },
+ {
+  "key": "rewrite.professional/rw-en-048",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "fact_changed",
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": "B converts 2 to 14:00 and softens the grout complaint."
+ },
+ {
+  "key": "rewrite.professional/rw-en-049",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": "B drops the second sentence entirely."
+ },
+ {
+  "key": "rewrite.professional/rw-en-050",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "Both keep facts; B reads more naturally with a proper greeting."
+ },
+ {
+  "key": "rewrite.professional/rw-en-101",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both keep all facts and read professionally."
+ },
+ {
+  "key": "rewrite.professional/rw-en-102",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "tie",
+  "note": "Both drop the embedded instruction instead of rewriting it."
+ },
+ {
+  "key": "rewrite.professional/rw-en-103",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural",
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": "A keeps the joke request though awkwardly; B drops it."
+ },
+ {
+  "key": "rewrite.professional/rw-en-104",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": "B's 'execute the signature' is unnatural."
+ },
+ {
+  "key": "rewrite.professional/rw-en-105",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both are faithful and professional."
+ },
+ {
+  "key": "rewrite.professional/rw-en-106",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "A",
+  "note": "A adds a polite 'please'; B is a little blunt."
+ },
+ {
+  "key": "rewrite.professional/rw-en-107",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "fact_changed",
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "format_lost"
+   ]
+  },
+  "better": "B",
+  "note": "A changes 'at 4' to '4:00 PM'; B turns the first question into a request."
+ },
+ {
+  "key": "rewrite.professional/rw-en-108",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "format_lost",
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A changes bullets to numbers and drops the thanks."
+ },
+ {
+  "key": "rewrite.professional/rw-en-109",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "B is a fuller professional sentence."
+ },
+ {
+  "key": "rewrite.professional/rw-en-110",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A's 'requested Ms O'Brien to bring' is ungrammatical."
+ },
+ {
+  "key": "rewrite.professional/rw-en-111",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Identical and faithful."
+ },
+ {
+  "key": "rewrite.professional/rw-en-112",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "format_lost",
+    "meaning_changed",
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": "B drops the question and 'only' and says '3 personnel'."
+ },
+ {
+  "key": "rewrite.professional/rw-en-113",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "B is slightly more natural."
+ },
+ {
+  "key": "rewrite.professional/rw-en-114",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": "B's 'genuinely enhanced my day' is stilted."
+ },
+ {
+  "key": "rewrite.professional/rw-en-115",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A changes 'call' to 'contact'."
+ },
+ {
+  "key": "rewrite.professional/rw-en-116",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "info_added"
+   ]
+  },
+  "better": "A",
+  "note": "B calls the migration a 'launch'."
+ },
+ {
+  "key": "rewrite.professional/rw-en-117",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed",
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "B",
+  "note": "Both miss the sarcasm; A is worse and garbled."
+ },
+ {
+  "key": "rewrite.professional/rw-en-118",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed",
+    "tone_missed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A drops the sympathy and sounds cold."
+ },
+ {
+  "key": "rewrite.professional/rw-hi-001",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "A",
+  "note": "A is more consistently formal; B mixes kripya with informal 'le'."
+ },
+ {
+  "key": "rewrite.professional/rw-hi-002",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "A",
+  "note": "A is more professional though slightly stiff; B keeps casual 'bhaiya'."
+ },
+ {
+  "key": "rewrite.professional/rw-hi-003",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both are natural and faithful."
+ },
+ {
+  "key": "rewrite.professional/rw-hi-004",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "A",
+  "note": "A adds a polite kripya; both keep date and amount."
+ },
+ {
+  "key": "rewrite.professional/rw-hi-005",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "wrong_language"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "wrong_language"
+   ]
+  },
+  "better": "B",
+  "note": "Both move Latin English words and the name Neha to Devanagari; A also translates presentation."
+ },
+ {
+  "key": "rewrite.professional/rw-hi-006",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "B keeps the emphatic 'mujhe hi' and reads more naturally."
+ },
+ {
+  "key": "rewrite.professional/rw-hi-007",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": "B's 'bill bhugtan nahi kiya gaya' is ungrammatical and stiff."
+ },
+ {
+  "key": "rewrite.professional/rw-hi-008",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "tone_missed"
+   ]
+  },
+  "better": "A",
+  "note": "B keeps the informal 'lekar aana'."
+ },
+ {
+  "key": "rewrite.professional/rw-hi-009",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Identical and acceptable."
+ },
+ {
+  "key": "rewrite.professional/rw-hi-010",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "wrong_language"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A switches to English."
+ },
+ {
+  "key": "rewrite.professional/rw-hi-011",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "tone_missed"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "tone_missed"
+   ]
+  },
+  "better": "tie",
+  "note": "Both return the input unchanged."
+ },
+ {
+  "key": "rewrite.professional/rw-hi-012",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "A",
+  "note": "B keeps the casual 'wala'."
+ },
+ {
+  "key": "rewrite.professional/rw-hi-013",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "tone_missed"
+   ]
+  },
+  "better": "A",
+  "note": "B is essentially unchanged."
+ },
+ {
+  "key": "rewrite.professional/rw-hi-014",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "B is slightly more polished."
+ }
+]

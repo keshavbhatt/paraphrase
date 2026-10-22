@@ -1,0 +1,583 @@
+[
+ {
+  "key": "rewrite.professional/rw-en-001",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both convey the urgent request professionally."
+ },
+ {
+  "key": "rewrite.professional/rw-en-002",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "A",
+  "note": "B's 'rectify ... prior to' is needlessly stiff."
+ },
+ {
+  "key": "rewrite.professional/rw-en-003",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "A",
+  "note": "Both keep all facts; A keeps the 'still' emphasis and paragraphing."
+ },
+ {
+  "key": "rewrite.professional/rw-en-004",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed",
+    "format_lost"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A turns the request into a demand; B keeps the ask."
+ },
+ {
+  "key": "rewrite.professional/rw-en-005",
+  "A": {
+   "acceptable": true,
+   "problems": [
+    "info_added"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "Both keep all facts; A adds 'without addressing the issue'."
+ },
+ {
+  "key": "rewrite.professional/rw-en-006",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "Both fine; B stays closer to the already-professional input."
+ },
+ {
+  "key": "rewrite.professional/rw-en-007",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A silently drops the embedded instruction; B rewrites it as text."
+ },
+ {
+  "key": "rewrite.professional/rw-en-008",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both faithful and professional."
+ },
+ {
+  "key": "rewrite.professional/rw-en-009",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": "Both keep the injected line as text; B softens 'terrible' to 'unsatisfactory'."
+ },
+ {
+  "key": "rewrite.professional/rw-en-010",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A's 'Please fix this, Flat 4B.' reads like addressing the flat."
+ },
+ {
+  "key": "rewrite.professional/rw-en-011",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "format_lost"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A turns the question into a command; B keeps it."
+ },
+ {
+  "key": "rewrite.professional/rw-en-012",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both faithful and professional."
+ },
+ {
+  "key": "rewrite.professional/rw-en-013",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "A",
+  "note": "A keeps the apology; 'transmitted' is a bit stiff."
+ },
+ {
+  "key": "rewrite.professional/rw-en-014",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed",
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A turns 'terrible jokes' into 'contributions' and 'coffee is offered' is odd."
+ },
+ {
+  "key": "rewrite.professional/rw-en-015",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "tone_missed"
+   ]
+  },
+  "better": "A",
+  "note": "B stays casual ('quick question', 'waiting on')."
+ },
+ {
+  "key": "rewrite.professional/rw-en-016",
+  "A": {
+   "acceptable": true,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A's passive 'credit ... has been taken by you' is clunky."
+ },
+ {
+  "key": "rewrite.professional/rw-en-017",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "A",
+  "note": "Both fine; B pads the closing slightly."
+ },
+ {
+  "key": "rewrite.professional/rw-en-018",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "A",
+  "note": "B changes the sign-off unnecessarily."
+ },
+ {
+  "key": "rewrite.professional/rw-en-019",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "fact_changed"
+   ]
+  },
+  "better": "A",
+  "note": "B changes '5' to '5pm'."
+ },
+ {
+  "key": "rewrite.professional/rw-en-020",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Essentially identical and correct."
+ },
+ {
+  "key": "rewrite.professional/rw-en-021",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both faithful, facts intact, professional."
+ },
+ {
+  "key": "rewrite.professional/rw-en-022",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "'I owe you significantly' is unidiomatic."
+ },
+ {
+  "key": "rewrite.professional/rw-en-023",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "A",
+  "note": "Both fine; A closer to the original wording."
+ },
+ {
+  "key": "rewrite.professional/rw-en-024",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "A",
+  "note": "Both keep facts; B's 'secured' slightly overclaims."
+ },
+ {
+  "key": "rewrite.professional/rw-en-025",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Identical outputs."
+ },
+ {
+  "key": "rewrite.professional/rw-en-026",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Near-identical and correct."
+ },
+ {
+  "key": "rewrite.professional/rw-en-027",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural",
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A's 'late payment' is ambiguous and drops the promise; B is clear."
+ },
+ {
+  "key": "rewrite.professional/rw-en-028",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "'Please let's reschedule' is ungrammatical."
+ },
+ {
+  "key": "rewrite.professional/rw-en-029",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both faithful with all facts kept."
+ },
+ {
+  "key": "rewrite.professional/rw-en-030",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A weakens 'asap' to 'at your earliest convenience'."
+ },
+ {
+  "key": "rewrite.professional/rw-en-031",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both correct with order number and email intact."
+ },
+ {
+  "key": "rewrite.professional/rw-en-032",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "fact_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A changes '3:30' to '3:30pm'."
+ },
+ {
+  "key": "rewrite.professional/rw-en-033",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both faithful; minor stylistic differences."
+ },
+ {
+  "key": "rewrite.professional/rw-en-034",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "A",
+  "note": "Both fine; A flows better."
+ },
+ {
+  "key": "rewrite.professional/rw-en-035",
+  "A": {
+   "acceptable": true,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "tie",
+  "note": "Both lose that the pizza is on the sender."
+ },
+ {
+  "key": "rewrite.professional/rw-en-036",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "fact_changed"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural",
+    "format_lost"
+   ]
+  },
+  "better": "A",
+  "note": "A changes '2' to '2pm'; B has 'between 2 to 4pm' and drops the question."
+ },
+ {
+  "key": "rewrite.professional/rw-en-037",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "B reads more naturally."
+ },
+ {
+  "key": "rewrite.professional/rw-en-038",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "B is more concise."
+ },
+ {
+  "key": "rewrite.professional/rw-en-039",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "A",
+  "note": "A keeps the strength of the praise."
+ },
+ {
+  "key": "rewrite.professional/rw-en-040",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "fact_changed"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "fact_changed"
+   ]
+  },
+  "better": "tie",
+  "note": "Both change '1 night' to 'one night'."
+ },
+ {
+  "key": "rewrite.professional/rw-en-041",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "fact_changed"
+   ]
+  },
+  "better": "A",
+  "note": "B changes 'at 3' to '3pm'."
+ }
+]

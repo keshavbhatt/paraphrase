@@ -1,0 +1,551 @@
+[
+ {
+  "key": "reply/rp-hi-005",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "generic"
+   ]
+  },
+  "better": "A",
+  "note": "A is more specific, offering to push tonight and keep updating."
+ },
+ {
+  "key": "reply/rp-hi-006",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "B directly confirms medicine on time and asks after mom."
+ },
+ {
+  "key": "reply/rp-hi-007",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "B",
+  "note": "A has odd replies asking the friend for details; B has two good thank-yous."
+ },
+ {
+  "key": "reply/rp-hi-008",
+  "A": {
+   "acceptable": true,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "not_distinct"
+   ]
+  },
+  "better": "B",
+  "note": "A parrots the times awkwardly; B is natural and thanks the neighbour."
+ },
+ {
+  "key": "reply/rp-hi-009",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both sets confirm 7 pm naturally in Hinglish."
+ },
+ {
+  "key": "reply/rp-hi-010",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "asks_known_info",
+    "generic"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural",
+    "generic"
+   ]
+  },
+  "better": "B",
+  "note": "Neither answers about eating; A asks when the checkup is though it is tomorrow."
+ },
+ {
+  "key": "reply/rp-hi-011",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Near-identical natural acknowledgements."
+ },
+ {
+  "key": "reply/rp-hi-012",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A has broken grammar and a blunt refusal; B has two usable replies."
+ },
+ {
+  "key": "reply/rp-hi-013",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural",
+    "asks_known_info"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural",
+    "asks_known_info"
+   ]
+  },
+  "better": "tie",
+  "note": "Both misread the delivery situation and ask for the address."
+ },
+ {
+  "key": "reply/rp-hi-014",
+  "A": {
+   "acceptable": true,
+   "problems": [
+    "asks_known_info"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "not_distinct"
+   ]
+  },
+  "better": "B",
+  "note": "A asks when to meet though 4 pm was given."
+ },
+ {
+  "key": "reply/rp-hi-015",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural",
+    "asks_known_info"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural",
+    "asks_known_info"
+   ]
+  },
+  "better": "A",
+  "note": "Neither declines; B's 'kab meeting hai' is even more off."
+ },
+ {
+  "key": "reply/rp-hi-101",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": "A is clean; B's third reply is awkward."
+ },
+ {
+  "key": "reply/rp-hi-102",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both acknowledge 12 pm politely."
+ },
+ {
+  "key": "reply/rp-hi-103",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": "B's address question is confusing."
+ },
+ {
+  "key": "reply/rp-hi-104",
+  "A": {
+   "acceptable": true,
+   "problems": [
+    "asks_known_info"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "asks_known_info"
+   ]
+  },
+  "better": "tie",
+  "note": "Each has one reply asking for known time."
+ },
+ {
+  "key": "reply/rp-hi-105",
+  "A": {
+   "acceptable": true,
+   "problems": [
+    "not_distinct"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": "B invents an order and asks what to do next."
+ },
+ {
+  "key": "reply/rp-hi-106",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": "B's replies are odd and mix up today and tomorrow."
+ },
+ {
+  "key": "reply/rp-hi-107",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": "B's first reply asks the sender about the party; A answers it."
+ },
+ {
+  "key": "reply/rp-hi-108",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "generic"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "generic"
+   ]
+  },
+  "better": "B",
+  "note": "A is vague; B at least commits to pushing."
+ },
+ {
+  "key": "reply/rp-es-001",
+  "A": {
+   "acceptable": true,
+   "problems": [
+    "asks_known_info"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A asks the time already given."
+ },
+ {
+  "key": "reply/rp-es-002",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "asks_known_info",
+    "generic"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "generic"
+   ]
+  },
+  "better": "B",
+  "note": "Both are vague; A asks the time already given."
+ },
+ {
+  "key": "reply/rp-fr-001",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "generic"
+   ]
+  },
+  "better": "A",
+  "note": "A is specific and all usable."
+ },
+ {
+  "key": "reply/rp-fr-002",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "not_distinct"
+   ]
+  },
+  "better": "B",
+  "note": "A's second and third replies don't fit; B confirms cleanly."
+ },
+ {
+  "key": "reply/rp-de-001",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "B offers clear yes, specific day and no."
+ },
+ {
+  "key": "reply/rp-de-002",
+  "A": {
+   "acceptable": true,
+   "problems": [
+    "not_distinct"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "B includes a useful alternative."
+ },
+ {
+  "key": "reply/rp-pt-001",
+  "A": {
+   "acceptable": true,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "B covers yes, no and time cleanly."
+ },
+ {
+  "key": "reply/rp-pt-002",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": "B has a grammar error and a nonsensical reply."
+ },
+ {
+  "key": "reply/rp-mr-001",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "B is more varied, including a decline."
+ },
+ {
+  "key": "reply/rp-mr-002",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "tie",
+  "note": "Both misread the courier perspective."
+ },
+ {
+  "key": "reply/rp-bn-001",
+  "A": {
+   "acceptable": true,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "wrong_register"
+   ]
+  },
+  "better": "B",
+  "note": "A's third reply is odd; B is mostly natural."
+ },
+ {
+  "key": "reply/rp-bn-002",
+  "A": {
+   "acceptable": true,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "B is cleaner throughout."
+ },
+ {
+  "key": "reply/rp-ta-001",
+  "A": {
+   "acceptable": true,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A's third reply is ungrammatical."
+ },
+ {
+  "key": "reply/rp-ta-002",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": [
+    "unnatural",
+    "wrong_language"
+   ]
+  },
+  "better": "A",
+  "note": "B's third reply is from the wrong perspective in Tanglish."
+ },
+ {
+  "key": "reply/rp-zh-001",
+  "A": {
+   "acceptable": true,
+   "problems": [
+    "generic"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "B is more specific and varied."
+ },
+ {
+  "key": "reply/rp-zh-002",
+  "A": {
+   "acceptable": true,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": "B's replies contradict or confuse the delivery."
+ }
+]

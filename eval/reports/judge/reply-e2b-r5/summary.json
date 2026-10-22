@@ -1,0 +1,41 @@
+{
+ "acceptable_pct": {
+  "q-rr-new2": 81.3,
+  "q-rr-r6": 78.5
+ },
+ "judged": {
+  "q-rr-new2": 107,
+  "q-rr-r6": 107
+ },
+ "better": {
+  "q-rr-r6": 41,
+  "tie": 26,
+  "q-rr-new2": 40
+ },
+ "problems": {
+  "q-rr-new2": {
+   "unnatural": 32,
+   "generic": 15,
+   "not_distinct": 9,
+   "asks_known_info": 9,
+   "wrong_register": 4,
+   "unsafe": 3,
+   "contradicts_draft": 1,
+   "wrong_language": 1
+  },
+  "q-rr-r6": {
+   "unnatural": 34,
+   "generic": 20,
+   "asks_known_info": 14,
+   "not_distinct": 6,
+   "wrong_register": 1,
+   "contradicts_draft": 1,
+   "unsafe": 1,
+   "wrong_language": 1
+  }
+ },
+ "acceptable_by_skill": {
+  "reply q-rr-new2": "87/107",
+  "reply q-rr-r6": "84/107"
+ }
+}

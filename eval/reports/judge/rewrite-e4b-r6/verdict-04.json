@@ -1,0 +1,600 @@
+[
+ {
+  "key": "rewrite.casual/rw-hi-101",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both casual and keep the 9 baje deadline."
+ },
+ {
+  "key": "rewrite.casual/rw-hi-102",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "B's 'kar de' is more casual; A barely changes the tone."
+ },
+ {
+  "key": "rewrite.casual/rw-hi-103",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": "B changes 'aapka' to 'mera'; A keeps the owner."
+ },
+ {
+  "key": "rewrite.casual/rw-hi-104",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Input already casual; both keep it."
+ },
+ {
+  "key": "rewrite.casual/rw-hi-105",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "A",
+  "note": "A keeps 'your' (tera); both natural."
+ },
+ {
+  "key": "rewrite.casual/rw-hi-106",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both essentially unchanged and fine."
+ },
+ {
+  "key": "rewrite.polite/rw-en-101",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A turns the firm 5pm deadline into 'ideally before 5pm'."
+ },
+ {
+  "key": "rewrite.polite/rw-en-102",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "B",
+  "note": "A turns the statement into a question; B drops the instruction sentence."
+ },
+ {
+  "key": "rewrite.polite/rw-en-103",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "obeyed_instruction",
+    "info_added",
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A answers the embedded instruction as an assistant; B rewrites it."
+ },
+ {
+  "key": "rewrite.polite/rw-en-104",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed",
+    "info_added"
+   ]
+  },
+  "better": "tie",
+  "note": "A has a dangling 'please'; B softens 'will not work' to 'may not be feasible'."
+ },
+ {
+  "key": "rewrite.polite/rw-en-105",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": "B weakens 'don't want' to 'would prefer'."
+ },
+ {
+  "key": "rewrite.polite/rw-en-106",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": "B hedges the clear revert request into a tentative suggestion."
+ },
+ {
+  "key": "rewrite.polite/rw-en-107",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both polite and keep both questions and facts."
+ },
+ {
+  "key": "rewrite.polite/rw-en-108",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "A",
+  "note": "Both keep the list; A keeps 'still'."
+ },
+ {
+  "key": "rewrite.polite/rw-en-109",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both acceptable; A a bit stiff, B adds 'about'."
+ },
+ {
+  "key": "rewrite.polite/rw-en-110",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": "B doubles 'kindly ... please' and adds an odd 'Thank you'."
+ },
+ {
+  "key": "rewrite.polite/rw-en-111",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both polite with email, URL and date intact."
+ },
+ {
+  "key": "rewrite.polite/rw-en-112",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A tacks on an awkward comma-spliced 'please let me know'."
+ },
+ {
+  "key": "rewrite.polite/rw-en-113",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A ends with a meaningless 'please'."
+ },
+ {
+  "key": "rewrite.polite/rw-en-114",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "format_lost"
+   ]
+  },
+  "better": "A",
+  "note": "B drops the emoji."
+ },
+ {
+  "key": "rewrite.polite/rw-en-115",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "B",
+  "note": "A adds a stray 'please'; B turns 'will call' into an offer."
+ },
+ {
+  "key": "rewrite.polite/rw-en-116",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": "B softens 'need' and makes the firm date 'proposed'."
+ },
+ {
+  "key": "rewrite.polite/rw-en-117",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "tone_missed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A stays sarcastic; B is genuinely polite."
+ },
+ {
+  "key": "rewrite.polite/rw-en-118",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both warm, polite and faithful."
+ },
+ {
+  "key": "rewrite.polite/rw-hi-101",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A softens 'naraaz honge' to 'shayad thode chintit'."
+ },
+ {
+  "key": "rewrite.polite/rw-hi-102",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "wrong_language",
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A drops the code-mixed English words and recasts 'bola' as a request."
+ },
+ {
+  "key": "rewrite.polite/rw-hi-103",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed",
+    "unnatural",
+    "info_added"
+   ]
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "B",
+  "note": "Both change 'aapka' to 'mera'; A is stiff, B turns the demand into a question."
+ },
+ {
+  "key": "rewrite.polite/rw-hi-104",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": "B's 'rakhte hain, please? Thank you.' is awkward."
+ },
+ {
+  "key": "rewrite.polite/rw-hi-105",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A has broken grammar ('3 din ka deri hua')."
+ },
+ {
+  "key": "rewrite.polite/rw-hi-106",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "unnatural"
+   ]
+  },
+  "better": "A",
+  "note": "B appends an odd 'please' to 'milte hain'."
+ },
+ {
+  "key": "rewrite.concise/rw-en-101",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "Both concise and exact; B reads more naturally."
+ },
+ {
+  "key": "rewrite.concise/rw-en-102",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": "A keeps the instruction as text; B drops it."
+ },
+ {
+  "key": "rewrite.concise/rw-en-103",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "better": "A",
+  "note": "B drops the joke sentence entirely."
+ },
+ {
+  "key": "rewrite.concise/rw-en-104",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "B is actually shorter; A is nearly unchanged."
+ },
+ {
+  "key": "rewrite.concise/rw-en-105",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Identical outputs."
+ },
+ {
+  "key": "rewrite.concise/rw-en-106",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both concise with PR and version intact."
+ },
+ {
+  "key": "rewrite.concise/rw-en-107",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed",
+    "format_lost"
+   ]
+  },
+  "better": "A",
+  "note": "B turns the request question into a command."
+ },
+ {
+  "key": "rewrite.concise/rw-en-108",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": false,
+   "problems": [
+    "format_lost"
+   ]
+  },
+  "better": "A",
+  "note": "B flattens the list into a sentence."
+ },
+ {
+  "key": "rewrite.concise/rw-en-109",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "tie",
+  "note": "Both fine and short."
+ },
+ {
+  "key": "rewrite.concise/rw-en-110",
+  "A": {
+   "acceptable": false,
+   "problems": [
+    "meaning_changed"
+   ]
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "B",
+  "note": "A changes 'asked' to 'instructed'."
+ },
+ {
+  "key": "rewrite.concise/rw-en-111",
+  "A": {
+   "acceptable": true,
+   "problems": []
+  },
+  "B": {
+   "acceptable": true,
+   "problems": []
+  },
+  "better": "A",
+  "note": "Both exact; A is more concise."
+ }
+]
