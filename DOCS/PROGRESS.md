@@ -14,6 +14,24 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-22 - M1 step 4b: MTP drafting per skill
+
+- The engine loads the model's MTP draft head as llama-server does (`--spec-type draft-mtp`,
+  default draft length 3) and drafts requests whose skill says `speculative: draft`
+  (proofread, rewrite; ADR-004). A reply in between does not break the cache: the engine
+  tracks what the draft context holds and re-reads the prompt where the two differ.
+- Greedy answers are identical with and without drafting (tst_engine, 10 prompts).
+  Proposals accepted on those prompts: proofread 74%, rewrite 30%; llama-server with the same
+  head on the same prompts: 65% and 29%.
+- Fix found on the way: llama-server feeds the prompt to the sampler, so the repeat penalty
+  counts words from the prompt. The engine did not, which changed rewrite and reply answers
+  (proofread has no penalty). With the fix, greedy rewrites match llama-server's for the same
+  cache state.
+- Memory 4.71 GB with the head (4.49 GB without), load 4.8 s (3.5 s without), machine B.
+- Model note: greedy E2B writes a malformed Tamil word in one rewrite vector (rw-ta-001), in
+  llama-server too; rewrite samples at temperature 0.6 in use. Recorded for the M1 eval.
+- Next: step 5, models (catalog, downloader, hardware probe with the thread count, tier).
+
 ## 2026-10-22 - M1 step 4: the engine
 
 - `paraphrase_engine`: `LlamaEngine`, the only code that includes llama.cpp. It builds prompts
