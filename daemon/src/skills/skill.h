@@ -42,6 +42,9 @@ struct Skill
     /// The input the skill works on: "context" for a skill that answers a message (its
     /// template uses {{context}}; "text" is then an optional draft), otherwise "text".
     [[nodiscard]] QString mainInput() const;
+    /// The request inputs the prompt uses, in a fixed order: text, context, intent, tone,
+    /// target_lang (a preset's own values excluded). Clients build their forms from it.
+    [[nodiscard]] QStringList requestInputs() const;
     /// The shortest answer allowed, as a fraction of the input text (schema v4); 0 for none.
     [[nodiscard]] double minLength() const
     {

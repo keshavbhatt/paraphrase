@@ -44,6 +44,7 @@ struct FakeState
     QList<EngineConfig> loads;
     QStringList warmed;    ///< user prompts read ahead
     QList<int> cachedHits; ///< per generate(): whether the prompt matched the last warm
+    QStringList prompts;   ///< per generate(): the user prompt the engine was given
     bool loaded = false;
     std::atomic<bool> cancel{false};
 };
@@ -103,6 +104,7 @@ public:
             answer = m_state->answers.isEmpty() ? m_state->defaultAnswer : m_state->answers.takeFirst();
             delay = m_state->pieceDelayMs;
             m_state->cachedHits.append(m_state->warmed.contains(request.user) ? 1 : 0);
+            m_state->prompts.append(request.user);
         }
         Generation g;
         g.finishReason = u"stop"_s;

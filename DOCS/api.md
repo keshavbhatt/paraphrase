@@ -39,7 +39,7 @@ daemon exits; never while a download runs).
 | `RunSkill(s skill_id, a{sv} input, a{sv} options)` | `s request_id` | Queues a run; the answer comes as signals |
 | `Cancel(s request_id)` | | Stops one of the caller's requests |
 | `Warm(s skill_id, a{sv} input)` | | Reads the text ahead for a likely action (ADR-005) |
-| `ListSkills()` | `s` JSON array | Every skill and preset: `id`, `base`, `title`, `tier`, `output`, `variants`, `max_input_tokens`, `main_input` (`text`, or `context` for a skill that answers a message) |
+| `ListSkills()` | `s` JSON array | Every skill and preset: `id`, `base`, `title`, `tier`, `output`, `variants`, `max_input_tokens`, `main_input` (`text`, or `context` for a skill that answers a message), `inputs` (the request inputs its prompt uses, of `text`, `context`, `intent`, `tone`, `target_lang`) |
 | `Status()` | `s` JSON object | Loaded model, threads, queue, memory, the computer |
 | `ListModels()` | `s` JSON array | Offered models, installed or not, with their source |
 | `DownloadModel(s model_id)` | | Downloads a model and its draft head |

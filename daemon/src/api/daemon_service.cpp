@@ -533,6 +533,7 @@ QString DaemonService::ListSkills() const
             {u"variants"_s, s.variants},
             {u"max_input_tokens"_s, s.maxInputTokens},
             {u"main_input"_s, s.mainInput()},
+            {u"inputs"_s, QJsonArray::fromStringList(s.requestInputs())},
         });
     }
     return QString::fromUtf8(QJsonDocument(out).toJson(QJsonDocument::Compact));
