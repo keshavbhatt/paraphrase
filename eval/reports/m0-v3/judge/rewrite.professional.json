@@ -1,0 +1,62 @@
+{
+  "skill": "rewrite.professional",
+  "judge": "sarvam-30b-q4km",
+  "items": 65,
+  "models": [
+    "qwen3.5-2b-q4km",
+    "gemma-4-e2b-qat-q4_0",
+    "qwen3.5-4b-q4km",
+    "gemma-4-e4b-qat-q4_0"
+  ],
+  "minutes": 97.7,
+  "win_rate": {
+    "gemma-4-e4b-qat-q4_0": 0.559,
+    "qwen3.5-4b-q4km": 0.551,
+    "gemma-4-e2b-qat-q4_0": 0.485,
+    "qwen3.5-2b-q4km": 0.405
+  },
+  "win_rate_by_lang": {
+    "qwen3.5-2b-q4km": {
+      "en": 0.43,
+      "hi": 0.208,
+      "hinglish": 0.452
+    },
+    "gemma-4-e2b-qat-q4_0": {
+      "en": 0.493,
+      "hi": 0.583,
+      "hinglish": 0.31
+    },
+    "qwen3.5-4b-q4km": {
+      "en": 0.54,
+      "hi": 0.646,
+      "hinglish": 0.524
+    },
+    "gemma-4-e4b-qat-q4_0": {
+      "en": 0.537,
+      "hi": 0.562,
+      "hinglish": 0.714
+    }
+  },
+  "head_to_head": {
+    "qwen3.5-2b-q4km": {
+      "gemma-4-e2b-qat-q4_0": 0.446,
+      "qwen3.5-4b-q4km": 0.392,
+      "gemma-4-e4b-qat-q4_0": 0.377
+    },
+    "gemma-4-e2b-qat-q4_0": {
+      "qwen3.5-2b-q4km": 0.554,
+      "qwen3.5-4b-q4km": 0.446,
+      "gemma-4-e4b-qat-q4_0": 0.454
+    },
+    "qwen3.5-4b-q4km": {
+      "qwen3.5-2b-q4km": 0.608,
+      "gemma-4-e2b-qat-q4_0": 0.554,
+      "gemma-4-e4b-qat-q4_0": 0.492
+    },
+    "gemma-4-e4b-qat-q4_0": {
+      "qwen3.5-2b-q4km": 0.623,
+      "gemma-4-e2b-qat-q4_0": 0.546,
+      "qwen3.5-4b-q4km": 0.508
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "skill": "reply",
+  "judge": "sarvam-30b-q4km",
+  "items": 65,
+  "models": [
+    "qwen3.5-0.8b-q4km",
+    "qwen3.5-2b-q4km",
+    "gemma-4-e2b-qat-q4_0"
+  ],
+  "minutes": 50.4,
+  "win_rate": {
+    "qwen3.5-2b-q4km": 0.596,
+    "gemma-4-e2b-qat-q4_0": 0.5,
+    "qwen3.5-0.8b-q4km": 0.404
+  },
+  "win_rate_by_lang": {
+    "qwen3.5-0.8b-q4km": {
+      "en": 0.425,
+      "hi": 0.312,
+      "hinglish": 0.357
+    },
+    "qwen3.5-2b-q4km": {
+      "en": 0.61,
+      "hi": 0.469,
+      "hinglish": 0.643
+    },
+    "gemma-4-e2b-qat-q4_0": {
+      "en": 0.465,
+      "hi": 0.719,
+      "hinglish": 0.5
+    }
+  },
+  "head_to_head": {
+    "qwen3.5-0.8b-q4km": {
+      "qwen3.5-2b-q4km": 0.331,
+      "gemma-4-e2b-qat-q4_0": 0.477
+    },
+    "qwen3.5-2b-q4km": {
+      "qwen3.5-0.8b-q4km": 0.669,
+      "gemma-4-e2b-qat-q4_0": 0.523
+    },
+    "gemma-4-e2b-qat-q4_0": {
+      "qwen3.5-0.8b-q4km": 0.523,
+      "qwen3.5-2b-q4km": 0.477
+    }
+  }
+}

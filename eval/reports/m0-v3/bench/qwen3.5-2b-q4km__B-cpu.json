@@ -1,0 +1,47 @@
+{
+  "model": "qwen3.5-2b-q4km",
+  "profile": "B-cpu",
+  "label": "B, CPU only: Core Ultra 7 255U, 10 threads (fastest in a 2-14 sweep), 30 GB",
+  "when": "2026-10-22 06:52",
+  "load_cold_s": 1.73,
+  "load_warm_s": 1.33,
+  "tasks": {
+    "reply": {
+      "runs": 5,
+      "input_words": 91,
+      "ttft_s": 1.08,
+      "total_s": 3.124,
+      "total_s_max": 3.56,
+      "gen_tps": 21.516,
+      "prompt_tps": 136.69,
+      "prompt_tokens": 149,
+      "cached_tokens": 120,
+      "gen_tokens": 45
+    },
+    "proofread": {
+      "runs": 5,
+      "input_words": 100,
+      "ttft_s": 1.165,
+      "total_s": 6.998,
+      "total_s_max": 8.202,
+      "gen_tps": 21.685,
+      "prompt_tps": 138.255,
+      "prompt_tokens": 160,
+      "cached_tokens": 173,
+      "gen_tokens": 126
+    },
+    "rewrite.professional": {
+      "runs": 5,
+      "input_words": 101,
+      "ttft_s": 1.306,
+      "total_s": 7.907,
+      "total_s_max": 11.128,
+      "gen_tps": 21.182,
+      "prompt_tps": 136.906,
+      "prompt_tokens": 177,
+      "cached_tokens": 85,
+      "gen_tokens": 138
+    }
+  },
+  "peak_rss_mb": 2989
+}
