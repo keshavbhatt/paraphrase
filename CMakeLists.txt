@@ -45,7 +45,7 @@ include(Version)
 # Qt 6.11: the version of the KDE snap and Flatpak runtimes (as Omnidict, its ADR-009).
 # Components are added in the step that first uses them.
 set(PARAPHRASE_QT_MIN_VERSION "6.11" CACHE STRING "Minimum required Qt6 version")
-find_package(Qt6 ${PARAPHRASE_QT_MIN_VERSION} REQUIRED COMPONENTS Core)
+find_package(Qt6 ${PARAPHRASE_QT_MIN_VERSION} REQUIRED COMPONENTS Core Network)
 qt_standard_project_setup()
 
 add_compile_definitions(
