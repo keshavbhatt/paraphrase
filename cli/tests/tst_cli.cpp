@@ -107,6 +107,10 @@ private Q_SLOTS:
         const Run r = paraphrase({u"reply"_s, u"Are you free for dinner on Friday?"_s});
         QVERIFY2(r.code == 0, qPrintable(r.err));
         QCOMPARE(r.out.trimmed().split(u'\n').size(), 3); // one suggestion per line
+        // `run reply` takes the text as the message too, like `reply`.
+        const Run run = paraphrase({u"run"_s, u"reply"_s, u"--json"_s, u"Lunch at noon?"_s});
+        QVERIFY2(run.code == 0, qPrintable(run.err));
+        QCOMPARE(QJsonDocument::fromJson(run.out.toUtf8()).object().value(u"replies"_s).toArray().size(), 3);
     }
 
     void rewritesWithJson()
@@ -129,12 +133,13 @@ private Q_SLOTS:
         }
         const QByteArray requests = R"({"skill": "proofread", "input": {"text": "i has a apple"}}
 {"skill": "nonsense", "input": {"text": "x"}}
-{"skill": "reply", "input": {"context": "Lunch at noon?"}}
+{"skill": "proofread", "input": broken
+{"skill": "reply", "input": "Lunch at noon?"}
 )";
         const Run r = paraphrase({u"batch"_s, u"--model"_s, u"gemma-4-e2b-qat-q4_0"_s}, requests);
         QVERIFY2(r.code == 0, qPrintable(r.err));
         const QStringList lines = r.out.trimmed().split(u'\n');
-        QCOMPARE(lines.size(), 3);
+        QCOMPARE(lines.size(), 4);
         const QJsonObject first = QJsonDocument::fromJson(lines.at(0).toUtf8()).object();
         QCOMPARE(first.value(u"skill"_s).toString(), u"proofread"_s);
         QCOMPARE(first.value(u"model"_s).toString(), u"gemma-4-e2b-qat-q4_0"_s);
@@ -143,9 +148,15 @@ private Q_SLOTS:
         QVERIFY(first.value(u"client_total_s"_s).toDouble() >= first.value(u"client_ttft_s"_s).toDouble());
         QCOMPARE(QJsonDocument::fromJson(lines.at(1).toUtf8()).object().value(u"error"_s).toString(),
                  u"InvalidInput"_s);
-        const QJsonObject third = QJsonDocument::fromJson(lines.at(2).toUtf8()).object();
-        QCOMPARE(third.value(u"replies"_s).toArray().size(), 3);
-        QCOMPARE(third.value(u"load_s"_s).toDouble(), 0.0); // already loaded
+        // A broken line says so, with its number.
+        const QJsonObject broken = QJsonDocument::fromJson(lines.at(2).toUtf8()).object();
+        QCOMPARE(broken.value(u"error"_s).toString(), u"InvalidJson"_s);
+        QCOMPARE(broken.value(u"line"_s).toInt(), 3);
+        // A string input is the text the skill works on: for reply, the message.
+        const QJsonObject reply = QJsonDocument::fromJson(lines.at(3).toUtf8()).object();
+        QCOMPARE(reply.value(u"replies"_s).toArray().size(), 3);
+        QCOMPARE(reply.value(u"load_s"_s).toDouble(), 0.0); // already loaded
+        QCOMPARE(reply.value(u"line"_s).toInt(), 4);
     }
 };
 

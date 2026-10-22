@@ -58,8 +58,14 @@ paraphrase models download fast                   # Gemma 4 E2B and its speed-up
 echo "Their going to the market tomorow" | paraphrase proofread
 paraphrase rewrite --tone casual "Please find attached the figures."
 paraphrase reply "Are you free for dinner on Friday?"   # three suggestions, one per line
+paraphrase run reply "Lunch at noon?"           # run any skill by id; reply takes the message
 paraphrase skills; paraphrase status; paraphrase models
 ```
+
+`paraphrase batch` reads one request per line, `{"skill": "proofread", "input": {"text": "..."}}`
+or with `"input"` as a plain string (the text, or the message for reply), and writes one JSON
+result per line with its `line` number; a line that is not valid JSON gets
+`{"error": "InvalidJson", ...}`.
 
 The CLI starts `paraphrase-daemon` when it is not running, or runs it privately when there is
 no session bus. Answers stream into a terminal; a pipe gets the finished answer only.

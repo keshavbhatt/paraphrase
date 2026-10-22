@@ -63,6 +63,9 @@ private:
     void printError(const QString& code, const QString& message);
     [[nodiscard]] QString inputText() const;
     [[nodiscard]] QString resolveModel(const QString& name);
+    /// The input a skill works on ("text", or "context" for a skill that answers a message),
+    /// from ListSkills; "text" when the daemon does not say.
+    [[nodiscard]] QString mainInput(const QString& skillId);
 
     Command m_command;
     DaemonClient m_client;
@@ -71,7 +74,8 @@ private:
     bool m_stream = false;   ///< the answer streams to a terminal
     bool m_streamed = false; ///< something was printed already
     int m_code = kExitOk;
-    QEventLoop* m_loop = nullptr; ///< the running request's loop
+    QEventLoop* m_loop = nullptr;         ///< the running request's loop
+    QHash<QString, QString> m_mainInputs; ///< skill id -> main input, loaded once
 };
 
 } // namespace paraphrase::cli

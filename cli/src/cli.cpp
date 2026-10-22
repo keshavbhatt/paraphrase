@@ -6,6 +6,7 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QJsonParseError>
 #include <QLocale>
 #include <QTextStream>
 
@@ -107,6 +108,10 @@ int Cli::exec()
         skill = m_command.args.takeFirst();
         if (!m_command.context.isEmpty()) {
             input.insert(u"context"_s, m_command.context);
+        } else if (mainInput(skill) == u"context"_s) {
+            // Like `reply`: the text given is the message to answer.
+            input.insert(u"context"_s, inputText());
+            return runSkill(skill, input);
         }
     }
     if (name == u"reply"_s) {
@@ -261,14 +266,31 @@ int Cli::batch()
     if (!in.open(stdin, QIODevice::ReadOnly)) {
         return kExitFailed;
     }
+    int number = 0;
     while (!in.atEnd()) {
         const QByteArray line = in.readLine().trimmed();
+        ++number;
         if (line.isEmpty()) {
             continue;
         }
-        const QJsonObject request = QJsonDocument::fromJson(line).object();
-        const QJsonObject result =
-            runOne(request.value(u"skill"_s).toString(), request.value(u"input"_s).toObject().toVariantMap());
+        QJsonParseError parseError{};
+        const QJsonDocument doc = QJsonDocument::fromJson(line, &parseError);
+        QJsonObject result;
+        if (parseError.error != QJsonParseError::NoError || !doc.isObject()) {
+            const QString why = parseError.error != QJsonParseError::NoError
+                                    ? parseError.errorString()
+                                    : tr(R"(expected an object like {"skill": ..., "input": ...})");
+            result = {{u"error"_s, u"InvalidJson"_s}, {u"message"_s, tr("line %1: %2").arg(number).arg(why)}};
+        } else {
+            const QJsonObject request = doc.object();
+            const QString skill = request.value(u"skill"_s).toString();
+            const QJsonValue given = request.value(u"input"_s);
+            // "input" is an object of inputs, or a plain string: the text the skill works on.
+            const QVariantMap input = given.isString() ? QVariantMap{{mainInput(skill), given.toString()}}
+                                                       : given.toObject().toVariantMap();
+            result = runOne(skill, input);
+        }
+        result.insert(u"line"_s, number);
         out() << QString::fromUtf8(QJsonDocument(result).toJson(QJsonDocument::Compact)) << Qt::endl;
     }
     return kExitOk;
@@ -280,6 +302,21 @@ void Cli::interrupt()
     if (!m_requestId.isEmpty()) {
         (void)m_client.call(u"Cancel"_s, {m_requestId});
     }
+}
+
+QString Cli::mainInput(const QString& skillId)
+{
+    if (m_mainInputs.isEmpty()) {
+        const QDBusMessage reply = m_client.call(u"ListSkills"_s, {});
+        if (reply.type() == QDBusMessage::ReplyMessage) {
+            for (const auto& s : parseJson(reply.arguments().value(0).toString()).toArray()) {
+                const QJsonObject o = s.toObject();
+                m_mainInputs.insert(o.value(u"id"_s).toString(),
+                                    o.value(u"main_input"_s).toString(u"text"_s));
+            }
+        }
+    }
+    return m_mainInputs.value(skillId, u"text"_s);
 }
 
 int Cli::listSkills()
