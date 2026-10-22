@@ -1,6 +1,7 @@
 #pragma once
 
 #include "engine/engine.h"
+#include "engine/skill_runner.h"
 #include "skills/skill.h"
 #include "util/language_detector.h"
 
@@ -59,6 +60,8 @@ Q_SIGNALS:
 private:
     [[nodiscard]] bool ensureModel(const Job& job);
     [[nodiscard]] bool cancelled(const QString& id) const;
+    /// Emits finished() or failed() for a run's result.
+    void report(const Job& job, const util::Result<engine::SkillResult>& result);
     [[nodiscard]] int inputTokens(const Job& job) const;
     void warm(const Job& job);
 

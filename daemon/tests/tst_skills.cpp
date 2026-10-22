@@ -169,7 +169,7 @@ private Q_SLOTS:
         QVERIFY(dir.isValid());
         const QString path = dir.filePath(u"bad.yaml"_s);
 
-        writeFile(path, "id: bad\nversion: 3\n");
+        writeFile(path, "id: bad\nversion: 4\n");
         auto r = SkillRegistry::loadFile(path);
         QVERIFY(!r.ok());
         QVERIFY2(r.error().startsWith(u"bad.yaml: missing title"_s), qPrintable(r.error()));
@@ -179,7 +179,7 @@ private Q_SLOTS:
         QVERIFY(!r.ok());
         QVERIFY2(r.error().startsWith(u"bad.yaml: not valid YAML"_s), qPrintable(r.error()));
 
-        const QByteArray valid = "id: x\nversion: 3\ntitle: X\ntier: fast\nmax_input_tokens: 10\n"
+        const QByteArray valid = "id: x\nversion: 4\ntitle: X\ntier: fast\nmax_input_tokens: 10\n"
                                  "max_output_tokens: 10\nsampling: { temperature: 0.0 }\n"
                                  "output: { type: text }\nsystem: Be brief.\n";
         writeFile(path, valid + "template: |\n  {{secret}}\n");
@@ -191,6 +191,19 @@ private Q_SLOTS:
         r = SkillRegistry::loadFile(path);
         QVERIFY(!r.ok());
         QVERIFY2(r.error().contains(u"grammar must live under skills/"_s), qPrintable(r.error()));
+
+        // output.min_length (schema v4) is a fraction, for one text output.
+        const QByteArray minLength = "id: x\nversion: 4\ntitle: X\ntier: fast\nmax_input_tokens: 10\n"
+                                     "max_output_tokens: 10\nsampling: { temperature: 0.0 }\n"
+                                     "system: Be brief.\ntemplate: |\n  {{text}}\n";
+        writeFile(path, minLength + "output: { type: text, min_length: 1.5 }\n");
+        r = SkillRegistry::loadFile(path);
+        QVERIFY2(!r.ok() && r.error().contains(u"min_length must be a number between 0 and 1"_s),
+                 qPrintable(r.error()));
+        writeFile(path, minLength + "output: { type: text, min_length: 0.7 }\n");
+        r = SkillRegistry::loadFile(path);
+        QVERIFY2(r.ok(), qPrintable(r.error()));
+        QCOMPARE(r.value().first().minLength(), 0.7);
 
         writeFile(path, valid + "template: |\n  {{text}}\n");
         r = SkillRegistry::loadFile(path);

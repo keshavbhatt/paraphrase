@@ -4,6 +4,8 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
+#include <algorithm>
+
 using namespace Qt::StringLiterals;
 
 namespace paraphrase::engine {
@@ -17,6 +19,10 @@ QString expectedLang(const skills::Values& inputs)
 
 /// A greedy skill gets a little temperature (else the retry repeats itself) and every retry a
 /// fixed new seed, as the Python reference.
+/// The line a retry adds when the answer left out part of the text.
+constexpr QStringView kLengthHint =
+    u"Important: reply with all of the text, every sentence from the first to the last.";
+
 QJsonObject retrySampling(QJsonObject sampling)
 {
     if (sampling.value(u"temperature"_s).toDouble() == 0.0) {
@@ -68,6 +74,24 @@ QString SkillRunner::retryHint(const skills::Values& inputs) const
     return u"Important: write your answer in %1, the language of the original."_s.arg(name);
 }
 
+QString SkillRunner::lengthProblem(const skills::Skill& skill, const skills::Values& inputs,
+                                   const QString& output)
+{
+    const double min = skill.minLength();
+    if (min <= 0.0) {
+        return {};
+    }
+    const auto visible = [](const QString& s) {
+        return std::ranges::count_if(s, [](QChar c) { return !c.isSpace(); });
+    };
+    const auto in = visible(inputs.value(u"text"_s));
+    const auto out = visible(output);
+    if (in == 0 || static_cast<double>(out) >= min * static_cast<double>(in)) {
+        return {};
+    }
+    return u"the answer has %1 of the text's %2 characters"_s.arg(out).arg(in);
+}
+
 QString SkillRunner::languageProblem(const skills::Skill& skill, const skills::Values& inputs,
                                      const QStringList& texts) const
 {
@@ -93,6 +117,33 @@ QString SkillRunner::languageProblem(const skills::Skill& skill, const skills::V
     return {};
 }
 
+void SkillRunner::collect(const skills::Skill& skill, const Generation& g, SkillResult& result)
+{
+    if (skill.variants > 1) {
+        QJsonArray replies;
+        result.texts.clear();
+        for (const QString& t : g.texts) {
+            replies.append(t.trimmed());
+            result.texts.append(t.trimmed());
+        }
+        result.output = QString::fromUtf8(
+            QJsonDocument(QJsonObject{{u"replies"_s, replies}}).toJson(QJsonDocument::Compact));
+        return;
+    }
+    result.output = g.texts.value(0);
+    const auto replies = skill.outputType() == u"json"_s ? parseReplies(result.output) : std::nullopt;
+    result.texts = replies.value_or(QStringList{result.output});
+}
+
+SkillRunner::Problem SkillRunner::check(const skills::Skill& skill, const skills::Values& inputs,
+                                        const SkillResult& result) const
+{
+    if (QString why = languageProblem(skill, inputs, result.texts); !why.isEmpty()) {
+        return {.why = std::move(why), .tooShort = false};
+    }
+    return {.why = lengthProblem(skill, inputs, result.output), .tooShort = true};
+}
+
 util::Result<SkillResult> SkillRunner::run(const skills::Skill& skill, const skills::Values& inputs,
                                            const TextSink& sink, const RetryHook& onRetry)
 {
@@ -107,42 +158,38 @@ util::Result<SkillResult> SkillRunner::run(const skills::Skill& skill, const ski
         .draft = skill.speculative == u"draft"_s,
     };
     SkillResult result;
-    QString problem;
+    Problem problem;
     for (int attempt = 0; attempt < 2; ++attempt) {
         if (attempt == 1) {
             if (onRetry) {
-                onRetry(problem);
+                onRetry(problem.why);
             }
-            request.user = prompt.user + u"\n\n"_s + retryHint(inputs);
+            const QString hint = problem.tooShort ? kLengthHint.toString() : retryHint(inputs);
+            request.user = prompt.user + u"\n\n"_s + hint;
             request.sampling = retrySampling(skill.sampling);
         }
         const auto generated = m_generator.generate(request, sink);
         if (!generated.ok()) {
             return util::Result<SkillResult>::failure(generated.error());
         }
-        const Generation& g = generated.value();
-        result.calls.append(g);
-        if (skill.variants > 1) {
-            QJsonArray replies;
-            result.texts.clear();
-            for (const QString& t : g.texts) {
-                replies.append(t.trimmed());
-                result.texts.append(t.trimmed());
-            }
-            result.output = QString::fromUtf8(
-                QJsonDocument(QJsonObject{{u"replies"_s, replies}}).toJson(QJsonDocument::Compact));
-        } else {
-            result.output = g.texts.value(0);
-            const auto replies = skill.outputType() == u"json"_s ? parseReplies(result.output) : std::nullopt;
-            result.texts = replies.value_or(QStringList{result.output});
-        }
-        problem = languageProblem(skill, inputs, result.texts);
+        result.calls.append(generated.value());
+        collect(skill, generated.value(), result);
         result.retried = attempt > 0;
-        if (problem.isEmpty()) {
+        if (generated.value().finishReason == u"cancelled"_s) {
+            return util::Result<SkillResult>::success(std::move(result)); // no checks, no retry
+        }
+        problem = check(skill, inputs, result);
+        if (problem.why.isEmpty()) {
             return util::Result<SkillResult>::success(std::move(result));
         }
     }
-    result.warning = u"language: "_s + problem;
+    if (problem.tooShort) {
+        // A shortened text would replace the user's own: never show it (DOCS/skills.md).
+        result.incomplete = true;
+        result.warning = u"incomplete: "_s + problem.why;
+    } else {
+        result.warning = u"language: "_s + problem.why;
+    }
     return util::Result<SkillResult>::success(std::move(result));
 }
 

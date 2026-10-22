@@ -9,7 +9,7 @@
 
 namespace paraphrase::skills {
 
-inline constexpr int kSchemaVersion = 3;
+inline constexpr int kSchemaVersion = 4;
 
 /// Every skill the daemon can run, loaded from skills/*.yaml (PLAN D4). A file that breaks the
 /// schema is rejected with a message naming it, never half-loaded. A port of the Python

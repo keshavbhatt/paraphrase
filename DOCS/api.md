@@ -98,7 +98,8 @@ arrive on your own connection.
 
 **`Error` codes**: `cancelled`, `too-long` (the input is over the skill's
 `max_input_tokens`), `model` (the model could not be loaded), `engine` (the model failed
-while reading or writing).
+while reading or writing), `incomplete` (the answer left out part of the text twice, so it is
+not shown; DOCS/skills.md, "Length check").
 
 ### `Done` result
 

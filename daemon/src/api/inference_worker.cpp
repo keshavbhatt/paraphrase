@@ -155,15 +155,24 @@ void InferenceWorker::run(const Job& job)
         job.skill, job.inputs,
         [this, &id](int variant, const QString& piece) { Q_EMIT token(id, variant, piece); },
         [this, &id](const QString& why) { Q_EMIT retrying(id, why); });
+    report(job, result);
+    Q_EMIT idle();
+}
+
+void InferenceWorker::report(const Job& job, const util::Result<engine::SkillResult>& result)
+{
     if (!result.ok()) {
-        Q_EMIT failed(id, u"engine"_s, result.error());
+        Q_EMIT failed(job.id, u"engine"_s, result.error());
     } else if (!result.value().calls.isEmpty() &&
                result.value().calls.last().finishReason == u"cancelled"_s) {
-        Q_EMIT failed(id, u"cancelled"_s, tr("Cancelled."));
+        Q_EMIT failed(job.id, u"cancelled"_s, tr("Cancelled."));
+    } else if (result.value().incomplete) {
+        Q_EMIT failed(job.id, u"incomplete"_s,
+                      tr("The answer left out part of the text, so it is not shown. Try a shorter "
+                         "selection."));
     } else {
-        Q_EMIT finished(id, resultJson(job, result.value(), m_loadSeconds));
+        Q_EMIT finished(job.id, resultJson(job, result.value(), m_loadSeconds));
     }
-    Q_EMIT idle();
 }
 
 void InferenceWorker::warm(const Job& job)

@@ -42,6 +42,11 @@ struct Skill
     /// The input the skill works on: "context" for a skill that answers a message (its
     /// template uses {{context}}; "text" is then an optional draft), otherwise "text".
     [[nodiscard]] QString mainInput() const;
+    /// The shortest answer allowed, as a fraction of the input text (schema v4); 0 for none.
+    [[nodiscard]] double minLength() const
+    {
+        return output.value(QStringLiteral("min_length")).toDouble(0.0);
+    }
     [[nodiscard]] bool keepsLanguage() const
     {
         return output.value(QStringLiteral("language")).toString() == QStringLiteral("same");

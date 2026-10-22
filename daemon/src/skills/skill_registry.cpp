@@ -155,6 +155,14 @@ QString checkOutput(const QJsonObject& raw, const QString& name)
     if (type == u"json"_s && !raw.contains(u"grammar"_s)) {
         return u"%1: json output needs a grammar (PLAN D5)"_s.arg(name);
     }
+    if (const QJsonValue min = output.value(u"min_length"_s); !min.isUndefined()) {
+        if (!min.isDouble() || min.toDouble() <= 0.0 || min.toDouble() >= 1.0) {
+            return u"%1: output.min_length must be a number between 0 and 1"_s.arg(name);
+        }
+        if (type != u"text"_s || raw.value(u"variants"_s).toInt(1) > 1) {
+            return u"%1: output.min_length needs one text output"_s.arg(name);
+        }
+    }
     return {};
 }
 

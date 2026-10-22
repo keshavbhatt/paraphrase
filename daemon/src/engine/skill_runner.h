@@ -20,6 +20,7 @@ struct SkillResult
     QStringList texts;       ///< what the language check looked at: each reply, or the text
     bool retried = false;    ///< the language check failed once and the engine retried
     QString warning;         ///< set when the retry also failed: shown with the output
+    bool incomplete = false; ///< the answer left out part of the text, twice: not shown
     QList<Generation> calls; ///< one, or two after a retry
 };
 
@@ -44,6 +45,18 @@ public:
 
     /// The line the retry adds after the prompt: the language the answer must be in.
     [[nodiscard]] QString retryHint(const skills::Values& inputs) const;
+    struct Problem
+    {
+        QString why;           ///< empty when the output passed
+        bool tooShort = false; ///< the length check failed, not the language check
+    };
+    /// Fills the output and the texts the checks look at from one generation.
+    static void collect(const skills::Skill& skill, const Generation& g, SkillResult& result);
+    [[nodiscard]] Problem check(const skills::Skill& skill, const skills::Values& inputs,
+                                const SkillResult& result) const;
+    /// Set when a skill with `output.min_length` answers far shorter than its input text.
+    [[nodiscard]] static QString lengthProblem(const skills::Skill& skill, const skills::Values& inputs,
+                                               const QString& output);
     /// Empty when every output is in the expected language, else why not.
     [[nodiscard]] QString languageProblem(const skills::Skill& skill, const skills::Values& inputs,
                                           const QStringList& texts) const;

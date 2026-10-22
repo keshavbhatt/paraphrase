@@ -15,7 +15,7 @@ from typing import Any
 
 import yaml
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 SPECULATIVE = ("none", "draft")
 OUTPUT_LANGUAGE = ("same", "any")
 TIERS = ("fast", "quality", "any")
@@ -121,6 +121,12 @@ def _check(raw: dict[str, Any], path: Path) -> None:
         raise SkillError(f"{path.name}: output.language must be one of {OUTPUT_LANGUAGE}")
     if int(raw.get("variants", 1)) > 1 and raw["output"]["type"] != "text":
         raise SkillError(f"{path.name}: with variants > 1 each variant is one text output")
+    if "min_length" in raw["output"]:
+        m = raw["output"]["min_length"]
+        if not isinstance(m, (int, float)) or not 0 < m < 1:
+            raise SkillError(f"{path.name}: output.min_length must be a number between 0 and 1")
+        if raw["output"]["type"] != "text" or int(raw.get("variants", 1)) > 1:
+            raise SkillError(f"{path.name}: output.min_length needs one text output")
     if raw["output"]["type"] == "json" and "grammar" not in raw:
         raise SkillError(f"{path.name}: json output needs a grammar (PLAN D5)")
     if "{{" in raw["system"]:

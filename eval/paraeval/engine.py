@@ -11,7 +11,11 @@ The M1 daemon implements the same steps in C++ (PLAN D2); keep the two in step:
    also fails, return it with a warning instead of hiding it (owner, 2026-10-22). The retry
    adds one line after the prompt naming the language the answer must be in: a new seed
    alone kept giving English for Hinglish professional rewrites (M0 v5).
-4. Speculative decoding per skill (schema v3, ADR-004): `speculative: none` asks the server
+4. Length check (schema v4, `output.min_length`): an answer with fewer visible characters
+   than that fraction of the input text left part of it out. Retry once with a line asking
+   for all of the text; if the retry is short too, the result is `incomplete` and shows
+   nothing, because a shortened text would replace the user's own.
+5. Speculative decoding per skill (schema v3, ADR-004): `speculative: none` asks the server
    not to draft for this request, even when it runs with a draft head.
 """
 
@@ -26,6 +30,7 @@ from paraeval.llama import Completion, LlamaServer
 from paraeval.skills import Skill
 
 RETRY_TEMPERATURE = 0.3  # for skills that decode greedily
+LENGTH_HINT = "Important: reply with all of the text, every sentence from the first to the last."
 RETRY_SEED_OFFSET = 7919
 
 
@@ -36,6 +41,7 @@ class Result:
     calls: list[Completion] = field(default_factory=list)
     retried: bool = False
     warning: str = ""  # set when the language check still fails after the retry
+    incomplete: bool = False  # the answer left out part of the text twice: shown as nothing
 
     @property
     def total_s(self) -> float:
@@ -76,13 +82,27 @@ def language_ok(skill: Skill, inputs: dict[str, str], texts: list[str]) -> tuple
     return True, ""
 
 
+def length_problem(skill: Skill, inputs: dict[str, str], output: str) -> str:
+    """Set when a skill with `output.min_length` answers far shorter than its input text."""
+    minimum = skill.output.get("min_length")
+    if not minimum:
+        return ""
+    n_in = sum(not ch.isspace() for ch in inputs.get("text", ""))
+    n_out = sum(not ch.isspace() for ch in output)
+    if n_in == 0 or n_out >= minimum * n_in:
+        return ""
+    return f"the answer has {n_out} of the text's {n_in} characters"
+
+
 def run(server: LlamaServer, skill: Skill, inputs: dict[str, str]) -> Result:
     system, user = skill.render(inputs)
     sampling = dict(skill.sampling)
     extra = {"speculative.type": "none"} if skill.speculative == "none" else {}
     calls: list[Completion] = []
+    short = ""
     for attempt in range(2):
-        prompt = user if attempt == 0 else f"{user}\n\n{retry_hint(inputs)}"
+        hint = LENGTH_HINT if short else retry_hint(inputs)
+        prompt = user if attempt == 0 else f"{user}\n\n{hint}"
         c = server.chat(
             system,
             prompt,
@@ -95,9 +115,12 @@ def run(server: LlamaServer, skill: Skill, inputs: dict[str, str]) -> Result:
         calls.append(c)
         output, texts = outputs_of(skill, c)
         ok, why = language_ok(skill, inputs, texts)
-        if ok:
+        short = length_problem(skill, inputs, output) if ok else ""
+        if ok and not short:
             return Result(output, c, calls, retried=attempt > 0)
         sampling = _retry_sampling(skill.sampling)
+    if short:
+        return Result("", c, calls, retried=True, warning=f"incomplete: {short}", incomplete=True)
     return Result(output, c, calls, retried=True, warning=f"language: {why}")
 
 

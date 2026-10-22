@@ -65,6 +65,29 @@ private:
     QList<QStringList> m_answers;
 };
 
+/// Answers once, stopped by a cancel.
+class CancellingGenerator final : public Generator
+{
+public:
+    explicit CancellingGenerator(QString partial)
+        : m_partial(std::move(partial))
+    {}
+
+    Result<Generation> generate(const GenerationRequest& /*request*/, const TextSink& /*sink*/) override
+    {
+        ++calls;
+        Generation g;
+        g.texts = {m_partial};
+        g.finishReason = u"cancelled"_s;
+        return Result<Generation>::success(g);
+    }
+
+    int calls = 0;
+
+private:
+    QString m_partial;
+};
+
 RequestFields textField(const QString& text, const QString& targetLang = {})
 {
     return {.text = text, .context = {}, .targetLang = targetLang};
@@ -173,6 +196,64 @@ private Q_SLOTS:
         QVERIFY(result.value().retried);
         QCOMPARE(result.value().warning, u"language: Hindi answered outside Devanagari"_s);
         QCOMPARE(gen.requests.size(), 2);
+    }
+
+    void retriesAnAnswerThatLeftOutText()
+    {
+        // Proofread (output.min_length) gets one retry asking for all of the text.
+        const QString text = QString(u"I paid $8,500 of the $12,000 by March 19. "_s).repeated(10).trimmed();
+        const QString shortAnswer = u"I paid $8,500 of the $12,000 by March 19."_s;
+        ScriptedGenerator gen({{shortAnswer}, {text}});
+        SkillRunner runner(gen, m_detector);
+        const auto& proofread = skill(u"proofread"_s);
+        const auto in = inputs(u"proofread"_s, textField(text));
+        QStringList retries;
+        const auto result = runner.run(proofread, in, {}, [&](const QString& why) { retries.append(why); });
+        QVERIFY(result.ok());
+        QCOMPARE(result.value().output, text);
+        QVERIFY(result.value().retried && !result.value().incomplete);
+        QCOMPARE(retries.size(), 1);
+        QVERIFY(retries.front().startsWith(u"the answer has "_s));
+        QCOMPARE(
+            gen.requests.at(1).user,
+            proofread.render(in).user +
+                u"\n\nImportant: reply with all of the text, every sentence from the first to the last."_s);
+    }
+
+    void refusesAnAnswerThatLeftOutTextTwice()
+    {
+        const QString text = QString(u"Their going home now. "_s).repeated(8).trimmed();
+        ScriptedGenerator gen({{u"They're going home now."_s}, {u"They're going home now."_s}});
+        SkillRunner runner(gen, m_detector);
+        const auto result = runner.run(skill(u"proofread"_s), inputs(u"proofread"_s, textField(text)));
+        QVERIFY(result.ok());
+        QVERIFY(result.value().incomplete); // never shown: it would replace the user's text
+        QVERIFY(result.value().warning.startsWith(u"incomplete: "_s));
+    }
+
+    void aCancelledAnswerIsNeitherCheckedNorRetried()
+    {
+        // Stopped halfway, the answer is short on purpose: no length retry, no "incomplete".
+        const QString text = QString(u"Their going home now. "_s).repeated(8).trimmed();
+        CancellingGenerator gen(u"They're going"_s);
+        SkillRunner runner(gen, m_detector);
+        const auto result = runner.run(skill(u"proofread"_s), inputs(u"proofread"_s, textField(text)));
+        QVERIFY(result.ok());
+        QVERIFY(!result.value().incomplete && !result.value().retried);
+        QCOMPARE(gen.calls, 1);
+    }
+
+    void skillsWithoutMinLengthMayShorten()
+    {
+        // rewrite.concise has no min_length: a much shorter answer is the point.
+        const QString text = QString(u"I just wanted to let you know that I will be late. "_s).repeated(4);
+        ScriptedGenerator gen({{u"I'll be late."_s}});
+        SkillRunner runner(gen, m_detector);
+        const auto result =
+            runner.run(skill(u"rewrite.concise"_s), inputs(u"rewrite.concise"_s, textField(text)));
+        QVERIFY(result.ok());
+        QVERIFY(!result.value().retried && !result.value().incomplete);
+        QCOMPARE(gen.requests.size(), 1);
     }
 
     void checksAnExplicitTargetLanguage()

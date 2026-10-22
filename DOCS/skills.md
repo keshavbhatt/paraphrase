@@ -1,7 +1,7 @@
 # Skill files: schema reference
 
 Every feature is a skill (PLAN D4): a YAML file in `skills/` that the engine loads without
-recompiling. This page is the reference for **schema version 3**. Any change to the schema
+recompiling. This page is the reference for **schema version 4**. Any change to the schema
 bumps `version`, updates this page and the loaders (`eval/paraeval/skills.py` now, the
 daemon's `SkillRegistry` from M1), and comes with an eval before/after report.
 
@@ -10,7 +10,7 @@ daemon's `SkillRegistry` from M1), and comes with an eval before/after report.
 | Field | Type | Required | Meaning |
 |---|---|---|---|
 | `id` | string | yes | Skill id, e.g. `proofread`. With `presets`, each preset becomes `<id>.<preset>` |
-| `version` | int | yes | Schema version the file is written for (`3`) |
+| `version` | int | yes | Schema version the file is written for (`4`) |
 | `revision` | int | no (1) | Revision of this skill's prompts. Bumped on every prompt, grammar or sampling change; eval reports record it so before/after runs are comparable |
 | `title` | string | yes | Name shown in the UI |
 | `tier` | `fast` \| `quality` \| `any` | yes | Which model tier runs it by default (PLAN 5.3) |
@@ -20,7 +20,7 @@ daemon's `SkillRegistry` from M1), and comes with an eval before/after report.
 | `speculative` | `none` \| `draft` | no (`none`) | Whether the engine drafts ahead with the model's draft head (ADR-004). Greedy outputs are identical either way; `draft` pays off where the output repeats the input (proofread, rewrite) and costs reply its p90 |
 | `sampling` | map | yes | `temperature`, `top_p`, `top_k`, `min_p`, `repeat_penalty`, `seed` (`null` = random) |
 | `grammar` | path | no | GBNF file under `skills/grammars/`; the output must parse. Required when `output.type` is `json` (PLAN D5) |
-| `output` | map | yes | `type: text` or `type: json`; `schema` describes the JSON; `items` the expected count; `diff: words` asks the client for a word diff (PLAN D6); `language: same` turns on the engine's language check (below), `any` (default) turns it off |
+| `output` | map | yes | `type: text` or `type: json`; `schema` describes the JSON; `items` the expected count; `diff: words` asks the client for a word diff (PLAN D6); `language: same` turns on the engine's language check (below), `any` (default) turns it off; `min_length` (v4, a fraction such as `0.7`, one text output only) turns on the length check (below) |
 | `system` | string | yes | System prompt. Must be constant (no `{{...}}`) so its KV cache is shared by every request (PLAN 5.3) |
 | `template` | string | yes | User message, rendered per request |
 | `presets` | map | no | Named sets of extra template values, e.g. tones for `rewrite`. Each key becomes a skill `<id>.<key>`; `title` inside a preset is its display name |
@@ -78,6 +78,18 @@ bench run through it, so their numbers include retries.
 A rewrite keeps the input's language unless the user explicitly chose another (owner,
 2026-10-22): this is the hard check above, and the template says so through
 `{{#unless target_lang}}`.
+
+## Length check (schema v4)
+
+For a skill with `output.min_length` the engine counts the visible (non-space) characters of
+the answer and of the input `text`. An answer with fewer than that fraction left part of the
+text out: proofread once returned 1 of 14 repeated sentences (the owner's CLI suite, case
+E07). The engine retries once with a fresh seed and one added line, "Important: reply with
+all of the text, every sentence from the first to the last."; the language check runs first
+and its retry takes precedence. If the retry is short too, the request ends with the error
+`incomplete` and no text: unlike a language mismatch, a shortened text would replace the
+user's own, so it is never shown. Proofread sets `0.7`; rewrite does not, since concise and
+other tones may shorten on purpose. The eval scores an `incomplete` run as an empty output.
 
 ## Thinking
 

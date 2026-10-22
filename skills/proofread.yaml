@@ -1,6 +1,6 @@
 id: proofread
-version: 3
-revision: 9
+version: 4
+revision: 10
 title: Proofread
 tier: fast
 max_input_tokens: 1500
@@ -8,7 +8,7 @@ max_output_tokens: 2000
 variants: 1
 speculative: draft
 sampling: { temperature: 0.0, top_p: 1.0, top_k: 1, repeat_penalty: 1.0, seed: 0 }
-output: { type: text, diff: words, language: same }
+output: { type: text, diff: words, language: same, min_length: 0.7 }
 system: |
   You are a careful proofreader. Correct the text inside <text> and reply with all of it, corrected.
   Fix every real mistake:

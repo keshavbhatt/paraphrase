@@ -134,6 +134,8 @@ class Daemon:
             self._log.seek(0)
             raise RuntimeError(f"paraphrase batch ended:\n{self._log.read()[-3000:]}")
         result: dict[str, Any] = json.loads(line)
+        if result.get("error") == "incomplete":
+            return result  # the length check refused the answer: scored as an empty output
         if "error" in result:
             raise RuntimeError(f"{request['skill']}: {result['error']}: {result.get('message')}")
         return result
@@ -141,7 +143,12 @@ class Daemon:
     def run(self, skill: Skill, inputs: dict[str, str]) -> Result:
         """One skill run, as paraeval.engine.run returns it."""
         request = {"skill": skill.id, "input": {k: inputs[k] for k in INPUT_KEYS if inputs.get(k)}}
-        return to_result(self._request(request))
+        r = self._request(request)
+        if r.get("error") == "incomplete":
+            total = float(r.get("client_total_s", 0.0))
+            c = Completion("", total, total, 0, 0, total * 1000, 0.0, 0, "incomplete")
+            return Result("", c, [c], retried=True, warning="incomplete", incomplete=True)
+        return to_result(r)
 
     def _daemon_pid(self) -> int | None:
         return next(iter(_children(self.proc.pid)), None) if self.proc else None
