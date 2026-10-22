@@ -111,10 +111,19 @@ QString checkFields(const QJsonObject& raw, const QString& name)
     if (!missing.isEmpty()) {
         return u"%1: missing %2"_s.arg(name, missing.join(u", "_s));
     }
-    if (raw.value(u"version"_s).toInt() != kSchemaVersion) {
-        return u"%1: version %2 != schema %3"_s.arg(name)
-            .arg(raw.value(u"version"_s).toInt())
+    if (const int version = raw.value(u"version"_s).toInt();
+        version < kMinSchemaVersion || version > kSchemaVersion) {
+        return u"%1: version %2 is not schema %3 to %4"_s.arg(name)
+            .arg(version)
+            .arg(kMinSchemaVersion)
             .arg(kSchemaVersion);
+    }
+    if (raw.contains(u"user_presets"_s)) {
+        const QJsonArray values = raw.value(u"user_presets"_s).toObject().value(u"values"_s).toArray();
+        if (values.isEmpty() ||
+            std::ranges::any_of(values, [](const QJsonValue& v) { return !v.isString(); })) {
+            return u"%1: user_presets.values must list the preset values the user fills"_s.arg(name);
+        }
     }
     if (!oneOf(kTiers, raw.value(u"tier"_s).toString())) {
         return u"%1: tier must be one of fast, quality, any"_s.arg(name);
@@ -170,7 +179,7 @@ QString checkTemplate(const Skill& skill)
 {
     QStringList unknown;
     for (const QString& var : templateVariables(skill.templ)) {
-        if (!oneOf(kKnownValues, var) && !skill.preset.contains(var)) {
+        if (!oneOf(kKnownValues, var) && !skill.preset.contains(var) && !skill.userValues.contains(var)) {
             unknown.append(var);
         }
     }
@@ -215,6 +224,9 @@ Skill baseSkill(const QJsonObject& raw, QString grammar)
     s.system = raw.value(u"system"_s).toString();
     s.templ = raw.value(u"template"_s).toString();
     s.grammar = std::move(grammar);
+    for (const auto& v : raw.value(u"user_presets"_s).toObject().value(u"values"_s).toArray()) {
+        s.userValues.append(v.toString());
+    }
     return s;
 }
 
@@ -304,6 +316,10 @@ util::Result<SkillRegistry> SkillRegistry::load(const QString& skillsDir, const 
             if (registry.find(s.id) != nullptr) {
                 return R::failure(u"duplicate skill id %1"_s.arg(s.id));
             }
+            if (s.takesUserPresets() && s.preset.isEmpty()) {
+                registry.m_userBases.append(s); // a template for the user's actions
+                continue;
+            }
             registry.m_skills.append(s);
         }
     }
@@ -322,7 +338,25 @@ util::Result<SkillRegistry> SkillRegistry::load(const QString& skillsDir, const 
             }
         }
     }
+    registry.m_builtIn = registry.m_skills.size();
     return R::success(registry);
+}
+
+void SkillRegistry::setUserActions(const QList<UserAction>& actions)
+{
+    m_skills.resize(m_builtIn);
+    if (m_userBases.isEmpty()) {
+        return;
+    }
+    const Skill& base = m_userBases.front();
+    for (const UserAction& a : actions) {
+        Skill s = base;
+        s.id = base.baseId + u'.' + a.id;
+        s.title = base.title + u": "_s + a.name;
+        s.tier = a.tier;
+        s.preset.insert(base.userValues.front(), a.instruction);
+        m_skills.append(s);
+    }
 }
 
 const Skill* SkillRegistry::find(const QString& id) const

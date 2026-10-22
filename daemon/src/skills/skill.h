@@ -27,6 +27,9 @@ struct Skill
     QString templ;
     QString grammar; ///< GBNF text, empty when the skill has none
     Values preset;   ///< extra template values of a preset (title excluded)
+    /// Schema v5 `user_presets.values`: the preset values the user's own actions fill (e.g.
+    /// `instruction`). Such a skill is a template for them and never runs itself.
+    QStringList userValues;
 
     struct Prompt
     {
@@ -50,6 +53,7 @@ struct Skill
     {
         return output.value(QStringLiteral("min_length")).toDouble(0.0);
     }
+    [[nodiscard]] bool takesUserPresets() const { return !userValues.isEmpty(); }
     [[nodiscard]] bool keepsLanguage() const
     {
         return output.value(QStringLiteral("language")).toString() == QStringLiteral("same");

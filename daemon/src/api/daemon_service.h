@@ -34,7 +34,8 @@ struct ServiceSetup
     models::ModelDownloader::UrlResolver urlResolver; ///< tests: a local server; else Hugging Face
     int idleUnloadMs = 10 * 60 * 1000;                ///< PLAN 5.3: unload the model after 10 quiet minutes
     int idleExitMs = 30 * 60 * 1000;                  ///< ADR-010: exit after a quiet period
-    QString settingsPath; ///< the user's model choices (SetTierModel, SetSpeedUp); empty: not kept
+    QString settingsPath; ///< the user's model choices (SetTierModel, SetSpeedUp); empty: not kept.
+                          ///< The user's actions sit next to it, in actions.json.
 };
 
 /// The daemon's D-Bus API (PLAN 5.1, DOCS/api.md): `com.ktechpit.paraphrase.Daemon1` at
@@ -91,6 +92,14 @@ public Q_SLOTS:
     /// Turns the draft heads (the "speed-up", ADR-004) on or off. Kept across restarts.
     Q_SCRIPTABLE void SetSpeedUp(bool on);
 
+    /// The user's own actions (DOCS/api.md, "My actions"): whether this build takes them,
+    /// the limits, and each action with its skill id.
+    [[nodiscard]] Q_SCRIPTABLE QString ListActions() const;
+    /// Adds an action (empty `id`) or changes one; returns its skill id (`custom.<id>`).
+    Q_SCRIPTABLE QString SaveAction(const QString& id, const QString& name, const QString& instruction,
+                                    const QString& tier);
+    Q_SCRIPTABLE void DeleteAction(const QString& id);
+
 Q_SIGNALS:
     // Declared for introspection; sent as targeted signals to the requesting client only.
     Q_SCRIPTABLE void Token(const QString& requestId, int variant, const QString& text);
@@ -100,6 +109,8 @@ Q_SIGNALS:
     /// Broadcast to every client (it holds no user text):
     /// {"model", "state", "received", "total", "verified", "error"}.
     Q_SCRIPTABLE void DownloadProgress(const QString& status);
+    /// Broadcast when the skills changed (an action was saved or deleted): call ListSkills.
+    Q_SCRIPTABLE void SkillsChanged();
     // NOLINTEND(readability-identifier-naming)
 
     /// Nothing happened for idleExitMs: the daemon may exit (not on D-Bus).
@@ -125,6 +136,7 @@ private:
     /// The model a tier runs on now: the user's choice when it is installed, else TierSelector.
     [[nodiscard]] const models::ModelEntry* modelForTier(const QString& tier) const;
     void loadSettings();
+    void loadActions();
     void saveSettings() const;
     /// The requested model, or the one for the job's tier (TierSelector), with its draft
     /// head when installed.
@@ -146,6 +158,7 @@ private:
     ServiceSetup m_setup;
     util::LanguageDetector m_detector;
     models::ModelStore m_store;
+    skills::UserActions m_actions; ///< the user's own actions, next to the settings
     int m_maxVariants = 1;
 
     QThread m_thread;

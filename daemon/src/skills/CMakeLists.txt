@@ -4,6 +4,7 @@ add_library(paraphrase_skills STATIC
     request_inputs.cpp
     skill.cpp
     skill_registry.cpp
+    user_actions.cpp
     template_renderer.cpp
 )
 paraphrase_set_warnings(paraphrase_skills)

@@ -78,6 +78,7 @@ DaemonService::DaemonService(ServiceSetup setup, QObject* parent)
 {
     connect(&m_downloader, &models::ModelDownloader::changed, this, &DaemonService::onDownloadChanged);
     loadSettings();
+    loadActions();
     for (const auto& s : m_setup.skills.skills()) {
         m_maxVariants = std::max(m_maxVariants, s.variants);
     }
@@ -628,6 +629,65 @@ void DaemonService::SetSpeedUp(bool on)
 {
     m_speedUp = on;
     saveSettings();
+}
+
+void DaemonService::loadActions()
+{
+    if (m_setup.settingsPath.isEmpty() || !m_setup.skills.takesUserActions()) {
+        return;
+    }
+    m_actions = skills::UserActions(QFileInfo(m_setup.settingsPath).dir().filePath(u"actions.json"_s));
+    if (const auto loaded = m_actions.load(); !loaded.ok()) {
+        qCWarning(lcApi) << "the user's actions were not loaded:" << loaded.error();
+    }
+    m_setup.skills.setUserActions(m_actions.actions());
+}
+
+QString DaemonService::ListActions() const
+{
+    QJsonArray actions;
+    for (const skills::UserAction& a : m_actions.actions()) {
+        actions.append(QJsonObject{
+            {u"id"_s, a.id},
+            {u"skill"_s, m_setup.skills.userActionSkillId(a.id)},
+            {u"name"_s, a.name},
+            {u"instruction"_s, a.instruction},
+            {u"tier"_s, a.tier},
+        });
+    }
+    const QJsonObject o{
+        {u"supported"_s, m_setup.skills.takesUserActions() && !m_setup.settingsPath.isEmpty()},
+        {u"max"_s, static_cast<int>(skills::UserActions::kMaxActions)},
+        {u"actions"_s, actions},
+    };
+    return QString::fromUtf8(QJsonDocument(o).toJson(QJsonDocument::Compact));
+}
+
+QString DaemonService::SaveAction(const QString& id, const QString& name, const QString& instruction,
+                                  const QString& tier)
+{
+    if (!m_setup.skills.takesUserActions() || m_setup.settingsPath.isEmpty()) {
+        replyError(u"InvalidInput"_s, tr("This build does not keep your own actions."));
+        return {};
+    }
+    const auto saved = m_actions.save({.id = id, .name = name, .instruction = instruction, .tier = tier});
+    if (!saved.ok()) {
+        replyError(u"InvalidInput"_s, saved.error());
+        return {};
+    }
+    m_setup.skills.setUserActions(m_actions.actions());
+    Q_EMIT SkillsChanged();
+    return m_setup.skills.userActionSkillId(saved.value());
+}
+
+void DaemonService::DeleteAction(const QString& id)
+{
+    if (const auto removed = m_actions.remove(id); !removed.ok()) {
+        replyError(u"InvalidInput"_s, removed.error());
+        return;
+    }
+    m_setup.skills.setUserActions(m_actions.actions());
+    Q_EMIT SkillsChanged();
 }
 
 void DaemonService::loadSettings()

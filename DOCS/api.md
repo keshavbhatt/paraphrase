@@ -45,6 +45,9 @@ daemon exits; never while a download runs).
 | `DownloadModel(s model_id)` | | Downloads a model and its draft head |
 | `PauseDownload(s model_id)` | | Keeps what arrived; `DownloadModel` resumes |
 | `DeleteModel(s model_id)` | | Deletes a model and its draft head |
+| `ListActions()` | `s` JSON object | The user's own actions: `supported`, `max`, `actions` [{`id`, `skill`, `name`, `instruction`, `tier`}] |
+| `SaveAction(s id, s name, s instruction, s tier)` | `s` skill id | Adds an action (empty `id`) or changes one; `tier` is `fast` or `quality`; name at most 40 characters, instruction at most 600, at most 20 actions. Kept in `actions.json` next to the settings, never logged |
+| `DeleteAction(s id)` | | Deletes one of the user's actions |
 | `SetTierModel(s tier, s model_id)` | | The model a tier (`fast`, `quality`) runs on, chosen in Settings; `""` goes back to the automatic choice. Kept across restarts |
 | `SetSpeedUp(b on)` | | Turns the draft heads (the "speed-up", ADR-004) on or off. Kept across restarts |
 
@@ -103,6 +106,9 @@ arrive on your own connection.
 | `Done(s request_id, s result)` | The final answer, JSON below |
 | `Error(s request_id, s code, s message)` | The request ended without an answer |
 | `DownloadProgress(s status)` | Broadcast to all clients (no user text), JSON below |
+
+**`SkillsChanged()`** is broadcast after an action is saved or deleted: clients call
+`ListSkills` again.
 
 **`Error` codes**: `cancelled`, `too-long` (the input is over the skill's
 `max_input_tokens`), `model` (the model could not be loaded), `engine` (the model failed

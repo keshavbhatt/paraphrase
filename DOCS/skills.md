@@ -1,7 +1,7 @@
 # Skill files: schema reference
 
 Every feature is a skill (PLAN D4): a YAML file in `skills/` that the engine loads without
-recompiling. This page is the reference for **schema version 4**. Any change to the schema
+recompiling. This page is the reference for **schema version 5** (the daemon still loads version 4 files). Any change to the schema
 bumps `version`, updates this page and the loaders (`eval/paraeval/skills.py` now, the
 daemon's `SkillRegistry` from M1), and comes with an eval before/after report.
 
@@ -23,6 +23,7 @@ daemon's `SkillRegistry` from M1), and comes with an eval before/after report.
 | `output` | map | yes | `type: text` or `type: json`; `schema` describes the JSON; `items` the expected count; `diff: words` asks the client for a word diff (PLAN D6); `language: same` turns on the engine's language check (below), `any` (default) turns it off; `min_length` (v4, a fraction such as `0.7`, one text output only) turns on the length check (below) |
 | `system` | string | yes | System prompt. Must be constant (no `{{...}}`) so its KV cache is shared by every request (PLAN 5.3) |
 | `template` | string | yes | User message, rendered per request |
+| `user_presets` | map | no | Schema v5: `values: [instruction]` makes the skill a template for the user's own actions (PLAN 3, `custom.*`): it never runs itself; each action the user saves (DOCS/api.md, "My actions") becomes `<id>.<action>` with the action's text as the listed preset value and its own `tier` |
 | `presets` | map | no | Named sets of extra template values, e.g. tones for `rewrite`. Each key becomes a skill `<id>.<key>`; `title` inside a preset is its display name |
 
 ## Template rules

@@ -100,6 +100,7 @@ private:
     paraphrase::models::ModelCatalog m_catalog;
     int m_peers = 0;
     QString m_settingsPath; ///< kept by the daemon when set (SetTierModel, SetSpeedUp)
+    QString m_skillsDir;    ///< the skills to load; the shipped ones when empty
 
     void startServer(double memoryGb, const QStringList& installed, int idleUnloadMs = 60'000,
                      int idleExitMs = 60'000)
@@ -108,9 +109,10 @@ private:
         m_state = std::make_shared<FakeState>();
         m_catalog = paraphrase::models::ModelCatalog::parse(tinyCatalog()).value();
         QVERIFY(install(m_catalog, m_dir->path() + u"/models"_s, installed));
-        auto skills =
-            paraphrase::skills::SkillRegistry::load(QStringLiteral(PARAPHRASE_REPO_ROOT) + u"/skills"_s);
-        QVERIFY(skills.ok());
+        const QString skillsDir =
+            m_skillsDir.isEmpty() ? QStringLiteral(PARAPHRASE_REPO_ROOT) + u"/skills"_s : m_skillsDir;
+        auto skills = paraphrase::skills::SkillRegistry::load(skillsDir);
+        QVERIFY2(skills.ok(), qPrintable(skills.ok() ? QString() : skills.error()));
         paraphrase::models::HardwareInfo hw;
         hw.totalMemory = static_cast<qint64>(memoryGb * 1024 * 1024 * 1024);
         hw.threads = 4;
@@ -375,6 +377,59 @@ private Q_SLOTS:
         QTRY_VERIFY_WITH_TIMEOUT(l.errors.contains(id), kTimeoutMs);
         QCOMPARE(l.errors.value(id), u"cancelled"_s);
         QVERIFY(l.tokens.size() < 100);
+    }
+
+    void keepsTheUsersOwnActions()
+    {
+        // A skill that takes user presets (schema v5): the user's actions become skills,
+        // run with their own tier and instruction, and are kept next to the settings.
+        const QTemporaryDir skillsDir;
+        QVERIFY(QFile::copy(QStringLiteral(PARAPHRASE_REPO_ROOT "/skills/proofread.yaml"),
+                            skillsDir.filePath(u"proofread.yaml"_s)));
+        QVERIFY(writeFile(
+            skillsDir.filePath(u"custom.yaml"_s),
+            "id: custom\nversion: 5\ntitle: My actions\ntier: fast\nmax_input_tokens: 500\n"
+            "max_output_tokens: 200\nsampling: { temperature: 0.2 }\noutput: { type: text }\n"
+            "user_presets: { values: [instruction] }\nsystem: Do what the user asks with the text.\n"
+            "template: |\n  {{instruction}}\n  <text>\n  {{text}}\n  </text>\n"));
+        const QTemporaryDir config;
+        m_skillsDir = skillsDir.path();
+        m_settingsPath = config.filePath(u"paraphrase/daemon.json"_s);
+        startServer(32, {u"fast-model"_s, u"quality-model"_s});
+        QDBusConnection c = connect();
+        QVERIFY(
+            QJsonDocument::fromJson(call(c, u"ListActions"_s, {}).arguments().value(0).toString().toUtf8())
+                .object()
+                .value(u"supported"_s)
+                .toBool());
+        // The template itself is not a skill until there is an action.
+        QVERIFY(!call(c, u"ListSkills"_s, {}).arguments().value(0).toString().contains(u"\"custom\""_s));
+        const QDBusMessage saved =
+            call(c, u"SaveAction"_s, {QString(), u"Tweet"_s, u"Turn this into a tweet"_s, u"quality"_s});
+        QCOMPARE(saved.arguments().value(0).toString(), u"custom.tweet"_s);
+        QVERIFY(call(c, u"ListSkills"_s, {}).arguments().value(0).toString().contains(u"custom.tweet"_s));
+        QCOMPARE(call(c, u"SaveAction"_s, {QString(), QString(), u"x"_s, u"fast"_s}).type(),
+                 QDBusMessage::ErrorMessage);
+
+        Listener l;
+        QVERIFY(l.listen(c));
+        const QString id = runSkill(c, u"custom.tweet"_s, {{u"text"_s, u"We launch on March 12."_s}});
+        QTRY_VERIFY_WITH_TIMEOUT(l.done.contains(id), kTimeoutMs);
+        QCOMPARE(l.done.value(id).value(u"model"_s).toString(), u"quality-model"_s); // the action's tier
+        {
+            const QMutexLocker lock(&m_state->lock);
+            QVERIFY(m_state->prompts.last().contains(u"Turn this into a tweet"_s));
+        }
+        // Kept across restarts, and deleted for good.
+        cleanup();
+        startServer(32, {u"fast-model"_s});
+        QDBusConnection again = connect();
+        QVERIFY(call(again, u"ListSkills"_s, {}).arguments().value(0).toString().contains(u"custom.tweet"_s));
+        QCOMPARE(call(again, u"DeleteAction"_s, {u"tweet"_s}).type(), QDBusMessage::ReplyMessage);
+        QVERIFY(
+            !call(again, u"ListSkills"_s, {}).arguments().value(0).toString().contains(u"custom.tweet"_s));
+        m_skillsDir.clear();
+        m_settingsPath.clear();
     }
 
     void cancelsAtOnceDuringAModelLoad()
