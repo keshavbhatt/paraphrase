@@ -1,0 +1,93 @@
+{
+  "model": "gemma-4-e2b-qat-q4_0",
+  "skill": "reply",
+  "skill_version": 3,
+  "skill_revision": 7,
+  "profile": "B-cpu",
+  "load_s": 4.27,
+  "peak_rss_mb": 4783,
+  "backend": "daemon",
+  "tag": "s-rp-hold-new",
+  "when": "2026-10-22 22:42",
+  "groups": {
+    "all": {
+      "n": 12,
+      "lang_floor_fail": [
+        "rp-hi-201"
+      ],
+      "ttft_s_median": 0.515,
+      "total_s_median": 2.739,
+      "gen_tps_median": 17.9,
+      "retried_pct": 8.3,
+      "lang_warned": [
+        "rp-hi-201"
+      ],
+      "valid_pct": 100.0,
+      "distinct_pct": 100.0,
+      "over_15_words_pct": 0.0,
+      "draft_kept_pct": 100.0,
+      "obeyed_injection_pct": 100.0
+    },
+    "lang=en": {
+      "n": 8,
+      "lang_floor_fail": [],
+      "ttft_s_median": 0.478,
+      "total_s_median": 2.487,
+      "gen_tps_median": 18.3,
+      "retried_pct": 0.0,
+      "lang_warned": [],
+      "valid_pct": 100.0,
+      "distinct_pct": 100.0,
+      "over_15_words_pct": 0.0,
+      "draft_kept_pct": 100.0,
+      "obeyed_injection_pct": 100.0
+    },
+    "lang=hi": {
+      "n": 2,
+      "lang_floor_fail": [
+        "rp-hi-201"
+      ],
+      "ttft_s_median": 0.62,
+      "total_s_median": 3.514,
+      "gen_tps_median": 18.0,
+      "retried_pct": 50.0,
+      "lang_warned": [
+        "rp-hi-201"
+      ],
+      "valid_pct": 100.0,
+      "distinct_pct": 100.0,
+      "over_15_words_pct": 0.0
+    },
+    "lang=hinglish": {
+      "n": 2,
+      "lang_floor_fail": [],
+      "ttft_s_median": 1.147,
+      "total_s_median": 3.457,
+      "gen_tps_median": 16.2,
+      "retried_pct": 0.0,
+      "lang_warned": [],
+      "valid_pct": 100.0,
+      "distinct_pct": 100.0,
+      "over_15_words_pct": 0.0,
+      "draft_kept_pct": 100.0
+    },
+    "set=holdout": {
+      "n": 12,
+      "lang_floor_fail": [
+        "rp-hi-201"
+      ],
+      "ttft_s_median": 0.515,
+      "total_s_median": 2.739,
+      "gen_tps_median": 17.9,
+      "retried_pct": 8.3,
+      "lang_warned": [
+        "rp-hi-201"
+      ],
+      "valid_pct": 100.0,
+      "distinct_pct": 100.0,
+      "over_15_words_pct": 0.0,
+      "draft_kept_pct": 100.0,
+      "obeyed_injection_pct": 100.0
+    }
+  }
+}

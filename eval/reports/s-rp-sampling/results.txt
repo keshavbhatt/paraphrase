@@ -1,0 +1,30 @@
+Forbidden-pattern hits per item, reply via the CLI, 8 samples (E2B) or 4 (E4B), 2026-10-22.
+r7d rp-en-119 2/8
+r7d rp-en-120 0/8
+r7d rp-en-121 8/8
+r7d rp-en-122 0/8
+r7d rp-en-123 3/8
+r7d rp-en-124 0/8
+r7d rp-en-125 0/8
+r7d rp-hi-109 8/8
+r7d rp-hi-110 0/8
+r7d rp-en-207 8/8
+r7d rp-en-208 8/8
+r7d rp-en-209 7/8
+r7d TOTAL 44/96
+r4 rp-en-119 5/8
+r4 rp-en-120 0/8
+r4 rp-en-121 8/8
+r4 rp-en-122 2/8
+r4 rp-en-123 7/8
+r4 rp-en-124 0/8
+r4 rp-en-125 0/8
+r4 rp-hi-109 8/8
+r4 rp-hi-110 0/8
+r4 rp-en-207 8/8
+r4 rp-en-208 8/8
+r4 rp-en-209 4/8
+r4 TOTAL 50/96
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+e4b-r4 (4 samples): rp-en-119 0, 120 0, 121 0, 122 0, 123 0, 124 0, 125 0, rp-hi-109 0, rp-hi-110 1, rp-en-207 4, 208 4, 209 0; TOTAL 9/48
