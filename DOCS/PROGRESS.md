@@ -14,6 +14,19 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-22 - Quality first: reply revision 4, rewrite revision 5
+
+- Hard and holdout sets for reply (36 items) and rewrite (34 items, run in five tones),
+  written by Claude; a reply metric for continuing the user's draft; blind A/B judging by
+  reviewer agents (`eval/judge.py`, results in `eval/reports/judge/`).
+- Reply revision 4 (E2B): acceptable 64% to 80%, draft continued 0% to 100%, holdout 6 to 8
+  of 10. Rewrite revision 5: acceptable 55% to 75% on E4B and 48% to 68% on E2B, changed facts
+  44 to 4 and 53 to 9; holdout 50% to 74% (E4B) and 47% to 70% (E2B). DOCS/models.md.
+- Rejected after judging: reply revision 5 (a tie) and rewrite revision 6 (a tie on E4B,
+  worse on E2B); their outputs and verdicts stay in `eval/reports/` for the record.
+- Next: the polite and friendly presets on their own; reply's injected instructions; then
+  proofread's remaining Hindi agreement misses.
+
 ## 2026-10-22 - Quality first: proofread revision 7
 
 - Owner: the latency benchmarks wait until the models write correctly ("we can't go out with

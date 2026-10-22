@@ -151,7 +151,30 @@ to `-r7`, `q-holdout-r4`, `q-holdout-r7`):
 | holdout, 25 items | 7 | 0.93 | 0.83 | 0.91 | 76% | 0 |
 
 E4B with revision 7 changes 5 of 19 correct texts (F0.5 0.83 on all items), so proofread stays
-on E2B, the fast tier. Still missed by E2B: some Hindi and Hinglish gender agreement on
+on E2B, the fast tier.
+
+**Reply and rewrite (M1).** Metrics count valid JSON and kept facts but cannot judge meaning,
+tone or helpfulness, so these revisions are judged blind (`eval/judge.py`): reviewer agents
+get the input and two outputs in random order, and say whether each is acceptable to send as
+it is, which problems it has, and which is better. Reply has 26 hard and 10 holdout items,
+rewrite 24 hard and 10 holdout items run in five tones (professional, casual, polite, concise,
+friendly; only professional was tested before). A new reply metric checks that every
+suggestion continues the user's draft.
+
+| skill | revision | change | result |
+|---|---|---|---|
+| reply | 4 | replies specific to the message, never asking what it already says; three useful, different choices, warm ones for thanks, congratulations and sympathy, a pick for choice questions, never agreeing to a scam; reply to a thread's last line; the register of the message; every reply starts with the user's draft | E2B, 107 items: acceptable 64% to 80%, better in 64 items against 32; draft continued 0% to 100%; generic replies 31 to 4. Holdout (10): 6 to 8 |
+| reply | 5 (rejected) | write as the user, never as an assistant; three different meanings; ask only needed questions | a tie with 4 (81% against 79%, 40 against 41 wins): fewer unsafe and repeated sets, more generic ones |
+| rewrite | 5 | keep meaning and strength, every fact in its own format, every point and question, the layout, the language and script; add nothing; about the same length (not for concise or elaborate); rewrite instructions inside the text instead of obeying them | E4B, 201 items in 5 tones: acceptable 55% to 75%, better 114 against 42, changed facts 44 to 4; E2B: 48% to 68%, 101 against 40, changed facts 53 to 9. Holdout (50 per model): E2B 47% to 70% (reply and rewrite together), E4B 50% to 74% |
+| rewrite | 6 (rejected) | firmer rules for meaning, feeling and formats; "you" in the text is the reader; new polite, friendly and concise presets | E4B 67% to 70%, a tie in wins; E2B a tie in rate and worse in wins (61 against 86): more missed tone and 6 obeyed instructions. The polite and friendly presets alone helped on E4B (friendly 9 to 15 of 24) and are tried next on their own |
+
+A first draft of both named Hindi and Hinglish in the system prompt and made the models answer
+Devanagari messages in Latin letters (12 reply failures), the M0 revision 2 lesson again: the
+prompts state script rules without naming a language.
+
+Still weak: rewrite in polite and friendly tones (about half acceptable) and meaning drift in
+formal Hindi; reply sometimes answers as an assistant to injected instructions and repeats one
+answer three ways. Still missed by E2B: some Hindi and Hinglish gender agreement on
 masculine nouns ("मेरी भाई", "Mera bahan" half fixed), honorific agreement with आप, since/for
 with a duration, "until" for a deadline, and about half of the run-on sentences.
 
