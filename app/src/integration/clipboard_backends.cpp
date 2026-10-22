@@ -14,7 +14,7 @@ QString ClipboardCapture::name() const
 
 std::optional<CapturedText> ClipboardCapture::capture()
 {
-    QClipboard* clipboard = QGuiApplication::clipboard();
+    const QClipboard* clipboard = QGuiApplication::clipboard();
     if (clipboard->supportsSelection()) {
         if (const QString selected = clipboard->text(QClipboard::Selection); !selected.trimmed().isEmpty()) {
             return CapturedText{.text = selected, .origin = u"selection"_s, .appName = {}, .window = {}};

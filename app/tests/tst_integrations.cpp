@@ -68,7 +68,9 @@ private Q_SLOTS:
         QObject owner;
         const Integrations i(std::move(capture), std::move(insert),
                              {new FakeShortcut(true, &owner), new CommandShortcut(&owner)});
-        QCOMPARE(i.capture().capture()->text, u"from fake"_s);
+        const auto got = i.capture().capture();
+        QVERIFY(got.has_value());
+        QCOMPARE(got.value_or(CapturedText{}).text, u"from fake"_s);
         QVERIFY(i.hasGlobalShortcut());
         QCOMPARE(i.status().size(), 6);
     }
@@ -80,11 +82,10 @@ private Q_SLOTS:
         QVERIFY(!i.hasGlobalShortcut());
         QVERIFY(i.shortcut().description().contains(u"paraphrase-app --popup"_s));
         QGuiApplication::clipboard()->setText(u"copied text"_s);
-        const auto got = i.capture().capture();
-        QVERIFY(got.has_value());
-        QVERIFY(!got->text.isEmpty());
+        const CapturedText got = i.capture().capture().value_or(CapturedText{});
+        QVERIFY(!got.text.isEmpty());
         // Inserting never types here: it leaves the result on the clipboard.
-        QCOMPARE(i.insert().insert(u"the result"_s, *got), InsertOutcome::OnClipboard);
+        QCOMPARE(i.insert().insert(u"the result"_s, got), InsertOutcome::OnClipboard);
         QCOMPARE(QGuiApplication::clipboard()->text(), u"the result"_s);
     }
 };
