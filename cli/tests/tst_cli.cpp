@@ -3,6 +3,7 @@
 // Without the model only the usage checks run.
 
 #include <QFile>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QProcess>
@@ -120,6 +121,31 @@ private Q_SLOTS:
         QCOMPARE(done.value(u"skill"_s).toString(), u"rewrite.polite"_s);
         QVERIFY(!done.value(u"output"_s).toString().isEmpty());
         QVERIFY(!done.value(u"model"_s).toString().isEmpty());
+    }
+    void runsABatch()
+    {
+        if (!haveModel()) {
+            QSKIP("the fast tier model is not downloaded (make fetch)");
+        }
+        const QByteArray requests = R"({"skill": "proofread", "input": {"text": "i has a apple"}}
+{"skill": "nonsense", "input": {"text": "x"}}
+{"skill": "reply", "input": {"context": "Lunch at noon?"}}
+)";
+        const Run r = paraphrase({u"batch"_s, u"--model"_s, u"gemma-4-e2b-qat-q4_0"_s}, requests);
+        QVERIFY2(r.code == 0, qPrintable(r.err));
+        const QStringList lines = r.out.trimmed().split(u'\n');
+        QCOMPARE(lines.size(), 3);
+        const QJsonObject first = QJsonDocument::fromJson(lines.at(0).toUtf8()).object();
+        QCOMPARE(first.value(u"skill"_s).toString(), u"proofread"_s);
+        QCOMPARE(first.value(u"model"_s).toString(), u"gemma-4-e2b-qat-q4_0"_s);
+        QVERIFY(first.value(u"load_s"_s).toDouble() > 0.0); // the first request loads the model
+        QVERIFY(first.value(u"client_ttft_s"_s).toDouble() > 0.0);
+        QVERIFY(first.value(u"client_total_s"_s).toDouble() >= first.value(u"client_ttft_s"_s).toDouble());
+        QCOMPARE(QJsonDocument::fromJson(lines.at(1).toUtf8()).object().value(u"error"_s).toString(),
+                 u"InvalidInput"_s);
+        const QJsonObject third = QJsonDocument::fromJson(lines.at(2).toUtf8()).object();
+        QCOMPARE(third.value(u"replies"_s).toArray().size(), 3);
+        QCOMPARE(third.value(u"load_s"_s).toDouble(), 0.0); // already loaded
     }
 };
 

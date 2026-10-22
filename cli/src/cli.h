@@ -3,6 +3,7 @@
 #include "daemon_client.h"
 
 #include <QEventLoop>
+#include <QJsonObject>
 #include <QObject>
 #include <QStringList>
 #include <QVariantMap>
@@ -20,6 +21,7 @@ struct Command
     QString context;       ///< run: the context input
     bool json = false;     ///< print the Done JSON
     bool noStream = false; ///< print the answer only when it is complete
+    QString model;         ///< run on this model instead of the tier's
 };
 
 /// The `paraphrase` command (PLAN 4, DOCS/api.md): runs skills through the daemon and prints
@@ -47,6 +49,9 @@ public:
 
 private:
     [[nodiscard]] int runSkill(const QString& skillId, const QVariantMap& input);
+    [[nodiscard]] int batch();
+    [[nodiscard]] QJsonObject runOne(const QString& skillId, const QVariantMap& input);
+    [[nodiscard]] QVariantMap options() const;
     [[nodiscard]] int listSkills();
     [[nodiscard]] int status();
     [[nodiscard]] int models();

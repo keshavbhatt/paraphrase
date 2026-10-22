@@ -1,5 +1,6 @@
 #include "cli.h"
 
+#include <QElapsedTimer>
 #include <QEventLoop>
 #include <QFile>
 #include <QJsonArray>
@@ -68,7 +69,7 @@ int Cli::exec()
 {
     const QString& name = m_command.name;
     static const QStringList kCommands = {
-        u"proofread"_s, u"rewrite"_s, u"reply"_s, u"run"_s, u"skills"_s, u"status"_s, u"models"_s,
+        u"proofread"_s, u"rewrite"_s, u"reply"_s, u"run"_s, u"batch"_s, u"skills"_s, u"status"_s, u"models"_s,
     };
     if (!kCommands.contains(name)) {
         err() << tr("Unknown command \"%1\"; see paraphrase --help.").arg(name) << Qt::endl;
@@ -86,6 +87,9 @@ int Cli::exec()
     }
     if (name == u"models"_s) {
         return models();
+    }
+    if (name == u"batch"_s) {
+        return batch();
     }
 
     QVariantMap input;
@@ -159,7 +163,7 @@ int Cli::runSkill(const QString& skillId, const QVariantMap& input)
                 }
             });
 
-    const QDBusMessage reply = m_client.call(u"RunSkill"_s, {skillId, input, QVariantMap()});
+    const QDBusMessage reply = m_client.call(u"RunSkill"_s, {skillId, input, options()});
     if (reply.type() != QDBusMessage::ReplyMessage) {
         return replyError(reply);
     }
@@ -198,6 +202,76 @@ void Cli::printError(const QString& code, const QString& message)
     if (m_code != kExitInterrupted) {
         err() << message << Qt::endl;
     }
+}
+
+QVariantMap Cli::options() const
+{
+    QVariantMap o;
+    if (!m_command.model.isEmpty()) {
+        o.insert(u"model"_s, m_command.model);
+    }
+    return o;
+}
+
+QJsonObject Cli::runOne(const QString& skillId, const QVariantMap& input)
+{
+    // Timed as the client sees it, D-Bus included: from the call to the first piece of text
+    // and to the answer.
+    QElapsedTimer clock;
+    QString requestId;
+    double firstToken = 0.0;
+    QJsonObject result;
+    QEventLoop loop;
+    connect(&m_client, &DaemonClient::token, &loop, [&](const QString& id, int, const QString&) {
+        if (id == requestId && firstToken == 0.0) {
+            firstToken = static_cast<double>(clock.nsecsElapsed()) / 1e9;
+        }
+    });
+    connect(&m_client, &DaemonClient::done, &loop, [&](const QString& id, const QString& done) {
+        if (id == requestId) {
+            result = parseJson(done).toObject();
+            loop.quit();
+        }
+    });
+    connect(&m_client, &DaemonClient::error, &loop,
+            [&](const QString& id, const QString& code, const QString& message) {
+                if (id == requestId) {
+                    result = {{u"error"_s, code}, {u"message"_s, message}};
+                    loop.quit();
+                }
+            });
+    clock.start();
+    const QDBusMessage reply = m_client.call(u"RunSkill"_s, {skillId, input, options()});
+    if (reply.type() != QDBusMessage::ReplyMessage) {
+        return {{u"error"_s, reply.errorName().section(u'.', -1)}, {u"message"_s, reply.errorMessage()}};
+    }
+    requestId = reply.arguments().value(0).toString();
+    loop.exec();
+    result.insert(u"client_ttft_s"_s, firstToken);
+    result.insert(u"client_total_s"_s, static_cast<double>(clock.nsecsElapsed()) / 1e9);
+    return result;
+}
+
+int Cli::batch()
+{
+    // One request per line of standard input, {"skill": ..., "input": {...}}; one result per
+    // line of standard output, in order: the Done JSON with the client's timings, or
+    // {"error": ..., "message": ...}. For the eval harness and the latency bench.
+    QFile in;
+    if (!in.open(stdin, QIODevice::ReadOnly)) {
+        return kExitFailed;
+    }
+    while (!in.atEnd()) {
+        const QByteArray line = in.readLine().trimmed();
+        if (line.isEmpty()) {
+            continue;
+        }
+        const QJsonObject request = QJsonDocument::fromJson(line).object();
+        const QJsonObject result =
+            runOne(request.value(u"skill"_s).toString(), request.value(u"input"_s).toObject().toVariantMap());
+        out() << QString::fromUtf8(QJsonDocument(result).toJson(QJsonDocument::Compact)) << Qt::endl;
+    }
+    return kExitOk;
 }
 
 void Cli::interrupt()

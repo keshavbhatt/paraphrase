@@ -39,6 +39,7 @@ Command parse(const QCoreApplication& app)
         "  rewrite [--tone T] [TEXT]   rewrite in a tone (see paraphrase skills; default professional)\n"
         "  reply [--draft D] [MESSAGE] suggest replies to a message\n"
         "  run SKILL [TEXT]            run any skill by its id\n"
+        "  batch                       JSON lines in and out: {\"skill\", \"input\"} per line (eval)\n"
         "  skills                      list the skills\n"
         "  status                      the daemon, its model and this computer\n"
         "  models [list | download MODEL | pause MODEL | delete MODEL]\n\n"
@@ -53,7 +54,8 @@ Command parse(const QCoreApplication& app)
     const QCommandLineOption context(u"context"_s, u"Run: the context input of the skill."_s, u"text"_s);
     const QCommandLineOption json(u"json"_s, u"Print the full result as JSON."_s);
     const QCommandLineOption noStream(u"no-stream"_s, u"Print the answer only when it is complete."_s);
-    parser.addOptions({tone, to, draft, context, json, noStream});
+    const QCommandLineOption model(u"model"_s, u"Run on this model (see paraphrase models)."_s, u"id"_s);
+    parser.addOptions({tone, to, draft, context, json, noStream, model});
     parser.addPositionalArgument(u"command"_s, u"What to do (see above)."_s);
     parser.process(app);
     QStringList args = parser.positionalArguments();
@@ -69,6 +71,7 @@ Command parse(const QCoreApplication& app)
         .context = parser.value(context),
         .json = parser.isSet(json),
         .noStream = parser.isSet(noStream),
+        .model = parser.value(model),
     };
 }
 
