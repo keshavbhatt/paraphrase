@@ -30,3 +30,4 @@ endfunction()
 
 paraphrase_add_test(tst_smoke tst_smoke.cpp llama)
 paraphrase_add_test(tst_language tst_language.cpp paraphrase_util)
+paraphrase_add_test(tst_skills tst_skills.cpp paraphrase_skills)

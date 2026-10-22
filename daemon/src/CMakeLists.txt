@@ -1,4 +1,5 @@
 add_subdirectory(util)
+add_subdirectory(skills)
 
 configure_file(app/version.h.in "${CMAKE_CURRENT_BINARY_DIR}/generated/paraphrase/version.h" @ONLY)
 
