@@ -128,3 +128,121 @@ script and common words and says "its own language" when unsure.
 **Consequences.** Retries add a second generation to the few outputs that fail; the eval
 and the bench run through the same engine code (`eval/paraeval/engine.py`), so their numbers
 include it. The daemon ports the detector and the check to C++ with the same test vectors.
+
+---
+
+## ADR-007: One app ID, and a D-Bus name under it (2026-10-22)
+
+**Status.** Accepted (owner, 2026-10-22; DOCS/packaging.md, section 3).
+
+**Context.** A Flatpak may own `<app-id>` and `<app-id>.*` on the session bus without extra
+permission; any other name needs `--own-name`, which Flathub reviewers question. A snap
+needs a store declaration for any well-known name. PLAN 5.1 used `com.ktechpit.Paraphrase1`.
+
+**Decision.** App ID `com.ktechpit.paraphrase` everywhere (desktop file, metainfo, Flatpak,
+snap `common-id`), like Omnidict's `com.ktechpit.omnidict`. Daemon bus name
+`com.ktechpit.paraphrase.Daemon`, object path `/com/ktechpit/paraphrase/Daemon`, interface
+`com.ktechpit.paraphrase.Daemon1` (the number versions the API). Request the snap's name
+declaration with the first upload.
+
+**Consequences.** No extra Flatpak permission for the bus name. PLAN 5.1 uses the new names.
+
+---
+
+## ADR-008: Packages build llama.cpp for every CPU, not for the build machine (2026-10-22)
+
+**Status.** Accepted.
+
+**Context.** The M0 build uses `GGML_NATIVE=ON`, tuned to the laptop that built it. A package
+built that way stops with an illegal instruction on older CPUs.
+
+**Decision.** Packages build llama.cpp with `GGML_NATIVE=OFF`, `BUILD_SHARED_LIBS=ON`,
+`GGML_BACKEND_DL=ON` and `GGML_CPU_ALL_VARIANTS=ON`: one CPU library per instruction-set level,
+the best one loaded at run time (as Debian's llama.cpp packages do). Developer builds may
+stay native.
+
+**Consequences.** M1 re-runs the M0 bench on the portable build; a gap against the native
+numbers is a bug to fix before M5, not a reason to ship native builds.
+
+---
+
+## ADR-009: Models live in each format's own data folder (2026-10-22)
+
+**Status.** Accepted.
+
+**Context.** Models are 3 to 10 GB. In a snap the per-revision folder (`$SNAP_USER_DATA`) is
+copied on every refresh, and snapd snapshots a snap's data when it is removed.
+
+**Decision.** Models go in `$SNAP_USER_COMMON` (snap), `~/.var/app/com.ktechpit.paraphrase/data`
+(Flatpak), `$XDG_DATA_HOME/paraphrase` (AppImage, native). The UI always shows the real path
+and the space used; uninstall help mentions `snap remove --purge` and
+`flatpak uninstall --delete-data`.
+
+**Consequences.** The Settings mock's fixed path becomes the path of the running format.
+
+---
+
+## ADR-010: Clients start the daemon; it never depends on desktop services (2026-10-22)
+
+**Status.** Accepted.
+
+**Context.** D-Bus activation, user services and login autostart each work differently in a
+snap, a Flatpak and an AppImage, and some need store approval (DOCS/packaging.md).
+
+**Decision.** Any client (main window, popup, CLI) starts `paraphrase-daemon` when it is not
+on the bus; the daemon unloads the model and exits after a quiet period. If the daemon
+cannot own its bus name (for example a snap still waiting for its name declaration), the
+client runs it as a private child process over a private socket, with the same API. Login
+autostart is an option in Settings, through the Background portal (Flatpak), the snap's
+`autostart` key, or `~/.config/autostart` (AppImage, native). D-Bus activation and user
+services are optimisations, never required.
+
+**Consequences.** PLAN M5's "systemd user unit" is replaced by this. The daemon API is the
+same in both modes.
+
+---
+
+## ADR-011: D-Bus is the API; the Unix socket serves only the browser's native host (2026-10-22)
+
+**Status.** Accepted (refines PLAN D7).
+
+**Decision.** Desktop clients use D-Bus only. The Unix socket exists for the native messaging
+host (M4) and lives where each format shares files with the host:
+`$XDG_RUNTIME_DIR/app/com.ktechpit.paraphrase/` (Flatpak), `$XDG_RUNTIME_DIR/snap.paraphrase/`
+(snap), `$XDG_RUNTIME_DIR/paraphrase/` (AppImage, native); mode 0600, never TCP.
+
+---
+
+## ADR-012: One package per format, holding the daemon, the app and the CLI (2026-10-22)
+
+**Status.** Accepted.
+
+**Decision.** Each of snap, Flatpak and AppImage ships all three programs together. The
+exceptions are pieces that must live on the host: the input-method addon (M6) as distro
+packages (deb, rpm, AUR), and browser manifests that the app writes where the format allows
+(DOCS/packaging.md, section 4).
+
+**Consequences.** No cross-sandbox D-Bus rules between our own components.
+
+---
+
+## ADR-013: Standalone first: every feature works without desktop integration (2026-10-22)
+
+**Status.** Accepted (owner, 2026-10-22: "The application and all its features should be
+available without these desktop integration issues caused by packaging").
+
+**Context.** The global shortcut, reading text from other apps and typing back into them
+depend on the session (X11, KDE, GNOME, wlroots) and on the package format (DOCS/packaging.md).
+Any of them can be missing.
+
+**Decision.** The main window is a complete surface on its own: paste or type text, run any
+skill (proofread with the diff, reply, every tone, summarize, format, translate, custom
+actions), copy the result. It needs nothing from the desktop but a window and the clipboard
+while it has focus. The popup, the global shortcut, capture and inject are accelerators on
+top of the same skills; when one is missing the app says what is unavailable and how to
+get the same result in the main window, and nothing else stops working. The CLI is the
+second standalone surface.
+
+**Consequences.** M2 builds the main window with every skill before the popup's integration
+backends; its acceptance test runs with every hotkey, capture and inject backend switched off.
+A main-window mock is needed before it is coded (mocks-before-screens rule).

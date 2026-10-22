@@ -33,19 +33,21 @@ What makes this product different: **nothing leaves the machine**. There is no a
 
 | # | Decision | Rationale |
 |---|----------|-----------|
-| D1 | **Daemon + thin clients.** One background daemon (`paraphrase-daemon`) owns the model and does all inference. The popup, CLI, browser extension and IME are clients | The model loads once and is shared; clients stay tiny; each surface can ship independently |
+| D1 | **Daemon + thin clients.** One background daemon (`paraphrase-daemon`) owns the model and does all inference. The main window, popup, CLI, browser extension and IME are clients; any client starts the daemon when it is not running (ADR-010) | The model loads once and is shared; clients stay tiny; each surface can ship independently |
 | D2 | Inference = **llama.cpp linked as a library** (C API) inside the C++ daemon. GGUF models | Fastest CPU path, Vulkan for any GPU vendor, mmap loading, grammar-constrained decoding, parallel sequences, prompt caching. No Python at runtime |
 | D3 | Language/stack: **C++20 + Qt 6** for daemon and desktop UI; **Python** only for the offline eval harness and dataset tooling | Owner's core stack; one toolchain for shipping code |
 | D4 | Every feature is a **declarative "skill"** (YAML: prompt template, sampling params, output schema/grammar, limits). No feature-specific C++ in the engine | New actions and per-model prompt tuning without recompiling; user-defined custom actions come for free |
 | D5 | **Structured outputs via GBNF grammars** wherever the output has a shape (reply chips, edit lists, tables) | Small models are unreliable at free-form JSON; grammars make them reliable and cheaper (no retries) |
 | D6 | Proofread returns the **full corrected text**; the client computes a word-level diff locally to highlight changes | More robust with small models than asking for an edit list; the diff view is what makes Replace trustworthy |
-| D7 | IPC: **D-Bus session bus** for desktop clients + **Unix socket** for the native-messaging host. **No TCP port** | A localhost HTTP port is reachable by any web page (DNS rebinding, CSRF); avoid the whole class |
+| D7 | IPC: **D-Bus session bus** for desktop clients + **Unix socket** for the native-messaging host only, in the folder each package format shares with the host (ADR-011). **No TCP port** | A localhost HTTP port is reachable by any web page (DNS rebinding, CSRF); avoid the whole class |
 | D8 | Models are **downloaded on demand from upstream** (Hugging Face), pinned by revision + sha256, from a `models.json` catalog. Never re-hosted | Model licences differ; downloading from source avoids redistribution questions. Same catalog/download pattern as Omnidict |
 | D9 | **Hardware probe** picks a default model tier at first run (RAM, VRAM, CPU flags, Vulkan device) | "Super efficient" means the right model for the machine, not one size for all |
 | D10 | Linux first (X11 + Wayland), designed so Windows is a port of the capture/inject layer only | Owner's platform; Qt makes Windows realistic later |
 | D11 | Capture/inject layer is a **pluggable backend interface** with ranked fallbacks per session type (see §6) | Wayland capabilities differ per compositor; the app must degrade gracefully, never just fail |
 | D12 | Reasoning/"thinking" modes of models are **always disabled** for writing tasks | Latency; writing tasks don't benefit |
 | D13 | Privacy defaults: history **off**, no logs of user text, crash reports contain no text. Optional history is stored locally and encrypted | The whole value proposition |
+| D14 | **Standalone first** (owner, 2026-10-22, ADR-013): every feature works in the main window with nothing from the desktop but a window and the clipboard. The global shortcut, capture and inject are accelerators; when one is missing the app says so and points to the main window | Packaging (snap, Flatpak, AppImage) and the session (X11, KDE, GNOME, wlroots) decide which integrations work; the product must not depend on them |
+| D15 | **Packaging:** snap and Flatpak first, AppImage as a portable build; one package per format with the daemon, app and CLI; app ID `com.ktechpit.paraphrase`; llama.cpp built for every CPU level, not the build machine (ADR-007, ADR-008, ADR-012, DOCS/packaging.md) | Store rules and sandboxes shape the bus name, the data folder and the build |
 
 ---
 
@@ -69,10 +71,11 @@ Languages: English first-class; Hindi and Hinglish (Latin-script Hindi) as a sta
 
 ### 3.2 UX surfaces
 
-1. **Popup assistant (v1, primary).** Global hotkey → a small floating panel near the cursor showing the captured text, action chips (Proofread · Tone ▾ · Reply · Summarize · Format ▾ · Translate ▾ · Custom ▾), a streaming result area, and **Replace / Copy / Retry / ‹ variants ›**. Proofread shows an inline diff. Esc dismisses. The panel never steals focus longer than needed.
-2. **Tray + main window.** Compose from scratch, settings, model manager, custom actions, optional history.
-3. **CLI** (`paraphrase proofread < file`, `paraphrase reply --json`). Useful for scripting and as the hotkey fallback (§6).
-4. **Browser extension (M4).** Gmail-style reply chips inside webmail (Gmail, Outlook web, Zimbra/Carbonio, Proton). Also a selection menu in any text field. Talks to the daemon via native messaging.
+1. **Main window (v1, always available).** Paste or type text, run any skill, see the diff or the variants, copy the result. Works in every package format and session with no desktop integration (D14). Also the place for compose, settings, the model manager, custom actions and optional history.
+2. **Popup assistant (v1, the fast path).** Global hotkey → a small floating panel near the cursor showing the captured text, action chips (Proofread · Tone ▾ · Reply · Summarize · Format ▾ · Translate ▾ · Custom ▾), a streaming result area, and **Replace / Copy / Retry / ‹ variants ›**. Proofread shows an inline diff. Esc dismisses. The panel never steals focus longer than needed.
+3. **Tray icon** where the desktop shows one (KDE; GNOME needs an extension): opens the main window and the popup.
+4. **CLI** (`paraphrase proofread < file`, `paraphrase reply --json`). Useful for scripting and as the hotkey fallback (§6).
+5. **Browser extension (M4).** Gmail-style reply chips inside webmail (Gmail, Outlook web, Zimbra/Carbonio, Proton). Also a selection menu in any text field. Talks to the daemon via native messaging.
 5. **Thunderbird add-on (M4).** Reply chips in the message view; tone/proofread in the composer.
 6. **Input-method addon (M6).** Fcitx5 first, then IBus. Works inside every app on Wayland, can read surrounding text and commit text natively. This is the Samsung Keyboard–style experience and the long-term best answer to Wayland limits.
 
@@ -127,7 +130,7 @@ paraphrase/
 
 ## 5. Daemon design (`paraphrase-daemon`)
 
-### 5.1 Request API (D-Bus `com.ktechpit.Paraphrase1`, mirrored on the Unix socket as JSON lines)
+### 5.1 Request API (D-Bus name `com.ktechpit.paraphrase.Daemon`, interface `com.ktechpit.paraphrase.Daemon1`, ADR-007; mirrored on the Unix socket as JSON lines for the native host)
 
 ```
 RunSkill(skill_id: s, input: a{sv}, options: a{sv}) -> request_id: s
@@ -138,7 +141,7 @@ Cancel(request_id)
 ListSkills() -> json
 Status() -> json        # loaded model, tier, backend (cpu/vulkan), memory, queue depth
 Models: List/Download/Delete/SetDefault, DownloadProgress signal
-Warm()                  # clients call this when the popup opens, before the user picks an action
+Warm(skill_id)          # clients call this when the popup opens: read the text ahead for the likely action (ADR-005)
 ```
 
 `input` keys: `text`, `context` (thread / surrounding text), `lang`, `tone`, `intent`, `target_lang`.
@@ -238,6 +241,7 @@ The popup flow needs three things: a **global hotkey**, the **text** the user me
 | Fallback | — | result on clipboard + "Press Ctrl+V" toast | same | same |
 
 Rules:
+- **Standalone first (D14):** every backend may be missing. The app checks what works at start-up, shows it in Settings, and when the user reaches for a missing one it says what to do instead (copy first, paste the result, or use the main window). No feature is reachable only through an integration.
 - **Clipboard hygiene:** save the user's clipboard before any synthetic copy/paste and restore it after.
 - **Never type into a window the user didn't choose:** remember the target window at hotkey time; if focus changed, fall back to clipboard-only.
 - Keep `docs/platform-matrix.md` current; every backend has an integration test on a nested/headless compositor where possible.
@@ -282,13 +286,13 @@ Rules:
 
 | M | Deliverable | Acceptance |
 |---|---|---|
-| **M0 — Feasibility spike** | llama.cpp + 3–5 candidate models; prototype prompts for proofread, reply and rewrite; latency bench on reference machines A and B; first eval sets (50 items per skill) | A written go/no-go in `docs/models.md` with measured numbers; default fast/quality models chosen; §5.4 targets revised |
-| **M1 — Daemon** | paraphrase-daemon: engine, skill registry, D-Bus API, model catalog + downloader + hardware probe, CLI, eval harness | `paraphrase proofread`, `reply` and `rewrite` work from the CLI; eval reports generated; unit tests green |
-| **M2 — Popup on X11 + KDE Wayland** | Tray, hotkey (all three backends), capture, popup UI with streaming, diff view, variants, Replace/Copy | The full flow works in Telegram Desktop, a browser text field, LibreOffice and a terminal editor on X11 and KDE Wayland |
-| **M3 — Polish + GNOME/wlroots** | Clipboard-flow fallback with guidance, RemoteDesktop portal paste, settings, model manager UI, custom actions, compose window, optional history, speculative decoding where it helps | Works on GNOME Wayland via the documented fallback; first-run setup takes under 2 minutes on reference machine A |
-| **M4 — Mail** | Browser extension + native host + Gmail/Outlook/Zimbra-Carbonio adapters; Thunderbird add-on | Reply chips appear in each supported webmail and insert correctly |
-| **M5 — Release** | Snap, Flatpak, AppImage; systemd user unit for the daemon; store listings; promo video | Installs and runs on a clean Ubuntu LTS, Fedora and Arch |
-| **M6 — IME + Windows** | Fcitx5 addon (inline suggestions, a Writing Assist panel), then IBus; Windows build of the capture/inject layer | Inline proofread/tone in any app via the input method |
+| **M0: Feasibility spike** | llama.cpp + 3–5 candidate models; prototype prompts for proofread, reply and rewrite; latency bench on reference machines A and B; first eval sets (50 items per skill) | A written go/no-go in `docs/models.md` with measured numbers; default fast/quality models chosen; §5.4 targets revised |
+| **M1: Daemon** | paraphrase-daemon: engine, skill registry, D-Bus API, model catalog + downloader + hardware probe, CLI, eval harness | `paraphrase proofread`, `reply` and `rewrite` work from the CLI; eval reports generated; unit tests green |
+| **M2: Main window + popup on X11 + KDE Wayland** | Main window with every skill (D14), streaming, diff view, variants, Copy; then tray, hotkey (all three backends), capture, popup UI, Replace | Every skill works from the main window with all hotkey, capture and inject backends switched off; the popup flow works in Telegram Desktop, a browser text field, LibreOffice and a terminal editor on X11 and KDE Wayland |
+| **M3: Polish + GNOME/wlroots** | Clipboard-flow fallback with guidance, RemoteDesktop portal paste, settings, model manager UI, custom actions, compose, optional history, login autostart per format (ADR-010) | Works on GNOME Wayland via the documented fallback; first-run setup takes under 2 minutes on reference machine A |
+| **M4: Mail** | Browser extension + native host + Gmail/Outlook/Zimbra-Carbonio adapters; Thunderbird add-on | Reply chips appear in each supported webmail and insert correctly |
+| **M5: Release** | Snap, Flatpak, AppImage (DOCS/packaging.md); snap D-Bus name declaration; store listings; promo video | Installs and runs on a clean Ubuntu LTS, Fedora and Arch in each format, and every skill works from the main window in each |
+| **M6: IME + Windows** | Fcitx5 addon (inline suggestions, a Writing Assist panel), then IBus, shipped as distro packages (ADR-012); Windows build of the capture/inject layer | Inline proofread/tone in any app via the input method |
 | **v2** | "Write like me" style profile from opt-in samples (few-shot first, LoRA later); opt-in BYO cloud key; more languages | — |
 
 Order: **M0 before anything else.** If a ~1–2B model on reference machine A can't do proofread and reply well enough, the product shape changes. For example, it might require a GPU or accept slower targets, and that must be known before the UI is built.
