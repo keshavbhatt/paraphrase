@@ -14,6 +14,32 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-23 - My actions, General and Shortcut settings, both models loaded, facts kept
+
+- My actions (mock settings-actions.html, built before approval): skill schema v5
+  `user_presets`; the daemon keeps the user's actions in actions.json next to its settings
+  (`ListActions`, `SaveAction`, `DeleteAction`, the `SkillsChanged` signal) and runs an unsaved
+  one through the template with its `instruction` and a `tier` option (Try it). Settings has the
+  list, the editor and Try it; the window and the popup show My actions with "New action...".
+- Settings General and Shortcut (mock settings-general-shortcut.html, built before approval):
+  start at login (autostart entry, or the Background portal in a Flatpak), keep running in the
+  tray, appearance (system, light, dark); what this desktop lets Paraphrase do, in plain words,
+  and the command to bind by hand. The notice's link opens the Shortcut page.
+- The fast and the quality model stay loaded together when memory holds them with 6 GB to
+  spare: on this laptop, proofread after a tone went from a reload (6 to 15 s) to 1.2 s.
+- Rewrites and formats say which names, numbers and dates they kept ("kept: Sam, Friday") and
+  warn in yellow when one is missing; the popup offers "Write it in another language"; proofread
+  with nothing to fix says "Looks good, no changes" and offers only Close.
+- Desktop entry with a "Work on the selected text" action, the app icon and AppStream metadata
+  (PLAN 13 wording; the homepage URL is left out until there is one).
+- `tst_real_models` (by hand, `PARAPHRASE_TEST_REAL=1`) drives every action through the window
+  and the popup with the real models and saves screenshots; it found the window widening with a
+  long action label and a stale status line, both fixed.
+- Next: per-skill prompt caching in the engine (proofread then reply on the same model still
+  reads ~600 prompt tokens, about 4 s on this CPU; keep each skill's system prompt in its own
+  KV sequence and copy it in); the first-time portal dialogs, checked by a person; GNOME and
+  wlroots (M3); opt-in history (M3, needs a mock).
+
 ## 2026-10-23 - M2: every main-window feature, the popup, setup and settings, desktop backends
 
 Owner, before sleeping: autopilot; screens without an approved mock get a mock, are built, and
