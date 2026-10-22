@@ -34,6 +34,7 @@ struct ServiceSetup
     models::ModelDownloader::UrlResolver urlResolver; ///< tests: a local server; else Hugging Face
     int idleUnloadMs = 10 * 60 * 1000;                ///< PLAN 5.3: unload the model after 10 quiet minutes
     int idleExitMs = 30 * 60 * 1000;                  ///< ADR-010: exit after a quiet period
+    QString settingsPath; ///< the user's model choices (SetTierModel, SetSpeedUp); empty: not kept
 };
 
 /// The daemon's D-Bus API (PLAN 5.1, DOCS/api.md): `com.ktechpit.paraphrase.Daemon1` at
@@ -84,6 +85,11 @@ public Q_SLOTS:
     Q_SCRIPTABLE void PauseDownload(const QString& modelId);
     /// Deletes a model and its draft head; refused while it is loaded or downloading.
     Q_SCRIPTABLE void DeleteModel(const QString& modelId);
+    /// The model a tier ("fast", "quality") runs on, chosen in Settings; "" goes back to the
+    /// automatic choice (ADR-016). Kept across restarts.
+    Q_SCRIPTABLE void SetTierModel(const QString& tier, const QString& modelId);
+    /// Turns the draft heads (the "speed-up", ADR-004) on or off. Kept across restarts.
+    Q_SCRIPTABLE void SetSpeedUp(bool on);
 
 Q_SIGNALS:
     // Declared for introspection; sent as targeted signals to the requesting client only.
@@ -116,6 +122,10 @@ private:
     [[nodiscard]] QString checkFields(const skills::Skill& skill, const skills::RequestFields& fields) const;
     static constexpr qsizetype kMaxToneLength = 40;
     [[nodiscard]] QSet<QString> installedModels() const;
+    /// The model a tier runs on now: the user's choice when it is installed, else TierSelector.
+    [[nodiscard]] const models::ModelEntry* modelForTier(const QString& tier) const;
+    void loadSettings();
+    void saveSettings() const;
     /// The requested model, or the one for the job's tier (TierSelector), with its draft
     /// head when installed.
     [[nodiscard]] bool chooseModel(Job& job, const models::ModelEntry* requested = nullptr) const;
@@ -147,6 +157,8 @@ private:
     QString m_loadedModel;
     models::ModelDownloader m_downloader;
     QHash<QString, qint64> m_lastProgressMs; ///< throttles DownloadProgress per model
+    QHash<QString, QString> m_tierChoice;    ///< tier -> model id the user chose
+    bool m_speedUp = true;
 
     QTimer m_unloadTimer;
     QTimer m_exitTimer;

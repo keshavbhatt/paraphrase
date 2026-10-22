@@ -64,6 +64,7 @@ private:
                 .urlResolver = {},
                 .idleUnloadMs = 60'000,
                 .idleExitMs = 60'000,
+                .settingsPath = {},
             },
             address);
         m_server->start();
