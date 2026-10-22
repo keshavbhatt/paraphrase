@@ -17,7 +17,7 @@ The goal is the same: **small, boring, testable code**.
 | Language | C++20 for our targets (`CMAKE_CXX_STANDARD 20`, required, no extensions). Third-party code (llama.cpp, yaml-cpp) keeps its own standard. |
 | Qt | Qt 6.11 minimum, the version of the KDE snap SDK and runtimes. No Qt5 compatibility shims. |
 | Build | CMake >= 3.25 (`add_subdirectory(... SYSTEM)` for third-party headers), `qt_standard_project_setup()`, `qt_add_executable`. No qmake. The CMake root is the repository root: the daemon, the CLI and later the app share one build. |
-| Dev builds | `scripts/dev-build.sh` against the `kde-qt6-core24-sdk` snap, run and tested against the `kf6-core24` runtime snap (as Omnidict): what compiles here is what ships. |
+| Dev builds | **Identical to the snap pipeline** (owner, 2026-10-22): `scripts/dev-build.sh` builds and `dev-run.sh --ctest` tests in core24 (Ubuntu 24.04) with its GCC 13, the `cmake` snap and the `kde-qt6-core24-sdk` snap, tests running against the `kf6-core24` runtime snap. On any other host they run inside the container `packaging/core24/Dockerfile` (`scripts/core24-run.sh`, Docker); CI's Ubuntu 24.04 runner builds directly. Never the host's compiler, cmake or Qt. The Flatpak pipeline's toolchain differs and is checked in CI from M5. |
 | Compiler | GCC >= 12 / Clang >= 15. Warnings on: `-Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wsign-conversion -Wnon-virtual-dtor -Wold-style-cast` and more (`cmake/Warnings.cmake`), on our targets only. Warnings are errors in CI (`-Werror` behind `PARAPHRASE_WERROR`). |
 | Formatting | `clang-format` with the repo `.clang-format`; CI runs `clang-format --dry-run --Werror`. |
 | Static analysis | `clang-tidy` with the repo `.clang-tidy`; `make lint` runs it with warnings as errors. |

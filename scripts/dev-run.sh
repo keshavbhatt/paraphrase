@@ -18,10 +18,14 @@ source "$DIR/scripts/snap-runtime-env.sh"
     echo "kf6-core24 runtime snap missing: sudo snap install kf6-core24" >&2; exit 1; }
 
 if [ "${1:-}" = "--ctest" ]; then
-    # ctest is a host binary: keep the host environment. The tests themselves get the
-    # runtime env through their CTest ENVIRONMENT property (daemon/tests/CMakeLists.txt).
+    # Tests run where the build ran: core24, the shipped snap's base (scripts/core24-run.sh).
+    if ! paraphrase_in_core24; then
+        exec "$DIR/scripts/core24-run.sh" scripts/dev-run.sh "$@"
+    fi
+    # ctest from the cmake snap, like the configure step. The tests get the runtime env
+    # through their CTest ENVIRONMENT property (daemon/tests/CMakeLists.txt).
     cd "$BUILD"
-    exec ctest --output-on-failure "${@:2}"
+    exec "${PARAPHRASE_CTEST:-/snap/cmake/current/bin/ctest}" --output-on-failure "${@:2}"
 fi
 
 paraphrase_prepare_runtime_farm "$BUILD"

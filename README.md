@@ -25,12 +25,14 @@ models.json    model catalog: pinned upstream revisions, sha256, licences
 ## Prerequisites (Arch Linux)
 
 ```sh
-sudo pacman -S --needed base-devel git cmake ninja clang vulkan-headers shaderc vulkan-icd-loader uv shellcheck snapd
+sudo pacman -S --needed base-devel git cmake ninja clang vulkan-headers shaderc vulkan-icd-loader uv shellcheck snapd docker
 sudo snap install kde-qt6-core24-sdk kf6-core24
+sudo snap install cmake --classic
 ```
 
-The daemon builds against the KDE Qt snap SDK and runs against its runtime snap, the same Qt
-the packages ship (as Omnidict). The Vulkan driver for your GPU (`vulkan-intel`,
+The daemon builds exactly as the snap pipeline does: in core24 (Ubuntu 24.04) with GCC 13,
+the cmake snap and the KDE Qt snap SDK. On a host other than Ubuntu 24.04, `make build` and
+`make test` run in a Docker container with that environment (`scripts/core24-run.sh`). The Vulkan driver for your GPU (`vulkan-intel`,
 `vulkan-radeon` or `nvidia-utils`) is only needed for the M0 Vulkan bench.
 
 ## Quick start

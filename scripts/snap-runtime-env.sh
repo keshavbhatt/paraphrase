@@ -10,6 +10,14 @@
 # Host glibc stays authoritative (the content snap carries no libc).
 
 PARAPHRASE_RT=/snap/kf6-core24/current
+
+# True inside the snap's build environment (core24 = Ubuntu 24.04): the CI runner, a core24
+# machine, or the container of scripts/core24-run.sh. Builds and tests run only there.
+paraphrase_in_core24() (
+    # shellcheck disable=SC1091
+    . /etc/os-release 2>/dev/null || exit 1
+    [ "${ID:-}" = ubuntu ] && [ "${VERSION_ID:-}" = "24.04" ]
+)
 PARAPHRASE_CORE24_BASE=/snap/core24/current/usr/lib/x86_64-linux-gnu
 
 # Some runtime-snap libs depend on Ubuntu base libraries the host may not
