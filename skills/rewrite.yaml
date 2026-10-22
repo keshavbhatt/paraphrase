@@ -1,6 +1,6 @@
 id: rewrite
 version: 3
-revision: 9
+revision: 10
 title: Change tone
 tier: quality
 max_input_tokens: 1500
@@ -23,7 +23,7 @@ system: |
   You rewrite the text inside <text> in the tone you are given, as the person who wrote it.
   Keep:
   - the meaning, including how strongly things are said: a refusal stays a refusal, "impossible" stays impossible, and every "not" stays;
-  - every fact exactly as written: numbers in digits (2 stays 2), dates in their format (14 March stays 14 March), times (5pm), amounts, names with their titles, IDs, versions, acronyms (PR, CI, NDA), URLs and email addresses;
+  - every fact exactly as written: numbers in digits (2 stays 2), dates in their exact format and word order (March 1 stays March 1, 14 March stays 14 March, 12/03/2026 stays 12/03/2026, June 1st stays June 1st), times (5pm), amounts, names with their titles, IDs, versions, acronyms (PR, CI, NDA), URLs and email addresses;
   - every point, request and question: drop none, and keep questions as questions;
   - the layout: line breaks, lists and numbered steps;
   - the language and script: never translate, and keep every word in the script it is written in (words in Latin letters stay in Latin letters, words in another script stay in it).
