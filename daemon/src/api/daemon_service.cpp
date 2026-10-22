@@ -567,10 +567,20 @@ QString DaemonService::Status()
             },
         },
         {u"models_dir"_s, m_store.root()},
-        {u"tier_models"_s, QJsonObject{{u"fast"_s, idOf(modelForTier(u"fast"_s))},
-                                       {u"quality"_s, idOf(modelForTier(u"quality"_s))}}},
-        {u"tier_choice"_s, QJsonObject{{u"fast"_s, m_tierChoice.value(u"fast"_s)},
-                                       {u"quality"_s, m_tierChoice.value(u"quality"_s)}}},
+        {
+            u"tier_models"_s,
+            QJsonObject{
+                {u"fast"_s, idOf(modelForTier(u"fast"_s))},
+                {u"quality"_s, idOf(modelForTier(u"quality"_s))},
+            },
+        },
+        {
+            u"tier_choice"_s,
+            QJsonObject{
+                {u"fast"_s, m_tierChoice.value(u"fast"_s)},
+                {u"quality"_s, m_tierChoice.value(u"quality"_s)},
+            },
+        },
         {u"speed_up"_s, m_speedUp},
         {u"installed"_s, QJsonArray::fromStringList(installedModels().values())},
     };

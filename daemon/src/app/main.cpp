@@ -12,11 +12,11 @@
 
 #include <QCommandLineParser>
 #include <QCoreApplication>
-#include <QStandardPaths>
 #include <QDBusConnectionInterface>
 #include <QDBusServer>
 #include <QDir>
 #include <QFileInfo>
+#include <QStandardPaths>
 #include <QTextStream>
 
 #include <csignal>

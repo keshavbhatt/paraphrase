@@ -281,10 +281,12 @@ private Q_SLOTS:
             return QJsonDocument::fromJson(call(c, u"Status"_s, {}).arguments().value(0).toString().toUtf8())
                 .object();
         };
-        QCOMPARE(status().value(u"tier_models"_s).toObject().value(u"quality"_s).toString(), u"quality-model"_s);
+        QCOMPARE(status().value(u"tier_models"_s).toObject().value(u"quality"_s).toString(),
+                 u"quality-model"_s);
         QVERIFY(status().value(u"speed_up"_s).toBool());
         // Settings: the quality tier on the fast model, no speed-up.
-        QCOMPARE(call(c, u"SetTierModel"_s, {u"quality"_s, u"fast-model"_s}).type(), QDBusMessage::ReplyMessage);
+        QCOMPARE(call(c, u"SetTierModel"_s, {u"quality"_s, u"fast-model"_s}).type(),
+                 QDBusMessage::ReplyMessage);
         QCOMPARE(call(c, u"SetSpeedUp"_s, {false}).type(), QDBusMessage::ReplyMessage);
         QCOMPARE(call(c, u"SetTierModel"_s, {u"huge"_s, u"fast-model"_s}).type(), QDBusMessage::ErrorMessage);
         QCOMPARE(call(c, u"SetTierModel"_s, {u"fast"_s, u"fast-draft"_s}).type(), QDBusMessage::ErrorMessage);
@@ -302,15 +304,16 @@ private Q_SLOTS:
         // Kept across a restart; "" goes back to the automatic choice.
         startServer(32, {u"fast-model"_s, u"quality-model"_s});
         QDBusConnection again = connect();
-        const QJsonObject s = QJsonDocument::fromJson(
-                                  call(again, u"Status"_s, {}).arguments().value(0).toString().toUtf8())
-                                  .object();
+        const QJsonObject s =
+            QJsonDocument::fromJson(call(again, u"Status"_s, {}).arguments().value(0).toString().toUtf8())
+                .object();
         QCOMPARE(s.value(u"tier_choice"_s).toObject().value(u"quality"_s).toString(), u"fast-model"_s);
         QVERIFY(!s.value(u"speed_up"_s).toBool());
-        QCOMPARE(call(again, u"SetTierModel"_s, {u"quality"_s, QString()}).type(), QDBusMessage::ReplyMessage);
-        const QJsonObject reset = QJsonDocument::fromJson(
-                                      call(again, u"Status"_s, {}).arguments().value(0).toString().toUtf8())
-                                      .object();
+        QCOMPARE(call(again, u"SetTierModel"_s, {u"quality"_s, QString()}).type(),
+                 QDBusMessage::ReplyMessage);
+        const QJsonObject reset =
+            QJsonDocument::fromJson(call(again, u"Status"_s, {}).arguments().value(0).toString().toUtf8())
+                .object();
         QCOMPARE(reset.value(u"tier_models"_s).toObject().value(u"quality"_s).toString(), u"quality-model"_s);
         m_settingsPath.clear();
     }
