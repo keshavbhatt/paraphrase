@@ -13,7 +13,7 @@ struct Tokens
     QColor bg, bar, panel, elevated, sunk, hover, input, border;
     QColor text, muted;
     QColor ins, insBg, del, delBg;
-    QColor privacy, success, warning, danger;
+    QColor privacy, success, successBg, warning, warningBg, danger;
     bool dark = false;
 };
 

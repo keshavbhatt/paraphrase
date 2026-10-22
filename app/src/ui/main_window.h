@@ -1,5 +1,6 @@
 #pragma once
 
+#include "chip_button.h"
 #include "daemon_client.h"
 #include "theme.h"
 #include "util/language_detector.h"
@@ -24,7 +25,8 @@ class QPushButton;
 class QSplitter;
 class QStackedWidget;
 class QTextBrowser;
-class QToolButton;
+class QFrame;
+class QScrollArea;
 class QVBoxLayout;
 
 namespace paraphrase::app {
@@ -70,7 +72,8 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void actionsLoaded();
-    void finished(); ///< a request ended, with a result or a message
+    void settingsRequested(); ///< the header's Settings, or the notice's link
+    void finished();          ///< a request ended, with a result or a message
 
 protected:
     void resizeEvent(QResizeEvent* event) override;
@@ -84,16 +87,22 @@ private:
     };
 
     void buildUi();
-    void buildHeader(QVBoxLayout* main);
+    void buildHeader(QVBoxLayout* root);
+    [[nodiscard]] static QFrame* paneHead(QHBoxLayout*& row);
     [[nodiscard]] QWidget* buildInputPane();
+    [[nodiscard]] QWidget* buildReplyInput();
     [[nodiscard]] QWidget* buildOutputPane();
     [[nodiscard]] QWidget* buildReplyOutput();
-    [[nodiscard]] QHBoxLayout* buildFooter();
+    [[nodiscard]] QWidget* buildFooter();
     [[nodiscard]] QWidget* buildStatusBar();
     void buildActions(const QList<SkillInfo>& skills);
-    [[nodiscard]] QAbstractButton* actionButton(const QString& hint, const SkillInfo& s);
-    [[nodiscard]] QAbstractButton* presetButton(const QString& hint, const QString& base,
-                                                const QList<const SkillInfo*>& variants);
+    [[nodiscard]] ChipButton* actionButton(int number, const QString& base,
+                                           const QList<const SkillInfo*>& variants);
+    [[nodiscard]] static QString actionTitle(const QString& base, const QList<const SkillInfo*>& variants);
+    [[nodiscard]] static QString presetTitle(const SkillInfo& s);
+    void setNotice(const QString& text, const QString& link = {});
+    void makeReplyPolite();
+    void updateActionButtons(const SkillInfo& s);
     void applyTheme();
     void loadStatus();
     void showMessage(const QString& message, const QString& role = QStringLiteral("muted"));
@@ -135,9 +144,10 @@ private:
     QLabel* m_lock = nullptr;
     QWidget* m_notice = nullptr;
     QLabel* m_noticeIcon = nullptr;
+    QLabel* m_noticeText = nullptr;
+    QPushButton* m_settings = nullptr;
     QHBoxLayout* m_actionsRow = nullptr;
     QButtonGroup* m_actionGroup = nullptr;
-    QToolButton* m_toneButton = nullptr;
 
     // Left pane.
     QLabel* m_inTitle = nullptr;
@@ -147,21 +157,25 @@ private:
     QPlainTextEdit* m_message = nullptr;
     QPlainTextEdit* m_draft = nullptr;
     QLabel* m_inHint = nullptr;
+    QLabel* m_langPill = nullptr;
+    QPushButton* m_clear = nullptr;
+    QWidget* m_inFoot = nullptr;
 
     // Right pane.
     QLabel* m_outTitle = nullptr;
     QLabel* m_outInfo = nullptr;
-    QWidget* m_segment = nullptr;
+    QFrame* m_segment = nullptr;
     QPushButton* m_showChanges = nullptr;
     QPushButton* m_showResult = nullptr;
     QStackedWidget* m_outStack = nullptr;
     QTextBrowser* m_output = nullptr;
     QWidget* m_changes = nullptr;
     QVBoxLayout* m_changesLayout = nullptr;
-    QList<QPushButton*> m_replyButtons;
+    QScrollArea* m_changesScroll = nullptr;
+    QList<ChipButton*> m_replyButtons;
     QList<QPushButton*> m_replyCopy;
     QLineEdit* m_replyEdit = nullptr;
-    QPushButton* m_primary = nullptr;
+    ChipButton* m_primary = nullptr;
     QPushButton* m_secondary = nullptr;
     QPushButton* m_retry = nullptr;
 

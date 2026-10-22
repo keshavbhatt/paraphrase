@@ -5,6 +5,7 @@
 // PARAPHRASE_SCREENSHOTS=<dir> it also saves the window in light and dark for review.
 
 #include "fake_daemon.h"
+#include "ui/chip_button.h"
 #include "ui/main_window.h"
 
 #include <QAbstractButton>
@@ -20,7 +21,6 @@
 #include <QTemporaryDir>
 #include <QTest>
 #include <QTextBrowser>
-#include <QToolButton>
 
 using namespace Qt::StringLiterals;
 using namespace paraphrase::testing;
@@ -107,7 +107,7 @@ private Q_SLOTS:
         w.start();
         QVERIFY(w.findChild<QAbstractButton*>(u"action-proofread"_s) != nullptr);
         QVERIFY(w.findChild<QAbstractButton*>(u"action-reply"_s) != nullptr);
-        const auto* tone = w.findChild<QToolButton*>(u"action-rewrite"_s);
+        const auto* tone = w.findChild<paraphrase::app::ChipButton*>(u"action-rewrite"_s);
         QVERIFY(tone != nullptr && tone->menu() != nullptr);
         QStringList tones;
         for (const QAction* a : tone->menu()->actions()) {
@@ -150,7 +150,7 @@ private Q_SLOTS:
         setAnswers(
             {uR"({"replies": ["Yes, Friday works!", "Yes, what time?", "Yes, can I bring dessert?"]})"_s});
         runAndWait(w);
-        QVERIFY(w.findChild<QPushButton*>(u"reply2"_s)->text().contains(u"Yes, what time?"_s));
+        QCOMPARE(w.findChild<paraphrase::app::ChipButton*>(u"reply2"_s)->label(), u"Yes, what time?"_s);
         QCOMPARE(w.findChild<QLineEdit*>(u"replyEdit"_s)->text(), u"Yes, Friday works!"_s);
         w.findChild<QPushButton*>(u"reply3"_s)->click();
         QCOMPARE(w.resultText(), u"Yes, can I bring dessert?"_s);
@@ -166,7 +166,7 @@ private Q_SLOTS:
         w.findChild<QPlainTextEdit*>(u"text"_s)->setPlainText(u"send me the file now"_s);
         setAnswers({u"Could you send me the file, please?"_s});
         const QSignalSpy finished(&w, &MainWindow::finished);
-        const auto* tone = w.findChild<QToolButton*>(u"action-rewrite"_s);
+        const auto* tone = w.findChild<paraphrase::app::ChipButton*>(u"action-rewrite"_s);
         for (QAction* a : tone->menu()->actions()) {
             if (a->objectName() == u"rewrite.polite"_s) {
                 a->trigger();
@@ -175,7 +175,7 @@ private Q_SLOTS:
         QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 1, kTimeoutMs);
         QCOMPARE(w.currentSkill(), u"rewrite.polite"_s);
         QCOMPARE(w.resultText(), u"Could you send me the file, please?"_s);
-        QVERIFY(tone->text().contains(u"Polite"_s));
+        QCOMPARE(tone->label(), u"Tone: Polite"_s);
     }
 
     void saysWhenNoModelIsInstalled()

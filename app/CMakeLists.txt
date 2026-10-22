@@ -4,6 +4,7 @@
 find_package(Qt6 ${PARAPHRASE_QT_MIN_VERSION} REQUIRED COMPONENTS Gui Widgets Svg)
 
 add_library(paraphrase_ui STATIC
+    src/ui/chip_button.cpp
     src/ui/main_window.cpp
     src/ui/theme.cpp
 )

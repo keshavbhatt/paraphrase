@@ -24,6 +24,8 @@
 #include <QToolButton>
 #include <QVBoxLayout>
 
+#include <algorithm>
+
 using namespace Qt::StringLiterals;
 
 namespace paraphrase::app {
@@ -66,7 +68,9 @@ QString html(const QString& text)
 /// The order the actions appear in: the skills the mocks show first, then the rest.
 int rank(const QString& base)
 {
-    static const QStringList kOrder = {u"proofread"_s, u"rewrite"_s, u"reply"_s};
+    static const QStringList kOrder = {
+        u"proofread"_s, u"rewrite"_s, u"reply"_s, u"summarize"_s, u"format"_s, u"translate"_s,
+    };
     const qsizetype i = kOrder.indexOf(base);
     return i < 0 ? static_cast<int>(kOrder.size()) : static_cast<int>(i);
 }
@@ -105,17 +109,19 @@ MainWindow::~MainWindow()
 
 void MainWindow::buildUi()
 {
+    // The layout of main-window.html: a header band, the notice band, then the actions and the
+    // two panes on the window background, and the status band.
     auto* root = new QVBoxLayout(this);
     root->setContentsMargins(0, 0, 0, 0);
     root->setSpacing(0);
+    buildHeader(root);
 
     auto* body = new QWidget;
     auto* main = new QVBoxLayout(body);
-    main->setContentsMargins(20, 16, 20, 16);
+    main->setContentsMargins(16, 14, 16, 16);
     main->setSpacing(14);
     root->addWidget(body, 1);
 
-    buildHeader(main);
     // Actions, filled from the daemon's skills.
     m_actionsRow = new QHBoxLayout;
     m_actionsRow->setSpacing(8);
@@ -142,40 +148,73 @@ void MainWindow::buildUi()
     setRunning(false);
 }
 
-void MainWindow::buildHeader(QVBoxLayout* main)
+void MainWindow::buildHeader(QVBoxLayout* root)
 {
     // Header: the mark, and the privacy line on every surface (DESIGN.md 4).
-    auto* header = new QHBoxLayout;
+    auto* header = new QFrame;
+    header->setObjectName(u"header"_s);
+    auto* row = new QHBoxLayout(header);
+    row->setContentsMargins(14, 10, 14, 10);
+    row->setSpacing(10);
     m_mark = new QLabel;
-    header->addWidget(m_mark);
-    auto* name = label(u"<b>Paraphrase</b>"_s);
-    name->setStyleSheet(u"font-size: 16px;"_s);
-    header->addWidget(name);
-    header->addStretch();
+    row->addWidget(m_mark);
+    row->addWidget(label(u"<b>Paraphrase</b>"_s));
+    row->addStretch();
     m_lock = new QLabel;
-    header->addWidget(m_lock);
-    header->addWidget(label(tr("On this device"), u"private"_s));
-    main->addLayout(header);
+    auto* privacy = new QHBoxLayout;
+    privacy->setSpacing(5);
+    privacy->addWidget(m_lock);
+    privacy->addWidget(label(tr("On this device"), u"private"_s));
+    row->addLayout(privacy);
+    m_settings = button(tr("Settings"), u"flat"_s);
+    m_settings->setObjectName(u"settings"_s);
+    row->addWidget(m_settings);
+    connect(m_settings, &QPushButton::clicked, this, &MainWindow::settingsRequested);
+    root->addWidget(header);
 
     // The notice for what the desktop does not offer (ADR-013): never an error, can be hidden.
     m_notice = new QFrame;
     m_notice->setObjectName(u"notice"_s);
     auto* notice = new QHBoxLayout(m_notice);
-    notice->setContentsMargins(12, 10, 8, 10);
+    notice->setContentsMargins(16, 10, 10, 10);
+    notice->setSpacing(10);
     m_noticeIcon = new QLabel;
     notice->addWidget(m_noticeIcon, 0, Qt::AlignTop);
-    auto* noticeText =
-        label(tr("Paraphrase cannot open over other apps yet, because no global shortcut is set "
-                 "up. Everything works here: paste your text, pick an action, copy the result."));
-    noticeText->setWordWrap(true);
-    notice->addWidget(noticeText, 1);
-    auto* hide = button(QString(), u"flat"_s);
+    m_noticeText = label(QString());
+    m_noticeText->setObjectName(u"noticeText"_s);
+    m_noticeText->setWordWrap(true);
+    m_noticeText->setTextFormat(Qt::RichText);
+    connect(m_noticeText, &QLabel::linkActivated, this, &MainWindow::settingsRequested);
+    notice->addWidget(m_noticeText, 1);
+    auto* hide = button(QString(), u"icon"_s);
+    hide->setProperty("kind", u"flat"_s);
+    hide->setFixedSize(28, 28);
     hide->setObjectName(u"hideNotice"_s);
     hide->setToolTip(tr("Hide this notice"));
     hide->setAccessibleName(tr("Hide this notice"));
     connect(hide, &QPushButton::clicked, m_notice, &QWidget::hide);
     notice->addWidget(hide, 0, Qt::AlignTop);
-    main->addWidget(m_notice);
+    root->addWidget(m_notice);
+    setNotice(tr("This desktop gives Paraphrase no global shortcut, so it cannot open over other apps. "
+                 "Everything works here: paste your text, pick an action, copy the result."));
+}
+
+void MainWindow::setNotice(const QString& text, const QString& link)
+{
+    m_noticeText->setText(link.isEmpty()
+                              ? text.toHtmlEscaped()
+                              : u"%1 <a href=\"settings\">%2</a>"_s.arg(text.toHtmlEscaped(), link));
+    m_notice->setVisible(!text.isEmpty());
+}
+
+QFrame* MainWindow::paneHead(QHBoxLayout*& row)
+{
+    auto* head = new QFrame;
+    head->setObjectName(u"paneHead"_s);
+    row = new QHBoxLayout(head);
+    row->setContentsMargins(14, 8, 10, 8);
+    row->setSpacing(8);
+    return head;
 }
 
 QWidget* MainWindow::buildInputPane()
@@ -184,45 +223,50 @@ QWidget* MainWindow::buildInputPane()
     auto* left = new QFrame;
     left->setObjectName(u"pane"_s);
     auto* leftLayout = new QVBoxLayout(left);
-    leftLayout->setContentsMargins(16, 14, 16, 14);
-    auto* leftHead = new QHBoxLayout;
+    leftLayout->setContentsMargins(0, 0, 0, 0);
+    leftLayout->setSpacing(0);
+    QHBoxLayout* head = nullptr;
+    leftLayout->addWidget(paneHead(head));
     m_inTitle = label(tr("YOUR TEXT"), u"caption"_s);
-    leftHead->addWidget(m_inTitle);
-    m_inInfo = label(QString(), u"muted"_s);
-    leftHead->addWidget(m_inInfo);
-    leftHead->addStretch();
+    head->addWidget(m_inTitle);
+    m_inInfo = label(QString(), u"small"_s);
+    head->addWidget(m_inInfo);
+    head->addStretch();
+    m_langPill = label(QString(), u"pill"_s);
+    m_langPill->setObjectName(u"langPill"_s);
+    head->addWidget(m_langPill);
     auto* paste = button(tr("Paste"), u"flat"_s);
-    auto* clear = button(tr("Clear"), u"flat"_s);
-    leftHead->addWidget(paste);
-    leftHead->addWidget(clear);
-    leftLayout->addLayout(leftHead);
+    m_clear = button(tr("Clear"), u"flat"_s);
+    head->addWidget(paste);
+    head->addWidget(m_clear);
+
     m_inStack = new QStackedWidget;
+    auto* textPage = new QWidget;
+    auto* textLayout = new QVBoxLayout(textPage);
+    textLayout->setContentsMargins(14, 12, 14, 12);
     m_text = new QPlainTextEdit;
     m_text->setObjectName(u"text"_s);
     m_text->setPlaceholderText(tr("Type or paste your text"));
-    m_inStack->addWidget(m_text);
-    auto* replyIn = new QWidget;
-    auto* replyInLayout = new QVBoxLayout(replyIn);
-    replyInLayout->setContentsMargins(0, 0, 0, 0);
-    m_message = new QPlainTextEdit;
-    m_message->setObjectName(u"message"_s);
-    m_message->setPlaceholderText(tr("Paste the message you got"));
-    replyInLayout->addWidget(m_message, 2);
-    replyInLayout->addWidget(label(tr("Your reply so far (optional)"), u"muted"_s));
-    m_draft = new QPlainTextEdit;
-    m_draft->setObjectName(u"draft"_s);
-    m_draft->setPlaceholderText(tr("Start typing and the replies will continue it"));
-    replyInLayout->addWidget(m_draft, 1);
-    m_inStack->addWidget(replyIn);
+    textLayout->addWidget(m_text);
+    m_inStack->addWidget(textPage);
+    m_inStack->addWidget(buildReplyInput());
     leftLayout->addWidget(m_inStack, 1);
-    m_inHint = label(tr("Type or paste anything. Ctrl+Enter runs the selected action."), u"muted"_s);
-    leftLayout->addWidget(m_inHint);
+
+    auto* foot = new QFrame;
+    foot->setObjectName(u"paneFoot"_s);
+    auto* footRow = new QHBoxLayout(foot);
+    footRow->setContentsMargins(14, 10, 14, 10);
+    m_inHint = label(tr("Type or paste anything. Ctrl+Enter runs the selected action."), u"small"_s);
+    m_inHint->setWordWrap(true);
+    footRow->addWidget(m_inHint);
+    m_inFoot = foot;
+    leftLayout->addWidget(foot);
 
     connect(paste, &QPushButton::clicked, this, [this] {
         QPlainTextEdit* target = m_inStack->currentIndex() == 0 ? m_text : m_message;
         target->setPlainText(QApplication::clipboard()->text());
     });
-    connect(clear, &QPushButton::clicked, this, [this] {
+    connect(m_clear, &QPushButton::clicked, this, [this] {
         m_text->clear();
         m_message->clear();
         m_draft->clear();
@@ -233,8 +277,29 @@ QWidget* MainWindow::buildInputPane()
             warmLater();
         });
     }
-
     return left;
+}
+
+QWidget* MainWindow::buildReplyInput()
+{
+    // main-window-reply.html: the message (four lines), then the optional started reply.
+    auto* page = new QWidget;
+    auto* layout = new QVBoxLayout(page);
+    layout->setContentsMargins(14, 14, 14, 14);
+    layout->setSpacing(10);
+    m_message = new QPlainTextEdit;
+    m_message->setObjectName(u"message"_s);
+    m_message->setPlaceholderText(tr("Paste the message you got"));
+    m_message->setFixedHeight(120);
+    layout->addWidget(m_message);
+    layout->addWidget(label(tr("Your reply so far (optional)"), u"small"_s));
+    m_draft = new QPlainTextEdit;
+    m_draft->setObjectName(u"draft"_s);
+    m_draft->setPlaceholderText(tr("Start typing and the replies will continue it"));
+    m_draft->setFixedHeight(70);
+    layout->addWidget(m_draft);
+    layout->addStretch();
+    return page;
 }
 
 QWidget* MainWindow::buildOutputPane()
@@ -243,17 +308,19 @@ QWidget* MainWindow::buildOutputPane()
     auto* right = new QFrame;
     right->setObjectName(u"pane"_s);
     auto* rightLayout = new QVBoxLayout(right);
-    rightLayout->setContentsMargins(16, 14, 16, 14);
-    auto* rightHead = new QHBoxLayout;
+    rightLayout->setContentsMargins(0, 0, 0, 0);
+    rightLayout->setSpacing(0);
+    QHBoxLayout* head = nullptr;
+    rightLayout->addWidget(paneHead(head));
     m_outTitle = label(QString(), u"caption"_s);
-    rightHead->addWidget(m_outTitle);
-    m_outInfo = label(QString(), u"muted"_s);
+    head->addWidget(m_outTitle);
+    m_outInfo = label(QString(), u"small"_s);
     m_outInfo->setObjectName(u"outInfo"_s);
-    m_outInfo->setWordWrap(true);
-    rightHead->addWidget(m_outInfo, 1);
-    m_segment = new QWidget;
+    head->addWidget(m_outInfo, 1);
+    m_segment = new QFrame;
+    m_segment->setObjectName(u"seg"_s);
     auto* seg = new QHBoxLayout(m_segment);
-    seg->setContentsMargins(0, 0, 0, 0);
+    seg->setContentsMargins(2, 2, 2, 2);
     seg->setSpacing(0);
     m_showChanges = button(tr("Changes"), u"segment"_s);
     m_showResult = button(tr("Result"), u"segment"_s);
@@ -266,13 +333,13 @@ QWidget* MainWindow::buildOutputPane()
     segGroup->addButton(m_showChanges);
     segGroup->addButton(m_showResult);
     connect(segGroup, &QButtonGroup::buttonClicked, this, [this] { renderDiff(); });
-    rightHead->addWidget(m_segment);
-    rightLayout->addLayout(rightHead);
+    head->addWidget(m_segment);
 
     m_outStack = new QStackedWidget;
     auto* textOut = new QWidget;
     auto* textOutLayout = new QVBoxLayout(textOut);
-    textOutLayout->setContentsMargins(0, 0, 0, 0);
+    textOutLayout->setContentsMargins(14, 12, 14, 8);
+    textOutLayout->setSpacing(8);
     m_output = new QTextBrowser;
     m_output->setObjectName(u"output"_s);
     m_output->setOpenLinks(false);
@@ -281,16 +348,17 @@ QWidget* MainWindow::buildOutputPane()
     m_changesLayout = new QVBoxLayout(m_changes);
     m_changesLayout->setContentsMargins(0, 0, 0, 0);
     m_changesLayout->setSpacing(2);
-    auto* changesScroll = new QScrollArea;
-    changesScroll->setWidgetResizable(true);
-    changesScroll->setWidget(m_changes);
-    changesScroll->setObjectName(u"changes"_s);
-    textOutLayout->addWidget(changesScroll, 2);
+    m_changesScroll = new QScrollArea;
+    m_changesScroll->setWidgetResizable(true);
+    m_changesScroll->setWidget(m_changes);
+    m_changesScroll->setObjectName(u"changes"_s);
+    m_changesScroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    textOutLayout->addWidget(m_changesScroll, 2);
     m_outStack->addWidget(textOut);
 
     m_outStack->addWidget(buildReplyOutput());
     rightLayout->addWidget(m_outStack, 1);
-    rightLayout->addLayout(buildFooter());
+    rightLayout->addWidget(buildFooter());
     return right;
 }
 
@@ -298,17 +366,20 @@ QWidget* MainWindow::buildReplyOutput()
 {
     auto* replyOut = new QWidget;
     auto* replyOutLayout = new QVBoxLayout(replyOut);
-    replyOutLayout->setContentsMargins(0, 0, 0, 0);
+    replyOutLayout->setContentsMargins(14, 14, 14, 14);
+    replyOutLayout->setSpacing(10);
     for (int i = 0; i < 3; ++i) {
         auto* row = new QHBoxLayout;
-        auto* choice = button(QString(), u"choice"_s);
+        row->setSpacing(10);
+        auto* choice = new ChipButton(QString(), QString::number(i + 1));
+        choice->setProperty("kind", u"choice"_s);
         choice->setObjectName(u"reply%1"_s.arg(i + 1));
         choice->setCheckable(true);
         choice->setAutoExclusive(true);
-        choice->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
+        choice->setWordWrap(true);
         connect(choice, &QPushButton::clicked, this,
                 [this, choice] { m_replyEdit->setText(choice->property("reply").toString()); });
-        auto* copy = button(QString());
+        auto* copy = button(QString(), u"icon"_s);
         copy->setToolTip(tr("Copy reply %1").arg(i + 1));
         copy->setAccessibleName(tr("Copy reply %1").arg(i + 1));
         connect(copy, &QPushButton::clicked, this,
@@ -318,8 +389,13 @@ QWidget* MainWindow::buildReplyOutput()
         replyOutLayout->addLayout(row);
         m_replyButtons.append(choice);
         m_replyCopy.append(copy);
+        // Number keys 1 to 3 pick a reply (main-window-reply.html, note 3).
+        const auto* key = new QShortcut(QKeySequence(Qt::Key_1 + i), replyOut, nullptr, nullptr,
+                                        Qt::WidgetWithChildrenShortcut);
+        connect(key, &QShortcut::activated, choice, &QPushButton::click);
     }
-    replyOutLayout->addWidget(label(tr("Edit before copying"), u"muted"_s));
+    replyOutLayout->addSpacing(4);
+    replyOutLayout->addWidget(label(tr("Edit before copying"), u"small"_s));
     m_replyEdit = new QLineEdit;
     m_replyEdit->setObjectName(u"replyEdit"_s);
     replyOutLayout->addWidget(m_replyEdit);
@@ -328,13 +404,21 @@ QWidget* MainWindow::buildReplyOutput()
     return replyOut;
 }
 
-QHBoxLayout* MainWindow::buildFooter()
+QWidget* MainWindow::buildFooter()
 {
-    auto* footer = new QHBoxLayout;
-    m_primary = button(QString(), u"primary"_s);
+    auto* foot = new QFrame;
+    foot->setObjectName(u"paneFoot"_s);
+    auto* footer = new QHBoxLayout(foot);
+    footer->setContentsMargins(14, 10, 14, 10);
+    footer->setSpacing(8);
+    m_primary = new ChipButton(QString(), tr("Ctrl Shift C"), ChipButton::ChipSide::After);
+    m_primary->setProperty("kind", u"primary"_s);
+    m_primary->setProperty("size", u"big"_s);
     m_primary->setObjectName(u"copy"_s);
     m_secondary = button(QString());
+    m_secondary->setProperty("size", u"big"_s);
     m_retry = button(QString());
+    m_retry->setProperty("size", u"big"_s);
     footer->addWidget(m_primary);
     footer->addWidget(m_secondary);
     footer->addWidget(m_retry);
@@ -356,27 +440,31 @@ QHBoxLayout* MainWindow::buildFooter()
         if (busy()) {
             cancel();
         } else if (modeOf(m_skill) == Mode::Reply) {
-            // "Make it polite": the Tone action on the chosen reply.
-            const QString text = m_replyEdit->text().trimmed();
-            if (text.isEmpty() || skill(u"rewrite.polite"_s) == nullptr) {
-                return;
-            }
-            const QDBusMessage reply = m_client.call(
-                u"RunSkill"_s, {u"rewrite.polite"_s, QVariantMap{{u"text"_s, text}}, QVariantMap()});
-            if (reply.type() == QDBusMessage::ReplyMessage) {
-                m_politeForReply = true;
-                m_requestId = reply.arguments().value(0).toString();
-                m_streamed.clear();
-                setRunning(true);
-            } else {
-                showMessage(reply.errorMessage(), u"danger"_s);
-            }
+            makeReplyPolite();
         } else {
             run();
         }
     });
+    return foot;
+}
 
-    return footer;
+void MainWindow::makeReplyPolite()
+{
+    // "Make it polite": the Tone action on the chosen reply.
+    const QString text = m_replyEdit->text().trimmed();
+    if (text.isEmpty() || skill(u"rewrite.polite"_s) == nullptr) {
+        return;
+    }
+    const QDBusMessage reply =
+        m_client.call(u"RunSkill"_s, {u"rewrite.polite"_s, QVariantMap{{u"text"_s, text}}, QVariantMap()});
+    if (reply.type() == QDBusMessage::ReplyMessage) {
+        m_politeForReply = true;
+        m_requestId = reply.arguments().value(0).toString();
+        m_streamed.clear();
+        setRunning(true);
+    } else {
+        showMessage(reply.errorMessage(), u"danger"_s);
+    }
 }
 
 QWidget* MainWindow::buildStatusBar()
@@ -385,14 +473,17 @@ QWidget* MainWindow::buildStatusBar()
     auto* status = new QFrame;
     status->setObjectName(u"statusBar"_s);
     auto* statusLayout = new QHBoxLayout(status);
-    statusLayout->setContentsMargins(20, 8, 20, 8);
-    m_statusDot = label(u"●"_s);
+    statusLayout->setContentsMargins(16, 7, 16, 7);
+    statusLayout->setSpacing(10);
+    m_statusDot = new QLabel;
+    m_statusDot->setObjectName(u"dot"_s);
+    m_statusDot->setFixedSize(8, 8);
     statusLayout->addWidget(m_statusDot);
-    m_statusText = label(tr("Starting..."), u"muted"_s);
+    m_statusText = label(tr("Starting..."));
     m_statusText->setObjectName(u"statusText"_s);
     statusLayout->addWidget(m_statusText);
     statusLayout->addStretch();
-    statusLayout->addWidget(label(tr("Nothing leaves this computer"), u"muted"_s));
+    statusLayout->addWidget(label(tr("Nothing leaves this computer")));
 
     return status;
 }
@@ -401,21 +492,23 @@ void MainWindow::applyTheme()
 {
     m_tokens = Theme::current();
     setStyleSheet(Theme::styleSheet(m_tokens));
-    m_mark->setPixmap(Theme::icon(u"pen"_s, m_tokens.accent, 20).pixmap(20, 20));
+    m_mark->setPixmap(Theme::icon(u"pen"_s, m_tokens.accent, 18).pixmap(18, 18));
     m_lock->setPixmap(Theme::icon(u"lock"_s, m_tokens.privacy, 14).pixmap(14, 14));
-    m_noticeIcon->setPixmap(Theme::icon(u"info"_s, m_tokens.accent, 16).pixmap(16, 16));
+    m_noticeIcon->setPixmap(Theme::icon(u"info"_s, m_tokens.warning, 14).pixmap(14, 14));
     if (auto* hide = m_notice->findChild<QPushButton*>(u"hideNotice"_s)) {
-        hide->setIcon(Theme::icon(u"x"_s, m_tokens.muted));
+        hide->setIcon(Theme::icon(u"x"_s, m_tokens.warning, 14));
     }
-    m_primary->setIcon(Theme::icon(u"copy"_s, QColor(Qt::white)));
-    m_retry->setIcon(Theme::icon(u"refresh"_s, m_tokens.text));
+    m_primary->setLeadingIcon(Theme::icon(u"copy"_s, QColor(Qt::white), 14));
     for (QPushButton* copy : std::as_const(m_replyCopy)) {
-        copy->setIcon(Theme::icon(u"copy"_s, m_tokens.text));
+        copy->setIcon(Theme::icon(u"copy"_s, m_tokens.text, 14));
     }
-    if (m_toneButton != nullptr) {
-        m_toneButton->setIcon(Theme::icon(u"down"_s, m_tokens.muted));
+    for (QAbstractButton* b : m_actionGroup->buttons()) {
+        if (auto* chip = qobject_cast<ChipButton*>(b); chip != nullptr && chip->menu() != nullptr) {
+            chip->setTrailingIcon(
+                Theme::icon(u"down"_s, chip->isChecked() ? QColor(Qt::white) : m_tokens.muted, 14));
+        }
     }
-    m_statusDot->setStyleSheet(u"color: %1;"_s.arg(m_tokens.success.name()));
+    selectSkill(m_skill); // icons that depend on the action
     renderDiff();
 }
 
@@ -483,18 +576,14 @@ void MainWindow::buildActions(const QList<SkillInfo>& skills)
                 variants.append(&s);
             }
         }
-        const QString hint = number <= kMaxShortcuts ? u"Ctrl %1  "_s.arg(number) : QString();
-        QAbstractButton* action =
-            variants.size() == 1 ? actionButton(hint, *variants.front()) : presetButton(hint, base, variants);
-        action->setObjectName(u"action-"_s + base);
-        action->setCheckable(true);
+        ChipButton* action = actionButton(number, base, variants);
         m_actionGroup->addButton(action);
         m_actionsRow->addWidget(action);
         if (number <= kMaxShortcuts) {
             const auto* shortcut = new QShortcut(QKeySequence(u"Ctrl+%1"_s.arg(number)), this);
             connect(shortcut, &QShortcut::activated, action, [action] {
-                if (auto* tool = qobject_cast<QToolButton*>(action)) {
-                    tool->showMenu();
+                if (action->menu() != nullptr) {
+                    action->showMenu();
                 } else {
                     action->click();
                 }
@@ -508,33 +597,27 @@ void MainWindow::buildActions(const QList<SkillInfo>& skills)
     applyTheme();
 }
 
-QAbstractButton* MainWindow::actionButton(const QString& hint, const SkillInfo& s)
+ChipButton* MainWindow::actionButton(int number, const QString& base, const QList<const SkillInfo*>& variants)
 {
-    auto* b = button(hint + s.title, u"action"_s);
-    const QString id = s.id;
-    connect(b, &QPushButton::clicked, this, [this, id] {
-        selectSkill(id);
-        run();
-    });
-    return b;
-}
-
-QAbstractButton* MainWindow::presetButton(const QString& hint, const QString& base,
-                                          const QList<const SkillInfo*>& variants)
-{
-    // A skill with presets (rewrite's tones) opens a short menu (main-window.html, note 2).
-    const QString title = base == u"rewrite"_s ? tr("Tone") : variants.front()->title.section(u':', 0, 0);
-    auto* b = new QToolButton;
+    // One button per skill; a skill with presets (rewrite's tones, format's layouts) opens a
+    // short menu of them (main-window.html, note 2).
+    const QString chip = number <= kMaxShortcuts ? tr("Ctrl %1").arg(number) : QString();
+    auto* b = new ChipButton(actionTitle(base, variants), chip);
     b->setProperty("kind", u"action"_s);
-    b->setText(hint + title);
-    b->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-    b->setLayoutDirection(Qt::RightToLeft); // the arrow after the label
-    b->setPopupMode(QToolButton::InstantPopup);
-    b->setCursor(Qt::PointingHandCursor);
+    b->setObjectName(u"action-"_s + base);
+    b->setCheckable(true);
+    if (variants.size() == 1) {
+        const QString id = variants.front()->id;
+        connect(b, &QPushButton::clicked, this, [this, id] {
+            selectSkill(id);
+            run();
+        });
+        return b;
+    }
     auto* menu = new QMenu(b);
     for (const SkillInfo* v : variants) {
         const QString id = v->id;
-        QAction* item = menu->addAction(v->title);
+        QAction* item = menu->addAction(presetTitle(*v));
         item->setObjectName(id);
         connect(item, &QAction::triggered, this, [this, id] {
             selectSkill(id);
@@ -542,10 +625,52 @@ QAbstractButton* MainWindow::presetButton(const QString& hint, const QString& ba
         });
     }
     b->setMenu(menu);
-    if (base == u"rewrite"_s) {
-        m_toneButton = b;
-    }
+    // The menu opens on click; the button shows the action as selected only once one is picked.
+    connect(b, &QPushButton::clicked, b, [this, b] {
+        b->setChecked(skill(m_skill) != nullptr && u"action-"_s + skill(m_skill)->base == b->objectName());
+    });
     return b;
+}
+
+void MainWindow::updateActionButtons(const SkillInfo& s)
+{
+    if (auto* action = findChild<ChipButton*>(u"action-"_s + s.base); action != nullptr) {
+        action->setChecked(true);
+        if (action->menu() != nullptr) {
+            // The button names the preset in use: "Tone: Polite".
+            QList<const SkillInfo*> variants;
+            for (const SkillInfo& v : std::as_const(m_skills)) {
+                if (v.base == s.base) {
+                    variants.append(&v);
+                }
+            }
+            action->setLabel(tr("%1: %2").arg(actionTitle(s.base, variants), presetTitle(s)));
+        }
+    }
+    for (QAbstractButton* b : m_actionGroup->buttons()) {
+        if (auto* chip = qobject_cast<ChipButton*>(b); chip != nullptr && chip->menu() != nullptr) {
+            const QColor colour = chip->isChecked() ? QColor(Qt::white) : m_tokens.muted;
+            chip->setTrailingIcon(Theme::icon(u"down"_s, colour, 14));
+        }
+    }
+}
+
+QString MainWindow::actionTitle(const QString& base, const QList<const SkillInfo*>& variants)
+{
+    if (base == u"rewrite"_s) {
+        return tr("Tone");
+    }
+    if (base == u"reply"_s) {
+        return tr("Reply");
+    }
+    // A preset's title is "<Skill>: <Preset>"; the button shows the skill's part.
+    return variants.front()->title.section(u':', 0, 0).trimmed();
+}
+
+QString MainWindow::presetTitle(const SkillInfo& s)
+{
+    const QString preset = s.title.section(u':', 1).trimmed();
+    return preset.isEmpty() ? s.title : preset;
 }
 
 const SkillInfo* MainWindow::skill(const QString& id) const
@@ -572,12 +697,7 @@ void MainWindow::selectSkill(const QString& skillId)
     }
     const bool switchedMode = m_skill.isEmpty() || modeOf(m_skill) != modeOf(skillId);
     m_skill = skillId;
-    if (auto* action = findChild<QAbstractButton*>(u"action-"_s + s->base)) {
-        action->setChecked(true);
-        if (s->base == u"rewrite"_s) {
-            action->setText(action->text().section(u"Tone"_s, 0, 0) + tr("Tone: %1").arg(s->title));
-        }
-    }
+    updateActionButtons(*s);
     const bool reply = modeOf(skillId) == Mode::Reply;
     if (switchedMode) {
         // The text moves between the two input pages, so switching keeps what was typed.
@@ -589,10 +709,13 @@ void MainWindow::selectSkill(const QString& skillId)
     }
     m_inStack->setCurrentIndex(reply ? 1 : 0);
     m_inTitle->setText(reply ? tr("MESSAGE YOU GOT") : tr("YOUR TEXT"));
+    // main-window-reply.html: the language as a pill, no word count, no Clear, no hint line.
+    m_clear->setVisible(!reply);
+    m_inFoot->setVisible(!reply);
     m_outStack->setCurrentIndex(reply ? 1 : 0);
     m_outTitle->setText((reply ? tr("Replies") : s->title).toUpper());
     m_segment->setVisible(s->base == u"proofread"_s);
-    m_primary->setText(reply ? tr("Copy reply") : tr("Copy result"));
+    m_primary->setLabel(reply ? tr("Copy reply") : tr("Copy result"));
     m_secondary->setText(reply ? tr("3 new ones") : tr("Use as my text"));
     m_secondary->setIcon(reply ? Theme::icon(u"refresh"_s, m_tokens.text) : QIcon());
     m_retry->setText(reply ? tr("Make it polite") : tr("Retry"));
@@ -628,12 +751,19 @@ void MainWindow::updateInputInfo()
 {
     const bool reply = modeOf(m_skill) == Mode::Reply;
     const QString text = (reply ? m_message : m_text)->toPlainText();
+    m_langPill->setVisible(false);
     if (text.trimmed().isEmpty()) {
         m_inInfo->clear();
         return;
     }
     const auto words = text.split(QRegularExpression(u"\\s+"_s), Qt::SkipEmptyParts).size();
     const QString language = languageName(text);
+    if (reply) {
+        m_inInfo->clear();
+        m_langPill->setText(language.isEmpty() ? tr("Best effort") : language);
+        m_langPill->setVisible(true);
+        return;
+    }
     // Plurals written out: tr()'s %n needs a loaded translation to pluralise.
     const QString count = words == 1 ? tr("1 word") : tr("%1 words").arg(words);
     m_inInfo->setText(language.isEmpty() ? u"· "_s + count : u"· %1 · %2"_s.arg(count, language));
@@ -842,7 +972,7 @@ void MainWindow::renderDiff()
         delete item;
     }
     if (!m_diff) {
-        m_changes->parentWidget()->parentWidget()->setVisible(false);
+        m_changesScroll->setVisible(false);
         return;
     }
     const client::WordDiff& diff = *m_diff;
@@ -862,7 +992,9 @@ void MainWindow::renderDiff()
             u"<div style=\"white-space: pre-wrap; font-size: 15px\">%1</div>"_s.arg(diffHtml(diff)));
     }
     // One row per change, each with its own Undo.
-    m_changes->parentWidget()->parentWidget()->setVisible(!changes.isEmpty());
+    m_changesScroll->setVisible(!changes.isEmpty());
+    // Rows are 30 px: the list takes what it needs, up to a third of the pane.
+    m_changesScroll->setMaximumHeight(std::min<int>((static_cast<int>(changes.size()) * 32) + 4, 220));
     for (const qsizetype k : changes) {
         m_changesLayout->addWidget(changeRow(diff, k));
     }
@@ -898,30 +1030,35 @@ QString MainWindow::diffHtml(const client::WordDiff& diff) const
 
 QWidget* MainWindow::changeRow(const client::WordDiff& diff, qsizetype k)
 {
-    const auto& s = diff.segments().at(k);
+    // main-window.html, note 5: old word, arrow, new word, Undo. An addition shows where it
+    // went ("end" for the end of a line) and a removal says so: colour is never the only signal.
+    const auto& segments = diff.segments();
+    const auto& s = segments.at(k);
     auto* row = new QWidget;
     auto* layout = new QHBoxLayout(row);
-    layout->setContentsMargins(4, 2, 4, 2);
-    // An addition or a removal says so in words (colour is never the only signal).
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(8);
     const QString before = s.before.trimmed();
     const QString after = s.after.trimmed();
-    const QString del = u"<span style=\"color:%1; text-decoration:line-through\">%2</span>"_s.arg(
-        m_tokens.del.name(), before.toHtmlEscaped());
-    const QString ins = u"<span style=\"color:%1; text-decoration:underline\">%2</span>"_s.arg(
-        m_tokens.ins.name(), after.toHtmlEscaped());
-    const QString muted = u"<span style=\"color:%1\">%2</span>"_s;
-    QString line;
+    const auto chip = [](const QString& text, const QString& kind) {
+        auto* l = new QLabel(text.isEmpty() ? u" "_s : text);
+        l->setProperty("chip", kind);
+        l->setTextFormat(Qt::PlainText);
+        return l;
+    };
     if (before.isEmpty()) {
-        line = muted.arg(m_tokens.muted.name(), tr("added")) + u" "_s + ins;
-    } else if (after.isEmpty()) {
-        line = muted.arg(m_tokens.muted.name(), tr("removed")) + u" "_s + del;
+        const bool atEnd = k + 1 >= segments.size() || segments.at(k + 1).after.startsWith(u'\n');
+        layout->addWidget(chip(atEnd ? tr("end") : tr("new"), u"pill"_s));
     } else {
-        line = del + u" &rarr; "_s + ins;
+        layout->addWidget(chip(before, u"del"_s));
     }
-    layout->addWidget(new QLabel(line), 1);
-    auto* undo = button(m_undone.contains(k) ? tr("Redo") : tr("Undo"), u"flat"_s);
+    auto* arrow = new QLabel;
+    arrow->setPixmap(Theme::icon(u"forward"_s, m_tokens.muted, 14).pixmap(14, 14));
+    layout->addWidget(arrow);
+    layout->addWidget(after.isEmpty() ? chip(tr("removed"), u"pill"_s) : chip(after, u"ins"_s));
+    layout->addStretch(1);
+    auto* undo = button(m_undone.contains(k) ? tr("Redo") : tr("Undo"), u"link"_s);
     undo->setObjectName(u"undo%1"_s.arg(k));
-    undo->setStyleSheet(u"color: %1;"_s.arg(m_tokens.accent.name()));
     connect(undo, &QPushButton::clicked, this, [this, k] {
         if (!m_undone.remove(k)) {
             m_undone.insert(k);
@@ -936,10 +1073,10 @@ void MainWindow::showReplies(const QStringList& replies)
 {
     m_outStack->setCurrentIndex(1);
     for (qsizetype i = 0; i < m_replyButtons.size(); ++i) {
-        QPushButton* b = m_replyButtons.at(i);
+        ChipButton* b = m_replyButtons.at(i);
         const QString text = replies.value(i);
         b->setProperty("reply", text);
-        b->setText(text.isEmpty() ? QString() : u"%1   %2"_s.arg(i + 1).arg(text));
+        b->setLabel(text);
         b->setEnabled(!text.isEmpty());
         m_replyCopy.at(i)->setEnabled(!text.isEmpty());
     }
