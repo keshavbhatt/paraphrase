@@ -26,7 +26,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from paraeval import common, metrics
+from paraeval import common, engine, metrics
 from paraeval.llama import LlamaServer
 from paraeval.skills import Skill, load_skills
 
@@ -64,6 +64,9 @@ def summarise(skill: Skill, rows: list[dict[str, Any]]) -> dict[str, Any]:
         "ttft_s_median": round(statistics.median(r["ttft_s"] for r in rows), 3),
         "total_s_median": round(statistics.median(r["total_s"] for r in rows), 3),
         "gen_tps_median": round(statistics.median(r["gen_tps"] for r in rows), 1),
+        # Engine language check (skill schema v2): retried once, still failing after it.
+        "retried_pct": _pct(sum(r.get("retried", False) for r in rows), n),
+        "lang_warned": [r["id"] for r in rows if r.get("warning")],
     }
     if skill.base_id == "proofread":
         tp, fp, fn = (sum(x[k] for x in s) for k in ("tp", "fp", "fn"))
@@ -113,7 +116,7 @@ def report_md(model_id: str, skill: Skill, profile: str, summary: dict[str, Any]
         "",
     ]
     groups: dict[str, dict[str, Any]] = summary["groups"]
-    keys = [k for k in next(iter(groups.values())) if k != "lang_floor_fail"]
+    keys = [k for k in next(iter(groups.values())) if k not in ("lang_floor_fail", "lang_warned")]
     lines.append("| group | " + " | ".join(keys) + " | language floor failures |")
     lines.append("|---" * (len(keys) + 2) + "|")
     for name, g in groups.items():
@@ -180,12 +183,14 @@ def run(
     sets: tuple[str, ...],
     limit: int | None,
     tag: str,
+    overrides: list[Path] | None = None,
 ) -> list[dict[str, Any]]:
-    skills = load_skills(common.SKILLS_DIR)
+    skills = load_skills(common.SKILLS_DIR, overrides)
     info = common.model(model_id)
     profile = common.profiles()[profile_name]
     summaries = []
-    with LlamaServer(info.path, profile, ctx=info.ctx) as server:
+    parallel = max(skills[s].variants for s in skill_ids)
+    with LlamaServer(info.path, profile, ctx=info.ctx, parallel=parallel) as server:
         print(f"{model_id} on {profile_name}: loaded in {server.load_s:.2f} s")
         for skill_id in skill_ids:
             skill = skills[skill_id]
@@ -194,23 +199,23 @@ def run(
                 raise SystemExit(f"no dataset items for {skill_id}")
             rows = []
             for i, item in enumerate(items, 1):
-                system, user = skill.render(common.skill_inputs(skill.base_id, item))
-                c = server.chat(
-                    system, user, skill.sampling, skill.max_output_tokens, skill.grammar
-                )
+                res = engine.run(server, skill, common.skill_inputs(skill.base_id, item))
+                c = res.completion
                 rows.append(
                     {
                         "id": item["id"],
                         "lang": item["lang"],
                         "source": item["source"],
-                        "output": c.text,
+                        "output": res.output,
                         "finish": c.finish_reason,
-                        "ttft_s": c.ttft_s,
-                        "total_s": c.total_s,
+                        "ttft_s": res.calls[0].ttft_s,
+                        "total_s": res.total_s,
                         "gen_tps": c.gen_tps,
                         "prompt_tokens": c.prompt_tokens,
                         "gen_tokens": c.gen_tokens,
-                        "score": score(skill, item, c.text),
+                        "retried": res.retried,
+                        "warning": res.warning,
+                        "score": score(skill, item, res.output),
                     }
                 )
                 print(f"\r  {skill_id}: {i}/{len(items)}", end="", flush=True)
@@ -232,12 +237,19 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--limit", type=int)
     ap.add_argument("--tag", default="m0")
     ap.add_argument("--rescore", action="store_true", help="re-score saved outputs, no model")
+    ap.add_argument(
+        "--skill-override",
+        type=Path,
+        action="append",
+        default=[],
+        help="a candidate skill file that replaces the shipped skills it defines",
+    )
     args = ap.parse_args(argv)
     if args.rescore:
         rescore(args.model, args.skill, args.tag, args.profile)
         return 0
     sets = ("generated", "human") if args.set == "all" else (args.set,)
-    run(args.model, args.skill, args.profile, sets, args.limit, args.tag)
+    run(args.model, args.skill, args.profile, sets, args.limit, args.tag, args.skill_override)
     return 0
 
 

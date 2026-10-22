@@ -56,7 +56,7 @@ class Profile:
 
 @dataclass
 class Completion:
-    text: str
+    text: str  # the first completion; all of them are in `texts`
     ttft_s: float
     total_s: float
     prompt_tokens: int
@@ -65,6 +65,9 @@ class Completion:
     gen_ms: float
     cached_tokens: int
     finish_reason: str
+    texts: list[str] = field(default_factory=list)
+    draft_tokens: int = 0  # speculative decoding: tokens drafted
+    draft_accepted: int = 0  # ... and accepted by the main model
 
     @property
     def gen_tps(self) -> float:
@@ -233,7 +236,12 @@ class LlamaServer:
         sampling: dict[str, Any],
         max_tokens: int,
         grammar: str | None = None,
+        n: int = 1,
     ) -> Completion:
+        """One chat request. With n > 1 the prompt is processed once and n completions are
+        decoded in one batch (llama-server `n_cmpl`; the server needs n slots)."""
+        if n > self.parallel:
+            raise ValueError(f"n={n} needs a server started with parallel >= {n}")
         body: dict[str, Any] = {
             "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
             "max_tokens": max_tokens,
@@ -246,26 +254,36 @@ class LlamaServer:
                 body[k] = v
         if grammar:
             body["grammar"] = grammar
+        if n > 1:
+            body["n_cmpl"] = n
         start = time.monotonic()
         resp = self._post("/v1/chat/completions", body)
         ttft = 0.0
-        parts: list[str] = []
+        parts: dict[int, list[str]] = {}
         timings: dict[str, Any] = {}
+        all_timings: list[dict[str, Any]] = []
         finish = ""
         for event in _sse(resp):
             if "timings" in event:
                 timings = event["timings"]
+                all_timings.append(timings)
             for choice in event.get("choices", []):
                 delta = choice.get("delta", {}).get("content")
                 if delta:
                     if not parts:
                         ttft = time.monotonic() - start
-                    parts.append(delta)
+                    parts.setdefault(int(choice.get("index", 0)), []).append(delta)
                 if choice.get("finish_reason"):
                     finish = choice["finish_reason"]
         total = time.monotonic() - start
+        texts = ["".join(parts.get(i, [])) for i in range(max(n, len(parts)))]
+        first = min(all_timings, key=lambda t: -t.get("prompt_n", 0)) if all_timings else {}
+        timings = first or timings
         return Completion(
-            text="".join(parts),
+            text=texts[0] if texts else "",
+            texts=texts,
+            draft_tokens=int(timings.get("draft_n", 0)),
+            draft_accepted=int(timings.get("draft_n_accepted", 0)),
             ttft_s=ttft or total,
             total_s=total,
             prompt_tokens=int(timings.get("prompt_n", 0)),
