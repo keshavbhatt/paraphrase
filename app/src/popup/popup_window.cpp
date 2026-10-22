@@ -98,6 +98,15 @@ void PopupWindow::keyPressEvent(QKeyEvent* event)
     QWidget::keyPressEvent(event);
 }
 
+void PopupWindow::changeEvent(QEvent* event)
+{
+    if ((event->type() == QEvent::ThemeChange || event->type() == QEvent::PaletteChange) &&
+        Theme::current().dark != m_tokens.dark) {
+        applyTheme();
+    }
+    QWidget::changeEvent(event);
+}
+
 void PopupWindow::closeEvent(QCloseEvent* event)
 {
     Q_EMIT closed();

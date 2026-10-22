@@ -27,6 +27,7 @@ public:
     [[nodiscard]] bool available() const override { return m_available; }
     bool bind(const QKeySequence& keys) override;
     [[nodiscard]] QString description() const override;
+    [[nodiscard]] QString keys() const override { return m_trigger; }
     /// Ends the portal session; the desktop keeps the user's choice for the next one.
     void close();
 

@@ -65,6 +65,7 @@ add_library(paraphrase_ui STATIC
     src/ui/settings/action_editor.cpp
     src/ui/settings/action_list.cpp
     src/ui/settings/actions_page.cpp
+    src/ui/settings/general_page.cpp
     src/ui/parts/action_bar.cpp
     src/ui/main/bars.cpp
     src/ui/parts/change_list.cpp
@@ -75,7 +76,9 @@ add_library(paraphrase_ui STATIC
     src/ui/parts/input_pages.cpp
     src/ui/main/input_pane.cpp
     src/ui/settings/installed_models_table.cpp
+    src/ui/core/autostart.cpp
     src/ui/core/languages.cpp
+    src/ui/core/preferences.cpp
     src/ui/settings/languages_section.cpp
     src/ui/main/main_window.cpp
     src/ui/setup/model_card.cpp
@@ -90,6 +93,7 @@ add_library(paraphrase_ui STATIC
     src/ui/setup/sample_run.cpp
     src/ui/settings/settings_nav.cpp
     src/ui/settings/settings_window.cpp
+    src/ui/settings/shortcut_settings_page.cpp
     src/ui/setup/setup_window.cpp
     src/ui/setup/shortcut_page.cpp
     src/ui/core/skill_catalog.cpp
@@ -97,6 +101,7 @@ add_library(paraphrase_ui STATIC
     src/ui/setup/step_header.cpp
     src/ui/settings/text_page.cpp
     src/ui/common/theme.cpp
+    src/ui/common/toggle_switch.cpp
     src/ui/settings/tier_pickers.cpp
     src/ui/setup/try_page.cpp
     src/ui/common/widgets.cpp
@@ -130,6 +135,7 @@ add_library(paraphrase_shell STATIC
     src/shell/app_flow.cpp
     src/shell/app_service.cpp
     src/shell/application.cpp
+    src/shell/desktop_description.cpp
     src/shell/tray_icon.cpp
 )
 paraphrase_set_warnings(paraphrase_shell)

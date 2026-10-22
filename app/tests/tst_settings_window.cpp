@@ -5,10 +5,14 @@
 
 #include "app_daemon.h"
 #include "daemon_client.h"
+#include "ui/core/preferences.h"
 #include "ui/settings/settings_window.h"
 
+#include <QAbstractButton>
+#include <QClipboard>
 #include <QComboBox>
 #include <QDir>
+#include <QGuiApplication>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -17,6 +21,7 @@
 #include <QMutexLocker>
 #include <QPlainTextEdit>
 #include <QPushButton>
+#include <QSignalSpy>
 #include <QTest>
 
 using namespace Qt::StringLiterals;
@@ -135,6 +140,37 @@ private Q_SLOTS:
             !client.call(u"ListSkills"_s, {}).arguments().value(0).toString().contains(u"custom.tweet"_s));
     }
 
+    void showsGeneralAndShortcut()
+    {
+        // settings-general-shortcut.html: the switches keep their state, and the Shortcut page
+        // shows the command to bind by hand when the desktop has no global shortcut.
+        QVERIFY(m_daemon.start({u"fast-model"_s}));
+        DaemonClient client;
+        QVERIFY(client.connectToDaemon().isEmpty());
+        paraphrase::app::Preferences preferences;
+        const QSignalSpy keep(&preferences, &paraphrase::app::Preferences::keepInTrayChanged);
+        SettingsWindow w(client, &preferences, true);
+        w.show();
+        w.showPage(SettingsWindow::General);
+        auto* tray = w.findChild<QAbstractButton*>(u"keepInTray"_s);
+        QVERIFY(tray != nullptr);
+        tray->click();
+        QCOMPARE(keep.size(), 1);
+        paraphrase::app::DesktopSupport support;
+        support.steps.append(
+            {.step = u"Open over any app"_s, .how = u"by hand"_s, .status = u"By hand"_s, .works = false});
+        w.setDesktopSupport(support);
+        w.showPage(SettingsWindow::Shortcut);
+        const auto* command = w.findChild<QLabel*>(u"popupCommand"_s);
+        QVERIFY(command != nullptr);
+        QCOMPARE(command->text(), u"paraphrase-app --popup"_s);
+        auto* copy = w.findChild<QPushButton*>(u"copyCommand"_s);
+        QVERIFY(copy != nullptr);
+        copy->click();
+        QCOMPARE(QGuiApplication::clipboard()->text(), u"paraphrase-app --popup"_s);
+        tray->click(); // leave the preference as it was
+    }
+
     void savesScreenshots()
     {
         const QString dir = qEnvironmentVariable("PARAPHRASE_SCREENSHOTS");
@@ -179,6 +215,37 @@ private Q_SLOTS:
             actions.newAction();
             QTest::qWait(50);
             QVERIFY(actions.grab().save(dir + u"/settings-actions-%1.png"_s.arg(QLatin1StringView(theme))));
+            paraphrase::app::DesktopSupport support;
+            support.globalShortcut = true;
+            support.shortcut = u"Ctrl+Alt+Space"_s;
+            support.changeIt = u"System Settings, Shortcuts"_s;
+            support.steps = {
+                {
+                    .step = u"Open over any app"_s,
+                    .how = u"Shortcut from the desktop"_s,
+                    .status = u"Works"_s,
+                    .works = true,
+                },
+                {
+                    .step = u"Read the selected text"_s,
+                    .how = u"The selection, without copying"_s,
+                    .status = u"Works"_s,
+                    .works = true,
+                },
+                {
+                    .step = u"Put the result back"_s,
+                    .how = u"Pasted into the app, after you allow it once"_s,
+                    .status = u"Asks once"_s,
+                    .works = true,
+                },
+            };
+            actions.setDesktopSupport(support);
+            actions.showPage(SettingsWindow::Shortcut);
+            QTest::qWait(50);
+            QVERIFY(actions.grab().save(dir + u"/settings-shortcut-%1.png"_s.arg(QLatin1StringView(theme))));
+            actions.showPage(SettingsWindow::General);
+            QTest::qWait(50);
+            QVERIFY(actions.grab().save(dir + u"/settings-general-%1.png"_s.arg(QLatin1StringView(theme))));
             m_daemon.stop();
         }
         qunsetenv("PARAPHRASE_THEME");

@@ -55,6 +55,16 @@ void AppFlow::showSetup()
     QTimer::singleShot(0, m_setup.get(), &SetupWindow::start);
 }
 
+void AppFlow::setSettingsContext(Preferences* preferences, bool hasTray, const DesktopSupport& support)
+{
+    m_preferences = preferences;
+    m_hasTray = hasTray;
+    m_support = support;
+    if (m_settings) {
+        m_settings->setDesktopSupport(support);
+    }
+}
+
 MainWindow& AppFlow::mainWindow()
 {
     if (!m_main) {
@@ -97,7 +107,8 @@ void AppFlow::newAction()
 void AppFlow::showSettings()
 {
     if (!m_settings) {
-        m_settings = std::make_unique<SettingsWindow>(m_client);
+        m_settings = std::make_unique<SettingsWindow>(m_client, m_preferences, m_hasTray);
+        m_settings->setDesktopSupport(m_support);
     }
     m_settings->showPage(SettingsWindow::Models);
     m_settings->show();

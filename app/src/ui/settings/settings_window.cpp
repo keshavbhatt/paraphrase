@@ -1,11 +1,14 @@
 #include "ui/settings/settings_window.h"
 
 #include "ui/common/window_style.h"
+#include "ui/core/preferences.h"
 #include "ui/models/models_controller.h"
 #include "ui/settings/about_page.h"
 #include "ui/settings/actions_page.h"
+#include "ui/settings/general_page.h"
 #include "ui/settings/models_settings_page.h"
 #include "ui/settings/settings_nav.h"
+#include "ui/settings/shortcut_settings_page.h"
 #include "ui/settings/text_page.h"
 
 #include <QEvent>
@@ -30,7 +33,8 @@ QWidget* scrolled(QWidget* page)
 
 } // namespace
 
-SettingsWindow::SettingsWindow(client::DaemonClient& client, QWidget* parent)
+SettingsWindow::SettingsWindow(client::DaemonClient& client, Preferences* preferences, bool hasTray,
+                               QWidget* parent)
     : QWidget(parent)
     , m_client(client)
     , m_tokens(Theme::current())
@@ -44,6 +48,9 @@ SettingsWindow::SettingsWindow(client::DaemonClient& client, QWidget* parent)
           tr("About"),
       }))
     , m_pages(new QStackedWidget)
+    , m_ownPreferences(preferences == nullptr ? std::make_unique<Preferences>() : nullptr)
+    , m_preferences(preferences == nullptr ? m_ownPreferences.get() : preferences)
+    , m_hasTray(hasTray)
 {
     setObjectName(u"settingsWindow"_s);
     setWindowTitle(tr("Paraphrase settings"));
@@ -62,18 +69,10 @@ SettingsWindow::~SettingsWindow() = default;
 
 void SettingsWindow::addPages()
 {
-    m_pages->addWidget(scrolled(new TextPage(
-        tr("General"),
-        {
-            tr("Starting with your computer, the tray icon and the language of the app come here with "
-               "the popup, in a later version."),
-        })));
-    m_pages->addWidget(scrolled(new TextPage(
-        tr("Shortcut"),
-        {
-            tr("The global shortcut that opens Paraphrase over any app comes in a later version. Until "
-               "then everything works in Paraphrase's own window."),
-        })));
+    m_generalPage = new GeneralPage(*m_preferences, m_hasTray);
+    m_pages->addWidget(scrolled(m_generalPage));
+    m_shortcutPage = new ShortcutSettingsPage;
+    m_pages->addWidget(scrolled(m_shortcutPage));
     m_actionsPage = new ActionsPage(m_client);
     m_pages->addWidget(scrolled(m_actionsPage));
     m_modelsPage = new ModelsSettingsPage(*m_models);
@@ -97,6 +96,12 @@ void SettingsWindow::showPage(Page page)
     m_pages->setCurrentIndex(page);
     m_models->refresh();
     m_actionsPage->reload();
+    m_generalPage->reload();
+}
+
+void SettingsWindow::setDesktopSupport(const DesktopSupport& support)
+{
+    m_shortcutPage->setSupport(support);
 }
 
 void SettingsWindow::newAction()
@@ -111,6 +116,7 @@ void SettingsWindow::applyTheme()
     setStyleSheet(windowStyleSheet(m_tokens));
     m_modelsPage->setTheme(m_tokens);
     m_aboutPage->setTheme(m_tokens);
+    m_generalPage->applyTheme(m_tokens);
 }
 
 void SettingsWindow::changeEvent(QEvent* event)

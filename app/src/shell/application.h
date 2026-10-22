@@ -14,6 +14,7 @@ class AppFlow;
 class AppService;
 class Integrations;
 class PopupController;
+class Preferences;
 class TrayIcon;
 
 /// The running app: the windows (AppFlow), the popup, the tray, the backends of this session
@@ -33,6 +34,10 @@ public:
 
 private:
     void wire();
+    /// With a tray and "keep running in the tray", closing the window leaves the app running.
+    void applyKeepInTray();
+    /// Appearance changed in Settings: every window takes the new colours.
+    static void retheme();
 
     std::unique_ptr<client::DaemonClient> m_client; ///< one connection to the daemon for everything
     std::unique_ptr<Integrations> m_integrations;
@@ -40,6 +45,7 @@ private:
     PopupController* m_popup = nullptr;
     TrayIcon* m_tray = nullptr;
     AppService* m_service = nullptr;
+    Preferences* m_preferences = nullptr;
 };
 
 } // namespace paraphrase::app

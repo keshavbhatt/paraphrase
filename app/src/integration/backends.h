@@ -92,6 +92,8 @@ public:
     virtual bool bind(const QKeySequence& keys) = 0;
     /// What the user sees in Settings: the shortcut, or how to set one by hand.
     [[nodiscard]] virtual QString description() const = 0;
+    /// The keys that open the popup, as the desktop shows them ("Ctrl+Alt+Space"), or "".
+    [[nodiscard]] virtual QString keys() const { return {}; }
 
 Q_SIGNALS:
     void activated();

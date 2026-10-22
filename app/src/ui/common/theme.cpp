@@ -4,6 +4,7 @@
 #include <QGuiApplication>
 #include <QPainter>
 #include <QPixmap>
+#include <QSettings>
 #include <QStyleHints>
 #include <QSvgRenderer>
 
@@ -88,6 +89,7 @@ QLabel[chip="pill"] { color: @muted@; background: @hover@; border-radius: 9px; p
     font-family: monospace; font-size: 12px; }
 
 QFrame#actionRow { border: none; border-bottom: 1px solid @border@; }
+QLabel[role="cmd"] { font-family: monospace; font-size: 13px; background: @sunk@; border-radius: 8px; padding: 8px 10px; }
 QFrame#popup { background: @panel@; border: 1px solid @border@; border-radius: 14px; }
 QFrame#popupHead { border: none; border-bottom: 1px solid @border@; }
 QFrame#popupFoot { border: none; border-top: 1px solid @border@; background: @bar@;
@@ -178,7 +180,10 @@ Tokens Theme::dark()
 
 Tokens Theme::current()
 {
-    const QString forced = qEnvironmentVariable("PARAPHRASE_THEME");
+    QString forced = qEnvironmentVariable("PARAPHRASE_THEME");
+    if (forced.isEmpty()) {
+        forced = QSettings().value(u"general/appearance"_s).toString(); // Settings, General
+    }
     if (forced == u"dark"_s) {
         return dark();
     }

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ui/core/desktop_support.h"
+
 #include <QObject>
 
 #include <memory>
@@ -11,6 +13,7 @@ class DaemonClient;
 namespace paraphrase::app {
 
 class MainWindow;
+class Preferences;
 class SettingsWindow;
 class SetupWindow;
 
@@ -23,6 +26,9 @@ class AppFlow : public QObject
 
 public:
     explicit AppFlow(client::DaemonClient& client, QObject* parent = nullptr);
+
+    /// What Settings shows on General and Shortcut, from the app.
+    void setSettingsContext(Preferences* preferences, bool hasTray, const DesktopSupport& support);
     ~AppFlow() override;
 
     /// Opens setup on first run, else the main window (or keeps it hidden: tray autostart).
@@ -46,6 +52,9 @@ private:
     std::unique_ptr<SetupWindow> m_setup;
     std::unique_ptr<SettingsWindow> m_settings;
     bool m_globalShortcut = false;
+    Preferences* m_preferences = nullptr;
+    bool m_hasTray = false;
+    DesktopSupport m_support;
 };
 
 } // namespace paraphrase::app

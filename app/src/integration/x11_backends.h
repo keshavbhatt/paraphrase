@@ -58,6 +58,7 @@ public:
     [[nodiscard]] bool available() const override { return m_conn != nullptr; }
     bool bind(const QKeySequence& keys) override;
     [[nodiscard]] QString description() const override;
+    [[nodiscard]] QString keys() const override { return m_keys.toString(QKeySequence::NativeText); }
     bool nativeEventFilter(const QByteArray& eventType, void* message, qintptr* result) override;
 
 private:

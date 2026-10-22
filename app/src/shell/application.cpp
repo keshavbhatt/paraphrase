@@ -5,7 +5,9 @@
 #include "popup/popup_controller.h"
 #include "shell/app_flow.h"
 #include "shell/app_service.h"
+#include "shell/desktop_description.h"
 #include "shell/tray_icon.h"
+#include "ui/core/preferences.h"
 #include "ui/main/main_window.h"
 
 #include <QApplication>
@@ -19,20 +21,41 @@ Application::Application(QObject* parent)
     , m_flow(new AppFlow(*m_client, this))
     , m_popup(new PopupController(*m_integrations, m_client.get(), this))
     , m_service(new AppService(this))
+    , m_preferences(new Preferences(this))
 {
     if (TrayIcon::available()) {
         m_tray = new TrayIcon(this);
         m_tray->applyTheme(Theme::current());
-        // With a tray the app keeps running for the shortcut when the window closes.
-        QApplication::setQuitOnLastWindowClosed(false);
     }
+    applyKeepInTray();
+    m_flow->setSettingsContext(m_preferences, m_tray != nullptr, describeDesktop(*m_integrations));
     wire();
 }
 
 Application::~Application() = default;
 
+void Application::applyKeepInTray()
+{
+    QApplication::setQuitOnLastWindowClosed(m_tray == nullptr || !Preferences::keepInTray());
+}
+
+void Application::retheme()
+{
+    for (QWidget* w : QApplication::topLevelWidgets()) {
+        QEvent change(QEvent::ThemeChange);
+        QCoreApplication::sendEvent(w, &change);
+    }
+}
+
 void Application::wire()
 {
+    connect(m_preferences, &Preferences::keepInTrayChanged, this, &Application::applyKeepInTray);
+    connect(m_preferences, &Preferences::appearanceChanged, this, [this] {
+        retheme();
+        if (m_tray != nullptr) {
+            m_tray->applyTheme(Theme::current());
+        }
+    });
     connect(m_service, &AppService::popupRequested, m_popup, &PopupController::show);
     connect(m_service, &AppService::windowRequested, m_flow, &AppFlow::showMain);
     connect(&m_integrations->shortcut(), &ShortcutBackend::activated, m_popup, &PopupController::show);
