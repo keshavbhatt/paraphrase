@@ -197,6 +197,17 @@ class ProofreadScore:
     lang_reason: str
     preamble: bool
     layout_kept: bool = True
+    # The output lost content: under 70% of the input's characters (the owner's suite, E07).
+    too_short: bool = False
+
+
+SHORT_RATIO = 0.7
+
+
+def too_short(source: str, output: str) -> bool:
+    """Whether the output is far shorter than the input, counting non-space characters."""
+    src = len("".join(source.split()))
+    return src > 0 and len("".join(output.split())) < SHORT_RATIO * src
 
 
 def layout(text: str) -> tuple[int, int]:
@@ -228,6 +239,7 @@ def score_proofread(item: dict[str, Any], output: str) -> ProofreadScore:
         lang_reason=why,
         preamble=has_preamble(output, item["text"]),
         layout_kept=layout(output) == layout(item["text"]),
+        too_short=too_short(item["text"], output),
     )
 
 

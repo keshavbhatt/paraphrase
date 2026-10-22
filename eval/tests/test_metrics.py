@@ -101,3 +101,16 @@ def test_proofread_layout_kept() -> None:
     }
     assert metrics.score_proofread(item, "Name:\tAnjali\nNotes:\tShe will join").layout_kept
     assert not metrics.score_proofread(item, "Name: Anjali Notes: She will join").layout_kept
+
+
+def test_proofread_flags_lost_content() -> None:
+    text = "I paid $8,500 of the $12,000. " * 5
+    assert (
+        metrics.score_proofread({"lang": "en", "text": text, "reference": text}, text).too_short
+        is False
+    )
+    first = "I paid $8,500 of the $12,000."
+    assert (
+        metrics.score_proofread({"lang": "en", "text": text, "reference": text}, first).too_short
+        is True
+    )
