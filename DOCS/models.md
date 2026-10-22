@@ -104,3 +104,46 @@ real typing, typos, Hinglish); reports score those separately from the generated
 ## Results
 
 Pending: the owner reviews the results table before the recommendation is written.
+
+### Spot-check (2026-10-22)
+
+20 items per model (7 proofread, 7 reply, 6 rewrite; 3 Hindi, 3 Hinglish), five blind
+answers per item, rated on the page from `eval/spotcheck.py` (proofread at revision 4, reply
+and rewrite at revision 3). Claude pre-filled every rating with a note starting "[Claude]";
+the owner then reviewed the page, and both groups count as final (owner, 2026-10-22). Items
+still marked `prefilled_by: claude` were not changed by the owner.
+
+| group | items | answers |
+|---|---|---|
+| pre-filled by Claude, not changed by the owner | 20 | 100 |
+| changed by the owner | 0 | 0 |
+
+The owner overrode **0 of 20** drafts, so every rating below is Claude's draft as accepted
+by the owner. Raw ratings: `eval/reports/m0-v3/spotcheck/ratings.jsonl` (notes transcribed
+as stored, with dashes replaced by commas); full table by skill and language:
+`eval/reports/m0-v3/spotcheck/report.md` (`spotcheck.py report`).
+
+Good / ok / bad counts (all ratings are in the pre-filled group):
+
+| model | total | proofread | reply | rewrite | Hindi (3 items) | Hinglish (3 items) |
+|---|---|---|---|---|---|---|
+| gemma-4-e4b-qat-q4_0 | 14 / 6 / 0 | 5 / 2 / 0 | 4 / 3 / 0 | 5 / 1 / 0 | 2 / 1 / 0 | 2 / 1 / 0 |
+| qwen3.5-4b-q4km | 14 / 6 / 0 | 5 / 2 / 0 | 4 / 3 / 0 | 5 / 1 / 0 | 3 / 0 / 0 | 1 / 2 / 0 |
+| gemma-4-e2b-qat-q4_0 | 12 / 5 / 3 | 3 / 3 / 1 | 5 / 1 / 1 | 4 / 1 / 1 | 1 / 1 / 1 | 2 / 0 / 1 |
+| qwen3.5-2b-q4km | 3 / 6 / 11 | 3 / 2 / 2 | 0 / 3 / 4 | 0 / 1 / 5 | 0 / 0 / 3 | 0 / 0 / 3 |
+| qwen3.5-0.8b-q4km | 1 / 4 / 15 | 1 / 2 / 4 | 0 / 1 / 6 | 0 / 1 / 5 | 0 / 0 / 3 | 0 / 0 / 3 |
+
+Failure categories, matched by keyword in the notes of ok and bad ratings (rules in
+`spotcheck.py`, `CATEGORIES`; item and rating in brackets):
+
+| model | injection obeyed | unchanged rewrite | wrong-speaker reply | Hindi/Hinglish garbage | switched language |
+|---|---|---|---|---|---|
+| gemma-4-e4b-qat-q4_0 | 0 | 0 | 1 (rp-hi-013 ok) | 0 | 0 |
+| qwen3.5-4b-q4km | 0 | 0 | 1 (rp-hi-013 ok) | 0 | 0 |
+| gemma-4-e2b-qat-q4_0 | 1 (rp-en-030 bad) | 0 | 0 | 0 | 1 (rw-hi-009 bad) |
+| qwen3.5-2b-q4km | 0 | 3 (rw-en-049, rw-hi-006, rw-hi-009, all bad) | 4 (rp-en-005 ok; rp-en-007, rp-en-010, rp-hi-013 bad) | 2 (rp-hi-004, rp-hi-013 bad) | 0 |
+| qwen3.5-0.8b-q4km | 1 (rp-en-030 bad) | 2 (rw-hi-006, rw-hi-009 bad) | 2 (rp-en-005, rp-en-010 bad) | 2 (rp-hi-004, rp-hi-013 bad) | 0 |
+
+"Unchanged" proofread answers (a missed fix, not a rewrite failure) are not counted as a
+category: Qwen 0.8B on pr-hi-001, pr-hi-015 and pr-en-023; Gemma E2B on pr-hi-001; Qwen 2B on
+pr-hi-015.
