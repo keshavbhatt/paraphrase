@@ -1,5 +1,6 @@
 #include "llama_engine.h"
 
+#include <QCoreApplication>
 #include <QElapsedTimer>
 #include <QJsonValue>
 #include <QLoggingCategory>
@@ -166,6 +167,12 @@ public:
     }
 
     util::Result<Generation> execute();
+    /// Reads the prompt into the cache and stops there (LlamaEngine::warm).
+    util::Result<bool> prefill()
+    {
+        Generation unused;
+        return preparePrompt(unused);
+    }
 
 private:
     struct Variant
@@ -225,7 +232,8 @@ util::Result<bool> LlamaEngine::Run::preparePrompt(Generation& out)
     const Tokens prompt = tokenize(m_vocab, m_session.prompt());
     if (static_cast<int>(prompt.size()) + m_request.maxTokens > m_engine.m_config.contextSize) {
         return util::Result<bool>::failure(
-            u"The text is too long for this model (%1 tokens)."_s.arg(prompt.size()));
+            QCoreApplication::translate("LlamaEngine", "The text is too long for this model (%1 tokens).")
+                .arg(prompt.size()));
     }
     // Reuse the longest prefix already in the cache, as llama-server's prompt cache does; the
     // last prompt token is always decoded again for its logits. A drafted run needs the prefix
@@ -255,14 +263,16 @@ util::Result<bool> LlamaEngine::Run::preparePrompt(Generation& out)
     if (m_drafted) {
         m_engine.m_draftCachedTokens.clear();
         if (!decodeDraftedPrompt(prompt, keep)) {
-            return util::Result<bool>::failure(u"The model could not read the text."_s);
+            return util::Result<bool>::failure(
+                QCoreApplication::translate("LlamaEngine", "The model could not read the text."));
         }
         // The last prompt token is decoded with the first draft.
         m_engine.m_cachedTokens.assign(prompt.begin(), prompt.end() - 1);
         m_engine.m_draftCachedTokens = m_engine.m_cachedTokens;
     } else {
         if (!decodePrompt(m_ctx, prompt, keep, 0)) {
-            return util::Result<bool>::failure(u"The model could not read the text."_s);
+            return util::Result<bool>::failure(
+                QCoreApplication::translate("LlamaEngine", "The model could not read the text."));
         }
         m_engine.m_cachedTokens.assign(prompt.begin(), prompt.end());
     }
@@ -514,9 +524,7 @@ util::Result<bool> LlamaEngine::load(const EngineConfig& config)
     initBackend();
     QElapsedTimer clock;
     clock.start();
-    m_spec.reset();
-    m_draftInit.reset();
-    m_init.reset();
+    unload();
     common_params params;
     params.model.path = config.modelPath.toStdString();
     params.n_ctx = config.contextSize * config.maxVariants;
@@ -547,7 +555,9 @@ util::Result<bool> LlamaEngine::load(const EngineConfig& config)
     }
     auto init = common_init_from_params(params);
     if (!init || init->model() == nullptr || init->context() == nullptr) {
-        return util::Result<bool>::failure(u"The model could not be loaded from %1."_s.arg(config.modelPath));
+        return util::Result<bool>::failure(
+            QCoreApplication::translate("LlamaEngine", "The model could not be loaded from %1.")
+                .arg(config.modelPath));
     }
     m_templates.reset(common_chat_templates_init(init->model(), "").release());
     m_defaults = std::make_unique<common_params_sampling>(params.sampling);
@@ -599,7 +609,8 @@ bool LlamaEngine::isLoaded() const
 util::Result<Generation> LlamaEngine::generate(const GenerationRequest& request, const TextSink& sink)
 {
     if (!isLoaded()) {
-        return util::Result<Generation>::failure(u"No model is loaded."_s);
+        return util::Result<Generation>::failure(
+            QCoreApplication::translate("LlamaEngine", "No model is loaded."));
     }
     m_cancel.store(false);
     Run run(*this, request, sink);
@@ -614,6 +625,43 @@ std::vector<int> LlamaEngine::promptTokens(const GenerationRequest& request) con
     const llama_vocab* vocab = llama_model_get_vocab(m_init->model());
     const common_chat_session session(m_templates.get(), vocab, chatInputs(request));
     return tokenize(vocab, session.prompt());
+}
+
+util::Result<bool> LlamaEngine::warm(const GenerationRequest& request)
+{
+    if (!isLoaded()) {
+        return util::Result<bool>::failure(QCoreApplication::translate("LlamaEngine", "No model is loaded."));
+    }
+    m_cancel.store(false);
+    const TextSink none; // Run keeps a reference
+    Run run(*this, request, none);
+    return run.prefill();
+}
+
+int LlamaEngine::countTokens(const QString& text) const
+{
+    if (!isLoaded()) {
+        return 0;
+    }
+    const llama_vocab* vocab = llama_model_get_vocab(m_init->model());
+    return static_cast<int>(common_tokenize(vocab, text.toStdString(), false, false).size());
+}
+
+void LlamaEngine::unload()
+{
+    m_spec.reset();
+    m_draftInit.reset();
+    m_templates.reset();
+    m_defaults.reset();
+    m_init.reset();
+    m_cachedTokens.clear();
+    m_draftCachedTokens.clear();
+    m_config = {};
+}
+
+EngineConfig LlamaEngine::loadedConfig() const
+{
+    return isLoaded() ? m_config : EngineConfig{};
 }
 
 void LlamaEngine::cancel()

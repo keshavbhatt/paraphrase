@@ -1,6 +1,6 @@
 #pragma once
 
-#include "generator.h"
+#include "engine.h"
 
 #include <QString>
 
@@ -17,17 +17,6 @@ struct common_speculative_init_result;
 
 namespace paraphrase::engine {
 
-struct EngineConfig
-{
-    QString modelPath;
-    QString draftModelPath; ///< the model's MTP draft head (ADR-004), empty for none
-    int threads = 0;        ///< 0: llama.cpp's default
-    int gpuLayers = 0;      ///< layers offloaded to a GPU; 0 = CPU only
-    int contextSize = 4096;
-    int maxVariants = 1; ///< sequences decoded in one batch, at most
-    bool flashAttention = true;
-};
-
 /// The only code that talks to llama.cpp (DOCS/CODING_STANDARDS.md 10). It loads the model and
 /// builds prompts the way llama-server does (common_init_from_params, the model's own chat
 /// template through llama.cpp's chat session, thinking off per PLAN D12, the model file's
@@ -38,7 +27,7 @@ struct EngineConfig
 ///
 /// Not thread-safe: one thread owns it (the inference thread); cancel() may be called from
 /// any thread.
-class LlamaEngine final : public Generator
+class LlamaEngine final : public Engine
 {
 public:
     LlamaEngine();
@@ -48,8 +37,12 @@ public:
     LlamaEngine(LlamaEngine&&) = delete;
     LlamaEngine& operator=(LlamaEngine&&) = delete;
 
-    [[nodiscard]] util::Result<bool> load(const EngineConfig& config);
-    [[nodiscard]] bool isLoaded() const;
+    [[nodiscard]] util::Result<bool> load(const EngineConfig& config) override;
+    void unload() override;
+    [[nodiscard]] bool isLoaded() const override;
+    [[nodiscard]] EngineConfig loadedConfig() const override;
+    [[nodiscard]] int countTokens(const QString& text) const override;
+    [[nodiscard]] util::Result<bool> warm(const GenerationRequest& request) override;
     [[nodiscard]] double loadSeconds() const { return m_loadSeconds; }
     /// Whether requests with `draft` set are drafted: a draft head is loaded and usable.
     [[nodiscard]] bool canDraft() const { return m_spec != nullptr; }
@@ -61,8 +54,7 @@ public:
     /// loaded): for input limits, and for tests that hold the prompt to llama-server's.
     [[nodiscard]] std::vector<int> promptTokens(const GenerationRequest& request) const;
 
-    /// Stops the current generation at the next token; its finish reason is "cancelled".
-    void cancel();
+    void cancel() override;
 
 private:
     struct TemplatesDeleter

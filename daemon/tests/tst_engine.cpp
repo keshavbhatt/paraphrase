@@ -274,6 +274,40 @@ private Q_SLOTS:
         QVERIFY(accepted > drafted / 3); // M0: 95% on proofread, 53% on rewrite
     }
 
+    void warmsThePrompt()
+    {
+        // ADR-005: reading ahead leaves only the last prompt token for the real request.
+        const GenerationRequest req = request(u"proofread/pr-hi-001"_s);
+        const auto cold = m_engine.generate(req, {});
+        QVERIFY(m_engine.warm(request(u"reply/rp-en-001"_s)).ok()); // something else in between
+        QVERIFY(m_engine.warm(req).ok());
+        const auto warmed = m_engine.generate(req, {});
+        QVERIFY(cold.ok() && warmed.ok());
+        QCOMPARE(warmed.value().cachedTokens, warmed.value().promptTokens - 1);
+        QCOMPARE(warmed.value().texts, cold.value().texts);
+    }
+
+    void countsInputTokens()
+    {
+        QCOMPARE(m_engine.countTokens({}), 0);
+        const int n = m_engine.countTokens(u"Hello there, how are you?"_s);
+        QVERIFY(n > 3 && n < 12);
+        // Control tokens spelled out in user text are plain text, so they count as several.
+        QVERIFY(m_engine.countTokens(u"<|turn>"_s) > 1);
+    }
+
+    void unloadsAndReloads()
+    {
+        const auto config = m_engine.loadedConfig();
+        QCOMPARE(config.modelPath, modelPath());
+        m_engine.unload();
+        QVERIFY(!m_engine.isLoaded());
+        QVERIFY(m_engine.loadedConfig().modelPath.isEmpty());
+        QVERIFY(!m_engine.generate(request(u"proofread/pr-en-001"_s), {}).ok());
+        QVERIFY(m_engine.load(config).ok());
+        QVERIFY(m_engine.generate(request(u"proofread/pr-en-001"_s), {}).ok());
+    }
+
     void decodesVariantsInOneBatch()
     {
         LlamaEngine engine;
