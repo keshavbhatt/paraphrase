@@ -132,6 +132,8 @@ paraphrase/
 
 ### 5.1 Request API (D-Bus name `com.ktechpit.paraphrase.Daemon`, interface `com.ktechpit.paraphrase.Daemon1`, ADR-007; mirrored on the Unix socket as JSON lines for the native host)
 
+The contract is `DOCS/api.md` (M1): it adds `Warm`'s input, the `Retrying` signal, error names, model management and the private mode. The sketch below is the original plan.
+
 ```
 RunSkill(skill_id: s, input: a{sv}, options: a{sv}) -> request_id: s
   signals: Token(request_id, variant_idx, text)   # streaming

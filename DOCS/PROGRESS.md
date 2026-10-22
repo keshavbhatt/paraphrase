@@ -14,6 +14,25 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-22 - M1 step 6: the D-Bus API
+
+- `paraphrase_api` and `paraphrase-daemon`: the API in DOCS/api.md on the session bus, or on
+  a private peer socket (ADR-010, `--private-socket`) with the same object. Requests queue for
+  one inference thread; a new request from a client cancels its earlier ones; the skill's tier
+  picks the model; long input is refused; `Warm` reads ahead (ADR-005); the model unloads after
+  10 quiet minutes and the daemon exits after 30 (never during a download).
+- Streaming signals go only to the client that asked (targeted D-Bus signals): checked on the
+  real session bus, where `gdbus monitor` saw none of a request's text.
+- Models over D-Bus: list (with source, revision and sha256 for the UI), download with its
+  draft head and throttled progress, pause, delete (refused while in use).
+- Engine: an `Engine` interface (tst_api runs the real service with a fake), read-ahead,
+  token counting, unload, translatable errors, and a cancel that holds until the next job, so
+  one that arrives between the two calls of a language retry still counts.
+- Measured on machine B through D-Bus: idle daemon 20 MB (target under 40 MB); a proofread on
+  E2B with its draft head, 10 threads: 2.2 s.
+- Next: step 7, the CLI (`paraphrase proofread < file`), which starts the daemon or runs it
+  privately.
+
 ## 2026-10-22 - M1 step 5: models
 
 - Catalog schema 2 (DOCS/models.md, Catalog): Gemma 4 E2B is the fast-tier model and E4B
