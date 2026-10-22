@@ -15,7 +15,7 @@ __pycache__/
 *.egg-info/
 
 # Models: downloaded from upstream by pinned revision, never committed
-models/
+/models/
 *.gguf
 *.gguf.part
 
