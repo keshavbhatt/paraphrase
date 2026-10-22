@@ -14,7 +14,7 @@ Rules:
 - Standalone first (ADR-013): every feature must work in the main window with every hotkey, capture and inject backend switched off. Integrations are accelerators, never the only way in. Packaging limits are in DOCS/packaging.md.
 - Models are downloaded from upstream by pinned revision and verified by sha256; never commit model files (models/ and *.gguf are gitignored).
 - Dev machine is Arch Linux: use pacman package names when listing dependencies.
-- C++20, Qt 6, clang-format; Python 3.11+, ruff, type hints. Run ctest and the eval smoke suite before declaring a task done.
+- C++20, Qt 6, clang-format; Python 3.11+, ruff, type hints. Code follows DOCS/CODING_STANDARDS.md (as Omnidict). Build with `make build` (KDE snap SDK), check with `make test` and `make lint`. Run ctest and the eval smoke suite before declaring a task done.
 - Commit in small, logical steps with clear messages.
 - Mocks before screens: every screen or visible UI change first gets an HTML mock in
   `DOCS/mocks/` (see `DOCS/DESIGN.md`) that the owner approves; approval is recorded in
