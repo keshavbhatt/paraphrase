@@ -246,3 +246,21 @@ second standalone surface.
 **Consequences.** M2 builds the main window with every skill before the popup's integration
 backends; its acceptance test runs with every hotkey, capture and inject backend switched off.
 A main-window mock is needed before it is coded (mocks-before-screens rule).
+
+---
+
+## ADR-014: yaml-cpp reads skill files in the daemon (2026-10-22)
+
+**Status.** Accepted.
+
+**Context.** Skills are YAML (PLAN D4) and users write their own (custom actions). Qt has no
+YAML reader. The Python harness uses PyYAML (YAML 1.1).
+
+**Decision.** yaml-cpp 0.9.0 (MIT), as a pinned git submodule `third_party/yaml-cpp`, built
+static by `cmake/YamlCpp.cmake` with its tools, tests and install rules off. Snap and Flatpak
+builds have no network, so no download at build time. The loader resolves plain scalars as
+PyYAML does (YAML 1.1 null, booleans, integers and floats; quoted scalars stay strings) so
+both read a skill file the same way; `tests/vectors/skills.json` checks it.
+
+**Consequences.** yaml-cpp throws on malformed YAML; the loader catches it and returns an
+error naming the file, as the coding standards require.

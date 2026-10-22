@@ -7,6 +7,7 @@ with their licences in `models.json` and `DOCS/models.md`.
 | Component | Version | Licence | How it is obtained | Used by |
 |---|---|---|---|---|
 | llama.cpp (with ggml) | v0.7.0, commit 620d2225 (2026-10-15) | MIT | git submodule `third_party/llama.cpp`, built as a library by `cmake/LlamaCpp.cmake` (PLAN D2, ADR-008) | `daemon` (inference); M0 tools `llama-server`, `llama-bench` |
+| yaml-cpp | 0.9.0, commit 56e3bb55 (2026-02-04) | MIT | git submodule `third_party/yaml-cpp`, built static by `cmake/YamlCpp.cmake` (ADR-014) | `daemon` (skill files) |
 | Qt (Core, Test; DBus and Network from later M1 steps) | 6.11.1 | LGPL-3.0 | `kde-qt6-core24-sdk` snap (build), `kf6-core24` snap (runtime), as Omnidict | `daemon` |
 | PyYAML | resolved in `uv.lock` | MIT | PyPI, via `uv` | `eval` (skill files) |
 | ruff | dev-only | MIT | PyPI, via `uv` | tooling |

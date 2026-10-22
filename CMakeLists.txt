@@ -30,6 +30,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 # Third-party code first, before our language standard and Qt strictness flags apply:
 # llama.cpp keeps its own C++ standard and warnings.
 include(LlamaCpp)
+include(YamlCpp)
 
 # ---------------------------------------------------------------------------
 # Our code
