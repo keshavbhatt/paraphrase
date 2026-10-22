@@ -241,6 +241,21 @@ QString DaemonService::checkFields(const skills::Skill& s, const skills::Request
     return {};
 }
 
+int DaemonService::residentModels() const
+{
+    // Both tiers stay loaded when the computer holds them with room to spare, so switching
+    // between proofread and a tone costs no load (the owner's review of the CLI suite).
+    const models::ModelEntry* fast = modelForTier(u"fast"_s);
+    const models::ModelEntry* quality = modelForTier(u"quality"_s);
+    if (fast == nullptr || quality == nullptr || fast == quality) {
+        return 1;
+    }
+    constexpr double kReserveGb = 6.0; // the desktop and its apps keep this much
+    constexpr double kGb = 1024.0 * 1024.0 * 1024.0;
+    const double total = static_cast<double>(m_setup.hardware.totalMemory) / kGb;
+    return fast->memoryGb + quality->memoryGb + kReserveGb <= total ? 2 : 1;
+}
+
 bool DaemonService::chooseModel(Job& job, const models::ModelEntry* requested) const
 {
     const models::ModelEntry* model = requested != nullptr ? requested : modelForTier(job.skill.tier);
@@ -249,6 +264,7 @@ bool DaemonService::chooseModel(Job& job, const models::ModelEntry* requested) c
     }
     const models::ModelEntry* draft = m_speedUp ? m_setup.catalog.draftFor(model->id) : nullptr;
     job.modelId = model->id;
+    job.residentModels = residentModels();
     job.model = engine::EngineConfig{
         .modelPath = m_store.modelPath(*model),
         .draftModelPath =

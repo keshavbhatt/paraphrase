@@ -449,6 +449,29 @@ private Q_SLOTS:
         m_settingsPath.clear();
     }
 
+    void keepsBothModelsLoadedWhenTheyFit()
+    {
+        // Fast (4 GB) and quality (8 GB) plus a 6 GB reserve fit in 32 GB: switching between
+        // proofread and a tone loads each model once. In 16 GB they take turns.
+        for (const auto& [memoryGb, loads] : {std::pair{32.0, 2}, std::pair{16.0, 3}}) {
+            startServer(memoryGb, {u"fast-model"_s, u"quality-model"_s});
+            QDBusConnection c = connect();
+            Listener l;
+            QVERIFY(l.listen(c));
+            for (const QString& skill : {u"proofread"_s, u"rewrite.polite"_s, u"proofread"_s}) {
+                const QString id = runSkill(c, skill, {{u"text"_s, u"Their going home."_s}});
+                QTRY_VERIFY_WITH_TIMEOUT(l.done.contains(id), kTimeoutMs);
+            }
+            qsizetype loaded = 0;
+            {
+                const QMutexLocker lock(&m_state->lock);
+                loaded = m_state->loads.size();
+            }
+            QCOMPARE(loaded, loads);
+            cleanup();
+        }
+    }
+
     void cancelsAtOnceDuringAModelLoad()
     {
         // Ctrl+C while the model loads: the client hears "cancelled" at once, not after the

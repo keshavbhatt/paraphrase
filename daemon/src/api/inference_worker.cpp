@@ -58,8 +58,12 @@ QString resultJson(const Job& job, const engine::SkillResult& r, double loadSeco
 InferenceWorker::InferenceWorker(EngineFactory factory, const util::LanguageDetector& detector)
     : m_factory(std::move(factory))
     , m_detector(detector)
-    , m_engine(m_factory())
-{}
+{
+    for (auto& engine : m_engines) {
+        engine = m_factory();
+    }
+    m_engine = m_engines.front().get();
+}
 
 InferenceWorker::~InferenceWorker() = default;
 
@@ -67,7 +71,9 @@ void InferenceWorker::cancel(const QString& id)
 {
     const QMutexLocker lock(&m_cancelLock);
     m_cancelled = id;
-    m_engine->cancel(); // only atomic state: safe from this thread
+    for (const auto& engine : m_engines) {
+        engine->cancel(); // only atomic state: safe from this thread
+    }
 }
 
 bool InferenceWorker::cancelled(const QString& id) const
@@ -76,13 +82,53 @@ bool InferenceWorker::cancelled(const QString& id) const
     return m_cancelled == id;
 }
 
+bool InferenceWorker::holds(const engine::Engine& engine, const engine::EngineConfig& model)
+{
+    return engine.isLoaded() && engine.loadedConfig().modelPath == model.modelPath &&
+           engine.loadedConfig().draftModelPath == model.draftModelPath;
+}
+
+std::size_t InferenceWorker::slotFor(const Job& job)
+{
+    if (job.residentModels < 2) {
+        // Only one model fits: keep the first slot, free the other before loading.
+        for (std::size_t i = 1; i < kSlots; ++i) {
+            if (m_engines.at(i)->isLoaded()) {
+                m_engines.at(i)->unload();
+                m_slotModels.at(i).clear();
+            }
+        }
+        return 0;
+    }
+    std::size_t best = 0;
+    for (std::size_t i = 0; i < kSlots; ++i) {
+        if (!m_engines.at(i)->isLoaded()) {
+            return i;
+        }
+        if (m_lastUsed.at(i) < m_lastUsed.at(best)) {
+            best = i;
+        }
+    }
+    return best;
+}
+
 bool InferenceWorker::ensureModel(const Job& job)
 {
-    if (m_engine->isLoaded() && m_engine->loadedConfig().modelPath == job.model.modelPath &&
-        m_engine->loadedConfig().draftModelPath == job.model.draftModelPath) {
-        return true;
+    for (std::size_t i = 0; i < kSlots; ++i) {
+        if (holds(*m_engines.at(i), job.model) && (job.residentModels >= 2 || i == 0)) {
+            m_engine = m_engines.at(i).get();
+            m_lastUsed.at(i) = ++m_uses;
+            if (m_modelId != job.modelId) {
+                m_modelId = job.modelId;
+                Q_EMIT modelChanged(m_modelId);
+            }
+            return true;
+        }
     }
-    qCInfo(lcInference) << "loading" << job.modelId;
+    const std::size_t slot = slotFor(job);
+    m_engine = m_engines.at(slot).get();
+    m_lastUsed.at(slot) = ++m_uses;
+    qCInfo(lcInference) << "loading" << job.modelId << "in slot" << slot;
     QElapsedTimer clock;
     clock.start();
     const auto loaded = m_engine->load(job.model);
@@ -93,6 +139,7 @@ bool InferenceWorker::ensureModel(const Job& job)
         Q_EMIT failed(job.id, u"model"_s, loaded.error());
         return false;
     }
+    m_slotModels.at(slot) = job.modelId;
     m_modelId = job.modelId;
     Q_EMIT modelChanged(m_modelId);
     return true;
@@ -116,7 +163,9 @@ void InferenceWorker::run(const Job& job)
             Q_EMIT idle();
             return;
         }
-        m_engine->resetCancel(); // a cancel from here on is for this job
+        for (const auto& engine : m_engines) {
+            engine->resetCancel(); // a cancel from here on is for this job
+        }
     }
     if (!ensureModel(job)) {
         Q_EMIT idle();
@@ -194,9 +243,16 @@ void InferenceWorker::warm(const Job& job)
 
 void InferenceWorker::unload()
 {
-    if (m_engine->isLoaded()) {
-        m_engine->unload();
-        qCInfo(lcInference) << "model unloaded";
+    bool any = false;
+    for (std::size_t i = 0; i < kSlots; ++i) {
+        if (m_engines.at(i)->isLoaded()) {
+            m_engines.at(i)->unload();
+            m_slotModels.at(i).clear();
+            any = true;
+        }
+    }
+    if (any) {
+        qCInfo(lcInference) << "models unloaded";
         m_modelId.clear();
         Q_EMIT modelChanged({});
     }

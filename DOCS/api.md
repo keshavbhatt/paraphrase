@@ -72,6 +72,9 @@ Skill ids are those `ListSkills` returns: `proofread`, `reply`, and a preset as
 - **Cancel on change** (PLAN 5.3): a new `RunSkill` from a client cancels that client's
   earlier requests, queued or running. Each gets `Error(id, "cancelled", ...)`.
 - A client can cancel only its own requests.
+- Both the fast and the quality model stay loaded when the computer's memory holds them with
+  6 GB to spare (their `memory_gb` from the catalog), so switching between proofread and a tone
+  costs no load; otherwise one model is loaded at a time.
 - The skill's tier picks the model (ADR-016): quality skills run on the quality model when it
   is installed and fits the computer's memory, otherwise on the fast one.
   A model the user chose for the tier (`SetTierModel`) comes first while it is installed.

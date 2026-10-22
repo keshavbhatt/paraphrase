@@ -9,6 +9,7 @@
 #include <QObject>
 #include <QString>
 
+#include <array>
 #include <functional>
 #include <memory>
 
@@ -23,9 +24,12 @@ struct Job
     engine::EngineConfig model;
     QString modelId;
     bool warmOnly = false; ///< read the prompt ahead (ADR-005), generate nothing
+    /// How many models may stay loaded at once: 2 when the computer's memory holds the fast and
+    /// the quality model together (switching then costs no load), else 1.
+    int residentModels = 1;
 };
 
-/// Owns the engine on the inference thread (DOCS/CODING_STANDARDS.md, Threads): decoding
+/// Owns the engines on the inference thread (DOCS/CODING_STANDARDS.md, Threads): decoding
 /// blocks for seconds, so the D-Bus thread hands it one job at a time. Loads the job's model
 /// when another one is loaded, checks the skill's input limit, runs the skill with the
 /// language check, and reports through queued signals. cancel() is the one call from another
@@ -64,10 +68,20 @@ private:
     void report(const Job& job, const util::Result<engine::SkillResult>& result);
     [[nodiscard]] int inputTokens(const Job& job) const;
     void warm(const Job& job);
+    /// The slot to load `job`'s model into: a free one when two may stay loaded, else the one
+    /// used longest ago (the others are unloaded when only one may stay).
+    [[nodiscard]] std::size_t slotFor(const Job& job);
+    [[nodiscard]] static bool holds(const engine::Engine& engine, const engine::EngineConfig& model);
 
     EngineFactory m_factory;
     const util::LanguageDetector& m_detector;
-    std::unique_ptr<engine::Engine> m_engine; ///< loads and runs on the inference thread
+    static constexpr std::size_t kSlots = 2;
+    /// Created up front and never replaced: cancel() reaches them from another thread.
+    std::array<std::unique_ptr<engine::Engine>, kSlots> m_engines;
+    std::array<QString, kSlots> m_slotModels; ///< model id loaded in each slot
+    std::array<qint64, kSlots> m_lastUsed{};  ///< a use counter, for the slot used longest ago
+    qint64 m_uses = 0;
+    engine::Engine* m_engine = nullptr; ///< the slot of the running (or last) job
     QString m_modelId;
     double m_loadSeconds = 0.0;  ///< of the running job, when it loaded the model
     mutable QMutex m_cancelLock; ///< guards m_cancelled and the engine's cancel flag at job start
