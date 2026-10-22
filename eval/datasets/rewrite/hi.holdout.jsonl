@@ -1,0 +1,3 @@
+{"id": "rw-hi-201", "lang": "hi", "source": "holdout", "text": "मीटिंग 3 बजे से 4 बजे कर दी गई है, सबको बता देना।", "protected": ["3", "4"], "reference": "", "notes": "Hindi times"}
+{"id": "rw-hi-202", "lang": "hinglish", "source": "holdout", "text": "Mera laptop kharab ho gaya hai, aaj ka report kal tak bhejunga.", "protected": [], "reference": "", "notes": "Hinglish, stays Hinglish"}
+{"id": "rw-hi-203", "lang": "hi", "source": "holdout", "text": "Team, kal का launch postpone हो गया है, नई date 12 तारीख है।", "protected": ["Team", "launch", "postpone", "date", "12"], "reference": "", "notes": "code-mixed with a date"}

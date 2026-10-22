@@ -1,0 +1,4 @@
+{"id": "rp-hi-201", "lang": "hi", "source": "holdout", "context": "कल रात की पार्टी में तुम क्यों नहीं आए?", "text": "", "expect": "apologise and give a reason in Hindi", "notes": "Hindi question"}
+{"id": "rp-hi-202", "lang": "hinglish", "source": "holdout", "context": "Kal ki meeting cancel ho gayi hai, next week rakhenge", "text": "", "expect": "acknowledge, Hinglish", "notes": "Hinglish notice"}
+{"id": "rp-hi-203", "lang": "hinglish", "source": "holdout", "context": "Tum kal free ho? Movie dekhne chalte hain", "text": "Haan", "expect": "each reply starts with 'Haan'", "notes": "Hinglish draft continuation"}
+{"id": "rp-hi-204", "lang": "hi", "source": "holdout", "context": "आपका बिल ₹2,340 का है, कृपया 10 तारीख तक भुगतान करें।", "text": "", "expect": "acknowledge; amount as written; never ask the amount", "notes": "Hindi bill"}
