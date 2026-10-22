@@ -72,7 +72,7 @@ Languages: English first-class; Hindi and Hinglish (Latin-script Hindi) as a sta
 ### 3.2 UX surfaces
 
 1. **Main window (v1, always available).** Paste or type text, run any skill, see the diff or the variants, copy the result. Works in every package format and session with no desktop integration (D14). Also the place for compose, settings, the model manager, custom actions and optional history.
-2. **Popup assistant (v1, the fast path).** Global hotkey → a small floating panel near the cursor showing the captured text, action chips (Proofread · Tone ▾ · Reply · Summarize · Format ▾ · Translate ▾ · Custom ▾), a streaming result area, and **Replace / Copy / Retry / ‹ variants ›**. Proofread shows an inline diff. Esc dismisses. The panel never steals focus longer than needed.
+2. **Popup assistant (v1, the fast path).** Global hotkey → a small floating panel near the cursor showing the captured text, action chips (Proofread · Tone ▾ · Reply · Summarize · Format ▾ · Translate ▾ · Custom ▾), a streaming result area, and **Replace / Copy / Retry / ‹ variants › / Open in window** (hands the text to the main window). Proofread shows an inline diff. Esc dismisses. The panel never steals focus longer than needed.
 3. **Tray icon** where the desktop shows one (KDE; GNOME needs an extension): opens the main window and the popup.
 4. **CLI** (`paraphrase proofread < file`, `paraphrase reply --json`). Useful for scripting and as the hotkey fallback (§6).
 5. **Browser extension (M4).** Gmail-style reply chips inside webmail (Gmail, Outlook web, Zimbra/Carbonio, Proton). Also a selection menu in any text field. Talks to the daemon via native messaging.

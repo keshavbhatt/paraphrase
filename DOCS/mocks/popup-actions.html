@@ -20,6 +20,7 @@
       <span class="small muted">from Telegram</span>
       <span class="grow"></span>
       <span class="private"><svg class="ic s"><use href="#i-lock"/></svg>On this device</span>
+      <a class="btn flat icon" href="main-window.html" aria-label="Open in window" title="Open in window"><svg class="ic s"><use href="#i-expand"/></svg></a>
       <button class="btn flat icon" aria-label="Close (Esc)"><svg class="ic s"><use href="#i-x"/></svg></button>
     </div>
     <div class="pbody">
@@ -55,6 +56,6 @@
   <li><b>The captured text</b>: the selection where the session allows reading it (X11, KDE Wayland), else the clipboard. Word count and the detected language are shown; the language is what the result will be written in.</li>
   <li><b>Actions</b> are skills (PLAN D4): number keys 1 to 7 pick one, arrow keys move, Enter runs the highlighted one. The highlighted action is the one the user picks most often, so the next point can work ahead.</li>
   <li><b>Reading ahead</b>: as soon as the popup opens, the engine starts processing the text for the highlighted action (the daemon's <code>Warm()</code>, PLAN 5). On an 8 GB, 4-core laptop reading a 100-word text takes about 3 s; working ahead hides the second or so spent choosing. If the user picks another action the read-ahead is dropped. The line says what is happening in plain words, never a percentage.</li>
-  <li><b>On this device</b> is always visible: nothing leaves the computer. Esc closes the popup from any state; the popup never keeps focus longer than needed.</li>
+  <li><b>On this device</b> is always visible: nothing leaves the computer. Esc closes the popup from any state; the popup never keeps focus longer than needed. <b>Open in window</b> hands the text to the main window (ADR-013), for long texts or when the user wants to keep working on it.</li>
 </ol></section>
 </body></html>

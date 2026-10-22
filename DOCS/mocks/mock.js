@@ -23,6 +23,7 @@
     'alert': '<circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/>',
     'languages': '<path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/>',
     'plus': '<path d="M5 12h14"/><path d="M12 5v14"/>',
+    'expand': '<path d="M15 3h6v6"/><path d="m21 3-7 7"/><path d="m3 21 7-7"/><path d="M9 21H3v-6"/>',
   };
   const sprite = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   sprite.setAttribute('style', 'display:none');

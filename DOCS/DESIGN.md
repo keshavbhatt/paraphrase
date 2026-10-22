@@ -66,6 +66,8 @@ holds the main action (Replace or Insert, Enter) and Copy and Retry.
 
 | Mock | Shows | Milestone |
 |---|---|---|
+| `main-window.html` | Standalone: your text, every action, the diff, Copy, the missing-integration notice (ADR-013) | M2 |
+| `main-window-reply.html` | Standalone reply: message, optional draft, three replies to copy | M2 |
 | `popup-actions.html` | Captured text, numbered actions, reading ahead | M2 |
 | `popup-proofread.html` | Word diff, one line per change with Undo, Replace | M2 |
 | `popup-reply.html` | Three replies in the message's language, edit, Insert | M2 |
@@ -75,6 +77,9 @@ holds the main action (Replace or Insert, Enter) and Copy and Retry.
 
 ## 4. Rules that survive the mocks
 
+- Standalone first (ADR-013): every action works in the main window with no desktop
+  integration; a missing integration shows a notice that says what to do instead, never an
+  error, and the popup can always hand its text to the main window.
 - Nothing is typed into an app or sent without an explicit action: Replace and Insert type
   into the window the text came from; a reply is inserted, never sent (CLAUDE.md).
 - The result is in the language of the input unless the user chose another. When the
