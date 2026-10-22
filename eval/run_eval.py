@@ -254,7 +254,12 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--model", required=True)
     ap.add_argument("--skill", nargs="+", required=True)
     ap.add_argument("--profile", default="B-vulkan")
-    ap.add_argument("--set", choices=("generated", "human", "all"), default="all")
+    ap.add_argument(
+        "--set",
+        choices=("generated", "hard", "human", "holdout", "all"),
+        default="all",
+        help="all: generated, hard and human; holdout is kept out of tuning and runs alone",
+    )
     ap.add_argument("--limit", type=int)
     ap.add_argument("--tag", default="m0")
     ap.add_argument("--rescore", action="store_true", help="re-score saved outputs, no model")
@@ -278,7 +283,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.rescore:
         rescore(args.model, args.skill, args.tag, args.profile)
         return 0
-    sets = ("generated", "human") if args.set == "all" else (args.set,)
+    sets = ("generated", "hard", "human") if args.set == "all" else (args.set,)
     run(
         args.model,
         args.skill,

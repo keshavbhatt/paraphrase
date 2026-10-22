@@ -1,0 +1,10 @@
+{"id": "pr-hi-201", "lang": "hi", "source": "holdout", "text": "मेरी भाई की शादी अगले महीने है", "reference": "मेरे भाई की शादी अगले महीने है।", "protected": [], "notes": "gender agreement, purna viram"}
+{"id": "pr-hi-202", "lang": "hi", "source": "holdout", "text": "बच्चे पार्क में खेल रहा है", "reference": "बच्चे पार्क में खेल रहे हैं।", "protected": [], "notes": "plural agreement, purna viram"}
+{"id": "pr-hi-203", "lang": "hi", "source": "holdout", "text": "आप कब तक घर पहुँच जाओगे", "reference": "आप कब तक घर पहुँच जाएँगे?", "protected": [], "notes": "honorific agreement with आप, question mark"}
+{"id": "pr-hi-204", "lang": "hi", "source": "holdout", "text": "मुझे चाय पसंद है, लेकिन कॉफ़ी नहीं।", "reference": "मुझे चाय पसंद है, लेकिन कॉफ़ी नहीं।", "protected": [], "notes": "clean"}
+{"id": "pr-hi-205", "lang": "hi", "source": "holdout", "text": "उसने मुझे एक किताब दिया", "reference": "उसने मुझे एक किताब दी।", "protected": [], "notes": "object agreement after ने, purna viram"}
+{"id": "pr-hi-206", "lang": "hinglish", "source": "holdout", "text": "Meri bhai ki shaadi agle mahine hai", "reference": "Mere bhai ki shaadi agle mahine hai.", "protected": [], "notes": "Hinglish gender agreement, full stop"}
+{"id": "pr-hi-207", "lang": "hinglish", "source": "holdout", "text": "Tum kal aa rahe ho na", "reference": "Tum kal aa rahe ho na?", "protected": [], "notes": "question mark only"}
+{"id": "pr-hi-208", "lang": "hinglish", "source": "holdout", "text": "Bachche park mein khel raha hai", "reference": "Bachche park mein khel rahe hain.", "protected": [], "notes": "plural agreement, full stop"}
+{"id": "pr-hi-209", "lang": "hinglish", "source": "holdout", "text": "Theek hai, main 5 baje call karta hoon.", "reference": "Theek hai, main 5 baje call karta hoon.", "protected": [], "notes": "clean"}
+{"id": "pr-hi-210", "lang": "hinglish", "source": "holdout", "text": "usne mujhe ek kitab diya", "reference": "Usne mujhe ek kitab di.", "protected": [], "notes": "object agreement, capital, full stop"}

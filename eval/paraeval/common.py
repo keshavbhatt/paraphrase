@@ -68,7 +68,7 @@ def write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
 
 
 def dataset(
-    base_skill: str, sets: tuple[str, ...] = ("generated", "human")
+    base_skill: str, sets: tuple[str, ...] = ("generated", "hard", "human")
 ) -> list[dict[str, Any]]:
     """All items for a skill: <lang>.<set>.jsonl files under eval/datasets/<skill>/."""
     items: list[dict[str, Any]] = []
