@@ -9,7 +9,7 @@
 #include "popup/popup_controller.h"
 #include "popup/popup_pages.h"
 #include "popup/popup_window.h"
-#include "ui/chip_button.h"
+#include "ui/common/chip_button.h"
 
 #include <QDir>
 #include <QLabel>

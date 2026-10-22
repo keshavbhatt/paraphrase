@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ui/skill_catalog.h"
-#include "ui/theme.h"
+#include "ui/common/theme.h"
+#include "ui/core/skill_catalog.h"
 
 #include <QWidget>
 

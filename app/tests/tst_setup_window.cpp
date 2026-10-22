@@ -5,9 +5,9 @@
 
 #include "app_daemon.h"
 #include "daemon_client.h"
-#include "ui/chip_button.h"
-#include "ui/model_card.h"
-#include "ui/setup_window.h"
+#include "ui/common/chip_button.h"
+#include "ui/setup/model_card.h"
+#include "ui/setup/setup_window.h"
 
 #include <QCheckBox>
 #include <QDir>

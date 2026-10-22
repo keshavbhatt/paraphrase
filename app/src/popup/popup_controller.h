@@ -2,7 +2,7 @@
 
 #include "daemon_client.h"
 #include "integration/backends.h"
-#include "ui/skill_catalog.h"
+#include "ui/core/skill_catalog.h"
 #include "util/language_detector.h"
 
 #include <QJsonObject>

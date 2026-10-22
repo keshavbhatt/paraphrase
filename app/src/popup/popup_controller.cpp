@@ -3,11 +3,11 @@
 #include "integration/integrations.h"
 #include "popup/popup_pages.h"
 #include "popup/popup_window.h"
-#include "ui/action_bar.h"
-#include "ui/languages.h"
-#include "ui/request_runner.h"
-#include "ui/result_summary.h"
-#include "ui/result_views.h"
+#include "ui/core/languages.h"
+#include "ui/core/request_runner.h"
+#include "ui/core/result_summary.h"
+#include "ui/parts/action_bar.h"
+#include "ui/parts/result_views.h"
 
 #include <QClipboard>
 #include <QCursor>

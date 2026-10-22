@@ -5,8 +5,8 @@
 // PARAPHRASE_SCREENSHOTS=<dir> it also saves the window in light and dark for review.
 
 #include "app_daemon.h"
-#include "ui/chip_button.h"
-#include "ui/main_window.h"
+#include "ui/common/chip_button.h"
+#include "ui/main/main_window.h"
 
 #include <QAbstractButton>
 #include <QApplication>

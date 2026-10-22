@@ -1,11 +1,11 @@
 #include "popup/popup_pages.h"
 
-#include "ui/action_bar.h"
-#include "ui/chip_button.h"
-#include "ui/flow_layout.h"
-#include "ui/languages.h"
-#include "ui/result_views.h"
-#include "ui/widgets.h"
+#include "ui/common/chip_button.h"
+#include "ui/common/flow_layout.h"
+#include "ui/common/widgets.h"
+#include "ui/core/languages.h"
+#include "ui/parts/action_bar.h"
+#include "ui/parts/result_views.h"
 #include "util/language_detector.h"
 
 #include <QHBoxLayout>

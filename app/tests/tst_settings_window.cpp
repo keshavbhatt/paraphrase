@@ -5,7 +5,7 @@
 
 #include "app_daemon.h"
 #include "daemon_client.h"
-#include "ui/settings_window.h"
+#include "ui/settings/settings_window.h"
 
 #include <QComboBox>
 #include <QDir>

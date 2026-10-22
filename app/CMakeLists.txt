@@ -15,43 +15,42 @@ target_include_directories(paraphrase_integration PUBLIC "${CMAKE_CURRENT_SOURCE
 target_link_libraries(paraphrase_integration PUBLIC Qt6::Gui)
 
 add_library(paraphrase_ui STATIC
-    src/ui/about_page.cpp
-    src/ui/action_bar.cpp
-    src/ui/app_flow.cpp
-    src/ui/bars.cpp
-    src/ui/change_list.cpp
-    src/ui/chip_button.cpp
-    src/ui/flow_layout.cpp
-    src/ui/download_panel.cpp
-    src/ui/hardware_chips.cpp
-    src/ui/input_pages.cpp
-    src/ui/input_pane.cpp
-    src/ui/installed_models_table.cpp
-    src/ui/languages.cpp
-    src/ui/languages_section.cpp
-    src/ui/main_window.cpp
-    src/ui/model_card.cpp
-    src/ui/model_info.cpp
-    src/ui/model_page.cpp
-    src/ui/models_controller.cpp
-    src/ui/models_settings_page.cpp
-    src/ui/output_pane.cpp
-    src/ui/request_runner.cpp
-    src/ui/result_summary.cpp
-    src/ui/result_views.cpp
-    src/ui/sample_run.cpp
-    src/ui/settings_nav.cpp
-    src/ui/settings_window.cpp
-    src/ui/setup_window.cpp
-    src/ui/shortcut_page.cpp
-    src/ui/skill_catalog.cpp
-    src/ui/step_header.cpp
-    src/ui/text_page.cpp
-    src/ui/theme.cpp
-    src/ui/tier_pickers.cpp
-    src/ui/try_page.cpp
-    src/ui/widgets.cpp
-    src/ui/window_style.cpp
+    src/ui/settings/about_page.cpp
+    src/ui/parts/action_bar.cpp
+    src/ui/main/bars.cpp
+    src/ui/parts/change_list.cpp
+    src/ui/common/chip_button.cpp
+    src/ui/common/flow_layout.cpp
+    src/ui/setup/download_panel.cpp
+    src/ui/setup/hardware_chips.cpp
+    src/ui/parts/input_pages.cpp
+    src/ui/main/input_pane.cpp
+    src/ui/settings/installed_models_table.cpp
+    src/ui/core/languages.cpp
+    src/ui/settings/languages_section.cpp
+    src/ui/main/main_window.cpp
+    src/ui/setup/model_card.cpp
+    src/ui/models/model_info.cpp
+    src/ui/setup/model_page.cpp
+    src/ui/models/models_controller.cpp
+    src/ui/settings/models_settings_page.cpp
+    src/ui/main/output_pane.cpp
+    src/ui/core/request_runner.cpp
+    src/ui/core/result_summary.cpp
+    src/ui/parts/result_views.cpp
+    src/ui/setup/sample_run.cpp
+    src/ui/settings/settings_nav.cpp
+    src/ui/settings/settings_window.cpp
+    src/ui/setup/setup_window.cpp
+    src/ui/setup/shortcut_page.cpp
+    src/ui/core/skill_catalog.cpp
+    src/ui/setup/step_header.cpp
+    src/ui/settings/text_page.cpp
+    src/ui/common/theme.cpp
+    src/ui/settings/tier_pickers.cpp
+    src/ui/setup/try_page.cpp
+    src/ui/common/widgets.cpp
+    src/ui/common/window_style.cpp
 )
 paraphrase_set_warnings(paraphrase_ui)
 target_include_directories(paraphrase_ui PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
@@ -78,6 +77,7 @@ target_link_libraries(paraphrase_popup PUBLIC paraphrase_ui paraphrase_integrati
 # The running app: window, popup, tray, backends and the D-Bus service, wired together.
 find_package(Qt6 ${PARAPHRASE_QT_MIN_VERSION} REQUIRED COMPONENTS DBus)
 add_library(paraphrase_shell STATIC
+    src/shell/app_flow.cpp
     src/shell/app_service.cpp
     src/shell/application.cpp
     src/shell/tray_icon.cpp

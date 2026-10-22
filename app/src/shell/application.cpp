@@ -3,10 +3,10 @@
 #include "daemon_client.h"
 #include "integration/integrations.h"
 #include "popup/popup_controller.h"
+#include "shell/app_flow.h"
 #include "shell/app_service.h"
 #include "shell/tray_icon.h"
-#include "ui/app_flow.h"
-#include "ui/main_window.h"
+#include "ui/main/main_window.h"
 
 #include <QApplication>
 
