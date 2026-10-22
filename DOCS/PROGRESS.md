@@ -14,6 +14,26 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-22 - M1 step 5: models
+
+- Catalog schema 2 (DOCS/models.md, Catalog): Gemma 4 E2B is the fast-tier model and E4B
+  the quality-tier one, with the memory they need and use, and their draft heads. The daemon
+  builds the catalog in and never fetches it (ADR-015); the eval harness reads the same file.
+- `paraphrase_models`: the catalog reader (strict; file names, repositories and checksums are
+  checked because they become paths and URLs), the models folder (ADR-009 paths, the verified
+  stamps of scripts/fetch_model.py, so development models count as installed), the hardware
+  probe and the tier choice (ADR-016), and the downloader (one model at a time, `.part` files
+  resumed with Range across restarts, sha256 on the thread pool, HTTPS only).
+- Probe on machine B: 10 threads of 14 CPUs, the M0 sweep's fastest; it leaves out the two
+  low-power cores. tst_engine now uses it and runs in 49 s instead of 84 s.
+- The quality model is offered from 16 GB; on smaller computers rewrite runs on the fast one.
+- Checked once by hand: the downloader fetched the E2B draft head (59 MB) from Hugging Face,
+  followed its redirect and verified it (`PARAPHRASE_NETWORK_TESTS=1`; the suite stays offline).
+- Open for step 6: the engine's few error messages are plain strings; they need `tr()` when
+  they reach clients through the API.
+- Next: step 6, the D-Bus API (service, request queue, inference thread, idle unload, private
+  fallback).
+
 ## 2026-10-22 - M1 step 4b: MTP drafting per skill
 
 - The engine loads the model's MTP draft head as llama-server does (`--spec-type draft-mtp`,
