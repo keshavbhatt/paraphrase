@@ -1,4 +1,4 @@
-"""Skill files (skills/*.yaml, schema v1): loading, validation and prompt rendering.
+"""Skill files (skills/*.yaml, schema v2): loading, validation and prompt rendering.
 
 This mirrors what the daemon's SkillRegistry will do in M1, so the template rules here are
 the reference for the C++ port (DOCS/skills.md): `{{name}}` inserts a value and
@@ -15,7 +15,8 @@ from typing import Any
 
 import yaml
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
+OUTPUT_LANGUAGE = ("same", "any")
 TIERS = ("fast", "quality", "any")
 OUTPUT_TYPES = ("text", "json")
 REQUIRED = (
@@ -34,6 +35,7 @@ SAMPLING_KEYS = {"temperature", "top_p", "top_k", "min_p", "repeat_penalty", "se
 
 _VAR = re.compile(r"\{\{\s*([a-z_][a-z0-9_]*)\s*\}\}")
 _IF = re.compile(r"\{\{#if\s+([a-z_][a-z0-9_]*)\s*\}\}(.*?)\{\{/if\}\}", re.DOTALL)
+_UNLESS = re.compile(r"\{\{#unless\s+([a-z_][a-z0-9_]*)\s*\}\}(.*?)\{\{/unless\}\}", re.DOTALL)
 _TAG = re.compile(r"</?([a-z_]+)>")
 
 
@@ -82,16 +84,20 @@ def render_template(template: str, values: dict[str, str]) -> str:
     def cond(m: re.Match[str]) -> str:
         return m.group(2) if values.get(m.group(1), "").strip() else ""
 
+    def unless(m: re.Match[str]) -> str:
+        return "" if values.get(m.group(1), "").strip() else m.group(2)
+
     prev = None
     out = template
-    while prev != out:  # nested ifs resolve from the inside out
+    while prev != out:  # nested blocks resolve from the inside out
         prev = out
-        out = _IF.sub(cond, out)
+        out = _UNLESS.sub(unless, _IF.sub(cond, out))
     return _VAR.sub(lambda m: values.get(m.group(1), ""), out)
 
 
 def template_vars(template: str) -> set[str]:
-    return set(_VAR.findall(template)) | {m.group(1) for m in _IF.finditer(template)}
+    blocks = {m.group(1) for m in _IF.finditer(template)}
+    return set(_VAR.findall(template)) | blocks | {m.group(1) for m in _UNLESS.finditer(template)}
 
 
 def _check(raw: dict[str, Any], path: Path) -> None:
@@ -107,6 +113,10 @@ def _check(raw: dict[str, Any], path: Path) -> None:
     extra = set(raw["sampling"]) - SAMPLING_KEYS
     if extra:
         raise SkillError(f"{path.name}: unknown sampling keys {sorted(extra)}")
+    if raw["output"].get("language", "any") not in OUTPUT_LANGUAGE:
+        raise SkillError(f"{path.name}: output.language must be one of {OUTPUT_LANGUAGE}")
+    if int(raw.get("variants", 1)) > 1 and raw["output"]["type"] != "text":
+        raise SkillError(f"{path.name}: with variants > 1 each variant is one text output")
     if raw["output"]["type"] == "json" and "grammar" not in raw:
         raise SkillError(f"{path.name}: json output needs a grammar (PLAN D5)")
     if "{{" in raw["system"]:
@@ -149,11 +159,16 @@ def load_skill_file(path: Path) -> list[Skill]:
     return skills
 
 
-def load_skills(skills_dir: Path) -> dict[str, Skill]:
+def load_skills(skills_dir: Path, overrides: list[Path] | None = None) -> dict[str, Skill]:
+    """All skills in skills_dir; each file in overrides replaces the skills it defines
+    (used to evaluate a candidate revision before it replaces the shipped file)."""
     out: dict[str, Skill] = {}
     for path in sorted(skills_dir.glob("*.yaml")):
         for skill in load_skill_file(path):
             if skill.id in out:
                 raise SkillError(f"duplicate skill id {skill.id}")
+            out[skill.id] = skill
+    for path in overrides or []:
+        for skill in load_skill_file(path):
             out[skill.id] = skill
     return out

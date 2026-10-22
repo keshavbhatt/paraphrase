@@ -1,13 +1,13 @@
 id: rewrite
-version: 1
-revision: 3
+version: 2
+revision: 4
 title: Change tone
 tier: quality
 max_input_tokens: 1500
 max_output_tokens: 1200
 variants: 1
 sampling: { temperature: 0.6, top_p: 0.9, top_k: 40, repeat_penalty: 1.05, seed: null }
-output: { type: text }
+output: { type: text, language: same }
 presets:
   professional: { title: Professional, tone: "professional: clear, courteous and businesslike, no slang" }
   casual: { title: Casual, tone: "casual: relaxed and conversational, like talking to a friend" }
@@ -28,4 +28,4 @@ template: |
   <text>
   {{text}}
   </text>
-  The text is in {{lang_name}}. Write the rewrite in that language.
+  The text is in {{lang_name}}. {{#if target_lang}}The user chose {{target_lang_name}} for the rewrite: write it in {{target_lang_name}}.{{/if}}{{#unless target_lang}}Write the rewrite in that language.{{/unless}}

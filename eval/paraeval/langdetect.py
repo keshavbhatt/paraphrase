@@ -18,6 +18,10 @@ LANG_NAMES = {
     "even in a formal tone: do not translate it into English or Devanagari",
 }
 
+# Plain names, used when the user chose the output language: LANG_NAMES above also tells
+# the model to keep the input's language, which would contradict that choice.
+LANG_SHORT = {"en": "English", "hi": "Hindi", "hinglish": "Hinglish (Hindi in Latin letters)"}
+
 HINGLISH_MIN_RATIO = 0.15
 
 

@@ -86,4 +86,11 @@ def skill_inputs(base_skill: str, item: dict[str, Any]) -> dict[str, str]:
     if base_skill == "reply":
         inputs = {"context": item["context"], "text": item.get("text", "")}
         return inputs | langdetect.inputs_for(item["context"])
-    return {"text": item["text"]} | langdetect.inputs_for(item["text"])
+    inputs = {"text": item["text"]} | langdetect.inputs_for(item["text"])
+    if item.get("target_lang"):  # the user explicitly chose the output language
+        inputs |= {
+            "lang_name": langdetect.LANG_SHORT[inputs["lang"]],
+            "target_lang": item["target_lang"],
+            "target_lang_name": langdetect.LANG_SHORT[item["target_lang"]],
+        }
+    return inputs

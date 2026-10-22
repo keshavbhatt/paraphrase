@@ -1,5 +1,5 @@
 id: proofread
-version: 1
+version: 2
 revision: 4
 title: Proofread
 tier: fast
@@ -7,7 +7,7 @@ max_input_tokens: 1500
 max_output_tokens: 2000
 variants: 1
 sampling: { temperature: 0.0, top_p: 1.0, top_k: 1, repeat_penalty: 1.0, seed: 0 }
-output: { type: text, diff: words }
+output: { type: text, diff: words, language: same }
 system: |
   You are a proofreader. Fix spelling, grammar and punctuation in the text inside <text>.
   Keep the meaning, words, tone, formatting and line breaks. Do not rephrase sentences that are already correct. Casual chat style is fine: if a sentence starts in lowercase or has no final full stop, leave it so, and keep slang; only fix real mistakes. Never change the case of a word that is already correct. Keep British or American spelling and the date and number formats as written.
