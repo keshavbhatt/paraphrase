@@ -100,6 +100,19 @@ private Q_SLOTS:
         QCOMPARE(m_sent, QStringList{u"Mia doesn't know where the keys are."_s});
     }
 
+    void saysLooksGoodWhenNothingNeedsFixing()
+    {
+        QObject owner;
+        const auto backends = integrations(&owner);
+        PopupController popup(*backends);
+        popup.showText(selected(u"Where are the keys?"_s));
+        m_daemon.setAnswers({u"Where are the keys?"_s});
+        pick(popup, u"action-proofread"_s);
+        QCOMPARE(popup.window()->findChild<QLabel*>(u"popupInfo"_s)->text(), u"Looks good, no changes"_s);
+        QVERIFY(popup.window()->findChild<ChipButton*>(u"insert"_s)->isHidden());
+        QVERIFY(!popup.window()->findChild<QPushButton*>(u"closeResult"_s)->isHidden());
+    }
+
     void offersThreeRepliesAndInsertsTheChosenOne()
     {
         QObject owner;

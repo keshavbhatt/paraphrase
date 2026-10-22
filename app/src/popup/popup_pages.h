@@ -80,6 +80,9 @@ public:
     void setInfo(const QString& text, const QString& role = QStringLiteral("small"));
     void setRunning(bool running);
     void setLanguagePill(const QString& language);
+    /// Proofread found nothing: "Looks good, no changes" and only Close (popup-proofread.html,
+    /// note 5), so the user is never asked to replace text with itself.
+    void showNothingToFix();
     [[nodiscard]] TextResultView* textView() const { return m_text; }
     [[nodiscard]] QuickRepliesView* repliesView() const { return m_replies; }
     /// What Replace or Copy uses.
@@ -117,6 +120,8 @@ private:
     ChipButton* m_insert = nullptr;
     QPushButton* m_copy = nullptr;
     QPushButton* m_again = nullptr;
+    QPushButton* m_done = nullptr;
+    bool m_nothingToFix = false;
     SkillKind m_kind = SkillKind::Text;
     QString m_appName;
     bool m_running = false;

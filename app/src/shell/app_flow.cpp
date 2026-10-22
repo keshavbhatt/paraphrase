@@ -72,6 +72,7 @@ MainWindow& AppFlow::mainWindow()
         m_main->setGlobalShortcut(m_globalShortcut);
         connect(m_main.get(), &MainWindow::settingsRequested, this, &AppFlow::showSettings);
         connect(m_main.get(), &MainWindow::newActionRequested, this, &AppFlow::newAction);
+        connect(m_main.get(), &MainWindow::shortcutHelpRequested, this, &AppFlow::showShortcutHelp);
         // Connect after the window is up: starting the daemon can take a moment.
         QTimer::singleShot(0, m_main.get(), &MainWindow::start);
     }
@@ -96,6 +97,12 @@ void AppFlow::setGlobalShortcut(bool available)
     if (m_main) {
         m_main->setGlobalShortcut(available);
     }
+}
+
+void AppFlow::showShortcutHelp()
+{
+    showSettings();
+    m_settings->showPage(SettingsWindow::Shortcut);
 }
 
 void AppFlow::newAction()

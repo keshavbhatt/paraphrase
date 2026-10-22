@@ -256,10 +256,15 @@ QWidget* PopupResultPage::buildFoot()
     for (QPushButton* b : {m_copy, m_again}) {
         b->setProperty("size", u"big"_s);
     }
+    m_done = makeButton(tr("Close"), u"primary"_s);
+    m_done->setObjectName(u"closeResult"_s);
+    m_done->setProperty("size", u"big"_s);
     row->addWidget(m_insert);
+    row->addWidget(m_done);
     row->addWidget(m_copy);
     row->addWidget(m_again);
     row->addStretch();
+    connect(m_done, &QPushButton::clicked, this, &PopupResultPage::closeRequested);
     connect(m_insert, &QPushButton::clicked, this, &PopupResultPage::insertClicked);
     connect(m_copy, &QPushButton::clicked, this, &PopupResultPage::copyClicked);
     connect(m_again, &QPushButton::clicked, this, &PopupResultPage::againClicked);
@@ -285,6 +290,7 @@ void PopupResultPage::begin(SkillKind kind, const QString& title, const QString&
     m_text->clear();
     m_replies->setReplies({});
     m_presets->setVisible(false);
+    m_nothingToFix = false;
     setInfo(tr("· writing..."));
     updateButtons();
 }
@@ -335,8 +341,21 @@ QString PopupResultPage::result() const
     return m_kind == SkillKind::Text ? m_text->result() : m_replies->chosen();
 }
 
+void PopupResultPage::showNothingToFix()
+{
+    m_nothingToFix = true;
+    setInfo(tr("Looks good, no changes"));
+    m_view->setVisible(false);
+    updateButtons();
+}
+
 void PopupResultPage::updateButtons()
 {
+    for (QWidget* b :
+         {static_cast<QWidget*>(m_insert), static_cast<QWidget*>(m_copy), static_cast<QWidget*>(m_again)}) {
+        b->setVisible(!m_nothingToFix);
+    }
+    m_done->setVisible(m_nothingToFix);
     const bool reply = m_kind != SkillKind::Text;
     if (reply) {
         m_insert->setLabel(tr("Insert reply"));

@@ -36,6 +36,8 @@ public:
     /// Brings the main window up, creating it when needed (not during setup).
     void showMain();
     void showSettings();
+    /// Settings, Shortcut: how to open Paraphrase over other apps on this desktop.
+    void showShortcutHelp();
     /// Settings, My actions, with the editor on a new action.
     void newAction();
     /// The main window, created on first use.

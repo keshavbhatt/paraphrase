@@ -62,9 +62,10 @@ public Q_SLOTS:
 
 Q_SIGNALS:
     void actionsLoaded();
-    void finished();           ///< a request ended, with a result or a message
-    void settingsRequested();  ///< the header's Settings, or the notice's link
-    void newActionRequested(); ///< "New action..." under My actions
+    void finished();              ///< a request ended, with a result or a message
+    void settingsRequested();     ///< the header's Settings, or the notice's link
+    void newActionRequested();    ///< "New action..." under My actions
+    void shortcutHelpRequested(); ///< the notice's "Add a shortcut by hand"
 
 protected:
     void changeEvent(QEvent* event) override;

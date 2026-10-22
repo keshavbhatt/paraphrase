@@ -95,7 +95,7 @@ void MainWindow::buildUi()
 void MainWindow::connectParts()
 {
     connect(m_header, &HeaderBar::settingsClicked, this, &MainWindow::settingsRequested);
-    connect(m_notice, &NoticeBar::linkClicked, this, &MainWindow::settingsRequested);
+    connect(m_notice, &NoticeBar::linkClicked, this, &MainWindow::shortcutHelpRequested);
     connect(m_actions, &ActionBar::chosen, this, [this](const QString& id, const QString& lang) {
         m_targetLang = lang;
         selectSkill(id);

@@ -223,6 +223,9 @@ void PopupController::onFinished(const QJsonObject& result)
         .replyKind = {},
     };
     page->setInfo(resultSummary(facts));
+    if (facts.proofread && facts.changes == 0) {
+        page->showNothingToFix();
+    }
     if (!result.value(u"warning"_s).toString().isEmpty()) {
         page->setInfo(languageWarning(language), u"warning"_s);
     }
