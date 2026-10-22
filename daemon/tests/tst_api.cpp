@@ -99,6 +99,7 @@ private:
     std::unique_ptr<TestHttpServer> m_http; ///< where the tiny models download from
     paraphrase::models::ModelCatalog m_catalog;
     int m_peers = 0;
+    QString m_settingsPath; ///< kept by the daemon when set (SetTierModel, SetSpeedUp)
 
     void startServer(double memoryGb, const QStringList& installed, int idleUnloadMs = 60'000,
                      int idleExitMs = 60'000)
@@ -131,6 +132,7 @@ private:
                     },
                 .idleUnloadMs = idleUnloadMs,
                 .idleExitMs = idleExitMs,
+                .settingsPath = m_settingsPath,
             },
             u"unix:path="_s + m_dir->path() + u"/daemon.sock"_s);
         m_server->start();
@@ -267,6 +269,53 @@ private Q_SLOTS:
         const QString id2 = runSkill(small, u"rewrite.professional"_s, {{u"text"_s, u"hey send it"_s}});
         QTRY_VERIFY_WITH_TIMEOUT(ls.done.contains(id2), kTimeoutMs);
         QCOMPARE(ls.done.value(id2).value(u"model"_s).toString(), u"fast-model"_s);
+    }
+
+    void keepsTheUsersModelChoices()
+    {
+        const QTemporaryDir config;
+        m_settingsPath = config.filePath(u"paraphrase/daemon.json"_s);
+        startServer(32, {u"fast-model"_s, u"quality-model"_s, u"fast-draft"_s});
+        QDBusConnection c = connect();
+        const auto status = [&c] {
+            return QJsonDocument::fromJson(call(c, u"Status"_s, {}).arguments().value(0).toString().toUtf8())
+                .object();
+        };
+        QCOMPARE(status().value(u"tier_models"_s).toObject().value(u"quality"_s).toString(),
+                 u"quality-model"_s);
+        QVERIFY(status().value(u"speed_up"_s).toBool());
+        // Settings: the quality tier on the fast model, no speed-up.
+        QCOMPARE(call(c, u"SetTierModel"_s, {u"quality"_s, u"fast-model"_s}).type(),
+                 QDBusMessage::ReplyMessage);
+        QCOMPARE(call(c, u"SetSpeedUp"_s, {false}).type(), QDBusMessage::ReplyMessage);
+        QCOMPARE(call(c, u"SetTierModel"_s, {u"huge"_s, u"fast-model"_s}).type(), QDBusMessage::ErrorMessage);
+        QCOMPARE(call(c, u"SetTierModel"_s, {u"fast"_s, u"fast-draft"_s}).type(), QDBusMessage::ErrorMessage);
+        Listener l;
+        QVERIFY(l.listen(c));
+        const QString id = runSkill(c, u"rewrite.professional"_s, {{u"text"_s, u"hey send it"_s}});
+        QTRY_VERIFY_WITH_TIMEOUT(l.done.contains(id), kTimeoutMs);
+        QCOMPARE(l.done.value(id).value(u"model"_s).toString(), u"fast-model"_s);
+        {
+            const QMutexLocker lock(&m_state->lock);
+            QVERIFY(m_state->loads.last().draftModelPath.isEmpty()); // the speed-up is off
+        }
+        cleanup();
+
+        // Kept across a restart; "" goes back to the automatic choice.
+        startServer(32, {u"fast-model"_s, u"quality-model"_s});
+        QDBusConnection again = connect();
+        const QJsonObject s =
+            QJsonDocument::fromJson(call(again, u"Status"_s, {}).arguments().value(0).toString().toUtf8())
+                .object();
+        QCOMPARE(s.value(u"tier_choice"_s).toObject().value(u"quality"_s).toString(), u"fast-model"_s);
+        QVERIFY(!s.value(u"speed_up"_s).toBool());
+        QCOMPARE(call(again, u"SetTierModel"_s, {u"quality"_s, QString()}).type(),
+                 QDBusMessage::ReplyMessage);
+        const QJsonObject reset =
+            QJsonDocument::fromJson(call(again, u"Status"_s, {}).arguments().value(0).toString().toUtf8())
+                .object();
+        QCOMPARE(reset.value(u"tier_models"_s).toObject().value(u"quality"_s).toString(), u"quality-model"_s);
+        m_settingsPath.clear();
     }
 
     void runsOnTheRequestedModel()

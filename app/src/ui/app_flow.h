@@ -1,0 +1,49 @@
+#pragma once
+
+#include <QObject>
+
+#include <memory>
+
+namespace paraphrase::client {
+class DaemonClient;
+}
+
+namespace paraphrase::app {
+
+class MainWindow;
+class SettingsWindow;
+class SetupWindow;
+
+/// Which windows the app shows: first run (no model installed) opens the setup window, then
+/// the main window; Settings opens from the main window, the notice or the tray.
+class AppFlow : public QObject
+{
+    Q_OBJECT
+    Q_DISABLE_COPY_MOVE(AppFlow)
+
+public:
+    explicit AppFlow(QObject* parent = nullptr);
+    ~AppFlow() override;
+
+    /// Opens setup on first run, else the main window (or keeps it hidden: tray autostart).
+    void start(bool showWindow = true);
+    /// Brings the main window up, creating it when needed (not during setup).
+    void showMain();
+    void showSettings();
+    /// The main window, created on first use.
+    [[nodiscard]] MainWindow& mainWindow();
+    /// Whether the desktop gave a global shortcut; the main window's notice depends on it.
+    void setGlobalShortcut(bool available);
+
+private:
+    [[nodiscard]] bool hasModel();
+    void showSetup();
+
+    std::unique_ptr<client::DaemonClient> m_client; ///< for setup and settings
+    std::unique_ptr<MainWindow> m_main;
+    std::unique_ptr<SetupWindow> m_setup;
+    std::unique_ptr<SettingsWindow> m_settings;
+    bool m_globalShortcut = false;
+};
+
+} // namespace paraphrase::app

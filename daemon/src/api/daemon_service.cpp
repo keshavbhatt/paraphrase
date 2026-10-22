@@ -6,11 +6,14 @@
 #include <QCoreApplication>
 #include <QDBusMessage>
 #include <QDateTime>
+#include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QLoggingCategory>
+#include <QSaveFile>
 #include <QUuid>
 
 using namespace Qt::StringLiterals;
@@ -43,6 +46,11 @@ QString stateName(models::DownloadStatus::State state)
     return {};
 }
 
+QString idOf(const models::ModelEntry* m)
+{
+    return m != nullptr ? m->id : QString();
+}
+
 /// Resident memory of this process in MB (VmRSS), for Status.
 double residentMb()
 {
@@ -69,6 +77,7 @@ DaemonService::DaemonService(ServiceSetup setup, QObject* parent)
     , m_downloader(m_store, nullptr, m_setup.urlResolver)
 {
     connect(&m_downloader, &models::ModelDownloader::changed, this, &DaemonService::onDownloadChanged);
+    loadSettings();
     for (const auto& s : m_setup.skills.skills()) {
         m_maxVariants = std::max(m_maxVariants, s.variants);
     }
@@ -215,13 +224,11 @@ QString DaemonService::checkFields(const skills::Skill& s, const skills::Request
 
 bool DaemonService::chooseModel(Job& job, const models::ModelEntry* requested) const
 {
-    const models::TierSelector selector(m_setup.catalog, m_setup.hardware);
-    const models::ModelEntry* model =
-        requested != nullptr ? requested : selector.modelFor(job.skill.tier, installedModels());
+    const models::ModelEntry* model = requested != nullptr ? requested : modelForTier(job.skill.tier);
     if (model == nullptr) {
         return false;
     }
-    const models::ModelEntry* draft = m_setup.catalog.draftFor(model->id);
+    const models::ModelEntry* draft = m_speedUp ? m_setup.catalog.draftFor(model->id) : nullptr;
     job.modelId = model->id;
     job.model = engine::EngineConfig{
         .modelPath = m_store.modelPath(*model),
@@ -560,9 +567,105 @@ QString DaemonService::Status()
             },
         },
         {u"models_dir"_s, m_store.root()},
+        {
+            u"tier_models"_s,
+            QJsonObject{
+                {u"fast"_s, idOf(modelForTier(u"fast"_s))},
+                {u"quality"_s, idOf(modelForTier(u"quality"_s))},
+            },
+        },
+        {
+            u"tier_choice"_s,
+            QJsonObject{
+                {u"fast"_s, m_tierChoice.value(u"fast"_s)},
+                {u"quality"_s, m_tierChoice.value(u"quality"_s)},
+            },
+        },
+        {u"speed_up"_s, m_speedUp},
         {u"installed"_s, QJsonArray::fromStringList(installedModels().values())},
     };
     return QString::fromUtf8(QJsonDocument(o).toJson(QJsonDocument::Compact));
+}
+
+const models::ModelEntry* DaemonService::modelForTier(const QString& tier) const
+{
+    const QSet<QString> installed = installedModels();
+    if (const QString chosen = m_tierChoice.value(tier); !chosen.isEmpty() && installed.contains(chosen)) {
+        if (const models::ModelEntry* m = m_setup.catalog.find(chosen); m != nullptr) {
+            return m;
+        }
+    }
+    const models::TierSelector selector(m_setup.catalog, m_setup.hardware);
+    return selector.modelFor(tier, installed);
+}
+
+void DaemonService::SetTierModel(const QString& tier, const QString& modelId)
+{
+    if (tier != u"fast"_s && tier != u"quality"_s) {
+        replyError(u"InvalidInput"_s, tr("Unknown tier \"%1\": fast or quality.").arg(tier));
+        return;
+    }
+    if (!modelId.isEmpty()) {
+        const models::ModelEntry* m = m_setup.catalog.find(modelId);
+        if (m == nullptr || m->role != u"model"_s) {
+            replyError(u"InvalidInput"_s, tr("Unknown model \"%1\".").arg(modelId));
+            return;
+        }
+        if (!m_store.isInstalled(*m)) {
+            replyError(u"NoModel"_s, tr("%1 is not installed.").arg(m->name));
+            return;
+        }
+    }
+    if (modelId.isEmpty()) {
+        m_tierChoice.remove(tier);
+    } else {
+        m_tierChoice.insert(tier, modelId);
+    }
+    saveSettings();
+}
+
+void DaemonService::SetSpeedUp(bool on)
+{
+    m_speedUp = on;
+    saveSettings();
+}
+
+void DaemonService::loadSettings()
+{
+    if (m_setup.settingsPath.isEmpty()) {
+        return;
+    }
+    QFile file(m_setup.settingsPath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        return; // first run: the automatic choices
+    }
+    const QJsonObject o = QJsonDocument::fromJson(file.readAll()).object();
+    const QJsonObject tiers = o.value(u"tier_models"_s).toObject();
+    for (auto it = tiers.begin(); it != tiers.end(); ++it) {
+        if (const QString id = it.value().toString(); !id.isEmpty()) {
+            m_tierChoice.insert(it.key(), id);
+        }
+    }
+    m_speedUp = o.value(u"speed_up"_s).toBool(true);
+}
+
+void DaemonService::saveSettings() const
+{
+    if (m_setup.settingsPath.isEmpty()) {
+        return;
+    }
+    QJsonObject tiers;
+    for (auto it = m_tierChoice.begin(); it != m_tierChoice.end(); ++it) {
+        tiers.insert(it.key(), it.value());
+    }
+    QDir().mkpath(QFileInfo(m_setup.settingsPath).absolutePath());
+    QSaveFile file(m_setup.settingsPath);
+    if (!file.open(QIODevice::WriteOnly)) {
+        qCWarning(lcApi) << "cannot save settings to" << m_setup.settingsPath;
+        return;
+    }
+    file.write(QJsonDocument(QJsonObject{{u"tier_models"_s, tiers}, {u"speed_up"_s, m_speedUp}}).toJson());
+    (void)file.commit();
 }
 
 } // namespace paraphrase::api

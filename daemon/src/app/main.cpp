@@ -16,6 +16,7 @@
 #include <QDBusServer>
 #include <QDir>
 #include <QFileInfo>
+#include <QStandardPaths>
 #include <QTextStream>
 
 #include <csignal>
@@ -117,6 +118,9 @@ std::optional<paraphrase::api::ServiceSetup> setupFrom(const Options& options)
         .urlResolver = {}, // Hugging Face at the pinned revision
         .idleUnloadMs = options.idleUnloadS * 1000,
         .idleExitMs = options.idleExitS * 1000,
+        // ~/.config/paraphrase in a native install; each package format maps it to its own place.
+        .settingsPath = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) +
+                        u"/paraphrase/daemon.json"_s,
     };
 }
 

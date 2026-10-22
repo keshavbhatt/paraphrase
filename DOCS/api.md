@@ -45,6 +45,8 @@ daemon exits; never while a download runs).
 | `DownloadModel(s model_id)` | | Downloads a model and its draft head |
 | `PauseDownload(s model_id)` | | Keeps what arrived; `DownloadModel` resumes |
 | `DeleteModel(s model_id)` | | Deletes a model and its draft head |
+| `SetTierModel(s tier, s model_id)` | | The model a tier (`fast`, `quality`) runs on, chosen in Settings; `""` goes back to the automatic choice. Kept across restarts |
+| `SetSpeedUp(b on)` | | Turns the draft heads (the "speed-up", ADR-004) on or off. Kept across restarts |
 
 **`input`** (all strings): `text` (what to work on; required unless the skill's
 `main_input` is `context`), `context` (the message to reply to; required when it is), `target_lang` (a language code the user
@@ -67,6 +69,10 @@ Skill ids are those `ListSkills` returns: `proofread`, `reply`, and a preset as
 - A client can cancel only its own requests.
 - The skill's tier picks the model (ADR-016): quality skills run on the quality model when it
   is installed and fits the computer's memory, otherwise on the fast one.
+  A model the user chose for the tier (`SetTierModel`) comes first while it is installed.
+  `Status()` reports `tier_models` (what each tier runs on now), `tier_choice` (what the user
+  chose, `""` for automatic), `speed_up` and `models_dir`. The choices live in
+  `~/.config/paraphrase/daemon.json` (each package format maps the config folder).
 - `Warm` is best effort: never an error, and dropped when a real request arrives. If the
   same request follows, the model reads only the last token of its prompt again.
 

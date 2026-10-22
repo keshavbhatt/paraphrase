@@ -3,12 +3,12 @@
 // when the user clicks Replace; reply shows three replies; Esc closes. With
 // PARAPHRASE_SCREENSHOTS=<dir> it also saves its pages in light and dark for review.
 
+#include "app_daemon.h"
 #include "integration/clipboard_backends.h"
 #include "integration/integrations.h"
 #include "popup/popup_controller.h"
 #include "popup/popup_pages.h"
 #include "popup/popup_window.h"
-#include "test_daemon.h"
 #include "ui/chip_button.h"
 
 #include <QDir>
@@ -19,7 +19,7 @@
 
 using namespace Qt::StringLiterals;
 using namespace paraphrase::app;
-using paraphrase::testing::TestDaemon;
+using paraphrase::testing::AppDaemon;
 
 namespace {
 
@@ -54,7 +54,7 @@ class TestPopup : public QObject
     Q_OBJECT
 
 private:
-    TestDaemon m_daemon;
+    AppDaemon m_daemon;
     QStringList m_sent;
 
     [[nodiscard]] std::unique_ptr<Integrations> integrations(QObject* owner)
@@ -73,7 +73,7 @@ private:
         QVERIFY(action != nullptr);
         const QSignalSpy finished(&popup, &PopupController::finished);
         action->click();
-        QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 1, TestDaemon::kTimeoutMs);
+        QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 1, AppDaemon::kTimeoutMs);
     }
 
 private Q_SLOTS:

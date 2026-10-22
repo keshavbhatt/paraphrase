@@ -4,7 +4,7 @@
 // Tone menu; a missing model and a stopped request are shown in words. With
 // PARAPHRASE_SCREENSHOTS=<dir> it also saves the window in light and dark for review.
 
-#include "fake_daemon.h"
+#include "app_daemon.h"
 #include "ui/chip_button.h"
 #include "ui/main_window.h"
 
@@ -37,45 +37,10 @@ class TestMainWindow : public QObject
     Q_OBJECT
 
 private:
-    std::unique_ptr<QTemporaryDir> m_dir;
-    std::shared_ptr<FakeState> m_state;
-    std::unique_ptr<ServerThread> m_server;
+    AppDaemon m_daemon;
 
-    void startDaemon(const QStringList& installed)
-    {
-        m_dir = std::make_unique<QTemporaryDir>();
-        m_state = std::make_shared<FakeState>();
-        const auto catalog = paraphrase::models::ModelCatalog::parse(tinyCatalog()).value();
-        QVERIFY(install(catalog, m_dir->path() + u"/models"_s, installed));
-        auto skills =
-            paraphrase::skills::SkillRegistry::load(QStringLiteral(PARAPHRASE_REPO_ROOT) + u"/skills"_s);
-        QVERIFY(skills.ok());
-        paraphrase::models::HardwareInfo hw;
-        hw.totalMemory = qint64{32} * 1024 * 1024 * 1024;
-        hw.threads = 4;
-        const QString address = u"unix:path="_s + m_dir->path() + u"/daemon.sock"_s;
-        m_server = std::make_unique<ServerThread>(
-            ServiceSetup{
-                .skills = std::move(skills).value(),
-                .catalog = catalog,
-                .modelsRoot = m_dir->path() + u"/models"_s,
-                .hardware = hw,
-                .engineFactory = [state = m_state] { return std::make_unique<FakeEngine>(state); },
-                .urlResolver = {},
-                .idleUnloadMs = 60'000,
-                .idleExitMs = 60'000,
-            },
-            address);
-        m_server->start();
-        QTRY_VERIFY_WITH_TIMEOUT(m_server->ready.load(), kTimeoutMs);
-        qputenv("PARAPHRASE_DAEMON_ADDRESS", address.toUtf8());
-    }
-
-    void setAnswers(const QStringList& answers)
-    {
-        const QMutexLocker lock(&m_state->lock);
-        m_state->answers = answers;
-    }
+    void startDaemon(const QStringList& installed) { QVERIFY(m_daemon.start(installed)); }
+    void setAnswers(const QStringList& answers) const { m_daemon.setAnswers(answers); }
 
     static void runAndWait(MainWindow& w)
     {
@@ -90,15 +55,7 @@ private:
     }
 
 private Q_SLOTS:
-    void cleanup()
-    {
-        qunsetenv("PARAPHRASE_DAEMON_ADDRESS");
-        if (m_server) {
-            m_server->quit();
-            m_server->wait();
-            m_server.reset();
-        }
-    }
+    void cleanup() { m_daemon.stop(); }
 
     void buildsTheActionsFromTheSkills()
     {
@@ -199,9 +156,9 @@ private Q_SLOTS:
         runAndWait(w);
         QVERIFY(w.resultText().contains(u"Friday at 11 am"_s));
         {
-            const QMutexLocker lock(&m_state->lock);
-            QVERIFY(
-                m_state->prompts.last().contains(u"offer Friday 11 am"_s)); // the intent reached the model
+            const QMutexLocker lock(&m_daemon.state->lock);
+            QVERIFY(m_daemon.state->prompts.last().contains(
+                u"offer Friday 11 am"_s)); // the intent reached the model
         }
         // "Another version" keeps the first one behind ‹ ›.
         const QSignalSpy finished(&w, &MainWindow::finished);
@@ -248,9 +205,9 @@ private Q_SLOTS:
     {
         startDaemon({u"fast-model"_s});
         {
-            const QMutexLocker lock(&m_state->lock);
-            m_state->defaultAnswer = QString(u"word "_s).repeated(200).trimmed();
-            m_state->pieceDelayMs = 20;
+            const QMutexLocker lock(&m_daemon.state->lock);
+            m_daemon.state->defaultAnswer = QString(u"word "_s).repeated(200).trimmed();
+            m_daemon.state->pieceDelayMs = 20;
         }
         MainWindow w;
         w.start();
