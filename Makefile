@@ -14,7 +14,7 @@ export PATH := $(HOME)/.local/bin:$(PATH)
 PY := uv run python
 MODEL ?=
 BUILD_DIR ?= build/dev
-CXX_DIRS := daemon cli
+CXX_DIRS := daemon client cli
 CXX_SOURCES := $(shell find $(CXX_DIRS) -name '*.cpp' -o -name '*.h')
 TIDY_SOURCES := $(shell find $(CXX_DIRS) -name '*.cpp')
 

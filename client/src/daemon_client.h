@@ -9,12 +9,12 @@
 
 #include <memory>
 
-namespace paraphrase::cli {
+namespace paraphrase::client {
 
 /// A connection to paraphrase-daemon (DOCS/api.md), found or started as ADR-010 says: the
 /// daemon on the session bus; else one started detached, once its name appears; else (no bus,
 /// or the name may not be owned) a private daemon run as this process's child on a 0600 Unix
-/// socket. The same calls and signals either way. The main window (M2) will share this.
+/// socket. The same calls and signals either way. Shared by the CLI and the app.
 class DaemonClient : public QObject
 {
     Q_OBJECT
@@ -24,7 +24,8 @@ public:
     explicit DaemonClient(QObject* parent = nullptr);
     ~DaemonClient() override;
 
-    /// Empty on success, else a message for the user.
+    /// Empty on success, else a message for the user. $PARAPHRASE_DAEMON_ADDRESS (a D-Bus
+    /// peer address) connects to a daemon that already serves privately, for tests.
     [[nodiscard]] QString connectToDaemon();
     [[nodiscard]] bool isPrivate() const { return m_private != nullptr; }
 
@@ -54,6 +55,7 @@ private:
     QDBusConnection m_connection;
     std::unique_ptr<QProcess> m_private; ///< the private daemon, when there is one
     QString m_socketPath;
+    bool m_peer = false; ///< connected to $PARAPHRASE_DAEMON_ADDRESS, a daemon someone else runs
 };
 
-} // namespace paraphrase::cli
+} // namespace paraphrase::client

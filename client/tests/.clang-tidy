@@ -1,0 +1,9 @@
+---
+# Qt Test runs only member slots, so they can never be static. QVERIFY/QCOMPARE each expand
+# to a branch and a return, so the size and complexity limits count macro expansions, not
+# test logic.
+InheritParentConfig: true
+Checks: >
+  -readability-convert-member-functions-to-static,
+  -readability-function-cognitive-complexity,
+  -readability-function-size

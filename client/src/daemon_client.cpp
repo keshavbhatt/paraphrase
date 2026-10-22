@@ -11,7 +11,7 @@
 
 using namespace Qt::StringLiterals;
 
-namespace paraphrase::cli {
+namespace paraphrase::client {
 namespace {
 
 const QString kService = u"com.ktechpit.paraphrase.Daemon"_s;
@@ -37,6 +37,9 @@ DaemonClient::DaemonClient(QObject* parent)
 
 DaemonClient::~DaemonClient()
 {
+    if (m_peer) {
+        QDBusConnection::disconnectFromPeer(kPrivateName);
+    }
     if (m_private) {
         QDBusConnection::disconnectFromPeer(kPrivateName);
         m_private->terminate();
@@ -64,6 +67,15 @@ QString DaemonClient::daemonProgram()
 
 QString DaemonClient::connectToDaemon()
 {
+    // A daemon already serving on a private socket (tests, and a debugging session).
+    if (const QString address = qEnvironmentVariable("PARAPHRASE_DAEMON_ADDRESS"); !address.isEmpty()) {
+        m_connection = QDBusConnection::connectToPeer(address, kPrivateName);
+        if (!m_connection.isConnected()) {
+            return tr("Cannot connect to the daemon: %1").arg(m_connection.lastError().message());
+        }
+        m_peer = true;
+        return subscribe() ? QString() : tr("Cannot listen to the daemon.");
+    }
     const bool forcePrivate = qEnvironmentVariable("PARAPHRASE_PRIVATE") == u"1"_s;
     const QDBusConnection bus = QDBusConnection::sessionBus();
     if (!forcePrivate && bus.isConnected()) {
@@ -132,7 +144,7 @@ QString DaemonClient::startPrivately()
 bool DaemonClient::subscribe()
 {
     // On the bus only the daemon's own signals: they are addressed to this connection anyway.
-    const QString service = m_private ? QString() : kService;
+    const QString service = (m_private || m_peer) ? QString() : kService;
     return m_connection.connect(service, kPath, kInterface, u"Token"_s, this,
                                 SLOT(onToken(QString, int, QString))) &&
            m_connection.connect(service, kPath, kInterface, u"Retrying"_s, this,
@@ -147,8 +159,8 @@ bool DaemonClient::subscribe()
 
 QDBusMessage DaemonClient::call(const QString& method, const QVariantList& args)
 {
-    QDBusMessage msg =
-        QDBusMessage::createMethodCall(m_private ? QString() : kService, kPath, kInterface, method);
+    QDBusMessage msg = QDBusMessage::createMethodCall((m_private || m_peer) ? QString() : kService, kPath,
+                                                      kInterface, method);
     msg.setArguments(args);
     return m_connection.call(msg, QDBus::Block, 60'000);
 }
@@ -178,4 +190,4 @@ void DaemonClient::onDownloadProgress(const QString& status)
     Q_EMIT downloadProgress(status);
 }
 
-} // namespace paraphrase::cli
+} // namespace paraphrase::client

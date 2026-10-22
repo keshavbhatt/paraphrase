@@ -61,4 +61,5 @@ if(PARAPHRASE_BUILD_TESTS)
 endif()
 
 add_subdirectory(daemon)
+add_subdirectory(client)
 add_subdirectory(cli)

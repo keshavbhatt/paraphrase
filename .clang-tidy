@@ -25,7 +25,7 @@ Checks: >
   -readability-named-parameter,
   -readability-redundant-access-specifiers
 WarningsAsErrors: ''
-HeaderFilterRegex: '(daemon|cli|app)/(src|tests)/.*'
+HeaderFilterRegex: '(daemon|client|cli|app)/(src|tests)/.*'
 # Generated files (moc, version.h) live in the build tree, whose path also contains daemon/...
 ExcludeHeaderFilterRegex: '.*/build/.*'
 FormatStyle: file

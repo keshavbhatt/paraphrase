@@ -1,0 +1,1 @@
+paraphrase_add_test(tst_word_diff tst_word_diff.cpp paraphrase_client)

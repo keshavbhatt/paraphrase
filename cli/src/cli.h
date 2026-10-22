@@ -10,6 +10,8 @@
 
 namespace paraphrase::cli {
 
+using client::DaemonClient;
+
 /// What a command-line run asks for, parsed from the arguments.
 struct Command
 {
