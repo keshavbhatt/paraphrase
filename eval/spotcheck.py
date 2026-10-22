@@ -6,6 +6,10 @@
         --skill-tag takes one skill's outputs from another run (its newest prompt revision).
     uv run python eval/spotcheck.py score --tag m0-v2 ratings.json
         -> per-model scores from the ratings the page exports
+    uv run python eval/spotcheck.py report --tag m0-v3 ratings.jsonl
+        -> Markdown: good/ok/bad per model, skill and language, split into ratings still as
+           pre-filled and ratings the owner edited, plus failure categories from the notes.
+           ratings.jsonl holds one stored ratings document per line ({"id", "data"}).
 
 The page shows each item once with every model's output under a random letter, in a random
 order per item. Ratings (good / ok / bad, plus a note) are kept in the browser and exported
@@ -116,6 +120,129 @@ def score(tag: str, ratings_path: Path) -> None:
         print(f"{model:24} {sum(vals) / len(vals):.2f} over {len(vals)} ratings  {skills}")
 
 
+SKILL_OF = {"pr": "proofread", "rp": "reply", "rw": "rewrite"}
+# Failure categories, matched case-insensitively against a bad or ok rating's note.
+CATEGORIES: dict[str, tuple[tuple[str, ...], tuple[str, ...], tuple[str, ...]]] = {
+    # name: (skills, languages, note keywords)
+    "injection obeyed": (("proofread", "reply", "rewrite"), ("en", "hi", "hinglish"), ("inject",)),
+    "unchanged rewrite": (("rewrite",), ("en", "hi", "hinglish"), ("unchanged", "not rewritten")),
+    "wrong-speaker reply": (
+        ("reply",),
+        ("en", "hi", "hinglish"),
+        ("wrong side", "written as", "sounds like the"),
+    ),
+    "Hindi/Hinglish garbage": (
+        ("proofread", "reply", "rewrite"),
+        ("hi", "hinglish"),
+        ("garbled", "incoherent"),
+    ),
+    "switched language": (
+        ("proofread", "reply", "rewrite"),
+        ("en", "hi", "hinglish"),
+        ("switched to",),
+    ),
+}
+
+
+def categories(skill: str, lang: str, note: str) -> list[str]:
+    low = note.lower()
+    return [
+        name
+        for name, (skills, langs, words) in CATEGORIES.items()
+        if skill in skills and lang in langs and any(w in low for w in words)
+    ]
+
+
+def report(tag: str, ratings_path: Path) -> str:
+    key = json.loads((common.REPORTS_DIR / tag / "spotcheck" / "key.json").read_text())
+    lang_of = {
+        i["id"]: i["lang"] for s in ("proofread", "reply", "rewrite") for i in common.dataset(s)
+    }
+    docs = common.load_jsonl(ratings_path)
+    models = sorted({m for v in key.values() for m in v.values()})
+    langs = ("en", "hi", "hinglish")
+    # counts[group][(model, skill, lang)][rating]
+    counts: dict[str, dict[tuple[str, str, str], dict[str, int]]] = defaultdict(
+        lambda: defaultdict(lambda: {"good": 0, "ok": 0, "bad": 0})
+    )
+    cats: dict[tuple[str, str], list[str]] = defaultdict(list)
+    groups: dict[str, list[str]] = {"pre-filled, unchanged": [], "edited by the owner": []}
+    for d in docs:
+        item, body = d["id"], d["data"]
+        group = (
+            "pre-filled, unchanged"
+            if body.get("prefilled_by") == "claude"
+            else "edited by the owner"
+        )
+        groups[group].append(item)
+        skill, lang = SKILL_OF[item[:2]], lang_of[item]
+        for letter, r in body.get("ratings", {}).items():
+            model = key[item][letter]
+            rating = r.get("rating")
+            if rating not in ("good", "ok", "bad"):
+                continue
+            counts[group][(model, skill, lang)][rating] += 1
+            counts["all"][(model, skill, lang)][rating] += 1
+            if rating != "good":
+                for c in categories(skill, lang, r.get("note", "")):
+                    cats[(model, c)].append(f"{item}:{rating}")
+
+    def cell(group: str, model: str, skill: str, lang: str | None) -> str:
+        ls = langs if lang is None else (lang,)
+        t = {"good": 0, "ok": 0, "bad": 0}
+        for x in ls:
+            for k, v in counts[group].get((model, skill, x), {}).items():
+                t[k] += v
+        n = sum(t.values())
+        return f"{t['good']}/{t['ok']}/{t['bad']}" if n else "-"
+
+    out = [f"# Spot-check results ({tag})", ""]
+    out += [
+        f"{len(docs)} items, {len(models)} models. Cells are good/ok/bad counts.",
+        "",
+        "| group | items |",
+        "|---|---|",
+    ]
+    for g, ids in groups.items():
+        out.append(f"| {g} | {len(ids)} |")
+    for group in ("all", *groups):
+        if group != "all" and not groups[group]:
+            out += ["", f"## {group.capitalize()}", "", "No items."]
+            continue
+        title = "All ratings" if group == "all" else group.capitalize()
+        out += ["", f"## {title}", ""]
+        head = "| model | total |"
+        rule = "|---|---|"
+        cols: list[tuple[str, str | None]] = []
+        for skill in ("proofread", "reply", "rewrite"):
+            for lang in (None, *langs):
+                cols.append((skill, lang))
+                head += f" {skill} {lang or 'all'} |"
+                rule += "---|"
+        out += [head, rule]
+        for m in models:
+            tot = {"good": 0, "ok": 0, "bad": 0}
+            for (mm, _s, _l), v in counts[group].items():
+                if mm == m:
+                    for k in tot:
+                        tot[k] += v[k]
+            row = f"| {m} | {tot['good']}/{tot['ok']}/{tot['bad']} |"
+            row += "".join(f" {cell(group, m, s, lg)} |" for s, lg in cols)
+            out.append(row)
+    out += ["", "## Failure categories", "", "| model | " + " | ".join(CATEGORIES) + " |"]
+    out.append("|---|" + "---|" * len(CATEGORIES))
+    for m in models:
+        out.append(
+            f"| {m} | "
+            + " | ".join(
+                f"{len(cats[(m, c)])} ({', '.join(cats[(m, c)])})" if cats[(m, c)] else "0"
+                for c in CATEGORIES
+            )
+            + " |"
+        )
+    return "\n".join(out)
+
+
 PAGE = (Path(__file__).resolve().parent / "paraeval" / "spotcheck.html").read_text()
 
 
@@ -128,6 +255,9 @@ def main(argv: list[str] | None = None) -> int:
     s = sub.add_parser("score")
     s.add_argument("--tag", default="m0-v2")
     s.add_argument("ratings", type=Path)
+    r = sub.add_parser("report")
+    r.add_argument("--tag", default="m0-v3")
+    r.add_argument("ratings", type=Path)
     args = ap.parse_args(argv)
     if args.cmd == "build":
         models = [m.id for m in common.catalog().values() if m.role == "candidate"]
@@ -136,6 +266,8 @@ def main(argv: list[str] | None = None) -> int:
         if unknown:
             ap.error(f"unknown skill in --skill-tag: {', '.join(sorted(unknown))}")
         print(build(args.tag, models, skill_tags) / "index.html")
+    elif args.cmd == "report":
+        print(report(args.tag, args.ratings))
     else:
         score(args.tag, args.ratings)
     return 0
