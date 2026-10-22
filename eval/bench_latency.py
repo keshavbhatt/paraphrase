@@ -32,6 +32,7 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from paraeval import common, engine
+from paraeval.daemon import Daemon
 from paraeval.llama import LlamaServer, evict_page_cache
 from paraeval.skills import load_skills
 
@@ -68,6 +69,8 @@ def bench(
     server_args: list[str] | None = None,
     overrides: list[Path] | None = None,
     tasks: tuple[str, ...] = TASKS,
+    backend: str = "llama-server",
+    build_dir: Path | None = None,
 ) -> dict[str, Any]:
     info = common.model(model_id)
     profile = common.profiles()[profile_name]
@@ -82,11 +85,22 @@ def bench(
         "when": time.strftime("%Y-%m-%d %H:%M"),
         "server_args": server_args or [],
         "skill_revisions": {t: skills[t].revision for t in tasks},
+        "backend": backend,
     }
+    if backend == "daemon" and (server_args or overrides):
+        raise SystemExit("--server-args and --skill-override need the llama-server backend")
+
+    def start() -> LlamaServer | Daemon:
+        if backend == "daemon":
+            return Daemon(model_id, profile, build_dir)
+        return LlamaServer(info.path, profile, ctx=info.ctx, parallel=parallel)
+
+    if build_dir:
+        result["build"] = build_dir.name
     evict_page_cache(info.path)
-    with LlamaServer(info.path, profile, ctx=info.ctx, parallel=parallel) as cold:
+    with start() as cold:
         result["load_cold_s"] = round(cold.load_s, 2)
-    with LlamaServer(info.path, profile, ctx=info.ctx, parallel=parallel) as server:
+    with start() as server:
         result["load_warm_s"] = round(server.load_s, 2)
         results_by_task: dict[str, Any] = {}
         for task in tasks:
@@ -95,7 +109,12 @@ def bench(
             samples = []
             results = []
             for k, item in enumerate(inputs):
-                res = engine.run(server, skill, common.skill_inputs(skill.base_id, item))
+                values = common.skill_inputs(skill.base_id, item)
+                res = (
+                    server.run(skill, values)
+                    if isinstance(server, Daemon)
+                    else engine.run(server, skill, values)
+                )
                 if k == 0:
                     continue  # warm-up: fills the system-prompt cache
                 samples.append(res.calls[0])
@@ -161,6 +180,15 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--check", action="store_true", help="fail when a result exceeds eval/targets.json"
     )
+    ap.add_argument(
+        "--backend",
+        choices=("llama-server", "daemon"),
+        default="llama-server",
+        help="daemon: through paraphrase-daemon and the CLI (M1), as shipped",
+    )
+    ap.add_argument(
+        "--build-dir", type=Path, help="daemon backend: the build to run (default build/dev)"
+    )
     args = ap.parse_args(argv)
     misses: list[str] = []
     out_dir = common.REPORTS_DIR / args.tag / "bench"
@@ -175,6 +203,8 @@ def main(argv: list[str] | None = None) -> int:
                 shlex.split(args.server_args),
                 args.skill_override,
                 tuple(args.tasks),
+                args.backend,
+                args.build_dir,
             )
             res["variant"] = args.variant
             print(

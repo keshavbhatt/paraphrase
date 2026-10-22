@@ -78,6 +78,26 @@ class Completion:
         return self.prompt_tokens / (self.prompt_ms / 1000) if self.prompt_ms > 0 else 0.0
 
 
+def limits_prefix(p: Profile) -> list[str]:
+    """The memory cap and CPU pinning of a profile (machine A is emulated with both); both
+    tools exec into the command they run, so its pid is the one started."""
+    cmd: list[str] = []
+    if p.memory_max:
+        cmd += [
+            "systemd-run",
+            "--user",
+            "--scope",
+            "--quiet",
+            "-p",
+            f"MemoryMax={p.memory_max}",
+            "-p",
+            "MemorySwapMax=0",
+        ]
+    if p.cpus:
+        cmd += ["taskset", "-c", p.cpus]
+    return cmd
+
+
 def server_binary(build: str) -> Path:
     path = ROOT / "build" / f"llama-{build}" / "bin" / "llama-server"
     if not path.is_file():
@@ -122,20 +142,7 @@ class LlamaServer:
 
     def command(self) -> list[str]:
         p = self.profile
-        cmd: list[str] = []
-        if p.memory_max:
-            cmd += [
-                "systemd-run",
-                "--user",
-                "--scope",
-                "--quiet",
-                "-p",
-                f"MemoryMax={p.memory_max}",
-                "-p",
-                "MemorySwapMax=0",
-            ]
-        if p.cpus:
-            cmd += ["taskset", "-c", p.cpus]
+        cmd = limits_prefix(p)
         cmd += [
             str(server_binary(p.build)),
             "-m",

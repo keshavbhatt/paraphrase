@@ -27,6 +27,7 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from paraeval import common, engine, metrics
+from paraeval.daemon import Daemon
 from paraeval.llama import LlamaServer
 from paraeval.skills import Skill, load_skills
 
@@ -184,13 +185,24 @@ def run(
     limit: int | None,
     tag: str,
     overrides: list[Path] | None = None,
+    backend: str = "llama-server",
+    build_dir: Path | None = None,
 ) -> list[dict[str, Any]]:
     skills = load_skills(common.SKILLS_DIR, overrides)
     info = common.model(model_id)
     profile = common.profiles()[profile_name]
     summaries = []
     parallel = max(skills[s].variants for s in skill_ids)
-    with LlamaServer(info.path, profile, ctx=info.ctx, parallel=parallel) as server:
+    if backend == "daemon" and overrides:
+        raise SystemExit(
+            "--skill-override needs the llama-server backend: the daemon reads skills/"
+        )
+    server: LlamaServer | Daemon = (
+        Daemon(model_id, profile, build_dir)
+        if backend == "daemon"
+        else LlamaServer(info.path, profile, ctx=info.ctx, parallel=parallel)
+    )
+    with server:
         print(f"{model_id} on {profile_name}: loaded in {server.load_s:.2f} s")
         for skill_id in skill_ids:
             skill = skills[skill_id]
@@ -199,7 +211,12 @@ def run(
                 raise SystemExit(f"no dataset items for {skill_id}")
             rows = []
             for i, item in enumerate(items, 1):
-                res = engine.run(server, skill, common.skill_inputs(skill.base_id, item))
+                values = common.skill_inputs(skill.base_id, item)
+                res = (
+                    server.run(skill, values)
+                    if isinstance(server, Daemon)
+                    else engine.run(server, skill, values)
+                )
                 c = res.completion
                 rows.append(
                     {
@@ -221,7 +238,11 @@ def run(
                 print(f"\r  {skill_id}: {i}/{len(items)}", end="", flush=True)
             print()
             common.write_jsonl(common.RAW_DIR / tag / f"{model_id}__{skill_id}.jsonl", rows)
-            meta = {"load_s": round(server.load_s, 2), "peak_rss_mb": round(server.peak_rss_mb)}
+            meta = {
+                "load_s": round(server.load_s, 2),
+                "peak_rss_mb": round(server.peak_rss_mb),
+                "backend": backend,
+            }
             summary = write_summary(model_id, skill, profile_name, tag, rows, meta)
             print(json.dumps(summary["groups"]["all"], ensure_ascii=False))
             summaries.append(summary)
@@ -244,12 +265,31 @@ def main(argv: list[str] | None = None) -> int:
         default=[],
         help="a candidate skill file that replaces the shipped skills it defines",
     )
+    ap.add_argument(
+        "--backend",
+        choices=("llama-server", "daemon"),
+        default="llama-server",
+        help="daemon: through paraphrase-daemon and the CLI (M1), as shipped",
+    )
+    ap.add_argument(
+        "--build-dir", type=Path, help="daemon backend: the build to run (default build/dev)"
+    )
     args = ap.parse_args(argv)
     if args.rescore:
         rescore(args.model, args.skill, args.tag, args.profile)
         return 0
     sets = ("generated", "human") if args.set == "all" else (args.set,)
-    run(args.model, args.skill, args.profile, sets, args.limit, args.tag, args.skill_override)
+    run(
+        args.model,
+        args.skill,
+        args.profile,
+        sets,
+        args.limit,
+        args.tag,
+        args.skill_override,
+        args.backend,
+        args.build_dir,
+    )
     return 0
 
 
