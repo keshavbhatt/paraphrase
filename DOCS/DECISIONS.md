@@ -87,8 +87,9 @@ for reply. The heads are catalog entries with `role: draft` and `draft_for`, dow
 verified like any model, and shown in the model manager as "Speed-up". Greedy outputs are
 identical with and without it.
 
-**Consequences.** About 1 to 2 s more model load, under 0.1 GB more memory. The skill schema
-gains a speculative-decoding switch when the daemon implements it (M1), with a schema bump.
+**Consequences.** About 1 to 2 s more model load, and about 0.2 GB more memory: the daemon
+measured 4.49 GB without the head and 4.71 GB with it for E2B on B (M1), most of it the draft
+context's cache. The skill schema has the switch since v3 (`speculative: none | draft`).
 
 ---
 

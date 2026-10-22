@@ -104,6 +104,7 @@ util::Result<SkillResult> SkillRunner::run(const skills::Skill& skill, const ski
         .grammar = skill.grammar,
         .maxTokens = skill.maxOutputTokens,
         .variants = skill.variants,
+        .draft = skill.speculative == u"draft"_s,
     };
     SkillResult result;
     QString problem;

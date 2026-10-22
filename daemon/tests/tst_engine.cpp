@@ -17,6 +17,7 @@
 #include <algorithm>
 
 using namespace Qt::StringLiterals;
+using paraphrase::engine::EngineConfig;
 using paraphrase::engine::GenerationRequest;
 using paraphrase::engine::LlamaEngine;
 using paraphrase::engine::parseReplies;
@@ -33,6 +34,24 @@ QString root()
 QString modelPath()
 {
     return root() + u"/models/gemma-4-e2b-qat-q4_0/gemma-4-E2B_q4_0-it.gguf"_s;
+}
+
+QString draftPath()
+{
+    return root() + u"/models/gemma-4-e2b-mtp-q4_0/mtp-gemma-4-E2B-it-Q4_0.gguf"_s;
+}
+
+EngineConfig config(int maxVariants, const QString& draft)
+{
+    return {
+        .modelPath = modelPath(),
+        .draftModelPath = draft,
+        .threads = 0,
+        .gpuLayers = 0,
+        .contextSize = 4096,
+        .maxVariants = maxVariants,
+        .flashAttention = true,
+    };
 }
 
 QJsonObject vectors()
@@ -93,6 +112,7 @@ private:
                 .grammar = skill->grammar,
                 .maxTokens = skill->maxOutputTokens,
                 .variants = 1,
+                .draft = skill->speculative == u"draft"_s,
             };
         }
         qFatal("no vector %s", qPrintable(id));
@@ -105,15 +125,11 @@ private Q_SLOTS:
             QSKIP("the fast tier model is not downloaded (make fetch)");
         }
         QCOMPARE(m_vectors.value(u"model"_s).toString(), u"gemma-4-e2b-qat-q4_0"_s);
-        const auto loaded = m_engine.load({
-            .modelPath = modelPath(),
-            .threads = 0,
-            .gpuLayers = 0,
-            .contextSize = 4096,
-            .maxVariants = 1,
-            .flashAttention = true,
-        });
+        // As the daemon runs the fast tier: with its draft head (ADR-004).
+        const bool haveDraft = QFile::exists(draftPath());
+        const auto loaded = m_engine.load(config(1, haveDraft ? draftPath() : QString()));
         QVERIFY2(loaded.ok(), qPrintable(loaded.error()));
+        QCOMPARE(m_engine.canDraft(), haveDraft);
     }
 
     void promptTokensMatchLlamaServer()
@@ -129,6 +145,7 @@ private Q_SLOTS:
                 .grammar = {},
                 .maxTokens = 1,
                 .variants = 1,
+                .draft = false,
             };
             QVERIFY2(m_engine.promptTokens(req) == toTokens(o.value(u"tokens"_s).toArray()),
                      qPrintable(o.value(u"id"_s).toString()));
@@ -222,17 +239,44 @@ private Q_SLOTS:
         QVERIFY(result.error().contains(u"too long"_s));
     }
 
+    void draftedMatchesUndrafted()
+    {
+        if (!m_engine.canDraft()) {
+            QSKIP("the draft head is not downloaded (make fetch)");
+        }
+        int drafted = 0;
+        int accepted = 0;
+        for (const auto& p : m_vectors.value(u"prompts"_s).toArray()) {
+            const QString id = p.toObject().value(u"id"_s).toString();
+            if (id.startsWith(u"reply/"_s)) {
+                continue; // reply is not drafted (ADR-004)
+            }
+            // Greedy, so drafting may change the speed but never the answer. Undrafted first:
+            // the drafted run then starts from a cache only the model's context has.
+            GenerationRequest req = request(id);
+            req.sampling.insert(u"temperature"_s, 0.0);
+            req.sampling.insert(u"top_k"_s, 1);
+            req.draft = false;
+            const auto plain = m_engine.generate(req, {});
+            req.draft = true;
+            QString streamed;
+            const auto fast = m_engine.generate(req, [&](int, const QString& piece) { streamed += piece; });
+            QVERIFY(plain.ok() && fast.ok());
+            QVERIFY2(fast.value().texts == plain.value().texts, qPrintable(id));
+            QCOMPARE(streamed.trimmed(), fast.value().texts.value(0).trimmed());
+            QCOMPARE(plain.value().draftTokens, 0);
+            drafted += fast.value().draftTokens;
+            accepted += fast.value().draftAccepted;
+        }
+        QVERIFY(drafted > 0);
+        qInfo("draft head: %d of %d proposals accepted", accepted, drafted);
+        QVERIFY(accepted > drafted / 3); // M0: 95% on proofread, 53% on rewrite
+    }
+
     void decodesVariantsInOneBatch()
     {
         LlamaEngine engine;
-        const auto loaded = engine.load({
-            .modelPath = modelPath(),
-            .threads = 0,
-            .gpuLayers = 0,
-            .contextSize = 4096,
-            .maxVariants = 3,
-            .flashAttention = true,
-        });
+        const auto loaded = engine.load(config(3, {}));
         QVERIFY2(loaded.ok(), qPrintable(loaded.error()));
         GenerationRequest req = request(u"rewrite.professional/rw-en-001"_s);
         req.sampling.insert(u"temperature"_s, 0.8);

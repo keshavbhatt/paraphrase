@@ -18,7 +18,8 @@ struct GenerationRequest
     QJsonObject sampling; ///< temperature, top_p, top_k, min_p, repeat_penalty, seed (skill schema)
     QString grammar;      ///< GBNF, empty for none
     int maxTokens = 256;
-    int variants = 1; ///< completions decoded in one batch from one prompt
+    int variants = 1;   ///< completions decoded in one batch from one prompt
+    bool draft = false; ///< speculative decoding with the draft head, if loaded (ADR-004)
 };
 
 /// What came back, with the timings the latency bench reports (PLAN 5.4).
@@ -31,6 +32,8 @@ struct Generation
     int promptTokens = 0;      ///< tokens in the prompt
     int cachedTokens = 0;      ///< of those, reused from the previous request
     int generatedTokens = 0;   ///< all variants
+    int draftTokens = 0;       ///< tokens the draft head proposed
+    int draftAccepted = 0;     ///< of those, the ones the model kept
 };
 
 /// Called with each new piece of text as it is generated (complete UTF-8 only).

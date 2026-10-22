@@ -9,16 +9,20 @@
 #include <vector>
 
 struct common_init_result;
+struct common_params;
 struct common_params_sampling;
 struct common_chat_templates;
+struct common_speculative;
+struct common_speculative_init_result;
 
 namespace paraphrase::engine {
 
 struct EngineConfig
 {
     QString modelPath;
-    int threads = 0;   ///< 0: llama.cpp's default
-    int gpuLayers = 0; ///< layers offloaded to a GPU; 0 = CPU only
+    QString draftModelPath; ///< the model's MTP draft head (ADR-004), empty for none
+    int threads = 0;        ///< 0: llama.cpp's default
+    int gpuLayers = 0;      ///< layers offloaded to a GPU; 0 = CPU only
     int contextSize = 4096;
     int maxVariants = 1; ///< sequences decoded in one batch, at most
     bool flashAttention = true;
@@ -47,6 +51,8 @@ public:
     [[nodiscard]] util::Result<bool> load(const EngineConfig& config);
     [[nodiscard]] bool isLoaded() const;
     [[nodiscard]] double loadSeconds() const { return m_loadSeconds; }
+    /// Whether requests with `draft` set are drafted: a draft head is loaded and usable.
+    [[nodiscard]] bool canDraft() const { return m_spec != nullptr; }
 
     [[nodiscard]] util::Result<Generation> generate(const GenerationRequest& request,
                                                     const TextSink& sink) override;
@@ -63,13 +69,23 @@ private:
     {
         void operator()(common_chat_templates* tmpls) const;
     };
+    struct SpeculativeDeleter
+    {
+        void operator()(common_speculative* spec) const;
+    };
+
+    void loadDraft(const EngineConfig& config, common_params& params);
     class Run; // one generate() call, in llama_engine.cpp
 
     std::unique_ptr<common_init_result> m_init;         ///< owns the model and the context
     std::unique_ptr<common_params_sampling> m_defaults; ///< after the model file's defaults
     std::unique_ptr<common_chat_templates, TemplatesDeleter> m_templates;
+    // Declared after m_init and freed before it: the draft context reads the target's.
+    std::unique_ptr<common_speculative_init_result> m_draftInit; ///< the draft head and its context
+    std::unique_ptr<common_speculative, SpeculativeDeleter> m_spec;
     EngineConfig m_config;
-    std::vector<int> m_cachedTokens; ///< the tokens of sequence 0 in the KV cache
+    std::vector<int> m_cachedTokens;      ///< the tokens of sequence 0 in the KV cache
+    std::vector<int> m_draftCachedTokens; ///< the same for the draft context
     std::atomic<bool> m_cancel{false};
     double m_loadSeconds = 0.0;
 };

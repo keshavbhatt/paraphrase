@@ -133,6 +133,7 @@ private Q_SLOTS:
         QCOMPARE(gen.requests.at(0).sampling, proofread.sampling);
         QCOMPARE(gen.requests.at(0).maxTokens, proofread.maxOutputTokens);
         QCOMPARE(gen.requests.at(0).variants, 1);
+        QVERIFY(gen.requests.at(0).draft); // proofread drafts (ADR-004)
     }
 
     void retriesOnceNamingTheLanguage()
@@ -212,6 +213,7 @@ private Q_SLOTS:
         QCOMPARE(result.value().texts, (QStringList{kHindi, kHindi, kHindi}));
         QVERIFY(result.value().retried);
         QCOMPARE(gen.requests.at(0).grammar, reply.grammar);
+        QVERIFY(!gen.requests.at(0).draft); // reply does not
         // reply samples (temperature 0.7, seed null): only the seed changes on a retry.
         QCOMPARE(gen.requests.at(1).sampling.value(u"temperature"_s).toDouble(), 0.7);
         QCOMPARE(gen.requests.at(1).sampling.value(u"seed"_s).toInteger(), SkillRunner::kRetrySeedOffset);

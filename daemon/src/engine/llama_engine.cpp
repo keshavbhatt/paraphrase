@@ -10,6 +10,7 @@
 #include <llama.h>
 #include <mutex>
 #include <sampling.h>
+#include <speculative.h>
 #include <string>
 
 using namespace Qt::StringLiterals;
@@ -156,6 +157,8 @@ public:
         , m_ctx(engine.m_init->context())
         , m_vocab(llama_model_get_vocab(engine.m_init->model()))
         , m_session(engine.m_templates.get(), m_vocab, chatInputs(request))
+        // Drafting decodes one sequence: a request for several variants is not drafted.
+        , m_drafted(request.draft && request.variants <= 1 && engine.canDraft())
     {
         for (const auto& stop : m_session.additional_stops()) {
             m_longestStop = std::max(m_longestStop, stop.size());
@@ -177,8 +180,11 @@ private:
     };
 
     util::Result<bool> preparePrompt(Generation& out);
+    [[nodiscard]] bool decodeDraftedPrompt(const Tokens& prompt, size_t from);
     void prepareVariants(const Tokens& prompt);
     bool step(Generation& out);
+    bool draftStep(Generation& out);
+    bool take(size_t index, llama_token tok, Generation& out);
     void emit(int index, bool final);
     [[nodiscard]] size_t stopAt(const std::string& bytes) const;
 
@@ -188,10 +194,31 @@ private:
     llama_context* m_ctx;
     const llama_vocab* m_vocab;
     common_chat_session m_session;
+    bool m_drafted;
     std::vector<Variant> m_variants;
     size_t m_longestStop = 0;
     QElapsedTimer m_clock;
+
+    // Drafted runs only, as llama.cpp's speculative-simple example: the tokens in the cache,
+    // the last token (not yet decoded) and its position.
+    Tokens m_context;
+    llama_token m_last = LLAMA_TOKEN_NULL;
+    llama_pos m_past = 0;
+    Tokens m_draft;
 };
+
+namespace {
+
+size_t commonPrefix(const std::vector<int>& cached, const Tokens& prompt)
+{
+    size_t n = 0;
+    while (n < cached.size() && n < prompt.size() && cached[n] == prompt[n]) {
+        ++n;
+    }
+    return n;
+}
+
+} // namespace
 
 util::Result<bool> LlamaEngine::Run::preparePrompt(Generation& out)
 {
@@ -201,16 +228,22 @@ util::Result<bool> LlamaEngine::Run::preparePrompt(Generation& out)
             u"The text is too long for this model (%1 tokens)."_s.arg(prompt.size()));
     }
     // Reuse the longest prefix already in the cache, as llama-server's prompt cache does; the
-    // last prompt token is always decoded again for its logits.
-    const auto& cached = m_engine.m_cachedTokens;
-    size_t keep = 0;
-    while (keep < cached.size() && keep < prompt.size() && cached[keep] == prompt[keep]) {
-        ++keep;
+    // last prompt token is always decoded again for its logits. A drafted run needs the prefix
+    // in the draft context too, which only drafted runs fill.
+    size_t keep = commonPrefix(m_engine.m_cachedTokens, prompt);
+    if (m_drafted) {
+        keep = std::min(keep, commonPrefix(m_engine.m_draftCachedTokens, prompt));
     }
     keep = std::min(keep, prompt.size() - 1);
     llama_memory_t memory = llama_get_memory(m_ctx);
-    if (!llama_memory_seq_rm(memory, 0, static_cast<llama_pos>(keep), -1)) {
+    llama_memory_t draftMemory = m_drafted ? llama_get_memory(m_engine.m_draftInit->context()) : nullptr;
+    const auto from = static_cast<llama_pos>(keep);
+    if (!llama_memory_seq_rm(memory, 0, from, -1) ||
+        (draftMemory != nullptr && !llama_memory_seq_rm(draftMemory, 0, from, -1))) {
         llama_memory_seq_rm(memory, 0, -1, -1);
+        if (draftMemory != nullptr) {
+            llama_memory_seq_rm(draftMemory, 0, -1, -1);
+        }
         keep = 0;
     }
     for (int s = 1; s < m_engine.m_config.maxVariants; ++s) {
@@ -218,13 +251,46 @@ util::Result<bool> LlamaEngine::Run::preparePrompt(Generation& out)
     }
     out.promptTokens = static_cast<int>(prompt.size());
     out.cachedTokens = static_cast<int>(keep);
-    if (!decodePrompt(m_ctx, prompt, keep, 0)) {
-        m_engine.m_cachedTokens.clear();
-        return util::Result<bool>::failure(u"The model could not read the text."_s);
+    m_engine.m_cachedTokens.clear();
+    if (m_drafted) {
+        m_engine.m_draftCachedTokens.clear();
+        if (!decodeDraftedPrompt(prompt, keep)) {
+            return util::Result<bool>::failure(u"The model could not read the text."_s);
+        }
+        // The last prompt token is decoded with the first draft.
+        m_engine.m_cachedTokens.assign(prompt.begin(), prompt.end() - 1);
+        m_engine.m_draftCachedTokens = m_engine.m_cachedTokens;
+    } else {
+        if (!decodePrompt(m_ctx, prompt, keep, 0)) {
+            return util::Result<bool>::failure(u"The model could not read the text."_s);
+        }
+        m_engine.m_cachedTokens.assign(prompt.begin(), prompt.end());
     }
-    m_engine.m_cachedTokens.assign(prompt.begin(), prompt.end());
     prepareVariants(prompt);
     return util::Result<bool>::success(true);
+}
+
+bool LlamaEngine::Run::decodeDraftedPrompt(const Tokens& prompt, size_t from)
+{
+    common_speculative* spec = m_engine.m_spec.get();
+    common_batch batch(m_ctx);
+    const size_t end = prompt.size() - 1;
+    for (size_t i = from; i < end;) {
+        batch.clear();
+        for (; i < end && batch.size() < kBatch; ++i) {
+            batch.add(prompt[i], static_cast<llama_pos>(i), 0, false);
+        }
+        // The draft head reads the model's state for every token the model decodes.
+        if (llama_process(m_ctx, LLAMA_PROCESS_TYPE_DECODE, batch.get()) != 0 ||
+            !common_speculative_process(spec, batch)) {
+            return false;
+        }
+    }
+    m_context.assign(prompt.begin(), prompt.end() - 1);
+    m_last = prompt.back();
+    m_past = static_cast<llama_pos>(end);
+    common_speculative_begin(spec, 0, m_context);
+    return true;
 }
 
 void LlamaEngine::Run::prepareVariants(const Tokens& prompt)
@@ -234,7 +300,7 @@ void LlamaEngine::Run::prepareVariants(const Tokens& prompt)
         params.grammar = common_grammar(COMMON_GRAMMAR_TYPE_USER, m_request.grammar.toStdString());
     }
     m_session.apply_sampling(params);
-    const int n = std::clamp(m_request.variants, 1, m_engine.m_config.maxVariants);
+    const int n = m_drafted ? 1 : std::clamp(m_request.variants, 1, m_engine.m_config.maxVariants);
     m_variants.resize(static_cast<size_t>(n));
     for (int v = 0; v < n; ++v) {
         common_params_sampling own = params;
@@ -283,6 +349,34 @@ void LlamaEngine::Run::emit(int index, bool final)
     var.streamed = std::max(var.streamed, limit);
 }
 
+/// One sampled token of a variant: false when the variant is done (end, stop string, limit).
+bool LlamaEngine::Run::take(size_t index, llama_token tok, Generation& out)
+{
+    auto& var = m_variants[index];
+    ++var.tokens;
+    ++out.generatedTokens;
+    if (llama_vocab_is_eog(m_vocab, tok)) {
+        var.done = true;
+        return false;
+    }
+    var.bytes += common_token_to_piece(m_ctx, tok, false);
+    if (out.ttftSeconds == 0.0 && completeUtf8(var.bytes) > 0) {
+        out.ttftSeconds = static_cast<double>(m_clock.nsecsElapsed()) / 1e9;
+    }
+    if (const size_t at = stopAt(var.bytes); at != std::string::npos) {
+        var.bytes.resize(at);
+        var.done = true;
+        return false;
+    }
+    if (var.tokens >= m_request.maxTokens) {
+        var.done = true;
+        out.finishReason = u"length"_s;
+        return false;
+    }
+    emit(static_cast<int>(index), false);
+    return true;
+}
+
 bool LlamaEngine::Run::step(Generation& out)
 {
     llama_batch batch = llama_batch_init(static_cast<int32_t>(m_variants.size()), 0, 1);
@@ -293,27 +387,9 @@ bool LlamaEngine::Run::step(Generation& out)
         }
         const llama_token tok = common_sampler_sample(var.sampler.get(), m_ctx, var.batchIndex);
         common_sampler_accept(var.sampler.get(), tok, true);
-        ++var.tokens;
-        ++out.generatedTokens;
-        if (llama_vocab_is_eog(m_vocab, tok)) {
-            var.done = true;
+        if (!take(v, tok, out)) {
             continue;
         }
-        var.bytes += common_token_to_piece(m_ctx, tok, false);
-        if (out.ttftSeconds == 0.0 && completeUtf8(var.bytes) > 0) {
-            out.ttftSeconds = static_cast<double>(m_clock.nsecsElapsed()) / 1e9;
-        }
-        if (const size_t at = stopAt(var.bytes); at != std::string::npos) {
-            var.bytes.resize(at);
-            var.done = true;
-            continue;
-        }
-        if (var.tokens >= m_request.maxTokens) {
-            var.done = true;
-            out.finishReason = u"length"_s;
-            continue;
-        }
-        emit(static_cast<int>(v), false);
         const auto k = static_cast<size_t>(batch.n_tokens);
         batch.token[k] = tok;
         batch.pos[k] = var.pos++;
@@ -328,6 +404,64 @@ bool LlamaEngine::Run::step(Generation& out)
     return ok && more;
 }
 
+/// One round of drafting: the head proposes a few tokens, the model decodes the last token
+/// and the proposals in one batch, and keeps the proposals its own sampler agrees with.
+/// Greedy answers are the same as without drafting.
+bool LlamaEngine::Run::draftStep(Generation& out)
+{
+    const auto& var = m_variants.front();
+    if (var.done || m_engine.m_cancel.load()) {
+        return false;
+    }
+    common_speculative* spec = m_engine.m_spec.get();
+    const llama_context* draftCtx = m_engine.m_draftInit->context();
+    const int budget = std::min(m_engine.m_config.contextSize - static_cast<int>(m_past) - 2,
+                                m_request.maxTokens - var.tokens - 1);
+    m_draft.clear();
+    if (budget > 0) {
+        auto& params = common_speculative_get_draft_params(spec, 0);
+        params.drafting = true;
+        params.n_max = budget;
+        params.pos0 = m_past;
+        params.id_last = m_last;
+        params.prompt = &m_context;
+        params.result = &m_draft;
+        params.result_q = nullptr;
+        common_speculative_draft(spec);
+        llama_memory_seq_rm(llama_get_memory(draftCtx), 0, m_past, -1);
+    }
+
+    common_batch batch(m_ctx);
+    batch.add(m_last, m_past, 0, true);
+    for (size_t i = 0; i < m_draft.size(); ++i) {
+        batch.add(m_draft[i], m_past + 1 + static_cast<llama_pos>(i), 0, true);
+    }
+    if (llama_process(m_ctx, LLAMA_PROCESS_TYPE_DECODE, batch.get()) != 0 ||
+        !common_speculative_process(spec, batch)) {
+        return false;
+    }
+    const Tokens ids = common_sampler_sample_and_accept_n(var.sampler.get(), m_ctx, m_draft);
+    const auto accepted = static_cast<uint16_t>(ids.size() - 1);
+    common_speculative_accept(spec, 0, accepted);
+    out.draftTokens += static_cast<int>(m_draft.size());
+    out.draftAccepted += accepted;
+
+    bool more = true;
+    for (const llama_token id : ids) {
+        m_context.push_back(m_last);
+        m_last = id;
+        if (!take(0, id, out)) {
+            more = false;
+            break;
+        }
+    }
+    m_past += static_cast<llama_pos>(ids.size());
+    // Drop the rejected proposals from both caches.
+    llama_memory_seq_rm(llama_get_memory(m_ctx), 0, m_past, -1);
+    llama_memory_seq_rm(llama_get_memory(draftCtx), 0, m_past, -1);
+    return more;
+}
+
 util::Result<Generation> LlamaEngine::Run::execute()
 {
     m_clock.start();
@@ -336,7 +470,12 @@ util::Result<Generation> LlamaEngine::Run::execute()
     if (const auto ready = preparePrompt(out); !ready.ok()) {
         return util::Result<Generation>::failure(ready.error());
     }
-    while (step(out)) {
+    if (m_drafted) {
+        while (draftStep(out)) {
+        }
+    } else {
+        while (step(out)) {
+        }
     }
     if (m_engine.m_cancel.load()) {
         out.finishReason = u"cancelled"_s;
@@ -352,14 +491,19 @@ util::Result<Generation> LlamaEngine::Run::execute()
     // system prompt and the start of the user message with this one.
     out.totalSeconds = static_cast<double>(m_clock.nsecsElapsed()) / 1e9;
     qCDebug(lcEngine) << "generated" << out.generatedTokens << "tokens," << out.promptTokens
-                      << "prompt tokens," << out.cachedTokens << "cached," << out.totalSeconds << "s,"
-                      << out.finishReason;
+                      << "prompt tokens," << out.cachedTokens << "cached," << out.draftAccepted << "of"
+                      << out.draftTokens << "drafted," << out.totalSeconds << "s," << out.finishReason;
     return util::Result<Generation>::success(out);
 }
 
 void LlamaEngine::TemplatesDeleter::operator()(common_chat_templates* tmpls) const
 {
     common_chat_templates_free(tmpls);
+}
+
+void LlamaEngine::SpeculativeDeleter::operator()(common_speculative* spec) const
+{
+    common_speculative_free(spec);
 }
 
 LlamaEngine::LlamaEngine() = default;
@@ -370,6 +514,9 @@ util::Result<bool> LlamaEngine::load(const EngineConfig& config)
     initBackend();
     QElapsedTimer clock;
     clock.start();
+    m_spec.reset();
+    m_draftInit.reset();
+    m_init.reset();
     common_params params;
     params.model.path = config.modelPath.toStdString();
     params.n_ctx = config.contextSize * config.maxVariants;
@@ -388,6 +535,16 @@ util::Result<bool> LlamaEngine::load(const EngineConfig& config)
     // What llama-server's argument parser does: -1 threads becomes the number of math cores.
     postprocess_cpu_params(params.cpuparams, nullptr);
     postprocess_cpu_params(params.cpuparams_batch, &params.cpuparams);
+    if (!config.draftModelPath.isEmpty()) {
+        // As llama-server with `--spec-type draft-mtp -md <head>` and the default draft length;
+        // the model's context must hold the outputs of a drafted batch.
+        params.speculative.types = {COMMON_SPECULATIVE_TYPE_DRAFT_MTP};
+        params.speculative.draft.mparams.path = config.draftModelPath.toStdString();
+        const auto limits = common_speculative_get_output_limits(
+            params.n_batch, params.n_parallel, common_speculative_n_max(&params.speculative));
+        params.n_outputs_max = std::max(1, limits.total);
+        params.n_outputs_max_per_seq = std::max(1, limits.per_seq);
+    }
     auto init = common_init_from_params(params);
     if (!init || init->model() == nullptr || init->context() == nullptr) {
         return util::Result<bool>::failure(u"The model could not be loaded from %1."_s.arg(config.modelPath));
@@ -397,9 +554,41 @@ util::Result<bool> LlamaEngine::load(const EngineConfig& config)
     m_init = std::move(init);
     m_config = config;
     m_cachedTokens.clear();
+    m_draftCachedTokens.clear();
+    if (!config.draftModelPath.isEmpty()) {
+        loadDraft(config, params);
+    }
     m_loadSeconds = static_cast<double>(clock.nsecsElapsed()) / 1e9;
-    qCInfo(lcEngine) << "model loaded in" << m_loadSeconds << "s";
+    qCInfo(lcEngine) << "model loaded in" << m_loadSeconds << "s, drafting" << (canDraft() ? "on" : "off");
     return util::Result<bool>::success(true);
+}
+
+/// The draft head and its context, as llama-server creates them. Without them the engine
+/// still works, only slower, so a problem is logged and drafting stays off.
+void LlamaEngine::loadDraft(const EngineConfig& config, common_params& params)
+{
+    llama_context* ctx = m_init->context();
+    common_params draftParams = common_base_params_to_speculative(params);
+    auto draftInit = common_speculative_init_from_params(draftParams, m_init->model(), ctx);
+    if (!draftInit || draftInit->context() == nullptr) {
+        qCWarning(lcEngine) << "draft head not loaded, drafting off:" << config.draftModelPath;
+        return;
+    }
+    // The drafted loop trims rejected proposals from both caches.
+    if (common_context_can_seq_rm(ctx) != COMMON_CONTEXT_SEQ_RM_TYPE_PART ||
+        common_context_can_seq_rm(draftInit->context()) != COMMON_CONTEXT_SEQ_RM_TYPE_PART) {
+        qCWarning(lcEngine) << "this model's cache cannot drop drafted tokens, drafting off";
+        return;
+    }
+    params.speculative.draft.ctx_tgt = ctx;
+    params.speculative.draft.ctx_dft = draftInit->context();
+    common_speculative* spec = common_speculative_init(params.speculative, 1);
+    if (spec == nullptr) {
+        qCWarning(lcEngine) << "speculative decoding could not start, drafting off";
+        return;
+    }
+    m_draftInit = std::move(draftInit);
+    m_spec.reset(spec);
 }
 
 bool LlamaEngine::isLoaded() const
