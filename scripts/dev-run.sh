@@ -33,5 +33,20 @@ paraphrase_export_runtime_env "$BUILD"
 export QT_LOGGING_RULES="${QT_LOGGING_RULES:-paraphrase.*.debug=true}"
 
 [ "${1:-}" = "--" ] && shift
+
+# The desktop portal names a host app only after it finds the app's .desktop file; without
+# one it files the app under whatever launched it (the global shortcut showed up as
+# Konsole's). Install a dev copy whose Exec runs this script.
+if [[ "${PARAPHRASE_RUN:-}" == *paraphrase-app ]]; then
+    apps="${XDG_DATA_HOME:-$HOME/.local/share}/applications"
+    desktop="$apps/com.ktechpit.paraphrase.desktop"
+    exec_line="env PARAPHRASE_MODELS_DIR=${PARAPHRASE_MODELS_DIR:-$DIR/models} PARAPHRASE_RUN=${PARAPHRASE_RUN} $DIR/scripts/dev-run.sh --"
+    wanted="$(sed -e "s|^Name=Paraphrase$|Name=Paraphrase (dev)|" \
+        -e "s|^Exec=paraphrase-app|Exec=$exec_line|" "$DIR/app/data/com.ktechpit.paraphrase.desktop")"
+    if [ "$(cat "$desktop" 2>/dev/null)" != "$wanted" ]; then
+        mkdir -p "$apps"
+        printf '%s\n' "$wanted" >"$desktop"
+    fi
+fi
 cd "$DIR"
 exec "$BUILD/${PARAPHRASE_RUN:-daemon/src/paraphrase-daemon}" "$@"
