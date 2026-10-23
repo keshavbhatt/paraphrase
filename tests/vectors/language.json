@@ -4394,6 +4394,24 @@
    "plain_name": "English"
   },
   {
+   "text": "hi all the parking lot will be repainted on thursday so please park on the street that day.\n\nThanks,\nPriya Nair",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Email the client that the invoice for March is ready and they can pay it by the 15th. Sign it as Omar Haddad.",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "tell the group the bbq starts at 6 on saturday. from Dana",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
    "text": "बैंक मैनेजर को ईमेल लिखो कि मेरा डेबिट कार्ड खो गया है, उसे ब्लॉक कर दें और नया कार्ड घर के पते पर भेज दें। मेरा खाता 2019 से इसी शाखा में है।",
    "lang": "hi",
    "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
@@ -4434,6 +4452,12 @@
    "lang": "hinglish",
    "prompt_name": "Hinglish: Hindi written in Latin letters as in chat messages. Keep it Hinglish even in a formal tone: do not translate it into English or Devanagari",
    "plain_name": "Hinglish (Hindi in Latin letters)"
+  },
+  {
+   "text": "सभी को बताना है कि सोमवार को दफ़्तर बंद रहेगा।\n\nधन्यवाद,\nसुनील वर्मा",
+   "lang": "hi",
+   "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
+   "plain_name": "Hindi"
   },
   {
    "text": "Bonjour, est-ce que tu viens ce soir ? Je t'attends au café.",

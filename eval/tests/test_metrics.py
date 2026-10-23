@@ -169,6 +169,8 @@ def test_compose_shape_per_preset() -> None:
     email = email.replace(" on [Date]", "")
     assert metrics.compose_shape("email", email + "\n[Your name]")
     assert not metrics.compose_shape("email", email)  # the mock's sign-off is missing
+    assert metrics.compose_shape("email", email + "\nPriya Nair", "Priya Nair")
+    assert not metrics.compose_shape("email", email + "\n[Your name]", "Priya Nair")
     hindi = "Subject: छुट्टी\n\nनमस्ते सर,\n\nक्या मैं शुक्रवार को छुट्टी ले सकता हूँ?\n\nधन्यवाद,\n[Your name]"
     assert metrics.compose_shape("email", hindi)
     card = "विषय: कार्ड\n\nबैंक मैनेजर को,\n\nकार्ड खो गया है।\n\nधन्यवाद,\n[Your name]"

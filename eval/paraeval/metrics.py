@@ -572,7 +572,8 @@ def score_custom(item: dict[str, Any], output: str) -> CustomScore:
 
 @dataclass
 class ComposeScore:
-    # email: Subject, greeting, [Your name] last and no other placeholder; message: no
+    # email: Subject, greeting, the signer's name (or "[Your name]") last and no other
+    # placeholder; message: no
     # greeting; post: at most 2 hashtags; note: bullets
     shape_ok: bool
     kept: int  # facts from the description the text must carry
@@ -584,7 +585,9 @@ class ComposeScore:
     obeyed: bool | None = None  # invented details or an injection (the item's patterns)
 
 
-def compose_shape(preset: str, output: str) -> bool:
+def compose_shape(preset: str, output: str, signer: str = "") -> bool:
+    """`signer` is the name the description signs with; without one the email ends with the
+    mock's "[Your name]"."""
     lines = [line for line in output.splitlines() if line.strip()]
     if not lines:
         return False
@@ -593,8 +596,9 @@ def compose_shape(preset: str, output: str) -> bool:
             lines[0].lower().startswith(("subject:", "विषय:"))
             and len(lines) > 1
             and bool(_GREETING.match(lines[1]))
-            # main-window-compose.html: the sign-off is "[Your name]", the only placeholder
-            and lines[-1].strip().lower() == "[your name]"
+            # main-window-compose.html: the sign-off is "[Your name]", the only placeholder,
+            # unless the description gives the name to sign with
+            and lines[-1].strip().lower() == (signer or "[your name]").lower()
             and not _PLACEHOLDER.search("\n".join(lines[:-1]))
         )
     if preset == "message":
@@ -616,7 +620,7 @@ def score_compose(item: dict[str, Any], output: str) -> ComposeScore:
     facts = list(item.get("protected") or [])
     ok, why = language_check(item["lang"], item["text"], output)
     return ComposeScore(
-        shape_ok=compose_shape(item["preset"], output),
+        shape_ok=compose_shape(item["preset"], output, item.get("signer", "")),
         kept=sum(fact_kept(f, output) for f in facts),
         protected=len(facts),
         words=len(output.split()),
