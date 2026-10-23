@@ -14,6 +14,24 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-23 (afternoon) - Skill prompts read once per skill, the last mock details
+
+- Engine (PLAN 5.3, per-skill prompt cache): four extra cache sequences keep the last system
+  prompts; a skill that comes back after another shares its prompt back instead of reading it
+  again, drafted skills in the draft head's cache too. On E2B after switching: Proofread's first
+  output 6.5 s to 0.6 s, Reply 2.6 s to 0.4 s, Summarize 3.7 s to 1.0 s. The cache grows by
+  4 x 1024 cells (peak memory about 0.1 to 0.3 GB more). Reused cells change rounding as the
+  ordinary prefix reuse already did; the drafting test compares runs from an empty cache.
+- Skills: draft 9 (shape before the message for read-ahead, dates as written), Write 2 to 4
+  (no placeholders but the mock's "[Your name]", greetings in the text's language), Summarize 5
+  (reference numbers and dates kept). Numbers in DOCS/models.md "Prompt revisions".
+- App, against the approved mocks: 6 px between icons and text on plain buttons, the full
+  reply's language pill and Paste beside the message's label, popup replies without a copy
+  button per row and "Edit before sending".
+- Left: E2B writes "[Date]" in one Write note heading; Write cannot answer in another language
+  than the description's (the engine keeps output in the input's language); Format's last
+  E2B slips (one translated table, one "[Sender Name]").
+
 ## 2026-10-23 - New skills, Full reply fix, screens matched to the mocks
 
 - Owner approved the three mocks built before approval (2026-10-23): main-window-compose.html,
