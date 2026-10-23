@@ -25,14 +25,28 @@ public:
 
     /// Registers the service; false when another copy already runs it.
     [[nodiscard]] bool registerOnBus();
-    /// Asks the copy that runs the service to do `method`; false when none answers.
-    [[nodiscard]] static bool forward(const QString& method);
+    /// Asks the copy that runs the service to do `method`, passing on the activation token
+    /// this copy was started with, if any; false when none answers.
+    [[nodiscard]] static bool forward(const QString& method, const QString& activationToken);
+    /// On Wayland a window comes to the front only with the token of the action that asked for
+    /// it (the shortcut, the launcher); Qt takes it from XDG_ACTIVATION_TOKEN when it activates
+    /// the next window. Empty does nothing.
+    static void useActivationToken(const QString& token);
 
 public Q_SLOTS:
     // D-Bus methods are named as D-Bus names them (DOCS/api.md).
     // NOLINTBEGIN(readability-identifier-naming)
-    Q_SCRIPTABLE void ShowPopup() { Q_EMIT popupRequested(); }
-    Q_SCRIPTABLE void ShowWindow() { Q_EMIT windowRequested(); }
+    /// `activationToken` may be empty (DOCS/packaging.md).
+    Q_SCRIPTABLE void ShowPopup(const QString& activationToken)
+    {
+        useActivationToken(activationToken);
+        Q_EMIT popupRequested();
+    }
+    Q_SCRIPTABLE void ShowWindow(const QString& activationToken)
+    {
+        useActivationToken(activationToken);
+        Q_EMIT windowRequested();
+    }
     // NOLINTEND(readability-identifier-naming)
 
 Q_SIGNALS:

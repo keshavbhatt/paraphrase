@@ -57,8 +57,11 @@ already has this "clipboard flow"; the popup and setup must explain it per forma
    would need `--own-name` in the Flatpak. The snap still needs a store declaration for the
    name: request it with the first upload. The app owns a second name,
    `com.ktechpit.paraphrase.App` (object `/com/ktechpit/paraphrase/App`): one running copy,
-   so `paraphrase-app --popup` bound to a desktop shortcut reaches it. It starts with the app
-   ID, so the Flatpak needs nothing extra; the snap declares it with the daemon's.
+   so `paraphrase-app --popup` bound to a desktop shortcut reaches it. Its methods
+   `ShowPopup(s activation_token)` and `ShowWindow(s activation_token)` take the token the
+   launcher gave the second copy (`XDG_ACTIVATION_TOKEN`, may be empty): on Wayland a window in
+   the tray app comes to the front only with it. It starts with the app ID, so the Flatpak
+   needs nothing extra; the snap declares it with the daemon's.
 2. **Portable CPU build.** The M0 build uses `GGML_NATIVE=ON`, tuned to this laptop's CPU; a
    package built that way crashes on older CPUs. Packages build llama.cpp with
    `GGML_NATIVE=OFF`, `BUILD_SHARED_LIBS=ON`, `GGML_BACKEND_DL=ON` and `GGML_CPU_ALL_VARIANTS=ON`:

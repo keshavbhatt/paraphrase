@@ -159,9 +159,13 @@ QString PortalShortcut::description() const
 }
 
 void PortalShortcut::onActivated(const QDBusObjectPath& session, const QString& id, qulonglong /*timestamp*/,
-                                 const QVariantMap& /*options*/)
+                                 const QVariantMap& options)
 {
     if (session.path() == m_session && id == QLatin1StringView(kShortcutId)) {
+        // The portal's token lets the popup come to the front over the app in use (Wayland).
+        if (const QString token = options.value(u"activation_token"_s).toString(); !token.isEmpty()) {
+            qputenv("XDG_ACTIVATION_TOKEN", token.toUtf8());
+        }
         Q_EMIT activated();
     }
 }

@@ -18,6 +18,10 @@ using namespace Qt::StringLiterals;
 
 int main(int argc, char* argv[])
 {
+    // The token the launcher gave this copy (a desktop shortcut, the menu), read before Qt can
+    // use it up: a copy that hands its request over passes it on, so the running one may come
+    // to the front on Wayland.
+    const QString activationToken = qEnvironmentVariable("XDG_ACTIVATION_TOKEN");
     const QApplication app(argc, argv);
     QApplication::setApplicationName(u"Paraphrase"_s);
     QApplication::setOrganizationName(u"ktechpit"_s);
@@ -39,16 +43,17 @@ int main(int argc, char* argv[])
     // One copy runs: a second one hands its request over and leaves.
     paraphrase::app::Application paraphraseApp;
     if (!paraphraseApp.service()->registerOnBus()) {
-        const bool forwarded =
-            paraphrase::app::AppService::forward(parser.isSet(popup) ? u"ShowPopup"_s : u"ShowWindow"_s);
+        const bool forwarded = paraphrase::app::AppService::forward(
+            parser.isSet(popup) ? u"ShowPopup"_s : u"ShowWindow"_s, activationToken);
         if (forwarded) {
             return 0;
         }
     }
     paraphraseApp.start(!parser.isSet(hidden) && !parser.isSet(popup));
     if (parser.isSet(popup)) {
-        QMetaObject::invokeMethod(paraphraseApp.service(), &paraphrase::app::AppService::ShowPopup,
-                                  Qt::QueuedConnection);
+        QMetaObject::invokeMethod(
+            paraphraseApp.service(), [&paraphraseApp] { paraphraseApp.service()->ShowPopup({}); },
+            Qt::QueuedConnection);
     }
     return QApplication::exec();
 }

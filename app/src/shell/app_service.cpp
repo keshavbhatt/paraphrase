@@ -14,11 +14,19 @@ bool AppService::registerOnBus()
     return bus.registerObject(QString::fromLatin1(kPath), this, QDBusConnection::ExportScriptableSlots);
 }
 
-bool AppService::forward(const QString& method)
+bool AppService::forward(const QString& method, const QString& activationToken)
 {
-    const QDBusMessage call = QDBusMessage::createMethodCall(
+    QDBusMessage call = QDBusMessage::createMethodCall(
         QString::fromLatin1(kService), QString::fromLatin1(kPath), QString::fromLatin1(kService), method);
+    call << activationToken;
     return QDBusConnection::sessionBus().call(call).type() == QDBusMessage::ReplyMessage;
+}
+
+void AppService::useActivationToken(const QString& token)
+{
+    if (!token.isEmpty()) {
+        qputenv("XDG_ACTIVATION_TOKEN", token.toUtf8());
+    }
 }
 
 } // namespace paraphrase::app
