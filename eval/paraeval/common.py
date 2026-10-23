@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import functools
 import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+
+import yaml
 
 from paraeval import langdetect
 from paraeval.llama import Profile
@@ -81,12 +84,46 @@ def dataset(
     return items
 
 
+@functools.cache
+def _skill_file(base_skill: str) -> dict[str, Any]:
+    path = SKILLS_DIR / f"{base_skill}.yaml"
+    return yaml.safe_load(path.read_text(encoding="utf-8")) if path.exists() else {}
+
+
+def main_input(base_skill: str) -> str:
+    """ "context" for a skill that answers a message (its template uses {{context}}), else
+    "text": the daemon's Skill::mainInput."""
+    from paraeval.skills import template_vars  # local: skills imports common
+
+    return (
+        "context"
+        if "context" in template_vars(_skill_file(base_skill).get("template", ""))
+        else "text"
+    )
+
+
+def takes(base_skill: str, key: str) -> bool:
+    """Whether a request may carry `intent` or `tone` for this skill: its prompt uses the
+    value and no preset fixes it (the daemon refuses the rest)."""
+    from paraeval.skills import template_vars
+
+    raw = _skill_file(base_skill)
+    presets = raw.get("presets") or {}
+    fixed = any(key in (p or {}) for p in presets.values())
+    return key in template_vars(raw.get("template", "")) and not fixed
+
+
 def skill_inputs(base_skill: str, item: dict[str, Any]) -> dict[str, str]:
     """Map a dataset item to the skill's input keys (PLAN 5.1)."""
-    if base_skill == "reply":
-        inputs = {"context": item["context"], "text": item.get("text", "")}
+    chosen = {
+        k: str(item[k])
+        for k in ("intent", "tone")
+        if str(item.get(k) or "").strip() and takes(base_skill, k)
+    }
+    if main_input(base_skill) == "context":
+        inputs = {"context": item["context"], "text": item.get("text", "")} | chosen
         return inputs | langdetect.inputs_for(item["context"])
-    inputs = {"text": item["text"]} | langdetect.inputs_for(item["text"])
+    inputs = {"text": item["text"]} | chosen | langdetect.inputs_for(item["text"])
     if item.get("target_lang"):  # the user explicitly chose the output language
         inputs |= {
             "lang_name": langdetect.LANG_SHORT.get(inputs["lang"], "its own language"),

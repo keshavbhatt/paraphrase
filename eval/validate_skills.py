@@ -31,16 +31,20 @@ SAMPLES = [
 
 def check_offline(skill: Skill) -> list[str]:
     problems = []
-    known = {
-        "text",
-        "context",
-        "lang",
-        "lang_name",
-        "tone",
-        "intent",
-        "target_lang",
-        "target_lang_name",
-    } | set(skill.preset)
+    known = (
+        {
+            "text",
+            "context",
+            "lang",
+            "lang_name",
+            "tone",
+            "intent",
+            "target_lang",
+            "target_lang_name",
+        }
+        | set(skill.preset)
+        | set(skill.user_values)
+    )
     unknown = template_vars(skill.template) - known
     if unknown:
         problems.append(f"unknown template variables {sorted(unknown)}")
@@ -78,7 +82,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--model")
     ap.add_argument("--profile", default="B-cpu")
     args = ap.parse_args(argv)
-    skills = load_skills(common.SKILLS_DIR)
+    skills = load_skills(common.SKILLS_DIR, templates=True)
     problems = [f"{s.id}: {p}" for s in skills.values() for p in check_offline(s)]
     if args.model and not problems:
         problems += check_online(skills, args.model, args.profile)

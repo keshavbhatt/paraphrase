@@ -36,15 +36,25 @@ from paraeval.daemon import Daemon
 from paraeval.llama import LlamaServer, evict_page_cache
 from paraeval.skills import load_skills
 
-TASKS = ("reply", "proofread", "rewrite.professional")
+TASKS = (
+    "reply",
+    "proofread",
+    "rewrite.professional",
+    "summarize",
+    "format.bullets",
+    "translate",
+)
+DEFAULT_TASKS = ("reply", "proofread", "rewrite.professional")
 TARGETS = Path(__file__).resolve().parent / "targets.json"
 TARGET_WORDS = 100
 
 
-def bench_inputs(base_skill: str, n: int) -> list[dict[str, Any]]:
+def bench_inputs(base_skill: str, n: int, preset: str | None = None) -> list[dict[str, Any]]:
     items = [i for i in common.dataset(base_skill, ("generated",)) if i["lang"] == "en"]
     if base_skill == "rewrite":
         items = [i for i in items if i.get("tone") == "professional"]
+    elif preset:
+        items = [i for i in items if i.get("preset", preset) == preset]
     field = "context" if base_skill == "reply" else "text"
     items.sort(key=lambda i: abs(len(i[field].split()) - TARGET_WORDS))
     return items[: n + 1]  # one extra for the warm-up
@@ -105,7 +115,9 @@ def bench(
         results_by_task: dict[str, Any] = {}
         for task in tasks:
             skill = skills[task]
-            inputs = bench_inputs(skill.base_id, runs)
+            inputs = bench_inputs(
+                skill.base_id, runs, task.split(".", 1)[1] if "." in task else None
+            )
             samples = []
             results = []
             for k, item in enumerate(inputs):
@@ -173,7 +185,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument(
         "--tasks",
         nargs="+",
-        default=list(TASKS),
+        default=list(DEFAULT_TASKS),
         choices=TASKS,
         help="time only these tasks (e.g. reply without a draft head, the rest with one)",
     )

@@ -26,7 +26,7 @@ from paraeval.engine import Result
 from paraeval.llama import Completion, Profile, limits_prefix
 from paraeval.skills import Skill
 
-INPUT_KEYS = ("text", "context", "target_lang")
+INPUT_KEYS = ("text", "context", "target_lang", "intent", "tone", "instruction")
 WARM_UP = {"skill": "proofread", "input": {"text": "Hello there."}}
 
 

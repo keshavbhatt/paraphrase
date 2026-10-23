@@ -9,13 +9,14 @@ no file or network access.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any
 
 import yaml
 
-SCHEMA_VERSION = 4
+SCHEMA_VERSION = 5
+MIN_SCHEMA_VERSION = 4  # the daemon still loads version 4 files
 SPECULATIVE = ("none", "draft")
 OUTPUT_LANGUAGE = ("same", "any")
 TIERS = ("fast", "quality", "any")
@@ -63,6 +64,9 @@ class Skill:
     grammar: str | None = None
     grammar_path: Path | None = None
     preset: dict[str, str] = field(default_factory=dict)
+    # Schema v5 `user_presets.values`: the preset values a user's own action fills (e.g.
+    # instruction). Such a skill is a template for those actions and never runs itself.
+    user_values: tuple[str, ...] = ()
 
     def delimiter_tags(self) -> set[str]:
         """Tag names the template uses to fence data, e.g. text, message, draft."""
@@ -106,8 +110,17 @@ def _check(raw: dict[str, Any], path: Path) -> None:
     missing = [k for k in REQUIRED if k not in raw]
     if missing:
         raise SkillError(f"{path.name}: missing {', '.join(missing)}")
-    if raw["version"] != SCHEMA_VERSION:
-        raise SkillError(f"{path.name}: version {raw['version']} != schema {SCHEMA_VERSION}")
+    if not MIN_SCHEMA_VERSION <= raw["version"] <= SCHEMA_VERSION:
+        raise SkillError(
+            f"{path.name}: version {raw['version']} is not schema "
+            f"{MIN_SCHEMA_VERSION} to {SCHEMA_VERSION}"
+        )
+    if "user_presets" in raw:
+        values = (raw["user_presets"] or {}).get("values")
+        if not values or not all(isinstance(v, str) for v in values):
+            raise SkillError(
+                f"{path.name}: user_presets.values must list the preset values the user fills"
+            )
     if raw["tier"] not in TIERS:
         raise SkillError(f"{path.name}: tier must be one of {TIERS}")
     if raw["output"].get("type") not in OUTPUT_TYPES:
@@ -158,6 +171,7 @@ def load_skill_file(path: Path) -> list[Skill]:
         "template": raw["template"],
         "grammar": grammar,
         "grammar_path": grammar_path,
+        "user_values": tuple((raw.get("user_presets") or {}).get("values") or ()),
     }
     presets: dict[str, dict[str, str]] = raw.get("presets") or {}
     if not presets:
@@ -170,12 +184,31 @@ def load_skill_file(path: Path) -> list[Skill]:
     return skills
 
 
-def load_skills(skills_dir: Path, overrides: list[Path] | None = None) -> dict[str, Skill]:
+def user_action(base: Skill, action_id: str, name: str, instruction: str, tier: str) -> Skill:
+    """One of the user's own actions on a template skill, as the daemon builds it
+    (SkillRegistry::setUserActions): `<base>.<action>`, the instruction as the first listed
+    preset value, the action's own tier."""
+    return replace(
+        base,
+        id=f"{base.base_id}.{action_id}",
+        title=f"{base.title}: {name}",
+        tier=tier,
+        preset={**base.preset, base.user_values[0]: instruction},
+    )
+
+
+def load_skills(
+    skills_dir: Path, overrides: list[Path] | None = None, templates: bool = False
+) -> dict[str, Skill]:
     """All skills in skills_dir; each file in overrides replaces the skills it defines
-    (used to evaluate a candidate revision before it replaces the shipped file)."""
+    (used to evaluate a candidate revision before it replaces the shipped file). A template
+    for the user's own actions (schema v5) is left out, as the daemon lists it, unless
+    `templates` is set (the eval runs it with an instruction per dataset item)."""
     out: dict[str, Skill] = {}
     for path in sorted(skills_dir.glob("*.yaml")):
         for skill in load_skill_file(path):
+            if skill.user_values and not skill.preset and not templates:
+                continue
             if skill.id in out:
                 raise SkillError(f"duplicate skill id {skill.id}")
             out[skill.id] = skill

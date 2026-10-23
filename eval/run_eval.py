@@ -29,14 +29,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from paraeval import common, engine, metrics
 from paraeval.daemon import Daemon
 from paraeval.llama import LlamaServer
-from paraeval.skills import Skill, load_skills
+from paraeval.skills import Skill, load_skills, user_action
 
 
 def items_for(skill: Skill, sets: tuple[str, ...]) -> list[dict[str, Any]]:
     items = common.dataset(skill.base_id, sets)
     tone = skill.id.split(".", 1)[1] if "." in skill.id else None
     if tone:
-        items = [i for i in items if i.get("tone", tone) == tone]
+        items = [i for i in items if i.get("preset", i.get("tone", tone)) == tone]
     return items
 
 
@@ -47,6 +47,18 @@ def score(skill: Skill, item: dict[str, Any], output: str) -> dict[str, Any]:
         return asdict(metrics.score_reply(item, output))
     if skill.base_id == "rewrite":
         return asdict(metrics.score_rewrite(item, output))
+    if skill.base_id == "summarize":
+        return asdict(metrics.score_summarize(item, output))
+    if skill.base_id == "format":
+        return asdict(metrics.score_format(item, output))
+    if skill.base_id == "translate":
+        return asdict(metrics.score_translate(item, output))
+    if skill.base_id == "draft":
+        return asdict(metrics.score_draft(item, output))
+    if skill.base_id == "custom":
+        return asdict(metrics.score_custom(item, output))
+    if skill.base_id == "compose":
+        return asdict(metrics.score_compose(item, output))
     return {}
 
 
@@ -107,6 +119,61 @@ def summarise(skill: Skill, rows: list[dict[str, Any]]) -> dict[str, Any]:
             "preamble_pct": _pct(sum(x["preamble"] for x in s), n),
             "length_ratio_median": round(statistics.median(x["length_ratio"] for x in s), 2),
         }
+    elif skill.base_id == "summarize":
+        kept, prot = sum(x["kept"] for x in s), sum(x["protected"] for x in s)
+        out |= {
+            "facts_kept_pct": _pct(kept, prot),
+            "ratio_median": round(statistics.median(x["ratio"] for x in s), 2),
+            "longer_pct": _pct(sum(x["longer"] for x in s), n),
+            "bullets_pct": _pct(sum(x["bullets"] > 0 for x in s), n),
+            "preamble_pct": _pct(sum(x["preamble"] for x in s), n),
+        }
+    elif skill.base_id == "format":
+        kept, prot = sum(x["kept"] for x in s), sum(x["protected"] for x in s)
+        out |= {
+            "shape_ok_pct": _pct(sum(x["shape_ok"] for x in s), n),
+            "protected_kept_pct": _pct(kept, prot),
+            "coverage_median": round(statistics.median(x["coverage"] for x in s), 2),
+            "placeholder_pct": _pct(sum(x["placeholder"] for x in s), n),
+            "fenced_pct": _pct(sum(x["fenced"] for x in s), n),
+            "preamble_pct": _pct(sum(x["preamble"] for x in s), n),
+        }
+    elif skill.base_id == "translate":
+        kept, prot = sum(x["kept"] for x in s), sum(x["protected"] for x in s)
+        out |= {
+            "target_ok_pct": _pct(sum(x["target_ok"] for x in s), n),
+            "chrf_mean": round(statistics.mean(x["chrf"] for x in s), 3),
+            "protected_kept_pct": _pct(kept, prot),
+            "preamble_pct": _pct(sum(x["preamble"] for x in s), n),
+        }
+    elif skill.base_id == "draft":
+        kept, prot = sum(x["kept"] for x in s), sum(x["protected"] for x in s)
+        out |= {
+            "shape_ok_pct": _pct(sum(x["shape_ok"] for x in s), n),
+            "facts_kept_pct": _pct(kept, prot),
+            "words_median": statistics.median(x["words"] for x in s),
+            "preamble_pct": _pct(sum(x["preamble"] for x in s), n),
+        }
+    elif skill.base_id == "custom":
+        kept, prot = sum(x["kept"] for x in s), sum(x["protected"] for x in s)
+        out |= {
+            "facts_kept_pct": _pct(kept, prot),
+            "words_median": statistics.median(x["words"] for x in s),
+            "placeholder_pct": _pct(sum(x["placeholder"] for x in s), n),
+            "preamble_pct": _pct(sum(x["preamble"] for x in s), n),
+        }
+    elif skill.base_id == "compose":
+        kept, prot = sum(x["kept"] for x in s), sum(x["protected"] for x in s)
+        out |= {
+            "shape_ok_pct": _pct(sum(x["shape_ok"] for x in s), n),
+            "facts_kept_pct": _pct(kept, prot),
+            "words_median": statistics.median(x["words"] for x in s),
+            "preamble_pct": _pct(sum(x["preamble"] for x in s), n),
+        }
+    if skill.base_id in ("summarize", "format", "translate", "draft", "custom", "compose"):
+        injected = [x for x in s if x.get("obeyed") is not None]
+        if injected:
+            out["obeyed_injection_pct"] = _pct(sum(x["obeyed"] for x in injected), len(injected))
     return out
 
 
@@ -172,7 +239,7 @@ def write_summary(
 
 def rescore(model_id: str, skill_ids: list[str], tag: str, profile_name: str) -> None:
     """Recompute scores and summaries from saved raw outputs (after a metric change)."""
-    skills = load_skills(common.SKILLS_DIR)
+    skills = load_skills(common.SKILLS_DIR, templates=True)
     for skill_id in skill_ids:
         skill = skills[skill_id]
         items = {i["id"]: i for i in common.dataset(skill.base_id)}
@@ -196,7 +263,7 @@ def run(
     backend: str = "llama-server",
     build_dir: Path | None = None,
 ) -> list[dict[str, Any]]:
-    skills = load_skills(common.SKILLS_DIR, overrides)
+    skills = load_skills(common.SKILLS_DIR, overrides, templates=True)
     info = common.model(model_id)
     profile = common.profiles()[profile_name]
     summaries = []
@@ -220,10 +287,23 @@ def run(
             rows = []
             for i, item in enumerate(items, 1):
                 values = common.skill_inputs(skill.base_id, item)
+                run_skill, sent = skill, values
+                if skill.user_values and not skill.preset:
+                    # The template for the user's own actions, run with the item's instruction:
+                    # the daemon takes it as an input (Settings' Try it), the reference engine
+                    # builds the action as the daemon does from a saved one.
+                    sent = values | {"instruction": item["instruction"]}
+                    run_skill = user_action(
+                        skill,
+                        item["action"].replace(" ", "-"),
+                        item["action"],
+                        item["instruction"].strip(),
+                        skill.tier,
+                    )
                 res = (
-                    server.run(skill, values)
+                    server.run(skill, sent)
                     if isinstance(server, Daemon)
-                    else engine.run(server, skill, values)
+                    else engine.run(server, run_skill, values)
                 )
                 c = res.completion
                 rows.append(
