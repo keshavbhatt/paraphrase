@@ -14,6 +14,28 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-23 - New skills, Full reply fix, screens matched to the mocks
+
+- Skills (eval reports in `eval/reports/`, numbers in DOCS/models.md "Prompt revisions"):
+  summarize (revision 4, quality), format bullets, table and email (revision 5, fast),
+  translate (revision 2, quality), draft email and chat (revision 5), custom for My actions
+  (revision 2) and compose email, message, post and note (revision 1, measured once, no
+  before). Datasets for each in `eval/datasets/`, with 8 new hard draft items written from the
+  owner's report (short "no", "yes" and "done" notes in English and Hindi).
+- Full reply: the owner's web.de email was answered as if the note were the sender's problem.
+  Draft revision 5 frames the note as the user's own answer; it costs about 3 s more before
+  the first word on E4B. Per-skill prompt caching would take that back (next).
+- The client ends a running request with `daemon-gone` when the daemon stops; an eval run had
+  waited 6 hours on a dead private daemon.
+- Screens against their mocks: 14 px base text (the window rule did not reach its children),
+  44 px big buttons (QWidget's own `size` property swallowed the dynamic one), slim switches
+  and pills, one pane head height, line height and insets, the popup sized to its page and
+  text, settings headings, dividers and the Shortcut table. Chips keep their labels and the
+  choice shows in the result header; Retry/Stop, Delete and the tone button keep one width.
+  The My actions editor keeps its gaps and a long Try it result scrolls (capped at 160 px).
+- Left: icon-to-text gaps on plain buttons (2 px, mock 6), the full-reply pill and Paste in
+  the body as the mock shows, the popup reply rows without per-row copy.
+
 ## 2026-10-23 - My actions, General and Shortcut settings, both models loaded, facts kept
 
 - My actions (mock settings-actions.html, built before approval): skill schema v5
