@@ -3,7 +3,6 @@
 #include "ui/common/theme.h"
 
 #include <QIcon>
-#include <QMenu>
 #include <QProxyStyle>
 #include <QString>
 
@@ -38,29 +37,6 @@ public:
                                   const QWidget* widget = nullptr) const override;
     void polish(QWidget* widget) override;
     using QProxyStyle::polish;
-};
-
-/// A menu that shows each language's own name, muted, at the right edge (menus.html). The
-/// style sheet draws menu items itself, so the names are drawn over the finished menu.
-class NativeNamesMenu : public QMenu
-{
-    Q_OBJECT
-    Q_DISABLE_COPY_MOVE(NativeNamesMenu)
-
-public:
-    explicit NativeNamesMenu(QWidget* parent = nullptr);
-    ~NativeNamesMenu() override = default;
-
-    void setNativeName(QAction* action, const QString& native);
-    /// A heading between items ("BEST EFFORT"), as menus.html shows it.
-    void addCaption(const QString& text);
-    void setMuted(const QColor& muted) { m_muted = muted; }
-
-protected:
-    void paintEvent(QPaintEvent* event) override;
-
-private:
-    QColor m_muted;
 };
 
 } // namespace paraphrase::app

@@ -440,9 +440,14 @@ private Q_SLOTS:
         for (const QString& base : {u"rewrite"_s, u"format"_s, u"translate"_s}) {
             QMenu* menu = w.findChild<paraphrase::app::ChipButton*>(u"action-"_s + base)->menu();
             Q_EMIT menu->aboutToShow();
-            for (const QAction* a : menu->actions()) {
-                QVERIFY2(a->isSeparator() || a->property("caption").isValid() || !a->icon().isNull(),
-                         qPrintable(a->objectName()));
+            // Tones and formats are the menu's rows; languages are rows of its list, each
+            // with its action ("lang-<code>").
+            const auto rows = base == u"translate"_s
+                                  ? menu->findChildren<QAction*>(QRegularExpression(u"^lang-"_s))
+                                  : menu->actions();
+            QVERIFY(!rows.isEmpty());
+            for (const QAction* a : rows) {
+                QVERIFY2(a->isSeparator() || !a->icon().isNull(), qPrintable(a->objectName()));
             }
         }
         const QMenu* translate = w.findChild<paraphrase::app::ChipButton*>(u"action-translate"_s)->menu();
@@ -456,6 +461,11 @@ private Q_SLOTS:
                 menu->popup(w.mapToGlobal(QPoint(40, 200)));
                 QApplication::processEvents();
                 QVERIFY(menu->grab().save(dir + u"/menu-%1-%2.png"_s.arg(base, theme)));
+                if (base == u"translate"_s) {
+                    QTest::keyClick(menu->findChild<QWidget*>(u"languageList"_s), Qt::Key_End);
+                    QApplication::processEvents();
+                    QVERIFY(menu->grab().save(dir + u"/menu-translate-end-%1.png"_s.arg(theme)));
+                }
                 menu->hide();
             }
             w.findChild<paraphrase::app::ChipButton*>(u"action-compose"_s)->click();

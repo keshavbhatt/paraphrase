@@ -110,6 +110,9 @@ QPushButton[kind="tone"]:checked { background: @accentStrong@; border-color: @ac
 QMenu { background: @elevated@; color: @text@; border: 1px solid @border@; border-radius: 8px; padding: 4px; }
 QMenu::item { padding: 6px 18px; border-radius: 6px; }
 QMenu::item:selected { background: @hover@; }
+QMenu QListWidget#languageList { background: transparent; border: none; outline: 0; color: @text@; }
+QMenu QListWidget#languageList::item { padding: 0 8px; border-radius: 6px; }
+QMenu QListWidget#languageList::item:selected { background: @hover@; color: @text@; }
 QSplitter::handle { background: transparent; }
 QScrollArea, QScrollArea > QWidget > QWidget { background: transparent; border: none; }
 QScrollBar:vertical { background: transparent; width: 10px; margin: 2px; }

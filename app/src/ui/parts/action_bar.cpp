@@ -4,6 +4,7 @@
 #include "ui/common/flow_layout.h"
 #include "ui/common/menu_icons.h"
 #include "ui/core/languages.h"
+#include "ui/parts/language_menu.h"
 #include "util/language_detector.h"
 
 #include <QButtonGroup>
@@ -157,14 +158,19 @@ void ActionBar::decorate(QMenu* menu, bool ownActions) const
 QMenu* ActionBar::languageMenu(ChipButton* button, const QString& skillId)
 {
     // Filled when it opens, so the text's own language is left out.
-    auto* menu = new NativeNamesMenu(button);
+    auto* menu = new LanguageMenu(button);
     connect(menu, &QMenu::aboutToShow, this, [this, menu, skillId] { fillLanguages(menu, skillId); });
     return menu;
 }
 
 void ActionBar::fillLanguages(QMenu* menu, const QString& skillId)
 {
-    menu->clear();
+    auto* languages = qobject_cast<LanguageMenu*>(menu);
+    if (languages == nullptr) {
+        return;
+    }
+    languages->clearLanguages();
+    languages->setTokens(m_tokens);
     const QString own = m_textLanguage ? m_textLanguage() : QString();
     bool bestEffort = false;
     for (const MenuLanguage& lang : menuLanguages()) {
@@ -173,24 +179,16 @@ void ActionBar::fillLanguages(QMenu* menu, const QString& skillId)
             continue;
         }
         if (!lang.tested && !bestEffort) {
-            if (auto* names = qobject_cast<NativeNamesMenu*>(menu)) {
-                names->addCaption(tr("Best effort")); // a style-sheet section shows no text
-            } else {
-                menu->addSection(tr("Best effort"));
-            }
+            languages->addCaption(tr("Best effort"));
             bestEffort = true;
         }
-        QAction* item = menu->addAction(name);
-        item->setIcon(scriptBadge(lang.code, m_tokens));
-        // The name in its own writing, muted at the right edge (menus.html).
-        if (auto* names = qobject_cast<NativeNamesMenu*>(menu)) {
-            names->setMuted(m_tokens.muted);
-            names->setNativeName(item, nativeLanguageName(lang.code));
-        }
-        item->setObjectName(u"lang-"_s + lang.code);
+        // The script and, muted at the right edge, the name in its own writing (menus.html).
+        const QAction* item = languages->addLanguage(lang.code, name, nativeLanguageName(lang.code),
+                                                     scriptBadge(lang.code, m_tokens));
         const QString code = lang.code;
         connect(item, &QAction::triggered, this, [this, skillId, code] { Q_EMIT chosen(skillId, code); });
     }
+    languages->finish();
 }
 
 void ActionBar::highlight(const QString& base)

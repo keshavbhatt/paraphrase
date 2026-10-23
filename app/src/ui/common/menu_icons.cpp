@@ -5,7 +5,6 @@
 #include <QCoreApplication>
 #include <QHash>
 #include <QMenu>
-#include <QPaintEvent>
 #include <QPainter>
 #include <QPainterPath>
 #include <QStyledItemDelegate>
@@ -18,10 +17,7 @@ using namespace Qt::StringLiterals;
 namespace paraphrase::app {
 namespace {
 
-constexpr int kGlyph = 16;          // the Lucide icon inside the menu's icon box
-constexpr int kNativeRightPad = 14; // QMenu::item's right padding in theme.cpp
-constexpr int kNativeGap = 32;      // between a language's name and its own name
-constexpr int kNativePx = 12;
+constexpr int kGlyph = 16; // the Lucide icon inside the menu's icon box
 
 QIcon drawn(const std::function<void(QPainter&)>& paint)
 {
@@ -36,6 +32,7 @@ QIcon drawn(const std::function<void(QPainter&)>& paint)
         paint(p);
         p.end();
         icon.addPixmap(pixmap);
+        icon.addPixmap(pixmap, QIcon::Selected); // a list row's selection would tint it
     }
     return icon;
 }
@@ -184,59 +181,6 @@ int MenuIconStyle::pixelMetric(PixelMetric metric, const QStyleOption* option, c
         return kMenuIconSize;
     }
     return QProxyStyle::pixelMetric(metric, option, widget);
-}
-
-NativeNamesMenu::NativeNamesMenu(QWidget* parent)
-    : QMenu(parent)
-{}
-
-void NativeNamesMenu::setNativeName(QAction* action, const QString& native)
-{
-    action->setProperty("nativeName", native);
-    // Room for the widest name pair: QMenu sizes itself from the labels alone.
-    QFont small = font();
-    small.setPixelSize(kNativePx);
-    const QFontMetrics label(font());
-    const QFontMetrics side(small);
-    const int width = kMenuIconSize + label.horizontalAdvance(action->text()) + kNativeGap +
-                      side.horizontalAdvance(native) + (3 * kNativeRightPad);
-    setMinimumWidth(std::max(minimumWidth(), width));
-}
-
-void NativeNamesMenu::addCaption(const QString& text)
-{
-    QAction* caption = addAction(QString());
-    caption->setEnabled(false);
-    caption->setProperty("caption", text);
-}
-
-void NativeNamesMenu::paintEvent(QPaintEvent* event)
-{
-    QMenu::paintEvent(event);
-    QPainter p(this);
-    QFont caps = font();
-    caps.setPixelSize(11);
-    caps.setWeight(QFont::Bold);
-    caps.setCapitalization(QFont::AllUppercase);
-    caps.setLetterSpacing(QFont::PercentageSpacing, 106); // .cap { letter-spacing: .06em }
-    p.setPen(m_muted);
-    for (QAction* a : actions()) {
-        if (const QString caption = a->property("caption").toString(); !caption.isEmpty()) {
-            p.setFont(caps);
-            p.drawText(actionGeometry(a).adjusted(10, 4, 0, 0), Qt::AlignLeft | Qt::AlignVCenter, caption);
-        }
-    }
-    QFont small = font();
-    small.setPixelSize(kNativePx);
-    p.setFont(small);
-    p.setPen(m_muted);
-    for (QAction* a : actions()) {
-        const QString native = a->property("nativeName").toString();
-        if (!native.isEmpty()) {
-            p.drawText(actionGeometry(a).adjusted(0, 0, -kNativeRightPad, 0),
-                       Qt::AlignRight | Qt::AlignVCenter, native);
-        }
-    }
 }
 
 } // namespace paraphrase::app

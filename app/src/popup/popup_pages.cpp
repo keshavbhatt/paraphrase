@@ -3,9 +3,11 @@
 #include "ui/common/busy_pill.h"
 #include "ui/common/chip_button.h"
 #include "ui/common/flow_layout.h"
+#include "ui/common/menu_icons.h"
 #include "ui/common/widgets.h"
 #include "ui/core/languages.h"
 #include "ui/parts/action_bar.h"
+#include "ui/parts/language_menu.h"
 #include "ui/parts/result_views.h"
 #include "ui/parts/skeleton_view.h"
 #include "util/language_detector.h"
@@ -259,23 +261,26 @@ QWidget* PopupResultPage::buildBody()
 
 QPushButton* PopupResultPage::buildLanguageLink()
 {
-    // "Write it in another language": a menu of languages, filled when it opens.
+    // "Write it in another language": the languages, filled when it opens; a list that
+    // scrolls, as under Translate.
     QPushButton* link = makeButton(tr("Write it in another language"), u"link"_s);
     link->setObjectName(u"otherLanguage"_s);
-    auto* languages = new QMenu(link);
+    auto* languages = new LanguageMenu(link);
     link->setMenu(languages);
     connect(languages, &QMenu::aboutToShow, this, [this, languages] {
-        languages->clear();
+        languages->clearLanguages();
+        languages->setTokens(m_tokens);
         for (const MenuLanguage& lang : menuLanguages()) {
             const QString name = languageName(m_detector, lang.code);
             if (name.isEmpty() || lang.code == m_ownLanguage) {
                 continue;
             }
-            QAction* item = languages->addAction(name);
-            item->setObjectName(u"lang-"_s + lang.code);
+            const QAction* item = languages->addLanguage(lang.code, name, nativeLanguageName(lang.code),
+                                                         scriptBadge(lang.code, m_tokens));
             const QString code = lang.code;
             connect(item, &QAction::triggered, this, [this, code] { Q_EMIT languageChosen(code); });
         }
+        languages->finish();
     });
     link->hide();
     return link;

@@ -82,6 +82,7 @@ add_library(paraphrase_ui STATIC
     src/ui/core/facts_check.cpp
     src/ui/core/languages.cpp
     src/ui/core/preferences.cpp
+    src/ui/parts/language_menu.cpp
     src/ui/settings/languages_section.cpp
     src/ui/main/main_window.cpp
     src/ui/common/menu_icons.cpp
