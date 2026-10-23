@@ -2,12 +2,15 @@
 
 #include <QCoreApplication>
 #include <QDBusConnectionInterface>
+#include <QDBusServiceWatcher>
 #include <QDeadlineTimer>
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
 #include <QStandardPaths>
 #include <QThread>
+
+#include <utility>
 
 using namespace Qt::StringLiterals;
 
@@ -161,7 +164,40 @@ bool DaemonClient::subscribe()
         m_connection.connect(service, kPath, kInterface, u"DownloadProgress"_s, this,
                              SLOT(onDownloadProgress(QString))) &&
         m_connection.connect(service, kPath, kInterface, u"SkillsChanged"_s, this, SLOT(onSkillsChanged()));
+    if (m_subscribed) {
+        watchDaemon();
+    }
     return m_subscribed;
+}
+
+void DaemonClient::watchDaemon()
+{
+    // A daemon can die mid-request (a crash, a kill, a rebuild); without this, a caller would
+    // wait for its Done forever.
+    if (m_private || m_peer) {
+        m_connection.connect(QString(), u"/org/freedesktop/DBus/Local"_s, u"org.freedesktop.DBus.Local"_s,
+                             u"Disconnected"_s, this, SLOT(onDisconnected()));
+    } else {
+        const auto* watcher = new QDBusServiceWatcher(kService, m_connection,
+                                                      QDBusServiceWatcher::WatchForUnregistration, this);
+        connect(watcher, &QDBusServiceWatcher::serviceUnregistered, this, &DaemonClient::daemonLost);
+    }
+    if (m_private) {
+        connect(m_private.get(), &QProcess::finished, this, &DaemonClient::daemonLost);
+    }
+}
+
+void DaemonClient::onDisconnected()
+{
+    daemonLost();
+}
+
+void DaemonClient::daemonLost()
+{
+    const QSet<QString> running = std::exchange(m_running, {});
+    for (const QString& id : running) {
+        Q_EMIT error(id, u"daemon-gone"_s, tr("The daemon stopped before it answered."));
+    }
 }
 
 QDBusMessage DaemonClient::call(const QString& method, const QVariantList& args)
@@ -169,7 +205,11 @@ QDBusMessage DaemonClient::call(const QString& method, const QVariantList& args)
     QDBusMessage msg = QDBusMessage::createMethodCall((m_private || m_peer) ? QString() : kService, kPath,
                                                       kInterface, method);
     msg.setArguments(args);
-    return m_connection.call(msg, QDBus::Block, 60'000);
+    QDBusMessage reply = m_connection.call(msg, QDBus::Block, 60'000);
+    if (method == u"RunSkill"_s && reply.type() == QDBusMessage::ReplyMessage) {
+        m_running.insert(reply.arguments().value(0).toString());
+    }
+    return reply;
 }
 
 void DaemonClient::onToken(const QString& requestId, int variant, const QString& text)
@@ -184,11 +224,13 @@ void DaemonClient::onRetrying(const QString& requestId, const QString& reason)
 
 void DaemonClient::onDone(const QString& requestId, const QString& result)
 {
+    m_running.remove(requestId);
     Q_EMIT done(requestId, result);
 }
 
 void DaemonClient::onError(const QString& requestId, const QString& code, const QString& message)
 {
+    m_running.remove(requestId);
     Q_EMIT error(requestId, code, message);
 }
 

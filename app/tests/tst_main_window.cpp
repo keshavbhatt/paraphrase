@@ -283,6 +283,28 @@ private Q_SLOTS:
         QVERIFY(w.findChild<QLabel*>(u"outInfo"_s)->text().contains(u"stopped"_s));
     }
 
+    void saysSoWhenTheDaemonStopsMidAnswer()
+    {
+        // A crashed or killed daemon never sends Done: the client ends the request itself.
+        startDaemon({u"fast-model"_s});
+        {
+            const QMutexLocker lock(&m_daemon.state->lock);
+            m_daemon.state->defaultAnswer = QString(u"word "_s).repeated(200).trimmed();
+            m_daemon.state->pieceDelayMs = 20;
+        }
+        MainWindow w;
+        w.start();
+        w.findChild<QPlainTextEdit*>(u"text"_s)->setPlainText(u"Their going home."_s);
+        const QSignalSpy finished(&w, &MainWindow::finished);
+        w.run();
+        QTRY_VERIFY_WITH_TIMEOUT(!outputText(w).isEmpty(), kTimeoutMs);
+        m_daemon.state->cancel = true; // lets the fake engine end so the service thread can stop
+        m_daemon.stop();
+        QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 1, kTimeoutMs);
+        QVERIFY(!w.busy());
+        QVERIFY(outputText(w).contains(u"daemon stopped"_s));
+    }
+
     void savesScreenshots()
     {
         const QString dir = qEnvironmentVariable("PARAPHRASE_SCREENSHOTS");

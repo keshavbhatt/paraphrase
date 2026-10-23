@@ -4,6 +4,7 @@
 #include <QDBusMessage>
 #include <QObject>
 #include <QProcess>
+#include <QSet>
 #include <QString>
 #include <QVariantList>
 
@@ -30,6 +31,8 @@ public:
     [[nodiscard]] bool isPrivate() const { return m_private != nullptr; }
 
     /// A blocking call; the reply, or an error message whose name says what went wrong.
+    /// Requests that RunSkill starts are tracked: if the daemon goes away before they end, each
+    /// gets error(id, "daemon-gone", ...) so no caller waits for an answer that cannot come.
     [[nodiscard]] QDBusMessage call(const QString& method, const QVariantList& args);
 
 Q_SIGNALS:
@@ -48,8 +51,13 @@ private Q_SLOTS:
     void onError(const QString& requestId, const QString& code, const QString& message);
     void onDownloadProgress(const QString& status);
     void onSkillsChanged();
+    void onDisconnected(); ///< the private or peer connection closed
 
 private:
+    /// Ends every request still running with a daemon-gone error.
+    void daemonLost();
+    void watchDaemon();
+
     [[nodiscard]] static QString daemonProgram();
     [[nodiscard]] QString startPrivately();
     [[nodiscard]] bool subscribe();
@@ -59,6 +67,7 @@ private:
     QString m_socketPath;
     bool m_peer = false;       ///< connected to $PARAPHRASE_DAEMON_ADDRESS, a daemon someone else runs
     bool m_subscribed = false; ///< listening to the daemon: connected, so connecting again does nothing
+    QSet<QString> m_running;   ///< ids from RunSkill without a Done or Error yet
 };
 
 } // namespace paraphrase::client
