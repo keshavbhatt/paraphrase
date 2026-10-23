@@ -1,0 +1,36 @@
+{
+ "acceptable_pct": {
+  "f-r1": 77.8,
+  "f-r4": 85.2
+ },
+ "judged": {
+  "f-r1": 27,
+  "f-r4": 27
+ },
+ "better": {
+  "f-r4": 8,
+  "tie": 14,
+  "f-r1": 5
+ },
+ "problems": {
+  "f-r1": {
+   "wrong_format": 5,
+   "info_added": 2,
+   "content_lost": 1
+  },
+  "f-r4": {
+   "wrong_language": 2,
+   "content_lost": 1,
+   "obeyed_instruction": 1,
+   "info_added": 1
+  }
+ },
+ "acceptable_by_skill": {
+  "format.bullets f-r1": "6/9",
+  "format.bullets f-r4": "8/9",
+  "format.email f-r1": "8/9",
+  "format.email f-r4": "7/9",
+  "format.table f-r1": "7/9",
+  "format.table f-r4": "8/9"
+ }
+}

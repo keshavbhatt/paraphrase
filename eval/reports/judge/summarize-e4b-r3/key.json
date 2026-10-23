@@ -1,0 +1,120 @@
+{
+ "tags": [
+  "f-r1",
+  "f-r3"
+ ],
+ "labels": {
+  "summarize/sm-en-001": {
+   "A": "f-r1",
+   "B": "f-r3"
+  },
+  "summarize/sm-en-002": {
+   "A": "f-r3",
+   "B": "f-r1"
+  },
+  "summarize/sm-en-003": {
+   "A": "f-r3",
+   "B": "f-r1"
+  },
+  "summarize/sm-en-004": {
+   "A": "f-r3",
+   "B": "f-r1"
+  },
+  "summarize/sm-en-005": {
+   "A": "f-r3",
+   "B": "f-r1"
+  },
+  "summarize/sm-en-006": {
+   "A": "f-r3",
+   "B": "f-r1"
+  },
+  "summarize/sm-en-007": {
+   "A": "f-r3",
+   "B": "f-r1"
+  },
+  "summarize/sm-en-008": {
+   "A": "f-r1",
+   "B": "f-r3"
+  },
+  "summarize/sm-en-009": {
+   "A": "f-r3",
+   "B": "f-r1"
+  },
+  "summarize/sm-en-010": {
+   "A": "f-r3",
+   "B": "f-r1"
+  },
+  "summarize/sm-en-101": {
+   "A": "f-r3",
+   "B": "f-r1"
+  },
+  "summarize/sm-en-102": {
+   "A": "f-r3",
+   "B": "f-r1"
+  },
+  "summarize/sm-en-103": {
+   "A": "f-r1",
+   "B": "f-r3"
+  },
+  "summarize/sm-en-104": {
+   "A": "f-r1",
+   "B": "f-r3"
+  },
+  "summarize/sm-en-105": {
+   "A": "f-r1",
+   "B": "f-r3"
+  },
+  "summarize/sm-en-106": {
+   "A": "f-r3",
+   "B": "f-r1"
+  },
+  "summarize/sm-en-107": {
+   "A": "f-r3",
+   "B": "f-r1"
+  },
+  "summarize/sm-en-108": {
+   "A": "f-r3",
+   "B": "f-r1"
+  },
+  "summarize/sm-hi-001": {
+   "A": "f-r3",
+   "B": "f-r1"
+  },
+  "summarize/sm-hi-002": {
+   "A": "f-r3",
+   "B": "f-r1"
+  },
+  "summarize/sm-hi-003": {
+   "A": "f-r1",
+   "B": "f-r3"
+  },
+  "summarize/sm-hl-001": {
+   "A": "f-r3",
+   "B": "f-r1"
+  },
+  "summarize/sm-hl-002": {
+   "A": "f-r3",
+   "B": "f-r1"
+  },
+  "summarize/sm-hl-003": {
+   "A": "f-r1",
+   "B": "f-r3"
+  },
+  "summarize/sm-hi-101": {
+   "A": "f-r3",
+   "B": "f-r1"
+  },
+  "summarize/sm-hi-102": {
+   "A": "f-r3",
+   "B": "f-r1"
+  },
+  "summarize/sm-hl-101": {
+   "A": "f-r3",
+   "B": "f-r1"
+  },
+  "summarize/sm-hl-102": {
+   "A": "f-r1",
+   "B": "f-r3"
+  }
+ }
+}

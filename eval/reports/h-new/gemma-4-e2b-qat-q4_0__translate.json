@@ -1,0 +1,82 @@
+{
+  "model": "gemma-4-e2b-qat-q4_0",
+  "skill": "translate",
+  "skill_version": 4,
+  "skill_revision": 2,
+  "profile": "B-cpu",
+  "load_s": 4.26,
+  "peak_rss_mb": 4745,
+  "backend": "daemon",
+  "tag": "h-new",
+  "when": "2026-10-23 02:18",
+  "groups": {
+    "all": {
+      "n": 6,
+      "lang_floor_fail": [],
+      "ttft_s_median": 0.487,
+      "total_s_median": 1.544,
+      "gen_tps_median": 21.2,
+      "retried_pct": 0.0,
+      "lang_warned": [],
+      "target_ok_pct": 100.0,
+      "chrf_mean": 0.655,
+      "protected_kept_pct": 88.9,
+      "preamble_pct": 0.0,
+      "obeyed_injection_pct": 0.0
+    },
+    "lang=en": {
+      "n": 4,
+      "lang_floor_fail": [],
+      "ttft_s_median": 0.513,
+      "total_s_median": 1.701,
+      "gen_tps_median": 21.1,
+      "retried_pct": 0.0,
+      "lang_warned": [],
+      "target_ok_pct": 100.0,
+      "chrf_mean": 0.661,
+      "protected_kept_pct": 75.0,
+      "preamble_pct": 0.0,
+      "obeyed_injection_pct": 0.0
+    },
+    "lang=hi": {
+      "n": 1,
+      "lang_floor_fail": [],
+      "ttft_s_median": 0.465,
+      "total_s_median": 1.513,
+      "gen_tps_median": 21.0,
+      "retried_pct": 0.0,
+      "lang_warned": [],
+      "target_ok_pct": 100.0,
+      "chrf_mean": 0.613,
+      "protected_kept_pct": 100.0,
+      "preamble_pct": 0.0
+    },
+    "lang=hinglish": {
+      "n": 1,
+      "lang_floor_fail": [],
+      "ttft_s_median": 0.492,
+      "total_s_median": 1.464,
+      "gen_tps_median": 21.6,
+      "retried_pct": 0.0,
+      "lang_warned": [],
+      "target_ok_pct": 100.0,
+      "chrf_mean": 0.675,
+      "protected_kept_pct": 100.0,
+      "preamble_pct": 0.0
+    },
+    "set=holdout": {
+      "n": 6,
+      "lang_floor_fail": [],
+      "ttft_s_median": 0.487,
+      "total_s_median": 1.544,
+      "gen_tps_median": 21.2,
+      "retried_pct": 0.0,
+      "lang_warned": [],
+      "target_ok_pct": 100.0,
+      "chrf_mean": 0.655,
+      "protected_kept_pct": 88.9,
+      "preamble_pct": 0.0,
+      "obeyed_injection_pct": 0.0
+    }
+  }
+}

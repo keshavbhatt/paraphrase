@@ -1,0 +1,116 @@
+{
+ "tags": [
+  "f-r1",
+  "f-r4"
+ ],
+ "labels": {
+  "format.bullets/fm-en-001": {
+   "A": "f-r1",
+   "B": "f-r4"
+  },
+  "format.bullets/fm-en-002": {
+   "A": "f-r4",
+   "B": "f-r1"
+  },
+  "format.bullets/fm-en-003": {
+   "A": "f-r4",
+   "B": "f-r1"
+  },
+  "format.bullets/fm-en-004": {
+   "A": "f-r4",
+   "B": "f-r1"
+  },
+  "format.bullets/fm-en-101": {
+   "A": "f-r4",
+   "B": "f-r1"
+  },
+  "format.bullets/fm-en-102": {
+   "A": "f-r4",
+   "B": "f-r1"
+  },
+  "format.bullets/fm-hi-001": {
+   "A": "f-r4",
+   "B": "f-r1"
+  },
+  "format.bullets/fm-hl-001": {
+   "A": "f-r1",
+   "B": "f-r4"
+  },
+  "format.bullets/fm-hi-101": {
+   "A": "f-r4",
+   "B": "f-r1"
+  },
+  "format.table/fm-en-005": {
+   "A": "f-r4",
+   "B": "f-r1"
+  },
+  "format.table/fm-en-006": {
+   "A": "f-r4",
+   "B": "f-r1"
+  },
+  "format.table/fm-en-007": {
+   "A": "f-r4",
+   "B": "f-r1"
+  },
+  "format.table/fm-en-008": {
+   "A": "f-r1",
+   "B": "f-r4"
+  },
+  "format.table/fm-en-103": {
+   "A": "f-r1",
+   "B": "f-r4"
+  },
+  "format.table/fm-en-104": {
+   "A": "f-r1",
+   "B": "f-r4"
+  },
+  "format.table/fm-hi-002": {
+   "A": "f-r4",
+   "B": "f-r1"
+  },
+  "format.table/fm-hl-002": {
+   "A": "f-r4",
+   "B": "f-r1"
+  },
+  "format.table/fm-hl-101": {
+   "A": "f-r4",
+   "B": "f-r1"
+  },
+  "format.email/fm-en-009": {
+   "A": "f-r4",
+   "B": "f-r1"
+  },
+  "format.email/fm-en-010": {
+   "A": "f-r4",
+   "B": "f-r1"
+  },
+  "format.email/fm-en-011": {
+   "A": "f-r1",
+   "B": "f-r4"
+  },
+  "format.email/fm-en-012": {
+   "A": "f-r4",
+   "B": "f-r1"
+  },
+  "format.email/fm-en-105": {
+   "A": "f-r4",
+   "B": "f-r1"
+  },
+  "format.email/fm-en-106": {
+   "A": "f-r1",
+   "B": "f-r4"
+  },
+  "format.email/fm-hi-003": {
+   "A": "f-r4",
+   "B": "f-r1"
+  },
+  "format.email/fm-hl-003": {
+   "A": "f-r4",
+   "B": "f-r1"
+  },
+  "format.email/fm-hl-102": {
+   "A": "f-r4",
+   "B": "f-r1"
+  }
+ }
+}

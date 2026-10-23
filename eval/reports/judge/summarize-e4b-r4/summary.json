@@ -1,0 +1,28 @@
+{
+ "acceptable_pct": {
+  "f-r3": 85.7,
+  "f-r5": 89.3
+ },
+ "judged": {
+  "f-r3": 28,
+  "f-r5": 28
+ },
+ "better": {
+  "f-r5": 3,
+  "tie": 23,
+  "f-r3": 2
+ },
+ "problems": {
+  "f-r3": {
+   "missed_key_point": 4,
+   "meaning_changed": 1
+  },
+  "f-r5": {
+   "missed_key_point": 3
+  }
+ },
+ "acceptable_by_skill": {
+  "summarize f-r3": "24/28",
+  "summarize f-r5": "25/28"
+ }
+}

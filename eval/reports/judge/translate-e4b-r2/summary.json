@@ -1,0 +1,28 @@
+{
+ "acceptable_pct": {
+  "f-r1": 95.7,
+  "f-r3": 100.0
+ },
+ "judged": {
+  "f-r1": 23,
+  "f-r3": 23
+ },
+ "better": {
+  "f-r3": 11,
+  "tie": 12
+ },
+ "problems": {
+  "f-r1": {
+   "unnatural": 5,
+   "fact_changed": 1,
+   "meaning_changed": 1
+  },
+  "f-r3": {
+   "unnatural": 1
+  }
+ },
+ "acceptable_by_skill": {
+  "translate f-r1": "22/23",
+  "translate f-r3": "23/23"
+ }
+}

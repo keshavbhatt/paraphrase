@@ -1,0 +1,53 @@
+{
+  "model": "gemma-4-e4b-qat-q4_0",
+  "skill": "translate",
+  "skill_version": 4,
+  "skill_revision": 1,
+  "profile": "B-cpu",
+  "load_s": 5.13,
+  "peak_rss_mb": 7722,
+  "backend": "daemon",
+  "tag": "f-smoke",
+  "when": "2026-10-23 00:50",
+  "groups": {
+    "all": {
+      "n": 2,
+      "lang_floor_fail": [],
+      "ttft_s_median": 2.452,
+      "total_s_median": 5.345,
+      "gen_tps_median": 10.7,
+      "retried_pct": 0.0,
+      "lang_warned": [],
+      "target_ok_pct": 100.0,
+      "chrf_mean": 0.619,
+      "protected_kept_pct": 100.0,
+      "preamble_pct": 0.0
+    },
+    "lang=en": {
+      "n": 2,
+      "lang_floor_fail": [],
+      "ttft_s_median": 2.452,
+      "total_s_median": 5.345,
+      "gen_tps_median": 10.7,
+      "retried_pct": 0.0,
+      "lang_warned": [],
+      "target_ok_pct": 100.0,
+      "chrf_mean": 0.619,
+      "protected_kept_pct": 100.0,
+      "preamble_pct": 0.0
+    },
+    "set=generated": {
+      "n": 2,
+      "lang_floor_fail": [],
+      "ttft_s_median": 2.452,
+      "total_s_median": 5.345,
+      "gen_tps_median": 10.7,
+      "retried_pct": 0.0,
+      "lang_warned": [],
+      "target_ok_pct": 100.0,
+      "chrf_mean": 0.619,
+      "protected_kept_pct": 100.0,
+      "preamble_pct": 0.0
+    }
+  }
+}
