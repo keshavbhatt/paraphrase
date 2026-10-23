@@ -68,7 +68,93 @@ void ChangeList::setDiff(const client::WordDiff* diff, const QSet<qsizetype>& un
             height += w->sizeHint().height() + m_rows->spacing();
         }
     }
-    setMaximumHeight(std::min(height + (2 * frameWidth()), kMaxHeight));
+    // At least that much too: in the popup the window fits its content, and a list squeezed
+    // to two rows of five hid the rest behind a scrollbar.
+    const int fit = std::min(height + (2 * frameWidth()), kMaxHeight);
+    setMaximumHeight(fit);
+    setMinimumHeight(fit);
+}
+
+namespace {
+
+QString letters(const QString& word)
+{
+    QString out;
+    for (const QChar c : word) {
+        if (c.isLetterOrNumber() || c.isMark()) {
+            out += c;
+        }
+    }
+    return out;
+}
+
+QString punctuationName(const QString& mark)
+{
+    if (mark == u"."_s) {
+        return ChangeList::tr("full stop");
+    }
+    if (mark == u","_s) {
+        return ChangeList::tr("comma");
+    }
+    if (mark == u"?"_s) {
+        return ChangeList::tr("question mark");
+    }
+    if (mark == u"'"_s || mark == u"’"_s) {
+        return ChangeList::tr("apostrophe");
+    }
+    return ChangeList::tr("punctuation");
+}
+
+/// Levenshtein distance, for telling a spelling fix from another word.
+qsizetype distance(const QString& a, const QString& b)
+{
+    QList<qsizetype> row(b.size() + 1);
+    for (qsizetype j = 0; j <= b.size(); ++j) {
+        row[j] = j;
+    }
+    for (qsizetype i = 1; i <= a.size(); ++i) {
+        qsizetype diagonal = row[0];
+        row[0] = i;
+        for (qsizetype j = 1; j <= b.size(); ++j) {
+            const qsizetype up = row[j];
+            row[j] = std::min({row[j] + 1, row[j - 1] + 1, diagonal + (a.at(i - 1) == b.at(j - 1) ? 0 : 1)});
+            diagonal = up;
+        }
+    }
+    return row[b.size()];
+}
+
+} // namespace
+
+QString changeReason(const QString& before, const QString& after)
+{
+    const QString from = letters(before);
+    const QString to = letters(after);
+    if (from.isEmpty() && to.isEmpty()) {
+        // Only marks changed: name the one added, or the one taken away.
+        const QString mark = after.trimmed().isEmpty() ? before.trimmed() : after.trimmed();
+        return punctuationName(mark.right(1));
+    }
+    if (before.trimmed().isEmpty()) {
+        return ChangeList::tr("added word");
+    }
+    if (after.trimmed().isEmpty()) {
+        return ChangeList::tr("removed word");
+    }
+    if (from == to) {
+        if (before.contains(u'\'') != after.contains(u'\'')) {
+            return ChangeList::tr("spelling"); // egg's -> eggs, dont -> don't
+        }
+        const QString mark = after.size() > before.size() ? after.right(1) : before.right(1);
+        return punctuationName(mark);
+    }
+    if (from.compare(to, Qt::CaseInsensitive) == 0) {
+        return ChangeList::tr("capital letter");
+    }
+    const qsizetype longest = std::max(from.size(), to.size());
+    return distance(from.toLower(), to.toLower()) <= std::max<qsizetype>(2, longest / 3)
+               ? ChangeList::tr("spelling")
+               : ChangeList::tr("wording");
 }
 
 QWidget* ChangeList::row(const client::WordDiff& diff, qsizetype k, bool undone)
@@ -91,6 +177,9 @@ QWidget* ChangeList::row(const client::WordDiff& diff, qsizetype k, bool undone)
     arrow->setPixmap(Theme::icon(u"forward"_s, m_tokens.muted, kArrowSize).pixmap(kArrowSize, kArrowSize));
     layout->addWidget(arrow);
     layout->addWidget(after.isEmpty() ? chip(tr("removed"), u"pill"_s) : chip(after, u"ins"_s));
+    QLabel* reason = makeLabel(changeReason(s.before, s.after), u"small"_s);
+    reason->setObjectName(u"reason%1"_s.arg(k));
+    layout->addWidget(reason);
     layout->addStretch(1);
     QPushButton* undo = makeButton(undone ? tr("Redo") : tr("Undo"), u"link"_s);
     undo->setObjectName(u"undo%1"_s.arg(k));

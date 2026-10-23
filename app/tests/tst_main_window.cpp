@@ -9,6 +9,7 @@
 #include "ui/common/chip_button.h"
 #include "ui/common/menu_icons.h"
 #include "ui/main/main_window.h"
+#include "ui/parts/change_list.h"
 #include "ui/parts/input_pages.h"
 #include "ui/parts/tone_picker.h"
 
@@ -124,6 +125,21 @@ private Q_SLOTS:
         QCOMPARE(w.resultText(), u"Whisk the egg's with the milk."_s);
         w.copyResult();
         QCOMPARE(QApplication::clipboard()->text(), u"Whisk the egg's with the milk."_s);
+    }
+
+    void namesWhyEachWordChanged()
+    {
+        // popup-proofread.html, note 3: a short reason per change, from the two words alone.
+        using paraphrase::app::changeReason;
+        QCOMPARE(changeReason(u"monday"_s, u"Monday"_s), u"capital letter"_s);
+        QCOMPARE(changeReason(u"egg's"_s, u"eggs"_s), u"spelling"_s);
+        QCOMPARE(changeReason(u"tomorow"_s, u"tomorrow"_s), u"spelling"_s);
+        QCOMPARE(changeReason(u"Their"_s, u"They're"_s), u"spelling"_s);
+        QCOMPARE(changeReason(QString(), u"."_s), u"full stop"_s);
+        QCOMPARE(changeReason(u"fridge"_s, u"fridge?"_s), u"question mark"_s);
+        QCOMPARE(changeReason(u"big"_s, u"large"_s), u"wording"_s);
+        QCOMPARE(changeReason(QString(), u"the"_s), u"added word"_s);
+        QCOMPARE(changeReason(u"very"_s, QString()), u"removed word"_s);
     }
 
     void replyShowsThreeRepliesAndPassesTheDraft()

@@ -17,9 +17,11 @@ class LanguageDetector;
 namespace paraphrase::app {
 
 class ActionBar;
+class BusyPill;
 class ChipButton;
 class QuickRepliesView;
 class SegmentedControl;
+class SkeletonView;
 class TextResultView;
 
 /// The popup's first page (popup-actions.html): the captured text, the actions numbered 1 to
@@ -78,7 +80,11 @@ public:
     /// The other presets of the running skill ("Professional · Polite ..."), the current one marked.
     void setPresets(const QList<const SkillInfo*>& presets, const QString& currentId);
     void setInfo(const QString& text, const QString& role = QStringLiteral("small"));
+    /// While it runs: the working pill and, until the first word, the shape of the answer
+    /// about as long as the text (main-window-busy.html, the same in the popup).
     void setRunning(bool running);
+    void firstWord();
+    void retrying();
     void setLanguagePill(const QString& language);
     /// Proofread found nothing: "Looks good, no changes" and only Close (popup-proofread.html,
     /// note 5), so the user is never asked to replace text with itself.
@@ -107,6 +113,7 @@ private:
     [[nodiscard]] QWidget* buildFoot();
     [[nodiscard]] QPushButton* buildLanguageLink();
     void updateButtons();
+    void showResultView();
 
     QLabel* m_title = nullptr;
     QLabel* m_lock = nullptr;
@@ -116,8 +123,10 @@ private:
     QLabel* m_caption = nullptr;
     QLabel* m_pill = nullptr;
     QLabel* m_source = nullptr;
+    BusyPill* m_busy = nullptr;
     QLabel* m_info = nullptr;
     QLabel* m_pick = nullptr;
+    SkeletonView* m_skeleton = nullptr;
     SegmentedControl* m_view = nullptr;
     QStackedWidget* m_results = nullptr;
     TextResultView* m_text = nullptr;

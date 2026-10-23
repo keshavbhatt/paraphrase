@@ -10,6 +10,10 @@ class QVBoxLayout;
 
 namespace paraphrase::app {
 
+/// Why a word changed, in a few words (popup-proofread.html, note 3): "capital letter",
+/// "comma", "spelling", "wording", "added word". Worked out from the two words alone.
+[[nodiscard]] QString changeReason(const QString& before, const QString& after);
+
 /// Proofread's changes, one row each (main-window.html, note 5): the old word, an arrow, the
 /// new word, and Undo. An addition shows where it went ("end" of a line) and a removal says
 /// so in words: colour is never the only signal.

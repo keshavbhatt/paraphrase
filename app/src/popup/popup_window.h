@@ -24,6 +24,8 @@ class PopupWindow : public QWidget
     Q_DISABLE_COPY_MOVE(PopupWindow)
 
 public:
+    static constexpr int kOffset = 12; ///< from the cursor
+
     explicit PopupWindow(const util::LanguageDetector& detector, QWidget* parent = nullptr);
     ~PopupWindow() override = default;
 

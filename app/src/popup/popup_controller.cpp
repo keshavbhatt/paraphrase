@@ -3,6 +3,7 @@
 #include "integration/integrations.h"
 #include "popup/popup_pages.h"
 #include "popup/popup_window.h"
+#include "ui/core/app_names.h"
 #include "ui/core/facts_check.h"
 #include "ui/core/languages.h"
 #include "ui/core/request_runner.h"
@@ -53,8 +54,13 @@ PopupController::PopupController(const Integrations& integrations, client::Daemo
     connect(m_runner, &RequestRunner::token, this, [this](const QString& piece) {
         m_streamed += piece;
         if (m_catalog.kindOf(m_skill) == SkillKind::Text) {
+            m_window->resultPage()->firstWord();
             m_window->resultPage()->textView()->stream(m_streamed);
         }
+    });
+    connect(m_runner, &RequestRunner::retrying, this, [this] {
+        m_streamed.clear();
+        m_window->resultPage()->retrying();
     });
     connect(m_runner, &RequestRunner::finished, this, &PopupController::onFinished);
     // An action saved or deleted: read the skills again on the next open.
@@ -126,7 +132,7 @@ void PopupController::showText(const CapturedText& text)
 {
     m_text = text;
     PopupActionsPage* page = m_window->actionsPage();
-    page->showText(text.text, text.appName, text.origin);
+    page->showText(text.text, appDisplayName(text.appName), text.origin);
     m_window->showActions();
     if (!ensureCatalog()) {
         page->setStatus(tr("Paraphrase is not running. Open it from the menu and try again."));
@@ -185,7 +191,7 @@ void PopupController::run(const QString& skillId, const QString& targetLang)
     PopupResultPage* page = m_window->resultPage();
     const QString title = kind == SkillKind::Text ? m_catalog.actionTitle(skill->base) : tr("Reply");
     // Proofread shows the diff of the text itself (popup-proofread.html); the others show it too.
-    page->begin(kind, title, m_text.text, m_text.appName, skill->base != u"proofread"_s);
+    page->begin(kind, title, m_text.text, appDisplayName(m_text.appName), skill->base != u"proofread"_s);
     page->setPresets(m_catalog.variants(skill->base), skillId);
     // A tone keeps the text's language unless the user picks another (owner, 2026-10-22).
     page->offerOtherLanguages(skill->takes(u"target_lang"_s) && !m_catalog.picksLanguage(skill->base),
@@ -199,6 +205,7 @@ void PopupController::run(const QString& skillId, const QString& targetLang)
         return;
     }
     page->setRunning(true);
+    m_window->adjustSize(); // as tall as the shape of the answer, not the last result
 }
 
 void PopupController::onFinished(const QJsonObject& result)
@@ -263,12 +270,17 @@ void PopupController::insert()
     if (text.isEmpty()) {
         return;
     }
+    // Out of the way first: the text goes back only once its own window has the focus again
+    // (PasteInsert waits for it), and the popup on top would keep it.
+    const QPoint at = m_window->pos();
+    m_window->hide();
     const InsertOutcome outcome = m_integrations.insert().insert(text, m_text);
     if (outcome == InsertOutcome::Typed) {
         m_window->close();
         return;
     }
-    const QString where = m_text.appName.isEmpty() ? tr("the app") : m_text.appName;
+    m_window->openNear(at - QPoint(PopupWindow::kOffset, PopupWindow::kOffset)); // to say where the text is
+    const QString where = m_text.appName.isEmpty() ? tr("the app") : appDisplayName(m_text.appName);
     m_window->resultPage()->setInfo(outcome == InsertOutcome::OnClipboard
                                         ? tr("· on the clipboard: press Ctrl+V in %1").arg(where)
                                         : tr("· could not put it back; use Copy"),

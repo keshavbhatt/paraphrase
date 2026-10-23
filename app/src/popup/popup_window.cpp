@@ -16,7 +16,6 @@ namespace paraphrase::app {
 namespace {
 
 constexpr int kWidth = 440;
-constexpr int kOffset = 12; ///< from the cursor
 
 } // namespace
 

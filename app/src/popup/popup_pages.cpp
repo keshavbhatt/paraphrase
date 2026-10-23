@@ -1,11 +1,13 @@
 #include "popup/popup_pages.h"
 
+#include "ui/common/busy_pill.h"
 #include "ui/common/chip_button.h"
 #include "ui/common/flow_layout.h"
 #include "ui/common/widgets.h"
 #include "ui/core/languages.h"
 #include "ui/parts/action_bar.h"
 #include "ui/parts/result_views.h"
+#include "ui/parts/skeleton_view.h"
 #include "util/language_detector.h"
 
 #include <QHBoxLayout>
@@ -16,6 +18,8 @@
 #include <QStackedWidget>
 #include <QStyle>
 #include <QVBoxLayout>
+
+#include <algorithm>
 
 using namespace Qt::StringLiterals;
 
@@ -220,7 +224,12 @@ QWidget* PopupResultPage::buildBody()
         {.name = u"showChanges"_s, .text = tr("Changes")},
         {.name = u"showResult"_s, .text = tr("Result")},
     });
+    m_busy = new BusyPill;
+    m_busy->setSteps(
+        {tr("Reading your text"), tr("Writing"), tr("Checking, writing again"), tr("Writing 3 replies")});
+    infoRow->addWidget(m_busy);
     infoRow->addWidget(m_info, 1);
+    infoRow->addStretch(0); // keeps the pill at the start while the line is hidden
     infoRow->addWidget(m_view);
     layout->addLayout(infoRow);
     m_pick = makeLabel(tr("PICK A REPLY"), u"caption"_s);
@@ -235,8 +244,10 @@ QWidget* PopupResultPage::buildBody()
     for (const QWidget* view : {static_cast<QWidget*>(m_text), static_cast<QWidget*>(m_replies)}) {
         view->layout()->setContentsMargins(0, 0, 0, 0);
     }
+    m_skeleton = new SkeletonView;
     m_results->addWidget(m_text);
     m_results->addWidget(m_replies);
+    m_results->addWidget(m_skeleton);
     layout->addWidget(m_results, 1);
     m_otherLanguage = buildLanguageLink();
     layout->addWidget(m_otherLanguage, 0, Qt::AlignLeft);
@@ -306,6 +317,8 @@ void PopupResultPage::begin(SkillKind kind, const QString& title, const QString&
 {
     m_kind = kind;
     m_appName = appName;
+    m_running = false; // a new run: setRunning(true) starts the pill again
+    m_busy->stop();
     m_title->setText(u"<b>%1</b>"_s.arg(title.toHtmlEscaped()));
     const bool reply = kind != SkillKind::Text;
     m_caption->setText(reply ? tr("MESSAGE YOU GOT") : tr("YOUR TEXT"));
@@ -315,14 +328,19 @@ void PopupResultPage::begin(SkillKind kind, const QString& title, const QString&
     m_caption->setVisible(showSource);
     m_info->setVisible(!reply);
     m_pick->setVisible(reply);
-    showOnly(m_results, reply ? static_cast<QWidget*>(m_replies) : m_text);
+    showResultView();
     m_view->setVisible(false);
     m_text->clear();
     m_replies->setReplies({});
     m_presets->setVisible(false);
     m_nothingToFix = false;
-    setInfo(tr("· writing..."));
+    setInfo(QString());
     updateButtons();
+}
+
+void PopupResultPage::showResultView()
+{
+    showOnly(m_results, m_kind != SkillKind::Text ? static_cast<QWidget*>(m_replies) : m_text);
 }
 
 void PopupResultPage::setPresets(const QList<const SkillInfo*>& presets, const QString& currentId)
@@ -356,8 +374,47 @@ void PopupResultPage::setInfo(const QString& text, const QString& role)
 
 void PopupResultPage::setRunning(bool running)
 {
+    const bool started = running && !m_running;
+    const bool ended = !running && m_running;
     m_running = running;
+    const bool reply = m_kind != SkillKind::Text;
+    if (started) {
+        m_busy->start(reply ? tr("Writing 3 replies") : tr("Reading your text"));
+        m_info->hide();
+        // As many lines as the text takes in the result box: the answer is about as long.
+        QFont f = font();
+        f.setPixelSize(15);
+        const QFontMetrics fm(f);
+        const int width = std::max(200, m_results->width() > 0 ? m_results->width() : 408);
+        const int lines =
+            fm.boundingRect(QRect(0, 0, width, 100'000), Qt::TextWordWrap, m_source->text()).height() /
+            std::max(1, fm.lineSpacing());
+        m_skeleton->setShape(reply ? SkeletonView::Shape::Replies : SkeletonView::Shape::Text);
+        m_skeleton->setCompact(std::clamp(lines, 1, 12));
+        showOnly(m_results, m_skeleton);
+    } else if (ended) {
+        m_busy->stop();
+        m_info->setVisible(!reply);
+        m_text->endStream();
+        showResultView();
+    }
     updateButtons();
+}
+
+void PopupResultPage::firstWord()
+{
+    if (m_running && m_kind == SkillKind::Text && m_busy->step() != tr("Writing")) {
+        m_busy->setStep(tr("Writing"));
+        showResultView();
+    }
+}
+
+void PopupResultPage::retrying()
+{
+    if (m_running) {
+        m_busy->setStep(tr("Checking, writing again"));
+        showOnly(m_results, m_skeleton);
+    }
 }
 
 void PopupResultPage::setLanguagePill(const QString& language)
@@ -422,6 +479,8 @@ void PopupResultPage::applyTheme(const Tokens& t)
     m_insert->setLeadingIcon({});
     m_text->applyTheme(t);
     m_replies->applyTheme(t);
+    m_busy->applyTheme(t);
+    m_skeleton->applyTheme(t);
     updateButtons();
 }
 

@@ -4,8 +4,10 @@
 #include <QPainter>
 #include <QPainterPath>
 
+#include <algorithm>
 #include <array>
 #include <span>
+#include <vector>
 
 using namespace Qt::StringLiterals;
 
@@ -45,6 +47,25 @@ void SkeletonView::setShape(Shape shape)
 {
     m_shape = shape;
     update();
+}
+
+void SkeletonView::setCompact(int lines)
+{
+    m_lines = std::max(1, lines);
+    updateGeometry();
+    update();
+}
+
+QSize SkeletonView::sizeHint() const
+{
+    if (m_lines == 0) {
+        return QWidget::sizeHint();
+    }
+    if (m_shape == Shape::Replies) {
+        // Three cards of two, one and two lines (paintCards).
+        return {QWidget::sizeHint().width(), (6 * kInset) + (5 * kBar) + (2 * kCardRowGap) + (2 * kCardGap)};
+    }
+    return {QWidget::sizeHint().width(), (m_lines * (kBar + kRowGap)) + 4};
 }
 
 void SkeletonView::applyTheme(const Tokens& t)
@@ -119,6 +140,17 @@ void SkeletonView::paintEvent(QPaintEvent* /*event*/)
         paintCards(p, brush);
         return;
     }
+    if (m_lines > 0) {
+        // The popup: a paragraph as long as the text, in the body's own margins.
+        std::vector<int> widths;
+        widths.reserve(static_cast<std::size_t>(m_lines));
+        for (int i = 0; i < m_lines; ++i) {
+            widths.push_back(i + 1 == m_lines && m_lines > 1 ? 58
+                                                             : kText.at(static_cast<std::size_t>(i) % 4));
+        }
+        paintBars(p, QRectF(0, 4, width(), height() - 4), widths, kRowGap, brush);
+        return;
+    }
     const int top = m_shape == Shape::Text ? kTextTop : kMargin;
     const QRectF r(kMargin, top, width() - (2 * kMargin), height() - top - kMargin);
     if (m_shape == Shape::Draft) {
@@ -134,7 +166,8 @@ void SkeletonView::paintCards(QPainter& p, const QBrush& brush) const
 {
     // Three cards with their numbers (mock: .skcard).
     const std::array<std::span<const int>, 3> cards{kCard1, kCard2, kCard3};
-    double y = kMargin;
+    const int margin = m_lines > 0 ? 0 : kMargin;
+    double y = margin;
     QFont number = font();
     number.setFamily(u"monospace"_s);
     number.setPixelSize(11);
@@ -142,7 +175,7 @@ void SkeletonView::paintCards(QPainter& p, const QBrush& brush) const
     for (std::size_t i = 0; i < cards.size(); ++i) {
         const auto lines = static_cast<double>(cards.at(i).size());
         const double h = (2 * kInset) + (lines * kBar) + ((lines - 1) * kCardRowGap);
-        const QRectF card(kMargin, y, width() - (2 * kMargin), h);
+        const QRectF card(margin, y, width() - (2 * margin), h);
         paintOutline(p, card, m_tokens.border, Qt::NoBrush);
         const QRectF chip(card.left() + kInset, card.top() + kInset - 1, 18, 18);
         QPainterPath chipPath;

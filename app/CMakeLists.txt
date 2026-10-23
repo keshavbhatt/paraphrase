@@ -77,6 +77,7 @@ add_library(paraphrase_ui STATIC
     src/ui/parts/input_pages.cpp
     src/ui/main/input_pane.cpp
     src/ui/settings/installed_models_table.cpp
+    src/ui/core/app_names.cpp
     src/ui/core/autostart.cpp
     src/ui/core/facts_check.cpp
     src/ui/core/languages.cpp
