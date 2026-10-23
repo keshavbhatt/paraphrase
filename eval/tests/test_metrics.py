@@ -162,12 +162,17 @@ def test_summarize_counts_key_facts_and_injection() -> None:
 
 
 def test_compose_shape_per_preset() -> None:
-    email = "Subject: Friday off\n\nHi Sarah,\n\nCould I take Friday off?\n\nBest regards,"
-    assert metrics.compose_shape("email", email)
-    assert not metrics.compose_shape("email", email + "\n[Your name]")  # no placeholder, ever
-    hindi = "Subject: छुट्टी\n\nनमस्ते सर,\n\nक्या मैं शुक्रवार को छुट्टी ले सकता हूँ?\n\nधन्यवाद,"
+    email = (
+        "Subject: Friday off\n\nHi Sarah,\n\nCould I take Friday off on [Date]?\n\nBest regards,"
+    )
+    assert not metrics.compose_shape("email", email + "\n[Your name]")  # [Date] is not allowed
+    email = email.replace(" on [Date]", "")
+    assert metrics.compose_shape("email", email + "\n[Your name]")
+    assert not metrics.compose_shape("email", email)  # the mock's sign-off is missing
+    hindi = "Subject: छुट्टी\n\nनमस्ते सर,\n\nक्या मैं शुक्रवार को छुट्टी ले सकता हूँ?\n\nधन्यवाद,\n[Your name]"
     assert metrics.compose_shape("email", hindi)
-    assert metrics.compose_shape("email", "विषय: कार्ड\n\nबैंक मैनेजर को,\n\nकार्ड खो गया है।\n\nधन्यवाद,")
+    card = "विषय: कार्ड\n\nबैंक मैनेजर को,\n\nकार्ड खो गया है।\n\nधन्यवाद,\n[Your name]"
+    assert metrics.compose_shape("email", card)
     assert not metrics.compose_shape("email", "Hi Sarah,\n\nCould I take Friday off?")
     assert metrics.compose_shape("post", "Poetry night on Saturday! #poetry #books")
     assert not metrics.compose_shape("post", "Poetry night! #a #b #c")

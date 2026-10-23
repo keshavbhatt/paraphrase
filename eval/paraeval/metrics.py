@@ -572,8 +572,9 @@ def score_custom(item: dict[str, Any], output: str) -> CustomScore:
 
 @dataclass
 class ComposeScore:
-    shape_ok: bool  # email: Subject, greeting, no placeholder; message: no greeting; post: <= 2
-    # hashtags; note: bullets
+    # email: Subject, greeting, [Your name] last and no other placeholder; message: no
+    # greeting; post: at most 2 hashtags; note: bullets
+    shape_ok: bool
     kept: int  # facts from the description the text must carry
     protected: int
     words: int
@@ -592,7 +593,9 @@ def compose_shape(preset: str, output: str) -> bool:
             lines[0].lower().startswith(("subject:", "विषय:"))
             and len(lines) > 1
             and bool(_GREETING.match(lines[1]))
-            and not _PLACEHOLDER.search(output)
+            # main-window-compose.html: the sign-off is "[Your name]", the only placeholder
+            and lines[-1].strip().lower() == "[your name]"
+            and not _PLACEHOLDER.search("\n".join(lines[:-1]))
         )
     if preset == "message":
         return not _GREETING.match(lines[0]) or len(lines[0].split()) > 4

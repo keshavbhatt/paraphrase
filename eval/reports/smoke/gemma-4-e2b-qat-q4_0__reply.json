@@ -8,13 +8,13 @@
   "peak_rss_mb": 4477,
   "backend": "llama-server",
   "tag": "smoke",
-  "when": "2026-10-23 10:09",
+  "when": "2026-10-23 12:04",
   "groups": {
     "all": {
       "n": 5,
       "lang_floor_fail": [],
-      "ttft_s_median": 1.408,
-      "total_s_median": 2.989,
+      "ttft_s_median": 1.406,
+      "total_s_median": 3.093,
       "gen_tps_median": 20.7,
       "retried_pct": 0.0,
       "lang_warned": [],
@@ -25,8 +25,8 @@
     "lang=en": {
       "n": 5,
       "lang_floor_fail": [],
-      "ttft_s_median": 1.408,
-      "total_s_median": 2.989,
+      "ttft_s_median": 1.406,
+      "total_s_median": 3.093,
       "gen_tps_median": 20.7,
       "retried_pct": 0.0,
       "lang_warned": [],
@@ -37,8 +37,8 @@
     "set=generated": {
       "n": 5,
       "lang_floor_fail": [],
-      "ttft_s_median": 1.408,
-      "total_s_median": 2.989,
+      "ttft_s_median": 1.406,
+      "total_s_median": 3.093,
       "gen_tps_median": 20.7,
       "retried_pct": 0.0,
       "lang_warned": [],
