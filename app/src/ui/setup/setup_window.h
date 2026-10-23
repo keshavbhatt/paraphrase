@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ui/common/theme.h"
+#include "ui/core/desktop_support.h"
 
 #include <QWidget>
 
@@ -18,6 +19,7 @@ class ChipButton;
 class ModelPage;
 class ModelsController;
 class SampleRun;
+class ShortcutPage;
 class StepHeader;
 
 /// First run (setup-model.html), shown when no model is installed: the shortcut step (not
@@ -38,8 +40,10 @@ public:
     explicit SetupWindow(client::DaemonClient& client, QWidget* parent = nullptr);
     ~SetupWindow() override;
 
-    /// Reads the computer and the models and shows the model step.
+    /// Reads the computer and the models; the first step is "Over any app".
     void start();
+    /// What this desktop lets Paraphrase do, for the first step.
+    void setDesktopSupport(const DesktopSupport& support);
     [[nodiscard]] Step step() const;
 
 Q_SIGNALS:
@@ -60,7 +64,9 @@ private:
     StepHeader* m_header;
     QStackedWidget* m_pages;
     ModelPage* m_modelPage;
+    ShortcutPage* m_desktopPage;
     QPushButton* m_back = nullptr;
+    QPushButton* m_skip = nullptr;
     QLabel* m_footNote = nullptr;
     ChipButton* m_next = nullptr;
 };

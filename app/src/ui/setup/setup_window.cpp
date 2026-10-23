@@ -28,9 +28,10 @@ SetupWindow::SetupWindow(client::DaemonClient& client, QWidget* parent)
     , m_tokens(Theme::current())
     , m_models(new ModelsController(client, this))
     , m_run(new SampleRun(client, this))
-    , m_header(new StepHeader(tr("Set up Paraphrase"), {tr("Shortcut (later)"), tr("Model"), tr("Try it")}))
+    , m_header(new StepHeader(tr("Set up Paraphrase"), {tr("Over any app"), tr("Model"), tr("Try it")}))
     , m_pages(new QStackedWidget)
     , m_modelPage(new ModelPage(*m_models))
+    , m_desktopPage(new ShortcutPage)
 {
     setObjectName(u"setupWindow"_s);
     setWindowTitle(tr("Set up Paraphrase"));
@@ -39,17 +40,22 @@ SetupWindow::SetupWindow(client::DaemonClient& client, QWidget* parent)
     root->setContentsMargins(0, 0, 0, 0);
     root->setSpacing(0);
     root->addWidget(m_header);
-    m_pages->addWidget(new ShortcutPage);
+    m_pages->addWidget(m_desktopPage);
     m_pages->addWidget(m_modelPage);
     m_pages->addWidget(new TryPage(*m_run));
     root->addWidget(m_pages, 1);
     root->addWidget(buildFooter());
     connect(m_modelPage, &ModelPage::readyChanged, this, &SetupWindow::updateFooter);
     applyTheme();
-    showStep(Model);
+    showStep(Shortcut); // setup-desktop.html: over any app first, both optional
 }
 
 SetupWindow::~SetupWindow() = default;
+
+void SetupWindow::setDesktopSupport(const DesktopSupport& support)
+{
+    m_desktopPage->setSupport(support);
+}
 
 SetupWindow::Step SetupWindow::step() const
 {
@@ -72,6 +78,11 @@ QWidget* SetupWindow::buildFooter()
     m_back = makeButton(tr("Back"));
     m_back->setProperty("btnSize", u"big"_s);
     row->addWidget(m_back);
+    m_skip = makeButton(tr("Skip for now"), u"flat"_s);
+    m_skip->setObjectName(u"skip"_s);
+    m_skip->setProperty("btnSize", u"big"_s);
+    row->addWidget(m_skip);
+    connect(m_skip, &QPushButton::clicked, this, [this] { showStep(Model); });
     row->addStretch();
     m_footNote = makeLabel(tr("You can change models later in Settings"), u"small"_s);
     row->addWidget(m_footNote);
@@ -94,14 +105,19 @@ QWidget* SetupWindow::buildFooter()
 void SetupWindow::showStep(int step)
 {
     m_pages->setCurrentIndex(std::clamp(step, 0, 2));
-    // The shortcut is not built yet, so it is never shown as done (the mock ticks it).
     QList<int> done;
+    if (this->step() != Shortcut) {
+        done.append(Shortcut);
+    }
     if (this->step() == Try) {
         done.append(Model);
     }
     m_header->setStep(this->step(), done);
     m_back->setVisible(this->step() != Shortcut);
-    m_footNote->setVisible(this->step() == Model);
+    m_skip->setVisible(this->step() == Shortcut);
+    m_footNote->setVisible(this->step() != Try);
+    m_footNote->setText(this->step() == Shortcut ? tr("You can change both later in Settings")
+                                                 : tr("You can change models later in Settings"));
     updateFooter();
 }
 
@@ -124,6 +140,8 @@ void SetupWindow::updateFooter()
         m_next->setEnabled(true);
         break;
     }
+    // setup-desktop.html: "Next" with its arrow; the other steps' buttons have none.
+    m_next->setTrailingIcon(step() == Shortcut ? Theme::icon(u"forward"_s, QColor(Qt::white), 14) : QIcon());
 }
 
 void SetupWindow::applyTheme()
@@ -131,6 +149,7 @@ void SetupWindow::applyTheme()
     m_tokens = Theme::current();
     setStyleSheet(windowStyleSheet(m_tokens));
     m_modelPage->setLockIcon(Theme::icon(u"lock"_s, m_tokens.privacy, 14).pixmap(14, 14));
+    m_desktopPage->applyTheme(m_tokens);
 }
 
 void SetupWindow::changeEvent(QEvent* event)

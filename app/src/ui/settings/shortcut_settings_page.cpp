@@ -1,6 +1,7 @@
 #include "ui/settings/shortcut_settings_page.h"
 
 #include "ui/common/widgets.h"
+#include "ui/setup/desktop_access.h"
 
 #include <QApplication>
 #include <QClipboard>
@@ -47,19 +48,30 @@ QLabel* wrapped(const QString& text, const QString& role)
 ShortcutSettingsPage::ShortcutSettingsPage(QWidget* parent)
     : QWidget(parent)
     , m_cards(new QVBoxLayout)
+    , m_access(new DesktopAccess)
 {
     auto* column = new QVBoxLayout(this);
     column->setContentsMargins(0, 0, 0, 0);
     column->setSpacing(18);
     column->addWidget(makeLabel(tr("Shortcut"), u"h1"_s));
+    // "Put the result back" as in setup's first step (setup-desktop.html, note 3); the
+    // shortcut has its own cards below.
+    m_access->setShowsShortcut(false);
+    column->addWidget(m_access);
     m_cards->setSpacing(18);
     column->addLayout(m_cards);
     column->addStretch();
     setSupport({});
 }
 
+void ShortcutSettingsPage::applyTheme(const Tokens& t)
+{
+    m_access->applyTheme(t);
+}
+
 void ShortcutSettingsPage::setSupport(const DesktopSupport& support)
 {
+    m_access->setSupport(support);
     while (const QLayoutItem* item = m_cards->takeAt(0)) {
         delete item->widget();
         delete item;

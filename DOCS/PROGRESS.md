@@ -39,10 +39,13 @@ Newest first. One entry per working session.
   client was destroyed); it delivers them first.
 - Write 7: a note opens with a short title saying what it is about, not a date line ("Date:
   Unspecified"). Numbers in DOCS/models.md.
-- Open: the popup highlights the most used action (popup-actions.html note 3), so text of the
-  user's own with typos got Reply highlighted after many Reply runs; whether to guess from the
-  text instead is the owner's call. The "Control input devices" permission is asked at the
-  first Replace, after a wait; asking during setup needs a mock.
+- Owner's calls: the popup highlights the action used last (DECISIONS.md, the read-ahead
+  record). Language lists (Translate, "Write it in another language") show about twelve
+  languages and scroll, instead of covering the screen.
+- Mock `setup-desktop.html`, approved by the owner on 2026-10-23, and built: setup starts with
+  "Over any app", the shortcut and "Put the result back"; Allow opens the desktop's "Control
+  input devices" dialog then, not at the first Replace; both optional ("Skip for now"). Settings,
+  Shortcut shows the "Put the result back" row too.
 
 ## 2026-10-23 (night) - The result pane shows its work, menus with icons, Write 6
 

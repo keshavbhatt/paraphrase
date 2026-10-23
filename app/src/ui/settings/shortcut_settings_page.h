@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ui/common/theme.h"
 #include "ui/core/desktop_support.h"
 
 #include <QWidget>
@@ -8,6 +9,8 @@ class QLabel;
 class QVBoxLayout;
 
 namespace paraphrase::app {
+
+class DesktopAccess;
 
 /// Settings, Shortcut (settings-general-shortcut.html, note 2): the shortcut and whether it
 /// works here, how to bind it by hand, and what this desktop lets Paraphrase do.
@@ -21,6 +24,7 @@ public:
     ~ShortcutSettingsPage() override = default;
 
     void setSupport(const DesktopSupport& support);
+    void applyTheme(const Tokens& t);
 
 private:
     [[nodiscard]] static QWidget* shortcutCard(const DesktopSupport& support);
@@ -28,6 +32,7 @@ private:
     [[nodiscard]] static QWidget* stepsCard(const DesktopSupport& support);
 
     QVBoxLayout* m_cards = nullptr;
+    DesktopAccess* m_access = nullptr;
 };
 
 } // namespace paraphrase::app

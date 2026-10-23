@@ -26,6 +26,16 @@ enum class InsertOutcome : std::uint8_t
     Failed,
 };
 
+/// Whether Paraphrase may type a result back into another app (setup-desktop.html).
+enum class TypingPermission : std::uint8_t
+{
+    NotNeeded, ///< the session lets it type as it is (X11)
+    NotAsked,  ///< the desktop asks once, and has not yet
+    Allowed,
+    Refused,     ///< the user said no: results go on the clipboard
+    Unavailable, ///< this desktop offers no way to type: results go on the clipboard
+};
+
 /// What the app can do on this desktop, in plain words, for Settings and the notice.
 struct BackendStatus
 {
@@ -70,6 +80,9 @@ public:
     /// Never types into a window the user did not choose: when `target.window` no longer has
     /// focus, implementations leave the text on the clipboard instead (PLAN 6).
     [[nodiscard]] virtual InsertOutcome insert(const QString& text, const CapturedText& target) = 0;
+    [[nodiscard]] virtual TypingPermission typingPermission() const { return TypingPermission::Unavailable; }
+    /// Asks the desktop now, when it asks at all (its own dialog; waits for the answer).
+    virtual TypingPermission askTyping() { return typingPermission(); }
 };
 
 /// The global shortcut that opens the popup. Implementations: X11 key grab, the

@@ -33,6 +33,23 @@ DesktopSupport::Step step(const QString& what, const QString& how, const QString
     return s;
 }
 
+DesktopSupport::Typing typingOf(TypingPermission permission)
+{
+    switch (permission) {
+    case TypingPermission::NotNeeded:
+        return DesktopSupport::Typing::Ready;
+    case TypingPermission::NotAsked:
+        return DesktopSupport::Typing::NotAsked;
+    case TypingPermission::Allowed:
+        return DesktopSupport::Typing::Allowed;
+    case TypingPermission::Refused:
+        return DesktopSupport::Typing::Refused;
+    case TypingPermission::Unavailable:
+        break;
+    }
+    return DesktopSupport::Typing::Unavailable;
+}
+
 } // namespace
 
 DesktopSupport describeDesktop(const Integrations& integrations)
@@ -63,6 +80,11 @@ DesktopSupport describeDesktop(const Integrations& integrations)
                             QObject::tr("Asks once"), false)); // a warning pill, as in the mock
     } else {
         s.steps.append(step(back, QObject::tr("Pasted into the app"), QObject::tr("Works"), true));
+    }
+    s.typing = typingOf(integrations.insert().typingPermission());
+    if (s.typing == DesktopSupport::Typing::NotAsked || s.typing == DesktopSupport::Typing::Refused) {
+        InsertBackend* insert = &integrations.insert();
+        s.askTyping = [insert] { return typingOf(insert->askTyping()); };
     }
     return s;
 }

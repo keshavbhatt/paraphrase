@@ -15,6 +15,7 @@ namespace {
 
 const QString kInterface = u"org.freedesktop.portal.RemoteDesktop"_s;
 const QString kTokenKey = u"integration/remoteDesktopToken"_s;
+const QString kRefusedKey = u"integration/remoteDesktopRefused"_s;
 constexpr int kControlL = 0xffe3; // XKB keysyms
 constexpr int kV = 0x76;
 
@@ -58,8 +59,34 @@ bool PortalPasteKeys::startSession()
     }
     // A new token each time: the old one is used up (portal spec).
     QSettings().setValue(kTokenKey, started->value(u"restore_token"_s).toString());
+    QSettings().remove(kRefusedKey);
     m_session = session;
     return true;
+}
+
+TypingPermission PortalPasteKeys::typingPermission() const
+{
+    if (!m_available) {
+        return TypingPermission::Unavailable;
+    }
+    if (!m_session.isEmpty()) {
+        return TypingPermission::Allowed;
+    }
+    const QSettings settings;
+    if (settings.value(kRefusedKey, false).toBool()) {
+        return TypingPermission::Refused;
+    }
+    // A token from an earlier answer: allowed then, and restored without asking.
+    return settings.value(kTokenKey).toString().isEmpty() ? TypingPermission::NotAsked
+                                                          : TypingPermission::Allowed;
+}
+
+TypingPermission PortalPasteKeys::askTyping()
+{
+    if (m_available && m_session.isEmpty() && !startSession()) {
+        QSettings().setValue(kRefusedKey, true); // no, or no answer: Replace uses the clipboard
+    }
+    return typingPermission();
 }
 
 bool PortalPasteKeys::key(int keysym, bool pressed) const

@@ -23,6 +23,8 @@ QLabel[role="success"] { color: @success@; font-size: 12px; }
 QLabel[role="pill-accent"] { background: @accentSoft@; color: @accent@; border: 1px solid transparent; border-radius: 10px; padding: 1px 8px; font-size: 12px; }
 QLabel[role="pill-ok"] { background: @successBg@; color: @success@; border: 1px solid transparent; border-radius: 10px; padding: 1px 8px; font-size: 12px; }
 QLabel[role="pill-warn"] { background: @warningBg@; color: @warning@; border: 1px solid transparent; border-radius: 10px; padding: 1px 8px; font-size: 12px; }
+QFrame[role="grant"] { background: @panel@; border: 1px solid @border@; border-radius: 12px; }
+QLabel[role="grantBadge"] { background: @accentSoft@; border-radius: 10px; }
 QLabel[role="th"] { color: @muted@; font-size: 11px; font-weight: 700; letter-spacing: 1px; }
 
 QLabel[step="todo"] { color: @muted@; font-size: 13px; }

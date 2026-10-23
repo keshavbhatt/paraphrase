@@ -32,6 +32,8 @@ public:
     [[nodiscard]] QString name() const override { return m_name; }
     [[nodiscard]] bool available() const override;
     [[nodiscard]] InsertOutcome insert(const QString& text, const CapturedText& target) override;
+    [[nodiscard]] TypingPermission typingPermission() const override { return m_keys->typingPermission(); }
+    TypingPermission askTyping() override { return m_keys->askTyping(); }
     /// Puts back what the user had copied now instead of after the delay (tests, shutdown).
     void restoreNow();
 

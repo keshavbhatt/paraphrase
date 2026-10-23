@@ -117,6 +117,7 @@ void SettingsWindow::applyTheme()
     m_modelsPage->setTheme(m_tokens);
     m_aboutPage->setTheme(m_tokens);
     m_generalPage->applyTheme(m_tokens);
+    m_shortcutPage->applyTheme(m_tokens);
 }
 
 void SettingsWindow::changeEvent(QEvent* event)

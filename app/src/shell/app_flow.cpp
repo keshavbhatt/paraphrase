@@ -46,6 +46,7 @@ bool AppFlow::hasModel()
 void AppFlow::showSetup()
 {
     m_setup = std::make_unique<SetupWindow>(m_client);
+    m_setup->setDesktopSupport(m_support);
     connect(m_setup.get(), &SetupWindow::finished, this, [this] {
         m_setup->hide();
         showMain();

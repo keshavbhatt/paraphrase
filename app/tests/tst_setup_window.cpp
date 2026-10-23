@@ -6,6 +6,7 @@
 #include "app_daemon.h"
 #include "daemon_client.h"
 #include "ui/common/chip_button.h"
+#include "ui/core/desktop_support.h"
 #include "ui/setup/model_card.h"
 #include "ui/setup/setup_window.h"
 
@@ -22,6 +23,7 @@
 
 using namespace Qt::StringLiterals;
 using paraphrase::app::ChipButton;
+using paraphrase::app::DesktopSupport;
 using paraphrase::app::ModelCard;
 using paraphrase::app::SetupWindow;
 using paraphrase::client::DaemonClient;
@@ -63,6 +65,8 @@ private Q_SLOTS:
         QVERIFY(client.connectToDaemon().isEmpty());
         SetupWindow w(client);
         w.start();
+        QCOMPARE(w.step(), SetupWindow::Shortcut); // over any app first (setup-desktop.html)
+        w.findChild<ChipButton*>(u"next"_s)->click();
         QCOMPARE(w.step(), SetupWindow::Model);
         const auto cards = w.findChildren<ModelCard*>();
         QCOMPARE(cards.size(), 2);
@@ -81,6 +85,8 @@ private Q_SLOTS:
         QVERIFY(client.connectToDaemon().isEmpty());
         SetupWindow w(client);
         w.start();
+        w.findChild<QPushButton*>(u"skip"_s)->click(); // both are optional
+        QCOMPARE(w.step(), SetupWindow::Model);
         auto* download = w.findChild<QPushButton*>(u"download-fast-model"_s);
         QVERIFY(download != nullptr);
         QCOMPARE(download->text(), u"Download"_s);
@@ -119,6 +125,37 @@ private Q_SLOTS:
         QVERIFY(!quality->isChecked());
     }
 
+    void asksToTypeOnlyOnAllow()
+    {
+        // setup-desktop.html: the desktop's dialog opens on Allow, not before; its answer shows.
+        QVERIFY(m_daemon.start({}));
+        DaemonClient client;
+        QVERIFY(client.connectToDaemon().isEmpty());
+        SetupWindow w(client);
+        int asked = 0;
+        DesktopSupport support;
+        support.globalShortcut = true;
+        support.shortcut = u"Ctrl+Alt+Space"_s;
+        support.typing = DesktopSupport::Typing::NotAsked;
+        support.askTyping = [&asked] {
+            ++asked;
+            return DesktopSupport::Typing::Allowed;
+        };
+        w.setDesktopSupport(support);
+        w.start();
+        QCOMPARE(asked, 0);
+        auto* allow = w.findChild<QPushButton*>(u"allowTyping"_s);
+        QVERIFY(allow != nullptr);
+        allow->click();
+        QTRY_COMPARE(asked, 1);
+        QTRY_VERIFY(allow->isHidden());
+        bool allowed = false;
+        for (const QLabel* l : w.findChildren<QLabel*>()) {
+            allowed = allowed || l->text().contains(u"Allowed"_s);
+        }
+        QVERIFY(allowed);
+    }
+
     void savesScreenshots()
     {
         const QString dir = qEnvironmentVariable("PARAPHRASE_SCREENSHOTS");
@@ -132,11 +169,21 @@ private Q_SLOTS:
             DaemonClient client;
             QVERIFY(client.connectToDaemon().isEmpty());
             SetupWindow w(client);
+            DesktopSupport support;
+            support.globalShortcut = true;
+            support.shortcut = u"Ctrl+Alt+Space"_s;
+            support.typing = DesktopSupport::Typing::NotAsked;
+            support.askTyping = [] { return DesktopSupport::Typing::Allowed; };
+            w.setDesktopSupport(support);
             w.resize(820, 700);
             w.show();
             w.start();
             QTest::qWait(50); // widgets added to a visible window show on the next event loop pass
             QCoreApplication::processEvents(); // queued shows land first
+            QVERIFY(w.grab().save(dir + u"/setup-desktop-%1.png"_s.arg(QLatin1StringView(theme))));
+            w.findChild<ChipButton*>(u"next"_s)->click();
+            QTest::qWait(50);
+            QCoreApplication::processEvents();
             QVERIFY(w.grab().save(dir + u"/setup-model-%1.png"_s.arg(QLatin1StringView(theme))));
             w.findChild<QPushButton*>(u"download-fast-model"_s)->click();
             QTRY_VERIFY_WITH_TIMEOUT(w.findChild<ChipButton*>(u"next"_s)->isEnabled(), kTimeoutMs);

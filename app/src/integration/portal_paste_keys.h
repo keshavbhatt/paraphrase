@@ -26,6 +26,8 @@ public:
     [[nodiscard]] QString name() const override;
     [[nodiscard]] bool available() const override { return m_available; }
     [[nodiscard]] bool sendPaste() override;
+    [[nodiscard]] TypingPermission typingPermission() const override;
+    TypingPermission askTyping() override;
 
 private:
     [[nodiscard]] bool startSession();

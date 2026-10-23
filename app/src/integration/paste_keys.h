@@ -1,5 +1,7 @@
 #pragma once
 
+#include "integration/backends.h"
+
 #include <QString>
 
 namespace paraphrase::app {
@@ -19,6 +21,8 @@ public:
     [[nodiscard]] virtual bool available() const = 0;
     /// False when the keys could not be sent (no permission, no session).
     [[nodiscard]] virtual bool sendPaste() = 0;
+    [[nodiscard]] virtual TypingPermission typingPermission() const { return TypingPermission::NotNeeded; }
+    virtual TypingPermission askTyping() { return typingPermission(); }
 };
 
 } // namespace paraphrase::app
