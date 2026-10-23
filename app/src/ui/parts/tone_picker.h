@@ -5,6 +5,7 @@
 #include <QList>
 #include <QPushButton>
 #include <QString>
+#include <QStringList>
 
 #include <utility>
 
@@ -32,6 +33,7 @@ private:
     QString m_key;
     QString m_fallback;
     QString m_tone;
+    QStringList m_titles; ///< every tone's title, so the button can keep the widest one's width
 };
 
 } // namespace paraphrase::app

@@ -51,6 +51,13 @@ private:
         QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 1, kTimeoutMs);
     }
 
+    /// The window once Qt has laid out what the last answer added (rows are shown queued).
+    static QPixmap grabNow(QWidget& w)
+    {
+        QApplication::processEvents();
+        return w.grab();
+    }
+
     static QString outputText(MainWindow& w)
     {
         return w.findChild<QTextBrowser*>(u"output"_s)->toPlainText();
@@ -88,6 +95,13 @@ private Q_SLOTS:
         runAndWait(w);
         QCOMPARE(w.resultText(), u"Whisk the eggs with the milk."_s);
         QVERIFY(w.findChild<QLabel*>(u"outInfo"_s)->text().contains(u"2 changes"_s));
+        // The change rows show under the text, with room for both (main-window.html, note 4).
+        w.resize(1180, 760);
+        w.show();
+        QApplication::processEvents();
+        const auto* changes = w.findChild<QWidget*>(u"changes"_s);
+        QVERIFY(changes->isVisible());
+        QVERIFY(changes->height() >= 2 * 28);
         // Undo the first change only: "egg's" comes back, the full stop stays.
         auto undos = w.findChildren<QPushButton*>(QRegularExpression(u"^undo\\d+$"_s));
         QCOMPARE(undos.size(), 2);
@@ -126,6 +140,7 @@ private Q_SLOTS:
         setAnswers({u"Could you send me the file, please?"_s});
         const QSignalSpy finished(&w, &MainWindow::finished);
         const auto* tone = w.findChild<paraphrase::app::ChipButton*>(u"action-rewrite"_s);
+        const int width = tone->sizeHint().width();
         for (QAction* a : tone->menu()->actions()) {
             if (a->objectName() == u"rewrite.polite"_s) {
                 a->trigger();
@@ -139,7 +154,11 @@ private Q_SLOTS:
         setAnswers({u"Could you let her know the report is due soon?"_s});
         runAndWait(w);
         QVERIFY(w.findChild<QLabel*>(u"outInfo"_s)->text().contains(u"check: Priya, Friday are missing"_s));
-        QCOMPARE(tone->label(), u"Tone: Polite"_s);
+        // The chip keeps its label and size, so the row never re-wraps under the pointer.
+        QCOMPARE(tone->label(), u"Tone"_s);
+        QCOMPARE(tone->sizeHint().width(), width);
+        QCOMPARE(tone->toolTip(), u"Tone: Polite"_s);
+        QVERIFY(w.findChild<QLabel*>(u"outInfo"_s)->text().startsWith(u"· polite"_s));
     }
 
     void writesAFullReplyAndKeepsItsVersions()
@@ -193,7 +212,8 @@ private Q_SLOTS:
         const QSignalSpy finished(&w, &MainWindow::finished);
         french->trigger();
         QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 1, kTimeoutMs);
-        QCOMPARE(translate->label(), u"Translate: French"_s);
+        QCOMPARE(translate->label(), u"Translate"_s);
+        QCOMPARE(translate->toolTip(), u"Translate: French"_s);
         QVERIFY(w.findChild<QLabel*>(u"outInfo"_s)->text().contains(u"French"_s));
     }
 
@@ -331,14 +351,14 @@ private Q_SLOTS:
                 });
                 runAndWait(w);
                 QVERIFY(
-                    w.grab().save(dir + u"/main-window-proofread-%1.png"_s.arg(QLatin1StringView(theme))));
+                    grabNow(w).save(dir + u"/main-window-proofread-%1.png"_s.arg(QLatin1StringView(theme))));
                 w.selectSkill(u"reply"_s);
                 w.findChild<QPlainTextEdit*>(u"message"_s)
                     ->setPlainText(u"बेटा, रविवार को दादी का जन्मदिन है। सब लोग दोपहर 12 बजे तक घर आ जाना।"_s);
                 setAnswers(
                     {uR"({"replies": ["ठीक है, मैं 12 बजे तक आ जाऊँगा।", "क्या मैं कुछ लेकर आऊँ?", "ज़रूर, दादी को मेरी ओर से बधाई!"]})"_s});
                 runAndWait(w);
-                QVERIFY(w.grab().save(dir + u"/main-window-reply-%1.png"_s.arg(QLatin1StringView(theme))));
+                QVERIFY(grabNow(w).save(dir + u"/main-window-reply-%1.png"_s.arg(QLatin1StringView(theme))));
                 if (auto* full = w.findChild<QPushButton*>(u"fullReply"_s);
                     full != nullptr && !full->parentWidget()->isHidden()) {
                     full->click();
@@ -358,8 +378,8 @@ private Q_SLOTS:
                         "Wednesday, so you'll have it well before we speak.\n\nBest regards,\nPriya"_s,
                     });
                     runAndWait(w);
-                    QVERIFY(w.grab().save(dir +
-                                          u"/main-window-full-reply-%1.png"_s.arg(QLatin1StringView(theme))));
+                    QVERIFY(grabNow(w).save(
+                        dir + u"/main-window-full-reply-%1.png"_s.arg(QLatin1StringView(theme))));
                 }
                 if (auto* write = w.findChild<paraphrase::app::ChipButton*>(u"action-compose"_s)) {
                     write->click();
@@ -377,7 +397,7 @@ private Q_SLOTS:
                     });
                     runAndWait(w);
                     QVERIFY(
-                        w.grab().save(dir + u"/main-window-write-%1.png"_s.arg(QLatin1StringView(theme))));
+                        grabNow(w).save(dir + u"/main-window-write-%1.png"_s.arg(QLatin1StringView(theme))));
                 }
             }
             cleanup();

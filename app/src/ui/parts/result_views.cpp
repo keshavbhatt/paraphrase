@@ -4,6 +4,7 @@
 #include "ui/common/widgets.h"
 #include "ui/parts/change_list.h"
 
+#include <QAbstractTextDocumentLayout>
 #include <QApplication>
 #include <QClipboard>
 #include <QHBoxLayout>
@@ -12,8 +13,14 @@
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QShortcut>
+#include <QTextBlockFormat>
 #include <QTextBrowser>
+#include <QTextCursor>
+#include <QTextDocument>
 #include <QVBoxLayout>
+
+#include <algorithm>
+#include <cmath>
 
 using namespace Qt::StringLiterals;
 
@@ -26,6 +33,20 @@ constexpr int kIconSize = 14;
 QString html(const QString& text)
 {
     return text.toHtmlEscaped().replace(u'\n', u"<br>"_s);
+}
+
+constexpr int kLineHeight = 125;
+
+/// Plain text at the mocks' reading line height (mock.css: 15px/1.7). Qt scales the font's own
+/// line spacing, about 1.36 em, so 1.7 em is kLineHeight percent.
+void setReadableText(QTextBrowser* view, const QString& text)
+{
+    view->setPlainText(text);
+    QTextCursor all(view->document());
+    all.select(QTextCursor::Document);
+    QTextBlockFormat format;
+    format.setLineHeight(kLineHeight, QTextBlockFormat::ProportionalHeight);
+    all.mergeBlockFormat(format);
 }
 
 QVBoxLayout* viewLayout(QWidget* view, int top = 14)
@@ -46,6 +67,9 @@ TextResultView::TextResultView(QWidget* parent)
     QVBoxLayout* layout = viewLayout(this, 12);
     m_output->setObjectName(u"output"_s);
     m_output->setOpenLinks(false);
+    m_output->document()->setDocumentMargin(0); // the pane's 14 px is the whole inset
+    connect(m_output->document()->documentLayout(), &QAbstractTextDocumentLayout::documentSizeChanged, this,
+            &TextResultView::fitHeight);
     layout->addWidget(m_output, 3);
     layout->addWidget(m_changes, 2);
     connect(m_changes, &ChangeList::undoToggled, this, [this](qsizetype k) {
@@ -68,7 +92,7 @@ void TextResultView::clear()
 
 void TextResultView::stream(const QString& soFar)
 {
-    m_output->setPlainText(soFar);
+    setReadableText(m_output, soFar);
     m_output->moveCursor(QTextCursor::End);
 }
 
@@ -76,7 +100,7 @@ void TextResultView::showText(const QString& text)
 {
     clear();
     m_result = text.trimmed();
-    m_output->setPlainText(m_result);
+    setReadableText(m_output, m_result);
 }
 
 void TextResultView::showProofread(const QString& before, const QString& after)
@@ -96,6 +120,23 @@ void TextResultView::showMessage(const QString& message, bool problem)
     clear();
     const QColor colour = problem ? m_tokens.danger : m_tokens.muted;
     m_output->setHtml(u"<p style=\"color:%1\">%2</p>"_s.arg(colour.name(), html(message)));
+}
+
+void TextResultView::setFitToText(bool fit)
+{
+    m_fit = fit;
+    fitHeight();
+}
+
+void TextResultView::fitHeight()
+{
+    if (!m_fit) {
+        return;
+    }
+    constexpr int kMaxFitHeight = 220;
+    const int chrome = m_output->height() - m_output->viewport()->height();
+    const int text = static_cast<int>(std::ceil(m_output->document()->size().height()));
+    m_output->setFixedHeight(std::min(text + chrome, kMaxFitHeight));
 }
 
 void TextResultView::setShowResult(bool result)
@@ -124,10 +165,12 @@ void TextResultView::render()
     const client::WordDiff& diff = *m_diff;
     m_result = diff.result(m_undone);
     if (m_showResult) {
-        m_output->setPlainText(m_result);
+        setReadableText(m_output, m_result);
     } else {
         m_output->setHtml(
-            u"<div style=\"white-space: pre-wrap; font-size: 15px\">%1</div>"_s.arg(diffHtml(diff)));
+            u"<div style=\"white-space: pre-wrap; font-size: 15px; line-height: %1%\">%2</div>"_s
+                .arg(kLineHeight)
+                .arg(diffHtml(diff)));
     }
     m_changes->setDiff(&diff, m_undone);
 }
@@ -236,11 +279,16 @@ FullReplyView::FullReplyView(QWidget* parent)
     m_edit->setObjectName(u"draftOut"_s);
     m_edit->setPlaceholderText(tr("Your reply appears here. Edit it before you copy it."));
     layout->addWidget(m_edit, 1);
-    QLabel* hint = makeLabel(tr("Edit it here before you copy it. Names, dates and times come only from the "
-                                "message and from what you wrote."),
-                             u"small"_s);
-    hint->setWordWrap(true);
-    layout->addWidget(hint);
+    m_hint = makeLabel(tr("Edit it here before you copy it. Names, dates and times come only from the "
+                          "message and from what you wrote."),
+                       u"small"_s);
+    m_hint->setWordWrap(true);
+    layout->addWidget(m_hint);
+}
+
+void FullReplyView::setComposing(bool composing)
+{
+    m_hint->setVisible(!composing);
 }
 
 void FullReplyView::stream(const QString& soFar)

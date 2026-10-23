@@ -1,12 +1,14 @@
 #pragma once
 
 #include <QFrame>
+#include <QIcon>
 #include <QList>
 #include <QString>
 
 class QHBoxLayout;
 class QLabel;
 class QPushButton;
+class QStackedWidget;
 class QVBoxLayout;
 
 namespace paraphrase::app {
@@ -14,6 +16,14 @@ namespace paraphrase::app {
 /// Small building blocks every surface uses, styled by Theme through properties.
 [[nodiscard]] QLabel* makeLabel(const QString& text, const QString& role = {});
 [[nodiscard]] QPushButton* makeButton(const QString& text, const QString& kind = {});
+/// Makes `button` as wide as the widest of `texts` (with `icon`, when given), so swapping its
+/// text on a click, such as Retry to Stop, never moves the buttons beside it.
+void reserveWidth(QPushButton* button, const QStringList& texts, const QIcon& icon = {});
+/// A settings page's title and its intro, 6 px apart (settings mocks: h1 and intro in a .stack).
+[[nodiscard]] QVBoxLayout* pageHeading(const QString& title, const QString& intro);
+/// Shows `page` and lets only it count for the stack's size: a QStackedWidget is otherwise
+/// as tall as its tallest page, which leaves a popup with empty space under a short one.
+void showOnly(QStackedWidget* stack, QWidget* page);
 
 /// The mocks' `.seg`: two or more exclusive choices in one rounded box.
 class SegmentedControl : public QFrame

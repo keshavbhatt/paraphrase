@@ -11,6 +11,7 @@
 #include "popup/popup_window.h"
 #include "ui/common/chip_button.h"
 
+#include <QCoreApplication>
 #include <QDir>
 #include <QLabel>
 #include <QMenu>
@@ -179,10 +180,12 @@ private Q_SLOTS:
             popup.showText(
                 selected(u"Mia dont know where the keys are, can you check the drawer next to the fridge"_s));
             popup.window()->show();
+            QCoreApplication::processEvents(); // queued shows land first
             QVERIFY(popup.window()->grab().save(dir + u"/popup-actions-%1.png"_s.arg(name)));
             m_daemon.setAnswers(
                 {u"Mia doesn't know where the keys are, can you check the drawer next to the fridge?"_s});
             pick(popup, u"action-proofread"_s);
+            QCoreApplication::processEvents(); // queued shows land first
             QVERIFY(popup.window()->grab().save(dir + u"/popup-proofread-%1.png"_s.arg(name)));
             popup.showText(
                 selected(u"bhaiya parcel aapke ghar ke bahar rakh du? koi phone nahi utha raha"_s));
@@ -190,6 +193,7 @@ private Q_SLOTS:
                 uR"({"replies": ["Haan, rakh do main check karta hoon.", "Thoda time do, main call karta hoon.", "Abhi nahi, main khud utha lunga."]})"_s,
             });
             pick(popup, u"action-reply"_s);
+            QCoreApplication::processEvents(); // queued shows land first
             QVERIFY(popup.window()->grab().save(dir + u"/popup-reply-%1.png"_s.arg(name)));
         }
         qunsetenv("PARAPHRASE_THEME");

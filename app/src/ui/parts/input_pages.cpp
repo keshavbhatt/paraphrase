@@ -58,6 +58,7 @@ TextInput::TextInput(QWidget* parent)
 {
     auto* layout = new QVBoxLayout(this);
     layout->setContentsMargins(14, 12, 14, 12);
+    m_text->document()->setDocumentMargin(0); // the page's margins are the whole inset
     layout->addWidget(m_text);
     connect(m_text, &QPlainTextEdit::textChanged, this, &InputPage::edited);
 }

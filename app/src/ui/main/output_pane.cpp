@@ -106,12 +106,12 @@ void OutputPane::buildFoot()
 {
     m_copy = new ChipButton(QString(), tr("Ctrl Shift C"), ChipButton::ChipSide::After);
     m_copy->setProperty("kind", u"primary"_s);
-    m_copy->setProperty("size", u"big"_s);
+    m_copy->setProperty("btnSize", u"big"_s);
     m_copy->setObjectName(u"copy"_s);
     m_secondary = makeButton(QString());
     m_retry = makeButton(QString());
     for (QPushButton* b : {m_secondary, m_retry}) {
-        b->setProperty("size", u"big"_s);
+        b->setProperty("btnSize", u"big"_s);
     }
     footRow()->addWidget(m_copy);
     footRow()->addWidget(m_secondary);
@@ -131,6 +131,7 @@ void OutputPane::showKind(SkillKind kind, const QString& title, bool proofread)
         m_pages->setCurrentWidget(m_replies);
     } else {
         m_pages->setCurrentWidget(m_full); // a full reply and Write share the draft view
+        m_full->setComposing(kind == SkillKind::Compose);
     }
     m_title->setText(title.toUpper());
     m_view->setVisible(proofread);
@@ -202,6 +203,8 @@ void OutputPane::updateButtons()
     } else {
         m_retry->setIcon(m_running && m_kind != SkillKind::QuickReply ? stop : QIcon());
     }
+    // Retry or Shorter turns into Stop while it runs: the same width either way.
+    reserveWidth(m_retry, {textsFor(m_kind, false).retry, textsFor(m_kind, true).retry}, stop);
 }
 
 void OutputPane::updateVersions()

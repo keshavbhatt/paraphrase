@@ -1,6 +1,7 @@
 #include "popup/popup_window.h"
 
 #include "popup/popup_pages.h"
+#include "ui/common/widgets.h"
 
 #include <QCloseEvent>
 #include <QKeyEvent>
@@ -47,13 +48,13 @@ PopupWindow::PopupWindow(const util::LanguageDetector& detector, QWidget* parent
 
 void PopupWindow::showActions()
 {
-    m_pages->setCurrentWidget(m_actions);
+    showOnly(m_pages, m_actions);
     adjustSize();
 }
 
 void PopupWindow::showResult()
 {
-    m_pages->setCurrentWidget(m_result);
+    showOnly(m_pages, m_result);
     adjustSize();
 }
 

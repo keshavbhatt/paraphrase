@@ -70,7 +70,7 @@ QWidget* SetupWindow::buildFooter()
     row->setContentsMargins(24, 14, 24, 14);
     row->setSpacing(10);
     m_back = makeButton(tr("Back"));
-    m_back->setProperty("size", u"big"_s);
+    m_back->setProperty("btnSize", u"big"_s);
     row->addWidget(m_back);
     row->addStretch();
     m_footNote = makeLabel(tr("You can change models later in Settings"), u"small"_s);
@@ -78,7 +78,7 @@ QWidget* SetupWindow::buildFooter()
     m_next = new ChipButton(tr("Continue when ready"));
     m_next->setObjectName(u"next"_s);
     m_next->setProperty("kind", u"primary"_s);
-    m_next->setProperty("size", u"big"_s);
+    m_next->setProperty("btnSize", u"big"_s);
     row->addWidget(m_next);
     connect(m_back, &QPushButton::clicked, this, [this] { showStep(step() - 1); });
     connect(m_next, &QPushButton::clicked, this, [this] {

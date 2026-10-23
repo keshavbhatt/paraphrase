@@ -10,6 +10,7 @@
 #include "ui/setup/setup_window.h"
 
 #include <QCheckBox>
+#include <QCoreApplication>
 #include <QDir>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -135,10 +136,12 @@ private Q_SLOTS:
             w.show();
             w.start();
             QTest::qWait(50); // widgets added to a visible window show on the next event loop pass
+            QCoreApplication::processEvents(); // queued shows land first
             QVERIFY(w.grab().save(dir + u"/setup-model-%1.png"_s.arg(QLatin1StringView(theme))));
             w.findChild<QPushButton*>(u"download-fast-model"_s)->click();
             QTRY_VERIFY_WITH_TIMEOUT(w.findChild<ChipButton*>(u"next"_s)->isEnabled(), kTimeoutMs);
             QTest::qWait(50);
+            QCoreApplication::processEvents(); // queued shows land first
             QVERIFY(w.grab().save(dir + u"/setup-model-ready-%1.png"_s.arg(QLatin1StringView(theme))));
             m_daemon.stop();
         }

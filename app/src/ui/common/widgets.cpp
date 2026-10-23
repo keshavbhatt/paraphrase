@@ -4,7 +4,10 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
+#include <QStackedWidget>
 #include <QVBoxLayout>
+
+#include <algorithm>
 
 using namespace Qt::StringLiterals;
 
@@ -29,10 +32,52 @@ QPushButton* makeButton(const QString& text, const QString& kind)
     return b;
 }
 
+QVBoxLayout* pageHeading(const QString& title, const QString& intro)
+{
+    auto* heading = new QVBoxLayout;
+    heading->setSpacing(6);
+    heading->addWidget(makeLabel(title, u"h1"_s));
+    QLabel* text = makeLabel(intro, u"muted"_s);
+    text->setWordWrap(true);
+    text->setMaximumWidth(560);
+    heading->addWidget(text);
+    return heading;
+}
+
+void showOnly(QStackedWidget* stack, QWidget* page)
+{
+    for (int i = 0; i < stack->count(); ++i) {
+        QWidget* w = stack->widget(i);
+        const QSizePolicy::Policy p = w == page ? QSizePolicy::Preferred : QSizePolicy::Ignored;
+        w->setSizePolicy(p, p);
+    }
+    stack->setCurrentWidget(page);
+    stack->updateGeometry();
+}
+
+void reserveWidth(QPushButton* button, const QStringList& texts, const QIcon& icon)
+{
+    const QString text = button->text();
+    const QIcon shown = button->icon();
+    if (!icon.isNull()) {
+        button->setIcon(icon);
+    }
+    int width = 0;
+    for (const QString& t : texts) {
+        button->setText(t);
+        width = std::max(width, button->sizeHint().width());
+    }
+    button->setText(text);
+    button->setIcon(shown);
+    button->setMinimumWidth(width);
+}
+
 SegmentedControl::SegmentedControl(const QList<Item>& items, QWidget* parent)
     : QFrame(parent)
 {
     setObjectName(u"seg"_s);
+    // Its own height, never the row's: beside a taller button it stays a slim switch.
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     auto* row = new QHBoxLayout(this);
     row->setContentsMargins(2, 2, 2, 2);
     row->setSpacing(0);
@@ -68,6 +113,10 @@ void SegmentedControl::setCurrent(int index)
     }
 }
 
+namespace {
+constexpr int kHeadHeight = 57; // a 36 px button, 10 px above and below, the 1 px rule
+} // namespace
+
 Pane::Pane(QWidget* parent)
     : QFrame(parent)
     , m_layout(new QVBoxLayout(this))
@@ -78,7 +127,10 @@ Pane::Pane(QWidget* parent)
     auto* headFrame = new QFrame;
     headFrame->setObjectName(u"paneHead"_s);
     m_head = new QHBoxLayout(headFrame);
-    m_head->setContentsMargins(14, 8, 10, 8);
+    // mock.css .pane .ph: padding 10px 14px. One fixed height whatever the head holds, so the
+    // two panes line up and the body never jumps when the action changes.
+    m_head->setContentsMargins(14, 10, 14, 10);
+    headFrame->setFixedHeight(kHeadHeight);
     m_head->setSpacing(8);
     m_layout->addWidget(headFrame);
 }

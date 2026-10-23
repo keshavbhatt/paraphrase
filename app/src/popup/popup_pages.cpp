@@ -85,7 +85,7 @@ PopupActionsPage::PopupActionsPage(const util::LanguageDetector& detector, QWidg
     auto* body = new QWidget;
     auto* bodyLayout = new QVBoxLayout(body);
     bodyLayout->setContentsMargins(16, 14, 16, 14);
-    bodyLayout->setSpacing(10);
+    bodyLayout->setSpacing(12); // popup mocks: .pbody gap 12px
     auto* captionRow = new QHBoxLayout;
     m_caption = makeLabel(QString(), u"caption"_s);
     m_info = makeLabel(QString(), u"small"_s);
@@ -126,7 +126,7 @@ QWidget* PopupActionsPage::buildFoot()
 {
     QFrame* foot = band(u"popupFoot"_s);
     auto* row = new QHBoxLayout(foot);
-    row->setContentsMargins(16, 10, 16, 10);
+    row->setContentsMargins(16, 12, 16, 12); // .pfoot padding 12px 16px
     row->setSpacing(8);
     auto* dot = new QLabel;
     dot->setObjectName(u"dot"_s);
@@ -201,7 +201,7 @@ QWidget* PopupResultPage::buildBody()
     auto* body = new QWidget;
     auto* layout = new QVBoxLayout(body);
     layout->setContentsMargins(16, 14, 16, 14);
-    layout->setSpacing(10);
+    layout->setSpacing(12); // .pbody gap 12px
     m_presets = new QWidget;
     new FlowLayout(m_presets, 6);
     layout->addWidget(m_presets);
@@ -228,6 +228,7 @@ QWidget* PopupResultPage::buildBody()
     m_results = new QStackedWidget;
     m_text = new TextResultView;
     m_text->setObjectName(u"resultBox"_s);
+    m_text->setFitToText(true); // popup-proofread.html: the box hugs the text
     m_replies = new QuickRepliesView;
     // The views bring their own margins for the main window's panes; here the body has them.
     for (const QWidget* view : {static_cast<QWidget*>(m_text), static_cast<QWidget*>(m_replies)}) {
@@ -276,17 +277,17 @@ QWidget* PopupResultPage::buildFoot()
     m_insert = new ChipButton(QString(), tr("Enter"), ChipButton::ChipSide::After);
     m_insert->setObjectName(u"insert"_s);
     m_insert->setProperty("kind", u"primary"_s);
-    m_insert->setProperty("size", u"big"_s);
+    m_insert->setProperty("btnSize", u"big"_s);
     m_copy = makeButton(tr("Copy"));
     m_copy->setObjectName(u"popupCopy"_s);
     m_again = makeButton(QString());
     m_again->setObjectName(u"again"_s);
     for (QPushButton* b : {m_copy, m_again}) {
-        b->setProperty("size", u"big"_s);
+        b->setProperty("btnSize", u"big"_s);
     }
     m_done = makeButton(tr("Close"), u"primary"_s);
     m_done->setObjectName(u"closeResult"_s);
-    m_done->setProperty("size", u"big"_s);
+    m_done->setProperty("btnSize", u"big"_s);
     row->addWidget(m_insert);
     row->addWidget(m_done);
     row->addWidget(m_copy);
@@ -313,7 +314,7 @@ void PopupResultPage::begin(SkillKind kind, const QString& title, const QString&
     m_caption->setVisible(showSource);
     m_info->setVisible(!reply);
     m_pick->setVisible(reply);
-    m_results->setCurrentWidget(reply ? static_cast<QWidget*>(m_replies) : m_text);
+    showOnly(m_results, reply ? static_cast<QWidget*>(m_replies) : m_text);
     m_view->setVisible(false);
     m_text->clear();
     m_replies->setReplies({});
@@ -401,6 +402,8 @@ void PopupResultPage::updateButtons()
     } else {
         m_again->setText(m_running ? tr("Stop") : tr("Retry"));
     }
+    // Only this page's own pair: "3 new ones" never shares the row with Replace.
+    reserveWidth(m_again, reply ? QStringList{tr("3 new ones")} : QStringList{tr("Retry"), tr("Stop")});
     // Replace waits until the text is complete (popup-rewrite.html, note 2).
     m_insert->setEnabled(!m_running);
     m_copy->setEnabled(!m_running);

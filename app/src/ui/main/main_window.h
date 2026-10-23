@@ -88,6 +88,7 @@ private:
     void onFailed(const QString& code, const QString& message);
     void showResult(const QJsonObject& result);
     [[nodiscard]] QString inputLanguageName() const;
+    [[nodiscard]] QString chosenPreset(const SkillInfo& s) const;
 
     std::unique_ptr<client::DaemonClient> m_ownClient;
     client::DaemonClient& m_client;

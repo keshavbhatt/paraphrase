@@ -40,7 +40,7 @@ GeneralPage::GeneralPage(Preferences& preferences, bool hasTray, QWidget* parent
     auto* card = new QFrame;
     card->setObjectName(u"card"_s);
     auto* options = new QVBoxLayout(card);
-    options->setContentsMargins(18, 6, 18, 6);
+    options->setContentsMargins(18, 4, 18, 4); // .card 16px 18px, less the rows' own 12 px
     options->setSpacing(0);
     options->addWidget(
         option(tr("Start Paraphrase when I log in"),
@@ -54,7 +54,9 @@ GeneralPage::GeneralPage(Preferences& preferences, bool hasTray, QWidget* parent
         m_tray->setParent(this); // without a tray there is nothing to keep running in
         m_tray->hide();
     }
-    options->addWidget(option(tr("Appearance"), tr("Follows your desktop unless you choose."), m_appearance));
+    QWidget* last = option(tr("Appearance"), tr("Follows your desktop unless you choose."), m_appearance);
+    last->setProperty("last", true); // .opt:last-child: no rule under the last row
+    options->addWidget(last);
     column->addWidget(card);
     column->addStretch();
 

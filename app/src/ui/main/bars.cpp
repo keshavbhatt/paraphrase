@@ -50,20 +50,23 @@ NoticeBar::NoticeBar(QWidget* parent)
     : QFrame(parent)
     , m_icon(new QLabel)
     , m_text(makeLabel(QString()))
-    , m_hide(makeButton(QString(), u"flat"_s))
+    , m_hide(makeButton(QString(), u"icon"_s))
 {
     setObjectName(u"notice"_s);
     auto* row = new QHBoxLayout(this);
-    row->setContentsMargins(16, 10, 10, 10);
+    // main-window.html .notice: padding 10px 16px, icon on the first line of the text.
+    row->setContentsMargins(16, 10, 16, 10);
     row->setSpacing(10);
+    m_icon->setContentsMargins(0, 2, 0, 0);
     row->addWidget(m_icon, 0, Qt::AlignTop);
     m_text->setObjectName(u"noticeText"_s);
+    m_text->setAlignment(Qt::AlignLeft | Qt::AlignTop);
     m_text->setWordWrap(true);
     m_text->setTextFormat(Qt::RichText);
     connect(m_text, &QLabel::linkActivated, this, &NoticeBar::linkClicked);
     row->addWidget(m_text, 1);
     m_hide->setObjectName(u"hideNotice"_s);
-    m_hide->setFixedSize(28, 28);
+    m_hide->setProperty("flat", true);
     m_hide->setToolTip(tr("Hide this notice"));
     m_hide->setAccessibleName(tr("Hide this notice"));
     connect(m_hide, &QPushButton::clicked, this, &QWidget::hide);
@@ -97,8 +100,7 @@ StatusBar::StatusBar(QWidget* parent)
     m_dot->setFixedSize(kDotSize, kDotSize);
     row->addWidget(m_dot);
     m_text->setObjectName(u"statusText"_s);
-    row->addWidget(m_text);
-    row->addStretch();
+    row->addWidget(m_text, 1); // the spare width, so a longer model line is never cut
     row->addWidget(makeLabel(tr("Nothing leaves this computer")));
 }
 

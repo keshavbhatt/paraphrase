@@ -19,6 +19,7 @@ namespace {
 // 11 px captions, 12 px small text, 14 px UI, 15 px text the user reads or changes;
 // 8 px controls, 10 px actions, fields and big buttons, 12 px panes. @name@ is a token.
 constexpr char16_t kSheet[] = uR"(
+QWidget { font-size: 14px; }
 QWidget#mainWindow { background: @bg@; color: @text@; font-size: 14px; }
 QLabel { color: @text@; background: transparent; }
 QLabel[role="muted"], QLabel[role="caption"], QLabel[role="small"] { color: @muted@; }
@@ -27,7 +28,7 @@ QLabel[role="caption"] { font-size: 11px; font-weight: 700; letter-spacing: 1px;
 QLabel[role="private"] { color: @private@; font-size: 12px; }
 QLabel[role="warning"] { color: @warning@; }
 QLabel[role="danger"] { color: @danger@; }
-QLabel[role="pill"] { background: @hover@; color: @muted@; border-radius: 11px; padding: 2px 9px; font-size: 12px; }
+QLabel[role="pill"] { background: @hover@; color: @muted@; border: 1px solid transparent; border-radius: 10px; padding: 1px 8px; font-size: 12px; }
 
 QFrame#header { background: @bar@; border-bottom: 1px solid @border@; }
 QFrame#notice { background: @warningBg@; border-bottom: 1px solid @border@; }
@@ -58,10 +59,12 @@ QPushButton[kind="flat"]:hover { background: @hover@; }
 QPushButton[kind="link"] { background: transparent; border-color: transparent; color: @link@; min-height: 26px; padding: 0 8px; }
 QPushButton[kind="link"]:hover { background: @hover@; }
 QPushButton[kind="icon"] { padding: 0; min-width: 32px; max-width: 32px; min-height: 32px; max-height: 32px; }
-QPushButton[size="big"] { min-height: 42px; border-radius: 10px; }
+QPushButton[kind="icon"][flat="true"] { background: transparent; border-color: transparent; }
+QPushButton[kind="icon"][flat="true"]:hover { background: @hover@; }
+QPushButton[btnSize="big"] { min-height: 42px; border-radius: 10px; }
 QPushButton[kind="primary"] { background: @accentStrong@; border-color: @accentStrong@; color: @accentText@; font-weight: 500; }
 QPushButton[kind="primary"]:hover { background: @accentHover@; }
-QPushButton[kind="primary"]:disabled { background: @hover@; border-color: @hover@; }
+QPushButton[kind="primary"]:disabled { background: @hover@; border-color: @hover@; color: @muted@; }
 QPushButton[kind="action"] { min-height: 42px; border-radius: 10px; font-weight: 500; padding: 0; }
 QPushButton[kind="action"]:hover { border-color: @accent@; background: @panel@; }
 QPushButton[kind="action"]:checked { background: @accentStrong@; border-color: @accentStrong@; }
@@ -89,13 +92,14 @@ QLabel[chip="pill"] { color: @muted@; background: @hover@; border-radius: 9px; p
     font-family: monospace; font-size: 12px; }
 
 QFrame#actionRow { border: none; border-bottom: 1px solid @border@; }
+QFrame#actionRow[last="true"] { border-bottom: none; }
 QLabel[role="cmd"] { font-family: monospace; font-size: 13px; background: @sunk@; border-radius: 8px; padding: 8px 10px; }
 QFrame#popup { background: @panel@; border: 1px solid @border@; border-radius: 14px; }
 QFrame#popupHead { border: none; border-bottom: 1px solid @border@; }
 QFrame#popupFoot { border: none; border-top: 1px solid @border@; background: @bar@;
     border-bottom-left-radius: 14px; border-bottom-right-radius: 14px; }
-QLabel#source { background: @sunk@; border-radius: 10px; padding: 10px 14px; font-size: 15px; }
-QWidget#resultBox QTextBrowser#output { border: 1px solid @border@; border-radius: 10px; padding: 10px 12px; }
+QLabel#source { background: @sunk@; border-radius: 10px; padding: 11px 14px; font-size: 15px; }
+QWidget#resultBox QTextBrowser#output { border: 1px solid @border@; border-radius: 10px; padding: 12px 14px; }
 QLabel#popupTitle { font-weight: 600; }
 QLabel[role="kbd"] { border: 1px solid @border@; border-bottom-width: 2px; border-radius: 5px;
     padding: 0 6px; font-size: 12px; }

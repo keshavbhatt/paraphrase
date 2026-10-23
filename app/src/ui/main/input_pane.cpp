@@ -59,7 +59,7 @@ void InputPane::buildHead()
     head()->addWidget(m_title);
     head()->addWidget(m_info);
     head()->addStretch();
-    head()->addWidget(m_pill);
+    head()->addWidget(m_pill, 0, Qt::AlignVCenter);
     head()->addWidget(m_replyKind);
     head()->addWidget(paste);
     head()->addWidget(m_clear);
@@ -89,13 +89,19 @@ void InputPane::showKind(SkillKind kind)
     if (compose) {
         m_title->setText(tr("WHAT TO WRITE"));
         m_hint->setText(tr("Ctrl+Enter writes it. Names, dates and numbers come only from what you wrote."));
+    } else if (kind == SkillKind::FullReply) {
+        m_title->setText(tr("MESSAGE YOU GOT"));
+        m_hint->setText(
+            tr("Ctrl+Enter writes the reply. Leave \"What do you want to say?\" empty for a reply "
+               "that simply answers the message."));
     } else {
         m_title->setText(text ? tr("YOUR TEXT") : tr("MESSAGE YOU GOT"));
         m_hint->setText(tr("Type or paste anything. Ctrl+Enter runs the selected action."));
     }
-    // main-window-reply.html: the language as a pill, no word count, no Clear, no hint line.
+    // main-window-reply.html: the language as a pill, no word count, no Clear, no hint line;
+    // main-window-reply-draft.html keeps the hint for a full reply.
     m_clear->setVisible(text);
-    foot()->setVisible(text || compose);
+    foot()->setVisible(kind != SkillKind::QuickReply);
     m_replyKind->setVisible(!text && !compose && m_fullAvailable);
     m_replyKind->setCurrent(kind == SkillKind::FullReply ? 1 : 0);
     updateInfo();

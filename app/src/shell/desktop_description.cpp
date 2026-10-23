@@ -60,7 +60,7 @@ DesktopSupport describeDesktop(const Integrations& integrations)
             step(back, QObject::tr("On the clipboard: you paste it"), QObject::tr("You paste"), false));
     } else if (wayland) {
         s.steps.append(step(back, QObject::tr("Pasted into the app, after you allow it once"),
-                            QObject::tr("Asks once"), true));
+                            QObject::tr("Asks once"), false)); // a warning pill, as in the mock
     } else {
         s.steps.append(step(back, QObject::tr("Pasted into the app"), QObject::tr("Works"), true));
     }

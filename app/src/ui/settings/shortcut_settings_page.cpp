@@ -133,18 +133,36 @@ QWidget* ShortcutSettingsPage::stepsCard(const DesktopSupport& support)
 {
     const auto [c, column] = card();
     column->addWidget(makeLabel(tr("What works on this desktop"), u"h2"_s));
+    // settings-general-shortcut.html table.list: th 8px 10px, td 11px 10px, a rule under each row.
     auto* grid = new QGridLayout;
-    grid->setHorizontalSpacing(16);
-    grid->setVerticalSpacing(10);
-    grid->addWidget(makeLabel(tr("STEP"), u"th"_s), 0, 0);
-    grid->addWidget(makeLabel(tr("HOW"), u"th"_s), 0, 1);
-    grid->addWidget(makeLabel(tr("STATUS"), u"th"_s), 0, 2);
-    int row = 1;
+    grid->setHorizontalSpacing(0);
+    grid->setVerticalSpacing(0);
+    const auto cell = [](QWidget* w, int vertical) {
+        w->setContentsMargins(10, vertical, 10, vertical);
+        return w;
+    };
+    const auto rule = [grid](int row) {
+        auto* line = new QFrame;
+        line->setObjectName(u"rule"_s);
+        grid->addWidget(line, row, 0, 1, 3);
+    };
+    grid->addWidget(cell(makeLabel(tr("STEP"), u"th"_s), 8), 0, 0);
+    grid->addWidget(cell(makeLabel(tr("HOW"), u"th"_s), 8), 0, 1);
+    grid->addWidget(cell(makeLabel(tr("STATUS"), u"th"_s), 8), 0, 2);
+    rule(1);
+    int row = 2;
     for (const DesktopSupport::Step& s : support.steps) {
-        grid->addWidget(makeLabel(s.step), row, 0);
-        grid->addWidget(wrapped(s.how, QString()), row, 1);
-        grid->addWidget(pill(s.status, s.works), row, 2);
-        ++row;
+        grid->addWidget(cell(makeLabel(s.step), 11), row, 0, Qt::AlignTop);
+        grid->addWidget(cell(wrapped(s.how, QString()), 11), row, 1, Qt::AlignTop);
+        auto* status = new QWidget;
+        auto* statusRow = new QHBoxLayout(status);
+        statusRow->setContentsMargins(10, 10, 10, 10);
+        statusRow->addWidget(pill(s.status, s.works));
+        grid->addWidget(status, row, 2, Qt::AlignTop | Qt::AlignLeft);
+        if (&s != &support.steps.last()) {
+            rule(row + 1);
+        }
+        row += 2;
     }
     grid->setColumnStretch(1, 1);
     column->addLayout(grid);

@@ -9,6 +9,7 @@
 
 #include <optional>
 
+class QLabel;
 class QLineEdit;
 class QPlainTextEdit;
 class QPushButton;
@@ -37,6 +38,8 @@ public:
     void showMessage(const QString& message, bool problem);
     /// Changes (the diff) or the corrected text alone.
     void setShowResult(bool result);
+    /// The text box as tall as its text, up to a cap, instead of filling the space (popup).
+    void setFitToText(bool fit);
     [[nodiscard]] QString result() const { return m_result; }
     [[nodiscard]] bool hasDiff() const { return m_diff.has_value(); }
     [[nodiscard]] qsizetype changeCount() const;
@@ -47,6 +50,8 @@ Q_SIGNALS:
 
 private:
     void render();
+    void fitHeight();
+    bool m_fit = false;
     [[nodiscard]] QString diffHtml(const client::WordDiff& diff) const;
 
     QTextBrowser* m_output = nullptr;
@@ -95,6 +100,9 @@ public:
     void showVersion(qsizetype index);
     /// Forgets the versions: the message or what to say changed.
     void reset();
+    /// Write has no message to take facts from: its view shows no reply hint
+    /// (main-window-compose.html).
+    void setComposing(bool composing);
     [[nodiscard]] QString text() const;
     [[nodiscard]] qsizetype versionCount() const { return m_versions.size(); }
     [[nodiscard]] qsizetype versionIndex() const { return m_index; }
@@ -104,6 +112,7 @@ Q_SIGNALS:
 
 private:
     QPlainTextEdit* m_edit = nullptr;
+    QLabel* m_hint = nullptr;
     QStringList m_versions;
     qsizetype m_index = -1;
 };

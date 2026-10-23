@@ -59,6 +59,7 @@ void ChipButton::setLabel(const QString& label)
 {
     m_label->setText(label);
     setAccessibleName(label);
+    m_layout->invalidate(); // measure the new label now, not on the next layout pass
     updateGeometry();
 }
 

@@ -170,10 +170,12 @@ void ActionBar::setCurrent(const SkillInfo& skill, const QString& targetLang)
         return;
     }
     b->setChecked(true);
+    // The label never changes: a longer one would widen the chip and re-wrap the row under the
+    // pointer. The choice shows in the tooltip and in the result's header.
     if (m_catalog->picksLanguage(base) && !targetLang.isEmpty()) {
-        b->setLabel(tr("%1: %2").arg(m_catalog->actionTitle(base), languageName(m_detector, targetLang)));
+        b->setToolTip(tr("%1: %2").arg(m_catalog->actionTitle(base), languageName(m_detector, targetLang)));
     } else if (b->menu() != nullptr) {
-        b->setLabel(tr("%1: %2").arg(m_catalog->actionTitle(base), SkillCatalog::presetTitle(skill)));
+        b->setToolTip(tr("%1: %2").arg(m_catalog->actionTitle(base), SkillCatalog::presetTitle(skill)));
     }
     updateArrows();
 }

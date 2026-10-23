@@ -14,7 +14,6 @@ using namespace Qt::StringLiterals;
 namespace paraphrase::app {
 namespace {
 
-constexpr int kRowHeight = 32;
 constexpr int kMaxHeight = 220;
 constexpr int kArrowSize = 14;
 
@@ -23,6 +22,7 @@ QLabel* chip(const QString& text, const QString& kind)
     auto* l = new QLabel(text.isEmpty() ? u" "_s : text);
     l->setProperty("chip", kind);
     l->setTextFormat(Qt::PlainText);
+    l->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed); // hugs its text, as in the mock
     return l;
 }
 
@@ -59,8 +59,16 @@ void ChangeList::setDiff(const client::WordDiff* diff, const QSet<qsizetype>& un
         m_rows->addWidget(row(*diff, k, undone.contains(k)));
     }
     m_rows->addStretch();
-    // The list takes what it needs, up to a third of the pane.
-    setMaximumHeight(std::min<int>((static_cast<int>(changes.size()) * kRowHeight) + 4, kMaxHeight));
+    // The list takes what its rows need, measured rather than assumed, up to kMaxHeight.
+    // Measured from the rows themselves: rows just added to a visible list count as hidden
+    // until Qt shows them, so the layout's own size hint would leave them out.
+    int height = 0;
+    for (int i = 0; i < m_rows->count(); ++i) {
+        if (const QWidget* w = m_rows->itemAt(i)->widget()) {
+            height += w->sizeHint().height() + m_rows->spacing();
+        }
+    }
+    setMaximumHeight(std::min(height + (2 * frameWidth()), kMaxHeight));
 }
 
 QWidget* ChangeList::row(const client::WordDiff& diff, qsizetype k, bool undone)

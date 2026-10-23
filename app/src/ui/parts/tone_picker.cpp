@@ -1,5 +1,7 @@
 #include "ui/parts/tone_picker.h"
 
+#include "ui/common/widgets.h"
+
 #include <QMenu>
 #include <QSettings>
 
@@ -22,7 +24,9 @@ void TonePicker::setTones(const QList<std::pair<QString, QString>>& tones)
     menu()->clear();
     const QString saved = QSettings().value(m_key, m_fallback).toString();
     m_tone.clear();
+    m_titles.clear();
     for (const auto& [tone, title] : tones) {
+        m_titles.append(title);
         QAction* item = menu()->addAction(title);
         item->setObjectName(u"tone-"_s + tone);
         connect(item, &QAction::triggered, this, [this, tone, title] {
@@ -34,6 +38,7 @@ void TonePicker::setTones(const QList<std::pair<QString, QString>>& tones)
         }
     }
     setVisible(!tones.isEmpty());
+    reserveWidth(this, m_titles); // Friendly or Professional: the button keeps one width
 }
 
 void TonePicker::choose(const QString& tone, const QString& title)
@@ -47,6 +52,7 @@ void TonePicker::applyTheme(const Tokens& t)
     // The menu arrow after the tone's name, as on the actions.
     setLayoutDirection(Qt::RightToLeft);
     setIcon(Theme::icon(u"down"_s, t.muted, 14));
+    reserveWidth(this, m_titles);
 }
 
 } // namespace paraphrase::app

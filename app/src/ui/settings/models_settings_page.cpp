@@ -42,14 +42,9 @@ ModelsSettingsPage::ModelsSettingsPage(ModelsController& models, QWidget* parent
     auto* col = new QVBoxLayout(this);
     col->setContentsMargins(0, 0, 4, 0);
     col->setSpacing(18);
-    col->addWidget(makeLabel(tr("Models"), u"h1"_s));
-    QLabel* intro =
-        makeLabel(tr("Paraphrase runs these models on this computer. Quick actions use the fast model; "
-                     "tone changes and longer writing use the quality model when it is installed."),
-                  u"muted"_s);
-    intro->setWordWrap(true);
-    intro->setMaximumWidth(560);
-    col->addWidget(intro);
+    col->addLayout(pageHeading(
+        tr("Models"), tr("Paraphrase runs these models on this computer. Quick actions use the fast model; "
+                         "tone changes and longer writing use the quality model when it is installed.")));
     QVBoxLayout* tiersCol = nullptr;
     col->addWidget(card(tiersCol));
     tiersCol->addWidget(makeLabel(tr("Which model does what"), u"h2"_s));

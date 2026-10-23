@@ -31,7 +31,7 @@ TryPage::TryPage(SampleRun& run, QWidget* parent)
     m_sample->setObjectName(u"sample"_s);
     row->addWidget(m_sample, 1);
     m_button->setObjectName(u"tryIt"_s);
-    m_button->setProperty("size", u"big"_s);
+    m_button->setProperty("btnSize", u"big"_s);
     row->addWidget(m_button);
     col->addLayout(row);
     auto* card = new QFrame;

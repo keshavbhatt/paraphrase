@@ -26,14 +26,9 @@ ActionsPage::ActionsPage(client::DaemonClient& client, QWidget* parent)
     auto* column = new QVBoxLayout(this);
     column->setContentsMargins(0, 0, 0, 0);
     column->setSpacing(18);
-    column->addWidget(makeLabel(tr("My actions"), u"h1"_s));
-    QLabel* intro =
-        makeLabel(tr("Your own actions, in your words. They appear under My actions in the window and the "
-                     "popup, and run on this computer like the others."),
-                  u"muted"_s);
-    intro->setWordWrap(true);
-    intro->setMaximumWidth(560);
-    column->addWidget(intro);
+    column->addLayout(pageHeading(tr("My actions"),
+                                  tr("Your own actions, in your words. They appear under My actions in the "
+                                     "window and the popup, and run on this computer like the others.")));
     column->addWidget(m_unsupported);
     column->addWidget(m_list);
     column->addWidget(m_editor);

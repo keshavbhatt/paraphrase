@@ -231,7 +231,12 @@ void PopupController::onFinished(const QJsonObject& result)
         .replyKind = {},
         .facts = factsLine(check),
     };
-    page->setInfo(resultSummary(facts), check.missing.isEmpty() ? u"small"_s : u"warning"_s);
+    // popup-proofread.html: the line starts the row ("2 changes · kept in English"), no title before it.
+    QString summary = resultSummary(facts);
+    if (summary.startsWith(u"· "_s)) {
+        summary.remove(0, 2);
+    }
+    page->setInfo(summary, check.missing.isEmpty() ? u"small"_s : u"warning"_s);
     if (facts.proofread && facts.changes == 0) {
         page->showNothingToFix();
     }

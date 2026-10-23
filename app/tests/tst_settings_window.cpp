@@ -11,6 +11,7 @@
 #include <QAbstractButton>
 #include <QClipboard>
 #include <QComboBox>
+#include <QCoreApplication>
 #include <QDir>
 #include <QGuiApplication>
 #include <QJsonArray>
@@ -21,6 +22,8 @@
 #include <QMutexLocker>
 #include <QPlainTextEdit>
 #include <QPushButton>
+#include <QScrollArea>
+#include <QScrollBar>
 #include <QSignalSpy>
 #include <QTest>
 
@@ -129,6 +132,16 @@ private Q_SLOTS:
             const QMutexLocker lock(&m_daemon.state->lock);
             QVERIFY(m_daemon.state->prompts.last().contains(u"Turn this into a tweet"_s));
         }
+        // A long result scrolls in a capped area instead of stretching the editor.
+        const auto* area = w.findChild<QScrollArea*>(u"tryResultArea"_s);
+        const int shortHeight = area->height();
+        m_daemon.setAnswers({QString(u"A much longer answer that goes on. "_s).repeated(80)});
+        w.findChild<QPushButton*>(u"tryAction"_s)->click();
+        QTRY_VERIFY_WITH_TIMEOUT(w.findChild<QLabel*>(u"tryResult"_s)->text().startsWith(u"A much"_s),
+                                 AppDaemon::kTimeoutMs);
+        QVERIFY(area->height() > shortHeight);
+        QVERIFY(area->height() <= 160);
+        QVERIFY(area->verticalScrollBar()->maximum() > 0);
         w.findChild<QPushButton*>(u"saveAction"_s)->click();
         QVERIFY(client.call(u"ListSkills"_s, {}).arguments().value(0).toString().contains(u"custom.tweet"_s));
         auto* remove = w.findChild<QPushButton*>(u"delete-tweet"_s);
@@ -189,6 +202,7 @@ private Q_SLOTS:
                 w.show();
                 w.showPage(SettingsWindow::Models);
                 QTest::qWait(50);
+                QCoreApplication::processEvents(); // queued shows land first
                 QVERIFY(w.grab().save(dir + u"/settings-models-%1.png"_s.arg(QLatin1StringView(theme))));
             }
             m_daemon.stop();
@@ -214,6 +228,7 @@ private Q_SLOTS:
             actions.show();
             actions.newAction();
             QTest::qWait(50);
+            QCoreApplication::processEvents(); // queued shows land first
             QVERIFY(actions.grab().save(dir + u"/settings-actions-%1.png"_s.arg(QLatin1StringView(theme))));
             paraphrase::app::DesktopSupport support;
             support.globalShortcut = true;
@@ -242,9 +257,11 @@ private Q_SLOTS:
             actions.setDesktopSupport(support);
             actions.showPage(SettingsWindow::Shortcut);
             QTest::qWait(50);
+            QCoreApplication::processEvents(); // queued shows land first
             QVERIFY(actions.grab().save(dir + u"/settings-shortcut-%1.png"_s.arg(QLatin1StringView(theme))));
             actions.showPage(SettingsWindow::General);
             QTest::qWait(50);
+            QCoreApplication::processEvents(); // queued shows land first
             QVERIFY(actions.grab().save(dir + u"/settings-general-%1.png"_s.arg(QLatin1StringView(theme))));
             m_daemon.stop();
         }

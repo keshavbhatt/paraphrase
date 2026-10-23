@@ -269,7 +269,26 @@ void MainWindow::selectSkill(const QString& skillId)
         title = tr("Your text");
     }
     m_output->showKind(kind, title, s->base == u"proofread"_s);
+    if (const QString chosen = chosenPreset(*s); !chosen.isEmpty()) {
+        m_output->setInfo(u"· "_s + chosen);
+    }
     m_output->setRunning(busy());
+}
+
+QString MainWindow::chosenPreset(const SkillInfo& s) const
+{
+    // Which tone, format, language or action of the user's: the chips keep their own labels.
+    if (m_catalog.kindOf(s.id) != SkillKind::Text) {
+        return {};
+    }
+    if (m_catalog.picksLanguage(s.base)) {
+        return m_targetLang.isEmpty() ? QString() : tr("into %1").arg(languageName(m_detector, m_targetLang));
+    }
+    if (!s.title.contains(u':')) {
+        return {};
+    }
+    const QString preset = SkillCatalog::presetTitle(s);
+    return s.base == u"custom"_s ? preset : preset.toLower(); // the user's own names keep their case
 }
 
 bool MainWindow::busy() const
@@ -426,6 +445,8 @@ void MainWindow::showResult(const QJsonObject& result)
         replyKind = m_input->fullReplyInput()->chat() ? tr("chat message") : tr("email");
     } else if (kind == SkillKind::Compose && s != nullptr) {
         replyKind = SkillCatalog::presetTitle(*s).toLower();
+    } else if (s != nullptr && !m_catalog.picksLanguage(s->base)) {
+        replyKind = chosenPreset(*s);
     }
     const ResultFacts facts{
         .kind = kind,
