@@ -91,5 +91,9 @@ int main(int argc, char* argv[])
         QObject::connect(notifier, &QSocketNotifier::activated, &cli, [&cli] { cli.interrupt(); });
         std::signal(SIGINT, onSigint);
     }
-    return cli.exec();
+    const int code = cli.exec();
+    // Deliver what D-Bus still queued for the client before it goes: dropping a queued call
+    // event while the client is destroyed crashed in Qt (seen after `batch`).
+    QCoreApplication::sendPostedEvents();
+    return code;
 }
