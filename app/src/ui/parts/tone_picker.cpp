@@ -8,6 +8,9 @@
 using namespace Qt::StringLiterals;
 
 namespace paraphrase::app {
+namespace {
+constexpr int kArrowSize = 14;
+} // namespace
 
 TonePicker::TonePicker(QString settingsKey, QString fallback, QWidget* parent)
     : QPushButton(parent)
@@ -51,7 +54,7 @@ void TonePicker::applyTheme(const Tokens& t)
 {
     // The menu arrow after the tone's name, as on the actions.
     setLayoutDirection(Qt::RightToLeft);
-    setIcon(Theme::icon(u"down"_s, t.muted, 14));
+    setButtonIcon(this, u"down"_s, t.muted, kArrowSize, true); // right to left: the gap goes before it
     reserveWidth(this, m_titles);
 }
 

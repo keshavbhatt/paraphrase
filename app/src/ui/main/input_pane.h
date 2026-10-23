@@ -55,6 +55,7 @@ private:
     QLabel* m_pill = nullptr;
     SegmentedControl* m_replyKind = nullptr;
     QPushButton* m_clear = nullptr;
+    QPushButton* m_paste = nullptr;
     QStackedWidget* m_pages = nullptr;
     QHash<SkillKind, InputPage*> m_byKind;
     FullReplyInput* m_full = nullptr;

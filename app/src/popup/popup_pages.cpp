@@ -230,6 +230,7 @@ QWidget* PopupResultPage::buildBody()
     m_text->setObjectName(u"resultBox"_s);
     m_text->setFitToText(true); // popup-proofread.html: the box hugs the text
     m_replies = new QuickRepliesView;
+    m_replies->setForPopup(true);
     // The views bring their own margins for the main window's panes; here the body has them.
     for (const QWidget* view : {static_cast<QWidget*>(m_text), static_cast<QWidget*>(m_replies)}) {
         view->layout()->setContentsMargins(0, 0, 0, 0);
@@ -402,13 +403,13 @@ void PopupResultPage::updateButtons()
     } else {
         m_again->setText(m_running ? tr("Stop") : tr("Retry"));
     }
+    setButtonIcon(m_again, m_running && !reply ? u"stop"_s : u"refresh"_s, m_tokens.text, kIconSize);
     // Only this page's own pair: "3 new ones" never shares the row with Replace.
     reserveWidth(m_again, reply ? QStringList{tr("3 new ones")} : QStringList{tr("Retry"), tr("Stop")});
     // Replace waits until the text is complete (popup-rewrite.html, note 2).
     m_insert->setEnabled(!m_running);
     m_copy->setEnabled(!m_running);
     m_again->setEnabled(!m_running || !reply);
-    m_again->setIcon(Theme::icon(m_running && !reply ? u"stop"_s : u"refresh"_s, m_tokens.text, kIconSize));
 }
 
 void PopupResultPage::applyTheme(const Tokens& t)
@@ -417,7 +418,7 @@ void PopupResultPage::applyTheme(const Tokens& t)
     m_lock->setPixmap(Theme::icon(u"lock"_s, t.privacy, kIconSize).pixmap(kIconSize, kIconSize));
     m_back->setIcon(Theme::icon(u"left"_s, t.text, kIconSize));
     m_close->setIcon(Theme::icon(u"x"_s, t.muted, kIconSize));
-    m_copy->setIcon(Theme::icon(u"copy"_s, t.text, kIconSize));
+    setButtonIcon(m_copy, u"copy"_s, t.text, kIconSize);
     m_insert->setLeadingIcon({});
     m_text->applyTheme(t);
     m_replies->applyTheme(t);

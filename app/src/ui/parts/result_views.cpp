@@ -232,10 +232,21 @@ QuickRepliesView::QuickRepliesView(QWidget* parent)
         connect(key, &QShortcut::activated, choice, &QPushButton::click);
     }
     layout->addSpacing(4);
-    layout->addWidget(makeLabel(tr("Edit before copying"), u"small"_s));
+    m_editLabel = makeLabel(tr("Edit before copying"), u"small"_s);
+    layout->addWidget(m_editLabel);
     m_edit->setObjectName(u"replyEdit"_s);
     layout->addWidget(m_edit);
     layout->addStretch();
+}
+
+void QuickRepliesView::setForPopup(bool popup)
+{
+    // popup-reply.html: full-width rows (Insert and Copy are below) and the reply goes into
+    // the other app, so it is edited "before sending".
+    for (QPushButton* copy : std::as_const(m_copies)) {
+        copy->setVisible(!popup);
+    }
+    m_editLabel->setText(popup ? tr("Edit before sending") : tr("Edit before copying"));
 }
 
 void QuickRepliesView::setReplies(const QStringList& replies)

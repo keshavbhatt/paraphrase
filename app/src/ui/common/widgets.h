@@ -21,6 +21,10 @@ namespace paraphrase::app {
 void reserveWidth(QPushButton* button, const QStringList& texts, const QIcon& icon = {});
 /// A settings page's title and its intro, 6 px apart (settings mocks: h1 and intro in a .stack).
 [[nodiscard]] QVBoxLayout* pageHeading(const QString& title, const QString& intro);
+/// An icon beside a button's text with the mocks' 6 px gap: before the text, or after it (a menu
+/// arrow). An empty name clears the icon.
+void setButtonIcon(QPushButton* button, const QString& name, const QColor& color, int size,
+                   bool after = false);
 /// Shows `page` and lets only it count for the stack's size: a QStackedWidget is otherwise
 /// as tall as its tallest page, which leaves a popup with empty space under a short one.
 void showOnly(QStackedWidget* stack, QWidget* page);

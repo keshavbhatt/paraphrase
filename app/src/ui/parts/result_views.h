@@ -73,6 +73,8 @@ public:
     explicit QuickRepliesView(QWidget* parent = nullptr);
     ~QuickRepliesView() override = default;
 
+    /// In the popup: no copy button per row and "Edit before sending" (popup-reply.html).
+    void setForPopup(bool popup);
     void setReplies(const QStringList& replies);
     /// The reply as edited: what Copy copies.
     [[nodiscard]] QString chosen() const;
@@ -80,6 +82,7 @@ public:
     void applyTheme(const Tokens& t);
 
 private:
+    QLabel* m_editLabel = nullptr;
     QList<ChipButton*> m_choices;
     QList<QPushButton*> m_copies;
     QLineEdit* m_edit = nullptr;

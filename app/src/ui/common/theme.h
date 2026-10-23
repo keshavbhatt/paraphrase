@@ -31,6 +31,10 @@ public:
     [[nodiscard]] static QString styleSheet(const Tokens& t);
     /// A Lucide icon from :/icons/<name>.svg, drawn in `color`.
     [[nodiscard]] static QIcon icon(const QString& name, const QColor& color, int size = 16);
+    /// The icon with `padBefore` and `padAfter` transparent pixels beside it: a button's own
+    /// icon-to-text gap is about 2 px, the mocks' `.btn { gap: 6px }` needs 4 more.
+    [[nodiscard]] static QIcon icon(const QString& name, const QColor& color, int size, int padBefore,
+                                    int padAfter);
 };
 
 } // namespace paraphrase::app

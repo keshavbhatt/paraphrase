@@ -232,6 +232,25 @@ QString Theme::styleSheet(const Tokens& t)
     return css;
 }
 
+QIcon Theme::icon(const QString& name, const QColor& color, int size, int padBefore, int padAfter)
+{
+    const QIcon plain = icon(name, color, size);
+    if (plain.isNull()) {
+        return {};
+    }
+    QIcon padded;
+    for (const int scale : {1, 2}) {
+        QPixmap pixmap((size + padBefore + padAfter) * scale, size * scale);
+        pixmap.fill(Qt::transparent);
+        QPainter painter(&pixmap);
+        painter.drawPixmap(padBefore * scale, 0, plain.pixmap(size * scale, size * scale));
+        painter.end();
+        pixmap.setDevicePixelRatio(scale);
+        padded.addPixmap(pixmap);
+    }
+    return padded;
+}
+
 QIcon Theme::icon(const QString& name, const QColor& color, int size)
 {
     QFile file(u":/icons/"_s + name + u".svg"_s);

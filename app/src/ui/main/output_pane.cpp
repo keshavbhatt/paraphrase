@@ -195,14 +195,16 @@ void OutputPane::updateButtons()
     m_secondary->setEnabled(!m_running);
     // Quick replies' retry is "Make it polite": nothing to stop there while replies are written.
     m_retry->setEnabled(!m_running || m_kind != SkillKind::QuickReply);
-    const QIcon refresh = Theme::icon(u"refresh"_s, m_tokens.text, kIconSize);
-    const QIcon stop = Theme::icon(u"stop"_s, m_tokens.text, kIconSize);
-    m_secondary->setIcon(m_kind == SkillKind::Text ? QIcon() : refresh);
+    setButtonIcon(m_secondary, m_kind == SkillKind::Text ? QString() : u"refresh"_s, m_tokens.text,
+                  kIconSize);
+    QString retryIcon;
     if (m_kind == SkillKind::Text) {
-        m_retry->setIcon(m_running ? stop : refresh);
-    } else {
-        m_retry->setIcon(m_running && m_kind != SkillKind::QuickReply ? stop : QIcon());
+        retryIcon = m_running ? u"stop"_s : u"refresh"_s;
+    } else if (m_running && m_kind != SkillKind::QuickReply) {
+        retryIcon = u"stop"_s;
     }
+    setButtonIcon(m_retry, retryIcon, m_tokens.text, kIconSize);
+    const QIcon stop = Theme::icon(u"stop"_s, m_tokens.text, kIconSize, 0, 4); // as setButtonIcon pads it
     // Retry or Shorter turns into Stop while it runs: the same width either way.
     reserveWidth(m_retry, {textsFor(m_kind, false).retry, textsFor(m_kind, true).retry}, stop);
 }

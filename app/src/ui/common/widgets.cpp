@@ -1,5 +1,7 @@
 #include "ui/common/widgets.h"
 
+#include "ui/common/theme.h"
+
 #include <QButtonGroup>
 #include <QHBoxLayout>
 #include <QLabel>
@@ -30,6 +32,17 @@ QPushButton* makeButton(const QString& text, const QString& kind)
     }
     b->setCursor(Qt::PointingHandCursor);
     return b;
+}
+
+void setButtonIcon(QPushButton* button, const QString& name, const QColor& color, int size, bool after)
+{
+    constexpr int kExtraGap = 4; // the button's own 2 px plus this make the mocks' 6 px
+    if (name.isEmpty()) {
+        button->setIcon(QIcon());
+        return;
+    }
+    button->setIcon(Theme::icon(name, color, size, after ? kExtraGap : 0, after ? 0 : kExtraGap));
+    button->setIconSize(QSize(size + kExtraGap, size));
 }
 
 QVBoxLayout* pageHeading(const QString& title, const QString& intro)

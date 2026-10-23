@@ -54,18 +54,18 @@ void InputPane::buildHead()
         {.name = u"quickReplies"_s, .text = tr("Quick replies")},
         {.name = u"fullReply"_s, .text = tr("Full reply")},
     });
-    QPushButton* paste = makeButton(tr("Paste"), u"flat"_s);
+    m_paste = makeButton(tr("Paste"), u"flat"_s);
     m_clear = makeButton(tr("Clear"), u"flat"_s);
     head()->addWidget(m_title);
     head()->addWidget(m_info);
     head()->addStretch();
     head()->addWidget(m_pill, 0, Qt::AlignVCenter);
     head()->addWidget(m_replyKind);
-    head()->addWidget(paste);
+    head()->addWidget(m_paste);
     head()->addWidget(m_clear);
     connect(m_replyKind, &SegmentedControl::changed, this,
             [this](int index) { Q_EMIT fullReplyToggled(index == 1); });
-    connect(paste, &QPushButton::clicked, this,
+    connect(m_paste, &QPushButton::clicked, this,
             [this] { page()->setSubject(QApplication::clipboard()->text()); });
     connect(m_clear, &QPushButton::clicked, this, [this] {
         for (InputPage* p : std::as_const(m_byKind)) {
@@ -101,6 +101,7 @@ void InputPane::showKind(SkillKind kind)
     // main-window-reply.html: the language as a pill, no word count, no Clear, no hint line;
     // main-window-reply-draft.html keeps the hint for a full reply.
     m_clear->setVisible(text);
+    m_paste->setVisible(!page()->showsLanguage());
     foot()->setVisible(kind != SkillKind::QuickReply);
     m_replyKind->setVisible(!text && !compose && m_fullAvailable);
     m_replyKind->setCurrent(kind == SkillKind::FullReply ? 1 : 0);
@@ -132,6 +133,16 @@ void InputPane::updateInfo()
 {
     const QString text = page()->subject();
     const QString name = text.trimmed().isEmpty() ? QString() : languageName(m_detector, language());
+    if (page()->showsLanguage()) {
+        m_info->clear();
+        m_pill->setVisible(false);
+        QString shown;
+        if (!text.trimmed().isEmpty()) {
+            shown = name.isEmpty() ? tr("Best effort") : name;
+        }
+        page()->setLanguage(shown);
+        return;
+    }
     if (m_kind != SkillKind::Text) {
         m_info->clear();
         m_pill->setText(name.isEmpty() ? tr("Best effort") : name);
