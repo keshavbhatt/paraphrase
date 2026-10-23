@@ -9,6 +9,7 @@ class QLabel;
 class QLineEdit;
 class QPlainTextEdit;
 class QPushButton;
+class QScrollArea;
 
 namespace paraphrase::app {
 
@@ -36,8 +37,13 @@ Q_SIGNALS:
     void saveClicked(const ActionInfo& action);
     void cancelClicked();
 
+protected:
+    void resizeEvent(QResizeEvent* event) override;
+
 private:
     void buildForm(QGridLayout* form);
+    /// The result's area grows with the text up to a cap, then scrolls.
+    void fitTryResult();
 
     QString m_id;
     QLabel* m_title = nullptr;
@@ -46,6 +52,8 @@ private:
     SegmentedControl* m_tier = nullptr;
     QPlainTextEdit* m_sample = nullptr;
     QLabel* m_tryResult = nullptr;
+    QScrollArea* m_tryArea = nullptr;
+    int m_tryButtonHeight = 0;
     QLabel* m_problem = nullptr;
 };
 

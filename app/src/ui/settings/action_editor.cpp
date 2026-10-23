@@ -8,8 +8,12 @@
 #include <QLineEdit>
 #include <QPlainTextEdit>
 #include <QPushButton>
+#include <QScrollArea>
+#include <QScrollBar>
 #include <QStyle>
 #include <QVBoxLayout>
+
+#include <algorithm>
 
 using namespace Qt::StringLiterals;
 
@@ -19,6 +23,9 @@ namespace {
 constexpr int kMaxName = 40;
 constexpr int kInstructionHeight = 84;
 constexpr int kSampleHeight = 80;
+constexpr int kResultMaxHeight = 160; // a long result scrolls instead of stretching the card
+constexpr int kStackGap = 6;          // settings-actions.html: .stack gap under a field
+constexpr int kTryGap = 8;            // the Try it column and its button row
 
 QLabel* fieldLabel(const QString& text)
 {
@@ -47,6 +54,7 @@ ActionEditor::ActionEditor(QWidget* parent)
       }))
     , m_sample(new QPlainTextEdit)
     , m_tryResult(makeLabel(QString(), u"small"_s))
+    , m_tryArea(new QScrollArea)
     , m_problem(makeLabel(QString(), u"danger"_s))
 {
     setObjectName(u"card"_s);
@@ -89,22 +97,37 @@ void ActionEditor::buildForm(QGridLayout* form)
     m_tryResult->setObjectName(u"tryResult"_s);
     m_tryResult->setWordWrap(true);
     m_tryResult->setTextFormat(Qt::PlainText);
+    m_tryResult->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    m_tryResult->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    m_tryArea->setObjectName(u"tryResultArea"_s);
+    m_tryArea->setWidget(m_tryResult);
+    m_tryArea->setWidgetResizable(true);
+    m_tryArea->setFrameShape(QFrame::NoFrame);
+    m_tryArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_tryArea->viewport()->setAutoFillBackground(false);
+    m_tryResult->setAutoFillBackground(false);
 
+    // Nested in a grid whose row and column gaps differ, a layout inherits no gap: set each.
     auto* what = new QVBoxLayout;
+    what->setSpacing(kStackGap);
     what->addWidget(m_instruction);
     what->addWidget(hint(
         tr("Say what to do with the text, as you would ask a person. The text itself is added for you.")));
     auto* model = new QVBoxLayout;
+    model->setSpacing(kStackGap);
     model->addWidget(m_tier, 0, Qt::AlignLeft);
     model->addWidget(hint(tr("Fast answers in a few seconds; Quality writes better and takes longer.")));
     auto* tryIt = new QVBoxLayout;
+    tryIt->setSpacing(kTryGap);
     tryIt->addWidget(m_sample);
     auto* tryRow = new QHBoxLayout;
+    tryRow->setSpacing(kTryGap);
     QPushButton* tryButton = makeButton(tr("Try it"));
     tryButton->setObjectName(u"tryAction"_s);
     tryRow->addWidget(tryButton, 0, Qt::AlignTop);
-    tryRow->addWidget(m_tryResult, 1);
+    tryRow->addWidget(m_tryArea, 1);
     tryIt->addLayout(tryRow);
+    m_tryButtonHeight = tryButton->sizeHint().height();
     connect(tryButton, &QPushButton::clicked, this,
             [this] { Q_EMIT tryClicked(action(), m_sample->toPlainText()); });
 
@@ -126,6 +149,7 @@ void ActionEditor::edit(const ActionInfo& action)
     m_instruction->setPlainText(action.instruction);
     m_tier->setCurrent(action.tier == u"quality"_s ? 1 : 0);
     m_tryResult->clear();
+    fitTryResult();
     m_problem->clear();
     m_name->setFocus();
 }
@@ -147,6 +171,22 @@ void ActionEditor::showTryResult(const QString& text, bool problem)
     m_tryResult->setProperty("role", problem ? u"danger"_s : u"small"_s);
     m_tryResult->style()->unpolish(m_tryResult);
     m_tryResult->style()->polish(m_tryResult);
+    fitTryResult();
+    m_tryArea->verticalScrollBar()->setValue(0);
+}
+
+void ActionEditor::resizeEvent(QResizeEvent* event)
+{
+    QFrame::resizeEvent(event);
+    fitTryResult();
+}
+
+void ActionEditor::fitTryResult()
+{
+    // At least the button's height, so a one-line result sits centred beside it as in the mock.
+    const int width = m_tryArea->viewport()->width();
+    const int text = m_tryResult->text().isEmpty() ? 0 : m_tryResult->heightForWidth(width);
+    m_tryArea->setFixedHeight(std::clamp(text, m_tryButtonHeight, kResultMaxHeight));
 }
 
 void ActionEditor::showProblem(const QString& message)
