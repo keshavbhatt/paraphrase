@@ -162,14 +162,22 @@ def test_summarize_counts_key_facts_and_injection() -> None:
 
 
 def test_compose_shape_per_preset() -> None:
-    email = (
-        "Subject: Friday off\n\nHi Sarah,\n\nCould I take Friday off?\n\nBest regards,\n[Your name]"
-    )
+    email = "Subject: Friday off\n\nHi Sarah,\n\nCould I take Friday off?\n\nBest regards,"
     assert metrics.compose_shape("email", email)
+    assert not metrics.compose_shape("email", email + "\n[Your name]")  # no placeholder, ever
+    hindi = "Subject: छुट्टी\n\nनमस्ते सर,\n\nक्या मैं शुक्रवार को छुट्टी ले सकता हूँ?\n\nधन्यवाद,"
+    assert metrics.compose_shape("email", hindi)
+    assert metrics.compose_shape("email", "विषय: कार्ड\n\nबैंक मैनेजर को,\n\nकार्ड खो गया है।\n\nधन्यवाद,")
     assert not metrics.compose_shape("email", "Hi Sarah,\n\nCould I take Friday off?")
     assert metrics.compose_shape("post", "Poetry night on Saturday! #poetry #books")
     assert not metrics.compose_shape("post", "Poetry night! #a #b #c")
     assert metrics.compose_shape("note", "- sunscreen\n- towels")
+
+
+def test_fact_kept_ignores_spaces_and_case() -> None:
+    assert metrics.fact_kept("7am", "Our flight lands at 7 am.")
+    assert metrics.fact_kept("Q3", "the q3 report")
+    assert not metrics.fact_kept("8 months", "after eight months")
 
 
 def test_draft_shape_and_invented_details() -> None:

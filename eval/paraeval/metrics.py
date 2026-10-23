@@ -402,7 +402,7 @@ def table_rows(output: str) -> int:
 
 _GREETING = re.compile(
     r"^\s*((hi|hello|hey|dear|good (morning|afternoon|evening)|namaste|respected|sir|ma'am|madam)"
-    r"\b|(नमस्ते|नमस्कार|प्रिय|आदरणीय|सर|महोदय|मैडम))",
+    r"\b|(नमस्ते|नमस्कार|प्रिय|आदरणीय|सर|महोदय|मैडम)|\S+ जी,|.{1,40} को,$)",
     re.IGNORECASE,
 )
 _PLACEHOLDER = re.compile(r"\[[^\]\n]{1,40}\]|<[A-Z][a-z]+ ?[A-Za-z]*>")
@@ -572,7 +572,7 @@ def score_custom(item: dict[str, Any], output: str) -> CustomScore:
 
 @dataclass
 class ComposeScore:
-    shape_ok: bool  # email: Subject, greeting, [Your name]; message: no greeting; post: <= 2
+    shape_ok: bool  # email: Subject, greeting, no placeholder; message: no greeting; post: <= 2
     # hashtags; note: bullets
     kept: int  # facts from the description the text must carry
     protected: int
@@ -589,10 +589,10 @@ def compose_shape(preset: str, output: str) -> bool:
         return False
     if preset == "email":
         return (
-            lines[0].lower().startswith("subject:")
+            lines[0].lower().startswith(("subject:", "विषय:"))
             and len(lines) > 1
             and bool(_GREETING.match(lines[1]))
-            and "[your name]" in output.lower()
+            and not _PLACEHOLDER.search(output)
         )
     if preset == "message":
         return not _GREETING.match(lines[0]) or len(lines[0].split()) > 4
@@ -603,12 +603,18 @@ def compose_shape(preset: str, output: str) -> bool:
     return True
 
 
+def fact_kept(fact: str, output: str) -> bool:
+    """Whether a fact survives, ignoring case and spaces: "7am" is kept as "7 am"."""
+    squash = re.compile(r"\s+")
+    return squash.sub("", fact.lower()) in squash.sub("", output.lower())
+
+
 def score_compose(item: dict[str, Any], output: str) -> ComposeScore:
     facts = list(item.get("protected") or [])
     ok, why = language_check(item["lang"], item["text"], output)
     return ComposeScore(
         shape_ok=compose_shape(item["preset"], output),
-        kept=sum(f in output for f in facts),
+        kept=sum(fact_kept(f, output) for f in facts),
         protected=len(facts),
         words=len(output.split()),
         lang_ok=ok,
