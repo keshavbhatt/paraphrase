@@ -24,7 +24,7 @@ using namespace Qt::StringLiterals;
 namespace paraphrase::app {
 namespace {
 
-const QString kUsesKey = u"popup/uses/"_s;
+const QString kLastKey = u"popup/lastAction"_s;
 
 QVariantMap inputFor(SkillKind kind, const QString& text, const QString& targetLang)
 {
@@ -147,18 +147,10 @@ void PopupController::showText(const CapturedText& text)
 
 QString PopupController::likelyBase() const
 {
-    // The action the user picks most often, so the popup can work ahead (popup-actions.html).
-    const QSettings settings;
-    QString best = u"proofread"_s;
-    int most = -1;
-    for (const QString& base : m_catalog.actionBases()) {
-        const int uses = settings.value(kUsesKey + base, 0).toInt();
-        if (uses > most) {
-            most = uses;
-            best = base;
-        }
-    }
-    return best;
+    // The action used last, so the popup can work ahead (owner, 2026-10-23: rather than the
+    // one used most, which kept Reply on top for text of the user's own).
+    const QString last = QSettings().value(kLastKey).toString();
+    return m_catalog.actionBases().contains(last) ? last : u"proofread"_s;
 }
 
 void PopupController::readAhead()
@@ -186,8 +178,7 @@ void PopupController::run(const QString& skillId, const QString& targetLang)
     m_targetLang = targetLang;
     m_streamed.clear();
     const SkillKind kind = m_catalog.kindOf(skillId);
-    QSettings settings;
-    settings.setValue(kUsesKey + skill->base, settings.value(kUsesKey + skill->base, 0).toInt() + 1);
+    QSettings().setValue(kLastKey, skill->base);
     PopupResultPage* page = m_window->resultPage();
     const QString title = kind == SkillKind::Text ? m_catalog.actionTitle(skill->base) : tr("Reply");
     // Proofread shows the diff of the text itself (popup-proofread.html); the others show it too.

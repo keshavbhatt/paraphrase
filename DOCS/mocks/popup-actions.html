@@ -54,7 +54,7 @@
 <section class="notes"><h2>Notes</h2><ol>
   <li><b>Opens near the cursor</b> from the global shortcut, over any app, about 440 px wide. It remembers the app the text came from ("from Telegram"); if focus moves to another window before Replace, the result goes to the clipboard instead of being typed into the wrong window (PLAN 6).</li>
   <li><b>The captured text</b>: the selection where the session allows reading it (X11, KDE Wayland), else the clipboard. Word count and the detected language are shown; the language is what the result will be written in.</li>
-  <li><b>Actions</b> are skills (PLAN D4): number keys 1 to 7 pick one, arrow keys move, Enter runs the highlighted one. The highlighted action is the one the user picks most often, so the next point can work ahead.</li>
+  <li><b>Actions</b> are skills (PLAN D4): number keys 1 to 7 pick one, arrow keys move, Enter runs the highlighted one. The highlighted action is the one the user picked last (owner, 2026-10-23), so the next point can work ahead.</li>
   <li><b>Reading ahead</b>: as soon as the popup opens, the engine starts processing the text for the highlighted action (the daemon's <code>Warm()</code>, PLAN 5). On an 8 GB, 4-core laptop reading a 100-word text takes about 3 s; working ahead hides the second or so spent choosing. If the user picks another action the read-ahead is dropped. The line says what is happening in plain words, never a percentage.</li>
   <li><b>On this device</b> is always visible: nothing leaves the computer. Esc closes the popup from any state; the popup never keeps focus longer than needed. <b>Open in window</b> hands the text to the main window (ADR-013), for long texts or when the user wants to keep working on it.</li>
 </ol></section>

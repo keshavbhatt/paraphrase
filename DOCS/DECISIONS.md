@@ -101,7 +101,8 @@ context's cache. The skill schema has the switch since v3 (`speculative: none | 
 about a second before the user picks an action.
 
 **Decision.** When the popup opens, the daemon starts processing the captured text with the
-prompt of the action the user picks most often. If the user picks it, that work is reused
+prompt of the action the user picked last (until 2026-10-23: the one picked most often,
+which kept Reply on top for the user's own text; owner's choice). If the user picks it, that work is reused
 through the prompt cache; if not, it is dropped. No prompt change is needed: each skill's
 system prompt is already cached separately.
 
