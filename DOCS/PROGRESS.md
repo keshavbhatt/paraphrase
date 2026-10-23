@@ -16,6 +16,9 @@ Newest first. One entry per working session.
 
 ## 2026-10-23 - New skills, Full reply fix, screens matched to the mocks
 
+- Owner approved the three mocks built before approval (2026-10-23): main-window-compose.html,
+  settings-actions.html (with Delete asking "Delete?" at the same width) and
+  settings-general-shortcut.html.
 - Skills (eval reports in `eval/reports/`, numbers in DOCS/models.md "Prompt revisions"):
   summarize (revision 4, quality), format bullets, table and email (revision 5, fast),
   translate (revision 2, quality), draft email and chat (revision 5), custom for My actions
