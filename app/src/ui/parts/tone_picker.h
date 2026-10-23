@@ -26,17 +26,24 @@ public:
     void setTones(const QList<std::pair<QString, QString>>& tones);
     [[nodiscard]] const QString& tone() const { return m_tone; }
     void applyTheme(const Tokens& t);
+    [[nodiscard]] QString title() const { return m_title; }
+
+    [[nodiscard]] QSize sizeHint() const override;
+    [[nodiscard]] QSize minimumSizeHint() const override { return sizeHint(); }
 
 Q_SIGNALS:
     void changed(); ///< the user picked another tone
 
+protected:
+    void paintEvent(QPaintEvent* event) override;
+
 private:
     void choose(const QString& tone, const QString& title);
-    void showIcon();
 
     QString m_key;
     QString m_fallback;
     QString m_tone;
+    QString m_title;
     QStringList m_titles; ///< every tone's title, so the button can keep the widest one's width
     Tokens m_tokens;
 };

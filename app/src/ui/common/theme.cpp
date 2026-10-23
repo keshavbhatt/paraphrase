@@ -69,9 +69,6 @@ QPushButton[kind="action"] { min-height: 42px; border-radius: 10px; font-weight:
 QPushButton[kind="action"]:hover { border-color: @accent@; background: @panel@; }
 QPushButton[kind="action"]:checked { background: @accentStrong@; border-color: @accentStrong@; }
 QPushButton::menu-indicator { image: none; width: 0; }
-QPushButton#toneChoice { text-align: left; padding-right: 32px; }
-QPushButton#toneChoice::menu-indicator { image: url(:/icons/down-@scheme@.svg); subcontrol-origin: padding;
-    subcontrol-position: center right; width: 14px; height: 14px; right: -20px; }
 QPushButton[kind="choice"] { min-height: 46px; border-radius: 10px; padding: 0; text-align: left; }
 QPushButton[kind="choice"]:checked { background: @accentSoft@; border: 2px solid @accent@; }
 QPushButton[kind="choice"] QLabel#label { font-size: 15px; }
@@ -232,7 +229,6 @@ QString Theme::styleSheet(const Tokens& t)
     for (const auto& [name, colour] : colours) {
         css.replace(name.toString(), colour.name());
     }
-    css.replace(u"@scheme@"_s, t.dark ? u"dark"_s : u"light"_s);
     return css;
 }
 

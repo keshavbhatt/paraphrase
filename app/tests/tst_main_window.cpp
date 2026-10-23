@@ -442,6 +442,11 @@ private Q_SLOTS:
                 QVERIFY(menu->grab().save(dir + u"/menu-%1-%2.png"_s.arg(base, theme)));
                 menu->hide();
             }
+            w.findChild<paraphrase::app::ChipButton*>(u"action-compose"_s)->click();
+            QApplication::processEvents();
+            auto* tone =
+                w.findChild<paraphrase::app::ComposeInput*>()->findChild<paraphrase::app::TonePicker*>();
+            QVERIFY(tone->grab().save(dir + u"/tone-picker-%1.png"_s.arg(theme)));
         }
     }
 
