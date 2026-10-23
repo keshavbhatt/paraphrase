@@ -402,7 +402,7 @@ def table_rows(output: str) -> int:
 
 _GREETING = re.compile(
     r"^\s*((hi|hello|hey|dear|good (morning|afternoon|evening)|namaste|respected|sir|ma'am|madam)"
-    r"\b|(नमस्ते|नमस्कार|प्रिय|आदरणीय|सर|महोदय|मैडम)|\S+ जी,|.{1,40} को,$)",
+    r"\b|(नमस्ते|नमस्कार|प्रिय|आदरणीय|सर|महोदय|मैडम)|\S+ जी,|.{1,40} को,$|.{1,30} को (नमस्ते|नमस्कार),?$)",
     re.IGNORECASE,
 )
 _PLACEHOLDER = re.compile(r"\[[^\]\n]{1,40}\]|<[A-Z][a-z]+ ?[A-Za-z]*>")
@@ -601,6 +601,8 @@ def compose_shape(preset: str, output: str, signer: str = "") -> bool:
             and lines[-1].strip().lower() == (signer or "[your name]").lower()
             and not _PLACEHOLDER.search("\n".join(lines[:-1]))
         )
+    if _PLACEHOLDER.search(output):
+        return False  # only an email signs off, so nothing else has "[Your name]"
     if preset == "message":
         return not _GREETING.match(lines[0]) or len(lines[0].split()) > 4
     if preset == "post":

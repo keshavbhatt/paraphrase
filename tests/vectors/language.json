@@ -4412,6 +4412,12 @@
    "plain_name": "English"
   },
   {
+   "text": "notes from the design review: the login screen needs a bigger button, the settings page gets a search box, and Ravi checks the colours next week",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
    "text": "बैंक मैनेजर को ईमेल लिखो कि मेरा डेबिट कार्ड खो गया है, उसे ब्लॉक कर दें और नया कार्ड घर के पते पर भेज दें। मेरा खाता 2019 से इसी शाखा में है।",
    "lang": "hi",
    "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",

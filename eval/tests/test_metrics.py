@@ -173,12 +173,15 @@ def test_compose_shape_per_preset() -> None:
     assert not metrics.compose_shape("email", email + "\n[Your name]", "Priya Nair")
     hindi = "Subject: छुट्टी\n\nनमस्ते सर,\n\nक्या मैं शुक्रवार को छुट्टी ले सकता हूँ?\n\nधन्यवाद,\n[Your name]"
     assert metrics.compose_shape("email", hindi)
+    assert metrics.compose_shape("email", hindi.replace("नमस्ते सर,", "सभी को नमस्कार,"))
     card = "विषय: कार्ड\n\nबैंक मैनेजर को,\n\nकार्ड खो गया है।\n\nधन्यवाद,\n[Your name]"
     assert metrics.compose_shape("email", card)
     assert not metrics.compose_shape("email", "Hi Sarah,\n\nCould I take Friday off?")
     assert metrics.compose_shape("post", "Poetry night on Saturday! #poetry #books")
     assert not metrics.compose_shape("post", "Poetry night! #a #b #c")
     assert metrics.compose_shape("note", "- sunscreen\n- towels")
+    assert not metrics.compose_shape("note", "- sunscreen\n- towels\n\n[Your name]")
+    assert not metrics.compose_shape("message", "See you at 6.\n[Your name]")
 
 
 def test_fact_kept_ignores_spaces_and_case() -> None:
