@@ -105,10 +105,15 @@ inputs with no leftover tags, fenced data cannot escape, and grammars exist. Wit
 `--model <id>`, every grammar is also compiled by llama.cpp and a constrained sample output
 is checked against the skill's output schema.
 
-## Built-in skills (M0)
+## Built-in skills
 
 | Skill | Tier | Output | Notes |
 |---|---|---|---|
 | `proofread` | fast | full corrected text, word diff in the client | greedy decoding |
 | `reply` | fast | JSON `{"replies": [3 strings]}` via `grammars/reply3.gbnf` | one sequence writes all three so they differ |
 | `rewrite.<tone>` | quality | text | presets: professional, casual, polite, friendly, confident, concise, elaborate, social, emojify |
+| `summarize` | quality | text: one to three sentences, or up to five bullets | one call; input up to 3,000 tokens. Longer input is refused with `too-long`: chunking and merging (PLAN 3) is not built yet |
+| `format.<preset>` | fast | text | presets: bullets, table (Markdown), email; the content stays in the writer's words |
+| `translate` | quality | text | needs `target_lang`: the daemon accepts a request without it, but the language check then expects the input's language, so clients always send it; takes no `tone` |
+| `draft.<preset>` | quality | text | the Full reply (PLAN `reply.draft`): one complete reply to `context`, with optional `intent` and `tone`; presets: email, chat. Clients show it inside Reply |
+| `custom` | user's choice | text | schema v5 template for My actions (`user_presets: { values: [instruction] }`); never listed itself. Each saved action is `custom.<id>`; the output keeps the text's language, so a request to translate is done in that language (Translate is its own action) |
