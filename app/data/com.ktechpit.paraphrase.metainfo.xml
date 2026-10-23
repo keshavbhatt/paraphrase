@@ -8,6 +8,9 @@
   </developer>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>GPL-3.0-or-later</project_license>
+  <url type="homepage">https://github.com/keshavbhatt/paraphrase</url>
+  <url type="bugtracker">https://github.com/keshavbhatt/paraphrase/issues</url>
+  <url type="vcs-browser">https://github.com/keshavbhatt/paraphrase</url>
   <launchable type="desktop-id">com.ktechpit.paraphrase.desktop</launchable>
   <description>
     <p>
