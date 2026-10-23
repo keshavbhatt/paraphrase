@@ -303,7 +303,7 @@ Order: **M0 before anything else.** If a ~1 to 2B model on reference machine A c
 
 ## 11. Open questions (OPEN: ask the owner)
 
-1. Name: Paraphrase (decided). Still to do: reserve the snap name (`snapcraft register paraphrase`, or `paraphrase-ai` if taken), confirm `com.ktechpit.Paraphrase` on Flathub, register a domain, and get a short opinion from an IP lawyer on the US PARAPHRASE registration before a US launch
+1. Name: Paraphrase (decided). Still to do: reserve the snap name (`snapcraft register paraphrase`, or `paraphrase-ai` if taken), confirm `com.ktechpit.paraphrase` on Flathub, register a domain, and get a short opinion from an IP lawyer on the US PARAPHRASE registration before a US launch
 2. Licence and business model: open source (GPL), or proprietary with a free tier + one-time Pro (like TypingTutor)? If Pro, which features are Pro?
    *Partly answered (owner, 2026-10-21):* GPL-3.0-or-later with the Ktechpit Licensing Module carve-out, as in Omnidict (ADR-002). Whether there is a Pro tier, and what it holds, is still open.
 3. UI toolkit for the popup: Qt Quick (smoother animation, easier floating panel) or Widgets?
@@ -341,7 +341,7 @@ Rules:
 
 Brand name + keyword-rich title: the brand stays protectable and unique, and the keywords do the search work.
 
-- Snap name: `paraphrase` · Flatpak ID: `com.ktechpit.Paraphrase`
+- Snap name: `paraphrase` · Flatpak ID: `com.ktechpit.paraphrase` (owner, 2026-10-23)
 - Store title: **Paraphrase - Offline AI Writing Assistant**
 - Always present the name with its qualifier: "Paraphrase - Offline AI Writing Assistant" in stores, "Paraphrase by KTechpit" on the website and About box. Never use the bare word as a stylised logo-only mark.
 - Trademark precautions: do not file a trademark on the bare word (it would be refused as descriptive, and it collides with the existing US registration); if a mark is wanted later, file the logo + "KTechpit" combination. Do not describe the app as a "random text generator" or "word processor" (the registered goods).

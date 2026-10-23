@@ -19,6 +19,8 @@ Newest first. One entry per working session.
 - Owner approved the three mocks built before approval (2026-10-23): main-window-compose.html,
   settings-actions.html (with Delete asking "Delete?" at the same width) and
   settings-general-shortcut.html.
+- Owner decided the Flatpak ID: `com.ktechpit.paraphrase` (lowercase, as the code and
+  DOCS/packaging.md already use); PLAN section 13 is updated.
 - Skills (eval reports in `eval/reports/`, numbers in DOCS/models.md "Prompt revisions"):
   summarize (revision 4, quality), format bullets, table and email (revision 5, fast),
   translate (revision 2, quality), draft email and chat (revision 5), custom for My actions
