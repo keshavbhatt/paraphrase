@@ -14,6 +14,15 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-23 (evening) - Full reply no longer takes the sender's plans as the user's
+
+- Owner report: "Thanks Gabri, cool idea" as the note on a long announcement that ended in the
+  sender's own plan came back with that plan written as the user's. Draft 10 adds one sentence:
+  a note that only thanks or praises gives a reply that does only that. Numbers and the rejected
+  wordings in DOCS/models.md "Prompt revisions"; four new hard eval items of this kind.
+- Known: E4B once wrote "I will check and send my card details" to a phishing message
+  (dr-en-104), as revision 9 did on E2B; the item has no pattern that catches it yet.
+
 ## 2026-10-23 (afternoon) - Skill prompts read once per skill, the last mock details
 
 - Engine (PLAN 5.3, per-skill prompt cache): four extra cache sequences keep the last system
