@@ -114,6 +114,7 @@ private:
     [[nodiscard]] QPushButton* buildLanguageLink();
     void updateButtons();
     void showResultView();
+    void fitInsertLabel();
 
     QLabel* m_title = nullptr;
     QLabel* m_lock = nullptr;

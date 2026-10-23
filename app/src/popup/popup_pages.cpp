@@ -28,6 +28,7 @@ namespace {
 
 constexpr int kIconSize = 14;
 constexpr int kMarkSize = 18;
+constexpr int kFootGap = 6;
 
 QFrame* band(const QString& name)
 {
@@ -285,7 +286,7 @@ QWidget* PopupResultPage::buildFoot()
     QFrame* foot = band(u"popupFoot"_s);
     auto* row = new QHBoxLayout(foot);
     row->setContentsMargins(16, 12, 16, 12);
-    row->setSpacing(8);
+    row->setSpacing(kFootGap); // 2 px under the mocks' 8: "Replace in Telegram" fits the 440 px popup
     m_insert = new ChipButton(QString(), tr("Enter"), ChipButton::ChipSide::After);
     m_insert->setObjectName(u"insert"_s);
     m_insert->setProperty("kind", u"primary"_s);
@@ -454,6 +455,7 @@ void PopupResultPage::updateButtons()
         m_insert->setLabel(tr("Insert reply"));
     } else {
         m_insert->setLabel(m_appName.isEmpty() ? tr("Replace") : tr("Replace in %1").arg(m_appName));
+        fitInsertLabel();
     }
     if (reply) {
         m_again->setText(tr("3 new ones"));
@@ -467,6 +469,24 @@ void PopupResultPage::updateButtons()
     m_insert->setEnabled(!m_running);
     m_copy->setEnabled(!m_running);
     m_again->setEnabled(!m_running || !reply);
+}
+
+void PopupResultPage::fitInsertLabel()
+{
+    // The footer holds Replace, Copy and Retry in the popup's width: a long app name is cut
+    // with "…" rather than the label being clipped mid-letter ("Replace in Telegran").
+    constexpr int kFooterWidth = 440 - (2 * 16) - (2 * kFootGap); // the popup, .pfoot padding, two gaps
+    const int others = std::max(m_copy->sizeHint().width(), m_copy->minimumWidth()) +
+                       std::max(m_again->sizeHint().width(), m_again->minimumWidth());
+    const int over = m_insert->sizeHint().width() - (kFooterWidth - others);
+    if (over <= 0) {
+        return;
+    }
+    QFont f = m_insert->font();
+    f.setWeight(QFont::Medium); // QLabel#label in the style sheet
+    const QFontMetrics fm(f);
+    const QString name = fm.elidedText(m_appName, Qt::ElideRight, fm.horizontalAdvance(m_appName) - over - 2);
+    m_insert->setLabel(name.size() <= 1 ? tr("Replace") : tr("Replace in %1").arg(name));
 }
 
 void PopupResultPage::applyTheme(const Tokens& t)

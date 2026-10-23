@@ -4,8 +4,6 @@
 
 #include <QWidget>
 
-class QStackedWidget;
-
 namespace paraphrase::util {
 class LanguageDetector;
 }
@@ -43,13 +41,14 @@ Q_SIGNALS:
 protected:
     void keyPressEvent(QKeyEvent* event) override;
     void closeEvent(QCloseEvent* event) override;
+    bool event(QEvent* event) override;
     void changeEvent(QEvent* event) override;
 
 private:
-    QStackedWidget* m_pages = nullptr;
     PopupActionsPage* m_actions = nullptr;
     PopupResultPage* m_result = nullptr;
     Tokens m_tokens;
+    bool m_fitting = false;
 };
 
 } // namespace paraphrase::app

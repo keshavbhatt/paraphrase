@@ -65,7 +65,7 @@ QSize SkeletonView::sizeHint() const
         // Three cards of two, one and two lines (paintCards).
         return {QWidget::sizeHint().width(), (6 * kInset) + (5 * kBar) + (2 * kCardRowGap) + (2 * kCardGap)};
     }
-    return {QWidget::sizeHint().width(), (m_lines * (kBar + kRowGap)) + 4};
+    return {QWidget::sizeHint().width(), (m_lines * (kBar + kRowGap)) - kRowGap + (2 * kInset) + 4};
 }
 
 void SkeletonView::applyTheme(const Tokens& t)
@@ -148,7 +148,10 @@ void SkeletonView::paintEvent(QPaintEvent* /*event*/)
             widths.push_back(i + 1 == m_lines && m_lines > 1 ? 58
                                                              : kText.at(static_cast<std::size_t>(i) % 4));
         }
-        paintBars(p, QRectF(0, 4, width(), height() - 4), widths, kRowGap, brush);
+        // In the result box's own outline, as the answer will be (popup: #resultBox).
+        paintOutline(p, QRectF(0, 0, width(), height()), m_tokens.border, m_tokens.input);
+        paintBars(p, QRectF(kInset, kInset + 2, width() - (2 * kInset), height() - (2 * kInset)), widths,
+                  kRowGap, brush);
         return;
     }
     const int top = m_shape == Shape::Text ? kTextTop : kMargin;

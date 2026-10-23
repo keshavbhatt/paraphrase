@@ -10,6 +10,7 @@
 #include <QHBoxLayout>
 #include <QMenu>
 #include <QShortcut>
+#include <QTimer>
 
 using namespace Qt::StringLiterals;
 
@@ -97,13 +98,29 @@ ChipButton* ActionBar::addAction(int number, const QString& base)
         m_built.append(shortcut);
         connect(shortcut, &QShortcut::activated, b, [b] {
             if (b->menu() != nullptr) {
-                b->showMenu();
+                openFromKeyboard(b);
             } else {
                 b->click();
             }
         });
     }
     return b;
+}
+
+void ActionBar::openFromKeyboard(ChipButton* button)
+{
+    // The first item is ready for Enter or the arrows (live check: it took two presses of
+    // Down to reach the second tone).
+    QMenu* menu = button->menu();
+    QTimer::singleShot(0, menu, [menu] {
+        for (QAction* a : menu->actions()) {
+            if (!a->isSeparator() && a->isEnabled()) {
+                menu->setActiveAction(a);
+                break;
+            }
+        }
+    });
+    button->showMenu();
 }
 
 QMenu* ActionBar::presetMenu(ChipButton* button, const QString& base)

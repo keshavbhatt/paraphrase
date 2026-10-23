@@ -61,6 +61,8 @@ Q_SIGNALS:
 
 private:
     [[nodiscard]] ChipButton* addAction(int number, const QString& base);
+    /// Opens an action's menu from its number key, the first item highlighted.
+    static void openFromKeyboard(ChipButton* button);
     [[nodiscard]] QMenu* presetMenu(ChipButton* button, const QString& base);
     [[nodiscard]] QMenu* languageMenu(ChipButton* button, const QString& skillId);
     void fillLanguages(QMenu* menu, const QString& skillId);

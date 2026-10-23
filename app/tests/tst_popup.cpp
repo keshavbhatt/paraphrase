@@ -98,7 +98,12 @@ private Q_SLOTS:
         pick(popup, u"action-proofread"_s);
         QVERIFY(m_sent.isEmpty()); // nothing goes back without a click
         auto* insert = popup.window()->findChild<ChipButton*>(u"insert"_s);
-        QCOMPARE(insert->label(), u"Replace in Telegram"_s);
+        // "Replace in Telegram", or cut with "…" where the fonts run wide (the build
+        // container draws boxes): never clipped mid-letter.
+        const QString label = insert->label();
+        QVERIFY2(label == u"Replace in Telegram"_s || label == u"Replace"_s ||
+                     (label.startsWith(u"Replace in Tel"_s) && label.endsWith(u'…')),
+                 qPrintable(label));
         insert->click();
         QCOMPARE(m_sent, QStringList{u"Mia doesn't know where the keys are."_s});
     }
@@ -185,7 +190,7 @@ private Q_SLOTS:
             m_daemon.setAnswers(
                 {u"Mia doesn't know where the keys are, can you check the drawer next to the fridge?"_s});
             pick(popup, u"action-proofread"_s);
-            QCoreApplication::processEvents(); // queued shows land first
+            QTest::qWait(100); // the result box and its rows settle, and the popup fits them
             QVERIFY(popup.window()->grab().save(dir + u"/popup-proofread-%1.png"_s.arg(name)));
             popup.showText(
                 selected(u"bhaiya parcel aapke ghar ke bahar rakh du? koi phone nahi utha raha"_s));

@@ -7,7 +7,6 @@
 #include <QKeyEvent>
 #include <QPushButton>
 #include <QScreen>
-#include <QStackedWidget>
 #include <QVBoxLayout>
 
 using namespace Qt::StringLiterals;
@@ -21,7 +20,6 @@ constexpr int kWidth = 440;
 
 PopupWindow::PopupWindow(const util::LanguageDetector& detector, QWidget* parent)
     : QWidget(parent, Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint)
-    , m_pages(new QStackedWidget)
     , m_actions(new PopupActionsPage(detector))
     , m_result(new PopupResultPage(detector))
 {
@@ -34,10 +32,12 @@ PopupWindow::PopupWindow(const util::LanguageDetector& detector, QWidget* parent
     frame->setObjectName(u"popup"_s);
     auto* inner = new QVBoxLayout(frame);
     inner->setContentsMargins(0, 0, 0, 0);
-    inner->addWidget(m_pages);
+    // One page shows at a time. Not a QStackedWidget: that one is as tall as its tallest
+    // page, which left the short actions page with an empty band (live check, 2026-10-23).
+    inner->addWidget(m_actions);
+    inner->addWidget(m_result);
+    m_result->hide();
     outer->addWidget(frame);
-    m_pages->addWidget(m_actions);
-    m_pages->addWidget(m_result);
     setFixedWidth(kWidth);
     connect(m_actions, &PopupActionsPage::closeRequested, this, &QWidget::close);
     connect(m_result, &PopupResultPage::closeRequested, this, &QWidget::close);
@@ -47,13 +47,15 @@ PopupWindow::PopupWindow(const util::LanguageDetector& detector, QWidget* parent
 
 void PopupWindow::showActions()
 {
-    showOnly(m_pages, m_actions);
+    m_result->hide();
+    m_actions->show();
     adjustSize();
 }
 
 void PopupWindow::showResult()
 {
-    showOnly(m_pages, m_result);
+    m_actions->hide();
+    m_result->show();
     adjustSize();
 }
 
@@ -88,7 +90,7 @@ void PopupWindow::keyPressEvent(QKeyEvent* event)
     }
     // Enter on a result is Replace or Insert reply (popup-proofread.html, note 4).
     const bool enter = event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter;
-    if (enter && m_pages->currentWidget() == m_result) {
+    if (enter && m_result->isVisible()) {
         if (auto* insert = m_result->findChild<QPushButton*>(u"insert"_s);
             insert != nullptr && insert->isEnabled()) {
             insert->click();
@@ -105,6 +107,19 @@ void PopupWindow::changeEvent(QEvent* event)
         applyTheme();
     }
     QWidget::changeEvent(event);
+}
+
+bool PopupWindow::event(QEvent* event)
+{
+    const bool handled = QWidget::event(event);
+    // The popup hugs its content (popup-proofread.html: "the box hugs the text"): when what
+    // it shows asks for more or less room, the window follows, after Qt laid it out.
+    if (event->type() == QEvent::LayoutRequest && !m_fitting) {
+        m_fitting = true;
+        adjustSize();
+        m_fitting = false;
+    }
+    return handled;
 }
 
 void PopupWindow::closeEvent(QCloseEvent* event)
