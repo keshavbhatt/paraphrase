@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Paraphrase mock: First run, over any app</title><link rel="stylesheet" href="mock.css"><script src="mock.js"></script>
+<style>
+  .setup { max-width: 780px; }
+  .steps { display: flex; gap: 18px; list-style: none; margin: 0; padding: 0; font-size: 13px; }
+  .steps li { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+  .steps li.on { color: var(--text); font-weight: 600; }
+  .steps .n { width: 18px; height: 18px; border-radius: 9px; display: grid; place-items: center; font: 600 11px ui-monospace, monospace; border: 1px solid var(--border); }
+  .steps li.on .n { background: var(--accent-strong); border-color: var(--accent-strong); color: var(--accent-text); }
+  .grant { display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; gap: 14px; align-items: center; padding: 16px; border-radius: 12px; border: 1px solid var(--border); background: var(--panel); }
+  .grant .badge { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); }
+  .grant .side { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; min-width: 170px; }
+  .grant h3 { font-size: 15px; }
+  .states { max-width: 780px; margin: 0 auto 32px; padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
+  .states h2 { margin: 6px 0 4px; }
+  @media (max-width: 640px) { .grant { grid-template-columns: 36px minmax(0, 1fr); } .grant .side { grid-column: 1 / -1; align-items: flex-start; } }
+</style></head>
+<body>
+<div class="window setup">
+  <div class="titlebar"><div class="lights"><i></i><i></i><i></i></div><div class="title">Set up Paraphrase</div><div class="wc"><span>−</span><span>□</span><span>✕</span></div></div>
+  <div class="row" style="padding: 16px 24px; background: var(--bar); border-bottom: 1px solid var(--border)">
+    <h1 style="font-size: 16px">Set up Paraphrase</h1><span class="grow"></span>
+    <ol class="steps">
+      <li class="on" aria-current="step"><span class="n">1</span>Over any app</li>
+      <li><span class="n">2</span>Model</li>
+      <li><span class="n">3</span>Try it</li>
+    </ol>
+  </div>
+  <div class="stack" style="padding: 22px 24px; gap: 16px">
+    <div class="stack" style="gap: 8px">
+      <h2 style="font-size: 20px">Use Paraphrase over any app</h2>
+      <p class="muted" style="max-width: 620px">Select text anywhere, press the shortcut, pick an action, and the result goes back where the text was. Your desktop asks you about each of these once. You can skip both: everything also works in Paraphrase's own window.</p>
+    </div>
+
+    <div class="grant">
+      <span class="badge"><svg class="ic"><use href="#i-keyboard"/></svg></span>
+      <div class="stack" style="gap: 4px">
+        <h3>Shortcut</h3>
+        <span class="small muted">Opens Paraphrase on the text you selected, over the app you are in.</span>
+      </div>
+      <div class="side">
+        <span class="row"><span class="kbd">Ctrl</span><span class="kbd">Alt</span><span class="kbd">Space</span></span>
+        <span class="pill ok"><svg class="ic s"><use href="#i-check"/></svg>Set</span>
+      </div>
+    </div>
+
+    <div class="grant">
+      <span class="badge"><svg class="ic"><use href="#i-text-cursor-input"/></svg></span>
+      <div class="stack" style="gap: 4px">
+        <h3>Put the result back</h3>
+        <span class="small muted">Replace and Insert type the result into the app the text came from, and only when you press them. Your desktop calls this "Control input devices".</span>
+      </div>
+      <div class="side">
+        <button class="btn primary">Allow</button>
+        <span class="small muted">Your desktop asks in its own window</span>
+      </div>
+    </div>
+
+    <div class="row small" style="align-items: flex-start; gap: 10px"><span class="private"><svg class="ic s"><use href="#i-lock"/></svg></span><span>Paraphrase types only after you press Replace or Insert, into the window the text came from, and never sends a message. Nothing you write leaves this computer.</span></div>
+  </div>
+  <div class="row" style="padding: 14px 24px; border-top: 1px solid var(--border); background: var(--bar)">
+    <button class="btn big flat">Skip for now</button><span class="grow"></span>
+    <span class="small muted">You can change both later in Settings</span>
+    <button class="btn big primary">Next<svg class="ic s"><use href="#i-forward"/></svg></button>
+  </div>
+  <span class="pin" style="left: 700px; top: 205px">1</span>
+  <span class="pin" style="left: 700px; top: 312px">2</span>
+  <span class="pin" style="left: 20px; top: 372px">3</span>
+</div>
+
+<section class="states" aria-label="Put the result back, every state">
+  <h2>"Put the result back", step by step</h2>
+  <div class="grant">
+    <span class="badge"><svg class="ic"><use href="#i-text-cursor-input"/></svg></span>
+    <div class="stack" style="gap: 4px"><h3>Put the result back</h3><span class="small muted">a. Asked: the desktop's own window is open over this one.</span></div>
+    <div class="side"><button class="btn primary disabled">Allow</button><span class="small muted">Waiting for your answer</span></div>
+  </div>
+  <div class="grant">
+    <span class="badge"><svg class="ic"><use href="#i-text-cursor-input"/></svg></span>
+    <div class="stack" style="gap: 4px"><h3>Put the result back</h3><span class="small muted">b. Allowed: Replace and Insert type the result back.</span></div>
+    <div class="side"><span class="pill ok"><svg class="ic s"><use href="#i-check"/></svg>Allowed</span></div>
+  </div>
+  <div class="grant">
+    <span class="badge"><svg class="ic"><use href="#i-text-cursor-input"/></svg></span>
+    <div class="stack" style="gap: 4px"><h3>Put the result back</h3><span class="small muted">c. Not allowed: the result goes on the clipboard, and the popup says "press Ctrl+V". You can allow it here again, or later in Settings.</span></div>
+    <div class="side"><button class="btn">Allow</button><span class="pill warn">Not allowed</span></div>
+  </div>
+  <div class="grant">
+    <span class="badge"><svg class="ic"><use href="#i-text-cursor-input"/></svg></span>
+    <div class="stack" style="gap: 4px"><h3>Put the result back</h3><span class="small muted">d. Nothing to allow on this desktop (X11): it works as it is.</span></div>
+    <div class="side"><span class="pill ok"><svg class="ic s"><use href="#i-check"/></svg>Ready</span></div>
+  </div>
+</section>
+
+<section class="notes"><h2>Notes</h2><ol>
+  <li><b>The shortcut</b>: set through the desktop when it offers one (the KDE and GNOME shortcut portal), its own dialog lets the user change the keys. Where it cannot be set, the row says how to bind <code>paraphrase-app --popup</code> by hand (settings-general-shortcut.html), with no button.</li>
+  <li><b>Put the result back</b>: Allow opens the desktop's own "Control input devices" dialog now, at setup, instead of at the first Replace after a wait (owner, 2026-10-23). The answer is remembered, so it is asked once; a "no" leaves Replace on the clipboard with "press Ctrl+V". On X11 there is nothing to ask (d).</li>
+  <li><b>Optional</b>: Skip for now and Next both go on; nothing here blocks setup (ADR-013: standalone first). The same two rows are in Settings, General and shortcut. This step comes first in setup again: the placeholder "Shortcut (later)" step goes.</li>
+</ol></section>
+</body></html>
