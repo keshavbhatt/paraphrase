@@ -4,50 +4,50 @@
   "skill_version": 5,
   "skill_revision": 10,
   "profile": "B-cpu",
-  "load_s": 2.57,
+  "load_s": 2.53,
   "peak_rss_mb": 4482,
   "backend": "llama-server",
   "tag": "smoke",
-  "when": "2026-10-23 21:35",
+  "when": "2026-10-23 22:48",
   "groups": {
     "all": {
       "n": 5,
       "lang_floor_fail": [],
-      "ttft_s_median": 1.917,
-      "total_s_median": 4.061,
-      "gen_tps_median": 20.2,
+      "ttft_s_median": 2.072,
+      "total_s_median": 4.105,
+      "gen_tps_median": 19.7,
       "retried_pct": 0.0,
       "lang_warned": [],
       "changed_pct": 100.0,
       "protected_kept_pct": 100.0,
       "preamble_pct": 0.0,
-      "length_ratio_median": 1.11
+      "length_ratio_median": 1.08
     },
     "lang=en": {
       "n": 5,
       "lang_floor_fail": [],
-      "ttft_s_median": 1.917,
-      "total_s_median": 4.061,
-      "gen_tps_median": 20.2,
+      "ttft_s_median": 2.072,
+      "total_s_median": 4.105,
+      "gen_tps_median": 19.7,
       "retried_pct": 0.0,
       "lang_warned": [],
       "changed_pct": 100.0,
       "protected_kept_pct": 100.0,
       "preamble_pct": 0.0,
-      "length_ratio_median": 1.11
+      "length_ratio_median": 1.08
     },
     "set=generated": {
       "n": 5,
       "lang_floor_fail": [],
-      "ttft_s_median": 1.917,
-      "total_s_median": 4.061,
-      "gen_tps_median": 20.2,
+      "ttft_s_median": 2.072,
+      "total_s_median": 4.105,
+      "gen_tps_median": 19.7,
       "retried_pct": 0.0,
       "lang_warned": [],
       "changed_pct": 100.0,
       "protected_kept_pct": 100.0,
       "preamble_pct": 0.0,
-      "length_ratio_median": 1.11
+      "length_ratio_median": 1.08
     }
   }
 }

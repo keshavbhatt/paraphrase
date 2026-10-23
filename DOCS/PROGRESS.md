@@ -14,6 +14,36 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-23 (late night) - The popup checked live, Write 7 note titles
+
+- The popup driven live on KDE Wayland (KWrite as the source, the owner's shortcut), compared
+  with popup-actions.html and popup-proofread.html. Fixed:
+  - the source app by its name ("from KWrite", "Replace in KWrite"), from its desktop file,
+    not its id ("org.kde.l..."); a long name is cut with "…", never mid-letter;
+  - the popup fits its content: no empty band under the actions (the page stack took the
+    result page's 565 px), no jump from 567 px when a result comes;
+  - the working pill and the shape of the answer while it runs (main-window-busy.html), sized
+    to the text; retries show; the caret while words stream;
+  - every proofread change listed with a short reason ("spelling", "capital letter",
+    "question mark"), as popup-proofread.html note 3 asks; before, two rows of five showed;
+  - Replace typed nothing: it waited for the source window to get the focus back while the
+    popup kept it. The popup now steps aside first, and comes back with "on the clipboard"
+    if the text could not go back;
+  - on Wayland the popup came up behind the app in use when the tray copy opened it: the
+    shortcut portal's activation token and the launcher's `XDG_ACTIVATION_TOKEN` (passed on by
+    `paraphrase-app --popup`) now bring it to the front;
+  - a menu opened from its number key starts on its first item.
+- KDE asked again for the "Control input devices" permission: the saved token was granted when
+  KDE still filed the app under Konsole. Approved again by the owner under its own id.
+- CLI: `paraphrase batch` crashed on exit now and then (a queued D-Bus event dropped while the
+  client was destroyed); it delivers them first.
+- Write 7: a note opens with a short title saying what it is about, not a date line ("Date:
+  Unspecified"). Numbers in DOCS/models.md.
+- Open: the popup highlights the most used action (popup-actions.html note 3), so text of the
+  user's own with typos got Reply highlighted after many Reply runs; whether to guess from the
+  text instead is the owner's call. The "Control input devices" permission is asked at the
+  first Replace, after a wait; asking during setup needs a mock.
+
 ## 2026-10-23 (night) - The result pane shows its work, menus with icons, Write 6
 
 - Mocks `main-window-busy.html` and `menus.html`, approved by the owner on 2026-10-23.
