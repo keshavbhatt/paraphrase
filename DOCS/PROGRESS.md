@@ -14,12 +14,19 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
-## 2026-10-23 (evening) - Full reply no longer takes the sender's plans as the user's
+## 2026-10-23 (evening) - Full reply keeps the sender's plans theirs, Write signs with the name, options run again
 
 - Owner report: "Thanks Gabri, cool idea" as the note on a long announcement that ended in the
   sender's own plan came back with that plan written as the user's. Draft 10 adds one sentence:
   a note that only thanks or praises gives a reply that does only that. Numbers and the rejected
   wordings in DOCS/models.md "Prompt revisions"; four new hard eval items of this kind.
+- Write 5: an email signs with the name the description gives ("Best regards, Keshav Bhatt")
+  instead of "[Your name]", and capitals are fixed ("Monday"). Numbers in DOCS/models.md.
+- App: a result always matches the options beside it. Once something ran on the text, a new
+  "Write it as", email or chat, tone, or quick or full reply runs again at once (a run still
+  going stops and starts over); before the first run they wait for Ctrl+Enter (owner: picking
+  Social post did nothing until Ctrl+Enter). Rule in DOCS/DESIGN.md section 4. The main window
+  tests now keep their settings in a temporary directory.
 - Known: E4B once wrote "I will check and send my card details" to a phishing message
   (dr-en-104), as revision 9 did on E2B; the item has no pattern that catches it yet.
 
