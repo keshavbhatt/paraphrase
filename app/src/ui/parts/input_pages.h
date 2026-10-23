@@ -112,6 +112,7 @@ public:
 
 Q_SIGNALS:
     void kindChanged(); ///< email or chat message
+    void toneChanged();
 
 private:
     QLabel* m_language = nullptr;
@@ -144,6 +145,7 @@ public:
 
 Q_SIGNALS:
     void kindChanged();
+    void toneChanged();
 
 private:
     QPlainTextEdit* m_description = nullptr;

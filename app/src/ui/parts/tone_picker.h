@@ -27,6 +27,9 @@ public:
     [[nodiscard]] const QString& tone() const { return m_tone; }
     void applyTheme(const Tokens& t);
 
+Q_SIGNALS:
+    void changed(); ///< the user picked another tone
+
 private:
     void choose(const QString& tone, const QString& title);
 

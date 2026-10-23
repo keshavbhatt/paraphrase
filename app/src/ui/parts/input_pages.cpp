@@ -182,6 +182,7 @@ FullReplyInput::FullReplyInput(QWidget* parent)
         QSettings().setValue(kKindKey, chat() ? u"chat"_s : u"email"_s);
         Q_EMIT kindChanged();
     });
+    connect(m_tone, &TonePicker::changed, this, &FullReplyInput::toneChanged);
     for (const QPlainTextEdit* edit : {m_message, m_intent}) {
         connect(edit, &QPlainTextEdit::textChanged, this, &InputPage::edited);
     }
@@ -273,6 +274,7 @@ ComposeInput::ComposeInput(QWidget* parent)
         QSettings().setValue(kComposeKindKey, kind());
         Q_EMIT kindChanged();
     });
+    connect(m_tone, &TonePicker::changed, this, &ComposeInput::toneChanged);
     connect(m_description, &QPlainTextEdit::textChanged, this, &InputPage::edited);
 }
 

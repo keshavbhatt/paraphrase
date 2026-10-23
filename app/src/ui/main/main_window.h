@@ -58,6 +58,9 @@ public Q_SLOTS:
     void selectSkill(const QString& skillId);
     void run();
     void cancel();
+    /// After an option changes (a kind, a tone, quick or full reply): the result on screen
+    /// is out of date, so run again, stopping a run that is still going.
+    void rerun();
     void copyResult();
 
 Q_SIGNALS:
@@ -111,7 +114,9 @@ private:
     QString m_streamed;     ///< text streamed so far
     QString m_fullReplyKey; ///< message and intent of the last full reply, to keep its versions
     bool m_fullReply = false;
-    bool m_rewriting = false; ///< a Tone preset runs on the result
+    bool m_rewriting = false;      ///< a Tone preset runs on the result
+    bool m_ran = false;            ///< something ran on the current text, so option changes run again
+    bool m_rerunAfterStop = false; ///< an option changed during a run
 };
 
 } // namespace paraphrase::app

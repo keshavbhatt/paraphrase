@@ -33,8 +33,12 @@ void TonePicker::setTones(const QList<std::pair<QString, QString>>& tones)
         QAction* item = menu()->addAction(title);
         item->setObjectName(u"tone-"_s + tone);
         connect(item, &QAction::triggered, this, [this, tone, title] {
+            const bool other = tone != m_tone;
             choose(tone, title);
             QSettings().setValue(m_key, tone);
+            if (other) {
+                Q_EMIT changed();
+            }
         });
         if (tone == saved || m_tone.isEmpty()) {
             choose(tone, title);

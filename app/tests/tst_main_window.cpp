@@ -8,6 +8,8 @@
 #include "daemon_client.h"
 #include "ui/common/chip_button.h"
 #include "ui/main/main_window.h"
+#include "ui/parts/input_pages.h"
+#include "ui/parts/tone_picker.h"
 
 #include <QAbstractButton>
 #include <QApplication>
@@ -19,6 +21,7 @@
 #include <QMutexLocker>
 #include <QPlainTextEdit>
 #include <QPushButton>
+#include <QSettings>
 #include <QSignalSpy>
 #include <QTemporaryDir>
 #include <QTest>
@@ -63,7 +66,15 @@ private:
         return w.findChild<QTextBrowser*>(u"output"_s)->toPlainText();
     }
 
+    QTemporaryDir m_settingsDir; ///< the tests' own QSettings, never the user's
+
 private Q_SLOTS:
+    void initTestCase()
+    {
+        QVERIFY(m_settingsDir.isValid());
+        QSettings::setPath(QSettings::NativeFormat, QSettings::UserScope, m_settingsDir.path());
+    }
+    void init() { QSettings().clear(); } // a tone or kind one test picks never reaches the next
     void cleanup() { m_daemon.stop(); }
 
     void buildsTheActionsFromTheSkills()
@@ -243,6 +254,56 @@ private Q_SLOTS:
         }
         const QString info = w.findChild<QLabel*>(u"outInfo"_s)->text();
         QVERIFY2(info.contains(u"kept: "_s) && info.contains(u"Monday"_s), qPrintable(info));
+    }
+
+    void optionChangesRunAgain()
+    {
+        // Owner (2026-10-23): picking Social post after a result did nothing until Ctrl+Enter.
+        // Once something ran, a new kind or tone runs again; before that, it waits.
+        QVERIFY(m_daemon.start({u"fast-model"_s, u"quality-model"_s}, 32, true));
+        MainWindow w;
+        w.start();
+        w.findChild<paraphrase::app::ChipButton*>(u"action-compose"_s)->click();
+        w.findChild<QPushButton*>(u"composeEmail"_s)->click();
+        const auto promptCount = [this] {
+            const QMutexLocker lock(&m_daemon.state->lock);
+            return m_daemon.state->prompts.size();
+        };
+        auto* text = w.findChild<QPlainTextEdit*>(u"composeText"_s);
+        text->setPlainText(u"office closed Monday"_s);
+        w.findChild<QPushButton*>(u"composeNote"_s)->click(); // nothing ran yet: no run
+        QApplication::processEvents();
+        const auto before = promptCount();
+        QCOMPARE(w.currentSkill(), u"compose.note"_s);
+        setAnswers(
+            {u"- Office closed Monday"_s, u"Office closed on Monday! #office"_s, u"Office closed Monday."_s});
+        runAndWait(w);
+        QCOMPARE(promptCount(), before + 1);
+
+        const QSignalSpy finished(&w, &MainWindow::finished);
+        w.findChild<QPushButton*>(u"composePost"_s)->click();
+        QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 1, kTimeoutMs);
+        QCOMPARE(w.currentSkill(), u"compose.post"_s);
+        QVERIFY(w.resultText().contains(u"#office"_s));
+
+        const auto* tone =
+            w.findChild<paraphrase::app::ComposeInput*>()->findChild<paraphrase::app::TonePicker*>();
+        QAction* other = nullptr;
+        for (QAction* a : tone->menu()->actions()) {
+            if (a->objectName() != u"tone-"_s + tone->tone()) {
+                other = a;
+                break;
+            }
+        }
+        QVERIFY(other != nullptr);
+        other->trigger();
+        QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 2, kTimeoutMs);
+        QCOMPARE(promptCount(), before + 3);
+
+        text->clear(); // cleared: options wait again
+        w.findChild<QPushButton*>(u"composeEmail"_s)->click();
+        QApplication::processEvents();
+        QCOMPARE(promptCount(), before + 3);
     }
 
     void listsMyActionsAndNewAction()

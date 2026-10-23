@@ -108,14 +108,28 @@ void MainWindow::connectParts()
         run();
     });
     m_actions->setTextLanguage([this] { return m_input->language(); });
-    connect(m_input, &InputPane::fullReplyToggled, this, &MainWindow::chooseReply);
-    connect(m_input->fullReplyInput(), &FullReplyInput::kindChanged, this, [this] { chooseReply(true); });
+    connect(m_input, &InputPane::fullReplyToggled, this, [this](bool full) {
+        chooseReply(full);
+        rerun();
+    });
+    connect(m_input->fullReplyInput(), &FullReplyInput::kindChanged, this, [this] {
+        chooseReply(true);
+        rerun();
+    });
+    connect(m_input->fullReplyInput(), &FullReplyInput::toneChanged, this, &MainWindow::rerun);
     connect(m_actions, &ActionBar::composeChosen, this, [this] {
         chooseCompose();
         run();
     });
-    connect(m_input->composeInput(), &ComposeInput::kindChanged, this, &MainWindow::chooseCompose);
+    connect(m_input->composeInput(), &ComposeInput::kindChanged, this, [this] {
+        chooseCompose();
+        rerun();
+    });
+    connect(m_input->composeInput(), &ComposeInput::toneChanged, this, &MainWindow::rerun);
     connect(m_input, &InputPane::edited, this, [this] {
+        if (m_input->page()->subject().trimmed().isEmpty()) {
+            m_ran = false; // cleared: options wait for the next Ctrl+Enter
+        }
         if (const SkillInfo* s = m_catalog.find(m_skill)) {
             m_runner->warmLater(m_skill, m_input->page()->input(*s, m_targetLang));
         }
@@ -322,6 +336,7 @@ void MainWindow::run()
     }
     m_requestInput = in.value(s->mainInputIsContext() ? u"context"_s : u"text"_s).toString();
     m_rewriting = false;
+    m_ran = true;
     m_streamed.clear();
     selectSkill(m_skill); // the right view, also after a message was shown
     if (kind == SkillKind::Text) {
@@ -339,7 +354,21 @@ void MainWindow::run()
 
 void MainWindow::cancel()
 {
+    m_rerunAfterStop = false;
     m_runner->cancel();
+}
+
+void MainWindow::rerun()
+{
+    if (!m_ran) {
+        return; // nothing on screen yet: Ctrl+Enter or an action runs it
+    }
+    if (busy()) {
+        m_runner->cancel();
+        m_rerunAfterStop = true;
+        return;
+    }
+    run();
 }
 
 void MainWindow::onSecondary()
@@ -402,6 +431,14 @@ void MainWindow::onToken(const QString& piece)
 void MainWindow::onFinished(const QJsonObject& result)
 {
     m_output->setRunning(false);
+    if (m_rerunAfterStop) {
+        // An option changed while this ran and the answer came before the stop: it is stale.
+        m_rerunAfterStop = false;
+        m_rewriting = false;
+        Q_EMIT finished();
+        run();
+        return;
+    }
     const QString output = result.value(u"output"_s).toString().trimmed();
     const SkillKind kind = m_catalog.kindOf(m_skill);
     if (m_rewriting) {
@@ -473,6 +510,12 @@ void MainWindow::onFailed(const QString& code, const QString& message)
 {
     m_rewriting = false;
     m_output->setRunning(false);
+    if (code == u"cancelled"_s && m_rerunAfterStop) {
+        m_rerunAfterStop = false;
+        Q_EMIT finished();
+        run(); // stopped for an option change: run with the new one
+        return;
+    }
     if (code == u"cancelled"_s) {
         m_output->setInfo(tr("· stopped"));
     } else {

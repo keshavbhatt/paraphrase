@@ -95,5 +95,8 @@ holds the main action (Replace or Insert, Enter) and Copy and Retry.
   carry words.
 - Keyboard first: numbers pick actions and replies, Enter runs the main action, Esc closes;
   the focus ring is the accent.
+- A result on screen always matches the options shown beside it: once something ran on the
+  current text, picking another kind, tone or quick/full reply runs it again at once (a run
+  still going stops and starts over). Before the first run, options only wait for Ctrl+Enter.
 - Dark and light are both first class; screenshots for the owner are taken in both.
 - Nothing in the UI mentions accounts or app licensing.
