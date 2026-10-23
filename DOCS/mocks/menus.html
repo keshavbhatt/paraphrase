@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Paraphrase mock: Menus with icons</title><link rel="stylesheet" href="mock.css"><script src="mock.js"></script>
+<style>
+  .wrap { padding: 18px 16px 24px; display: flex; flex-direction: column; gap: 18px; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .menus { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 18px; align-items: start; }
+  .mcol { display: flex; flex-direction: column; gap: 8px; }
+  .mcol > .action { align-self: flex-start; border-color: var(--accent); }
+
+  /* QMenu as theme.cpp styles it (elevated, border, 4px padding, 6px items), now with a
+     16px icon in a fixed column so the labels line up. */
+  .menu { background: var(--elevated); border: 1px solid var(--border); border-radius: 8px; padding: 4px; box-shadow: var(--shadow); min-width: 220px; }
+  .menu .it { display: flex; align-items: center; gap: 10px; min-height: 32px; padding: 0 14px 0 10px; border-radius: 6px; color: var(--text); white-space: nowrap; }
+  .menu .it.sel { background: var(--hover); }
+  .menu .it > .ic { width: 16px; height: 16px; color: var(--muted); }
+  .menu .it.sel > .ic { color: var(--accent); }
+  .menu .it .native { margin-left: auto; padding-left: 16px; color: var(--muted); font-size: 12px; }
+  .menu .sec { padding: 8px 10px 4px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .menu hr { border: 0; border-top: 1px solid var(--border); margin: 4px 6px; }
+  /* A language is not a country: its badge is its own script, never a flag. */
+  .script { width: 26px; height: 22px; flex: none; display: grid; place-items: center; border-radius: 4px; background: var(--hover); color: var(--text); font-size: 14px; font-weight: 500; line-height: 1; }
+  /* The user's own actions have no fixed icon: the first letter of the name. */
+  .letter { width: 18px; height: 18px; flex: none; display: grid; place-items: center; border-radius: 9px; background: var(--accent-soft); color: var(--accent); font-size: 10px; font-weight: 700; }
+  .picker { display: flex; align-items: center; gap: 8px; }
+</style></head>
+<body>
+<div class="window">
+  <div class="titlebar"><div class="lights"><i></i><i></i><i></i></div><div class="title">Paraphrase</div><div class="wc"><span>−</span><span>□</span><span>✕</span></div></div>
+  <div class="wrap">
+    <div class="menus">
+      <div class="mcol">
+        <button class="action"><span class="num">Ctrl 2</span>Tone<svg class="ic s muted"><use href="#i-down"/></svg></button>
+        <div class="menu" role="menu" aria-label="Tone">
+          <div class="it"><svg class="ic"><use href="#i-briefcase"/></svg>Professional</div>
+          <div class="it"><svg class="ic"><use href="#i-coffee"/></svg>Casual</div>
+          <div class="it"><svg class="ic"><use href="#i-hand-heart"/></svg>Polite</div>
+          <div class="it sel"><svg class="ic"><use href="#i-smile"/></svg>Friendly</div>
+          <div class="it"><svg class="ic"><use href="#i-badge-check"/></svg>Confident</div>
+          <div class="it"><svg class="ic"><use href="#i-shrink"/></svg>Concise</div>
+          <div class="it"><svg class="ic"><use href="#i-enlarge"/></svg>Elaborate</div>
+          <div class="it"><svg class="ic"><use href="#i-megaphone"/></svg>Social</div>
+          <div class="it"><svg class="ic"><use href="#i-smile-plus"/></svg>Emojify</div>
+        </div>
+      </div>
+
+      <div class="mcol">
+        <button class="action"><span class="num">Ctrl 5</span>Format<svg class="ic s muted"><use href="#i-down"/></svg></button>
+        <div class="menu" role="menu" aria-label="Format">
+          <div class="it sel"><svg class="ic"><use href="#i-list"/></svg>Bullets</div>
+          <div class="it"><svg class="ic"><use href="#i-table"/></svg>Table</div>
+          <div class="it"><svg class="ic"><use href="#i-mail"/></svg>Email</div>
+        </div>
+        <span class="cap" style="margin-top: 14px">Tone in Write and Full reply</span>
+        <div class="picker"><span class="small muted">Tone</span><button class="btn"><svg class="ic s muted"><use href="#i-smile"/></svg>Friendly<svg class="ic s muted"><use href="#i-down"/></svg></button></div>
+      </div>
+
+      <div class="mcol">
+        <button class="action"><span class="num">Ctrl 6</span>Translate<svg class="ic s muted"><use href="#i-down"/></svg></button>
+        <div class="menu" role="menu" aria-label="Translate">
+          <div class="it sel"><span class="script" lang="hi">अ</span>Hindi<span class="native" lang="hi">हिन्दी</span></div>
+          <div class="it"><span class="script">अa</span>Hinglish<span class="native">Hindi in Latin letters</span></div>
+          <div class="sec">Best effort</div>
+          <div class="it"><span class="script" lang="mr">म</span>Marathi<span class="native" lang="mr">मराठी</span></div>
+          <div class="it"><span class="script" lang="bn">অ</span>Bengali<span class="native" lang="bn">বাংলা</span></div>
+          <div class="it"><span class="script" lang="ta">த</span>Tamil<span class="native" lang="ta">தமிழ்</span></div>
+          <div class="it"><span class="script" lang="ur">ا</span>Urdu<span class="native" lang="ur">اردو</span></div>
+          <div class="it"><span class="script" lang="es">Aa</span>Spanish<span class="native" lang="es">Español</span></div>
+          <div class="it"><span class="script" lang="ar">ع</span>Arabic<span class="native" lang="ar">العربية</span></div>
+          <div class="it"><span class="script" lang="zh">中</span>Chinese<span class="native" lang="zh">中文</span></div>
+          <div class="it"><span class="script" lang="ja">あ</span>Japanese<span class="native" lang="ja">日本語</span></div>
+          <div class="it"><span class="script" lang="ru">Я</span>Russian<span class="native" lang="ru">Русский</span></div>
+          <div class="it muted" style="min-height: 22px; font-size: 12px; padding-left: 46px">and 12 more</div>
+        </div>
+      </div>
+
+      <div class="mcol">
+        <button class="action"><span class="num">Ctrl 8</span>My actions<svg class="ic s muted"><use href="#i-down"/></svg></button>
+        <div class="menu" role="menu" aria-label="My actions">
+          <div class="it sel"><span class="letter">E</span>Explain it simply</div>
+          <div class="it"><span class="letter">M</span>Meeting notes to tasks</div>
+          <div class="it"><span class="letter">F</span>Fix my Hinglish</div>
+          <hr>
+          <div class="it"><svg class="ic"><use href="#i-plus"/></svg>New action...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <span class="pin" style="left: 6px; top: 118px">1</span>
+  <span class="pin" style="left: 326px; top: 252px">2</span>
+  <span class="pin" style="left: 588px; top: 118px">3</span>
+  <span class="pin" style="left: 880px; top: 118px">4</span>
+</div>
+<section class="notes"><h2>Notes</h2><ol>
+  <li><b>Every preset has an icon</b>, the same thin line icons as the rest of the app (Lucide), muted, in a fixed column so the names line up. The highlighted item's icon takes the accent. Tone: a briefcase for Professional, a cup for Casual, a hand with a heart for Polite, a smile for Friendly, a badge for Confident, arrows in for Concise and out for Elaborate, a megaphone for Social, a smile with a plus for Emojify. Format: a list, a table, an envelope.</li>
+  <li><b>The Tone picker</b> in Write and Full reply shows the chosen tone's icon too, from the same set, so a tone looks the same wherever it is picked.</li>
+  <li><b>Languages get their own script</b>, never a flag: a language is not a country (Hindi, Urdu, Spanish, Arabic are each spoken in many), and a script is what the reader recognises. On the right, the language's name in its own writing. The text's own language stays out of the list, as now, and the untested ones keep their "Best effort" heading.</li>
+  <li><b>My actions</b> are the user's own, so no fixed icon fits: each shows the first letter of its name on the accent's soft colour. New action keeps the plus, under a line.</li>
+</ol></section>
+</body></html>
