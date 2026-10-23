@@ -125,6 +125,7 @@ TextResultView::TextResultView(QWidget* parent)
     m_output->setObjectName(u"output"_s);
     m_output->setOpenLinks(false);
     m_output->document()->setDocumentMargin(0); // the pane's 14 px is the whole inset
+    m_output->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere); // long links wrap too
     connect(m_output->document()->documentLayout(), &QAbstractTextDocumentLayout::documentSizeChanged, this,
             &TextResultView::fitHeight);
     layout->addWidget(m_output, 3);
@@ -354,6 +355,7 @@ FullReplyView::FullReplyView(QWidget* parent)
 {
     QVBoxLayout* layout = viewLayout(this);
     m_edit->setObjectName(u"draftOut"_s);
+    m_edit->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
     m_edit->setPlaceholderText(tr("Your reply appears here. Edit it before you copy it."));
     layout->addWidget(m_edit, 1);
     m_hint = makeLabel(tr("Edit it here before you copy it. Names, dates and times come only from the "

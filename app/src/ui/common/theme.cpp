@@ -107,15 +107,20 @@ QPushButton[kind="tone"] { border-radius: 16px; min-height: 30px; padding: 0 12p
 QPushButton[kind="tone"]:checked { background: @accentStrong@; border-color: @accentStrong@; color: @accentText@;
     font-weight: 500; }
 
-QMenu { background: @elevated@; color: @text@; border: 1px solid @border@; padding: 4px; }
+QMenu { background: @elevated@; color: @text@; border: 1px solid @border@; border-radius: 8px; padding: 4px; }
 QMenu::item { padding: 6px 18px; border-radius: 6px; }
 QMenu::item:selected { background: @hover@; }
 QSplitter::handle { background: transparent; }
 QScrollArea, QScrollArea > QWidget > QWidget { background: transparent; border: none; }
 QScrollBar:vertical { background: transparent; width: 10px; margin: 2px; }
-QScrollBar::handle:vertical { background: @border@; border-radius: 4px; min-height: 24px; }
-QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }
-QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical { background: none; }
+QScrollBar:horizontal { background: transparent; height: 10px; margin: 2px; }
+QScrollBar::handle { background: @border@; border-radius: 3px; }
+QScrollBar::handle:hover, QScrollBar::handle:pressed { background: @muted@; }
+QScrollBar::handle:vertical { min-height: 24px; }
+QScrollBar::handle:horizontal { min-width: 24px; }
+QScrollBar::add-line, QScrollBar::sub-line { width: 0; height: 0; border: none; background: none; }
+QScrollBar::add-page, QScrollBar::sub-page { background: none; }
+QAbstractScrollArea::corner { background: transparent; }
 )";
 
 } // namespace

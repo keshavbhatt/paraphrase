@@ -1,11 +1,14 @@
 #include "ui/common/menu_icons.h"
 
+#include <QAbstractItemView>
+#include <QComboBox>
 #include <QCoreApplication>
 #include <QHash>
 #include <QMenu>
 #include <QPaintEvent>
 #include <QPainter>
 #include <QPainterPath>
+#include <QStyledItemDelegate>
 
 #include <algorithm>
 #include <functional>
@@ -152,6 +155,27 @@ QIcon letterBadge(const QString& name, const Tokens& t)
     const QString letter = name.trimmed().left(1).toUpper();
     return badge(letter, QRectF(1, 1, kMenuIconSize - 2, kMenuIconSize - 2), (kMenuIconSize - 2) / 2.0,
                  t.accentSoft, t.accent, 10, QFont::Bold);
+}
+
+void MenuIconStyle::polish(QWidget* widget)
+{
+    // A see-through, frameless menu window, so the style sheet's border-radius shows; the
+    // desktop's own shadow would stay square around it.
+    QWidget* popup = nullptr;
+    if (qobject_cast<QMenu*>(widget) != nullptr) {
+        popup = widget;
+    } else if (auto* combo = qobject_cast<QComboBox*>(widget)) {
+        popup = combo->view()->window(); // the drop-down list's own window
+        if (combo->itemDelegate()->metaObject() != &QStyledItemDelegate::staticMetaObject) {
+            // Qt's own combo delegate ignores the style sheet's ::item rules.
+            combo->setItemDelegate(new QStyledItemDelegate(combo));
+        }
+    }
+    if (popup != nullptr && !popup->testAttribute(Qt::WA_TranslucentBackground)) {
+        popup->setAttribute(Qt::WA_TranslucentBackground);
+        popup->setWindowFlags(popup->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
+    }
+    QProxyStyle::polish(widget);
 }
 
 int MenuIconStyle::pixelMetric(PixelMetric metric, const QStyleOption* option, const QWidget* widget) const

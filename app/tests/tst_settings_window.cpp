@@ -5,10 +5,13 @@
 
 #include "app_daemon.h"
 #include "daemon_client.h"
+#include "ui/common/menu_icons.h"
 #include "ui/core/preferences.h"
 #include "ui/settings/settings_window.h"
 
 #include <QAbstractButton>
+#include <QAbstractItemView>
+#include <QApplication>
 #include <QClipboard>
 #include <QComboBox>
 #include <QCoreApplication>
@@ -55,6 +58,12 @@ private:
     AppDaemon m_daemon;
 
 private Q_SLOTS:
+    void initTestCase()
+    {
+        // As main.cpp does: menus and drop-down lists with round corners.
+        QApplication::setStyle(new paraphrase::app::MenuIconStyle(QApplication::style()->name()));
+    }
+
     void cleanup() { m_daemon.stop(); }
 
     void listsTheInstalledModels()
@@ -204,6 +213,13 @@ private Q_SLOTS:
                 QTest::qWait(50);
                 QCoreApplication::processEvents(); // queued shows land first
                 QVERIFY(w.grab().save(dir + u"/settings-models-%1.png"_s.arg(QLatin1StringView(theme))));
+                // A drop-down's list has the round corners of the menus (menus.html).
+                auto* quality = w.findChild<QComboBox*>(u"tierQuality"_s);
+                quality->showPopup();
+                QTest::qWait(100);
+                QVERIFY(quality->view()->window()->grab().save(
+                    dir + u"/settings-combo-%1.png"_s.arg(QLatin1StringView(theme))));
+                quality->hidePopup();
             }
             m_daemon.stop();
             QVERIFY(m_daemon.start({u"fast-model"_s}, 32, true));

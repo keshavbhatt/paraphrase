@@ -49,7 +49,11 @@ QComboBox:focus { border: 1px solid @accent@; }
 QLabel[role="pill"] { border: 1px solid transparent; border-radius: 10px; padding: 1px 8px; }
 QComboBox::drop-down { border: none; background: transparent; width: 28px; }
 QComboBox::down-arrow { image: url(:/icons/down-@scheme@.svg); width: 14px; height: 14px; }
-QComboBox QAbstractItemView { background: @elevated@; color: @text@; selection-background-color: @hover@; selection-color: @text@; }
+QComboBox QAbstractItemView { background: @elevated@; color: @text@; selection-background-color: @hover@; selection-color: @text@;
+    border: 1px solid @border@; border-radius: 8px; padding: 4px; outline: 0; }
+QComboBox QAbstractItemView::item { min-height: 30px; padding: 0 10px; border-radius: 6px; border: none; }
+QComboBox QAbstractItemView::item:selected, QComboBox QAbstractItemView::item:hover { background: @hover@; color: @text@; }
+QComboBoxPrivateContainer { background: transparent; border: none; padding: 0; margin: 0; }
 
 QPushButton[kind="nav"] { text-align: left; background: transparent; border: none; border-radius: 8px; padding: 0 12px; min-height: 38px; }
 QPushButton[kind="nav"]:hover { background: @hover@; }

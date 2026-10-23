@@ -36,6 +36,8 @@ QPlainTextEdit* field(const QString& name, const QString& placeholder)
     auto* edit = new QPlainTextEdit;
     edit->setObjectName(name);
     edit->setPlaceholderText(placeholder);
+    // A long link or word wraps instead of scrolling sideways.
+    edit->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
     return edit;
 }
 

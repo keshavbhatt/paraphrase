@@ -87,9 +87,11 @@ void ActionEditor::buildForm(QGridLayout* form)
     m_name->setObjectName(u"actionName"_s);
     m_name->setMaxLength(kMaxName);
     m_instruction->setObjectName(u"actionInstruction"_s);
+    m_instruction->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
     m_instruction->setFixedHeight(kInstructionHeight);
     m_instruction->setPlaceholderText(tr("For example: Turn this into a tweet under 280 characters"));
     m_sample->setObjectName(u"actionSample"_s);
+    m_sample->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
     m_sample->setFixedHeight(kSampleHeight);
     m_sample->setPlainText(
         tr("We moved the launch to March 12 because the payment provider needs one more week "

@@ -25,7 +25,8 @@ inline constexpr int kMenuIconSize = 20;
 /// One of the user's own actions: the first letter of its name on the accent's soft colour.
 [[nodiscard]] QIcon letterBadge(const QString& name, const Tokens& t);
 
-/// The application style with menus drawing their icons at kMenuIconSize.
+/// The application style: menus draw their icons at kMenuIconSize and have the mocks' round
+/// corners (a menu window is square unless its background is see-through).
 class MenuIconStyle : public QProxyStyle
 {
     Q_OBJECT
@@ -35,6 +36,8 @@ public:
 
     [[nodiscard]] int pixelMetric(PixelMetric metric, const QStyleOption* option = nullptr,
                                   const QWidget* widget = nullptr) const override;
+    void polish(QWidget* widget) override;
+    using QProxyStyle::polish;
 };
 
 /// A menu that shows each language's own name, muted, at the right edge (menus.html). The
