@@ -179,8 +179,11 @@ def test_compose_shape_per_preset() -> None:
     assert not metrics.compose_shape("email", "Hi Sarah,\n\nCould I take Friday off?")
     assert metrics.compose_shape("post", "Poetry night on Saturday! #poetry #books")
     assert not metrics.compose_shape("post", "Poetry night! #a #b #c")
-    assert metrics.compose_shape("note", "- sunscreen\n- towels")
-    assert not metrics.compose_shape("note", "- sunscreen\n- towels\n\n[Your name]")
+    assert metrics.compose_shape("note", "Beach trip, Saturday\n- sunscreen\n- towels")
+    assert not metrics.compose_shape("note", "- sunscreen\n- towels")  # no title line
+    assert not metrics.compose_shape("note", "Date: Unspecified\n- sunscreen\n- towels")
+    assert not metrics.compose_shape("note", "## Beach trip\n- sunscreen\n- towels")
+    assert not metrics.compose_shape("note", "Beach trip\n- sunscreen\n- towels\n\n[Your name]")
     assert not metrics.compose_shape("message", "See you at 6.\n[Your name]")
 
 

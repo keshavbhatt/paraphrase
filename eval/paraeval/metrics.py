@@ -405,6 +405,8 @@ _GREETING = re.compile(
     r"\b|(नमस्ते|नमस्कार|प्रिय|आदरणीय|सर|महोदय|मैडम)|\S+ जी,|.{1,40} को,$|.{1,30} को (नमस्ते|नमस्कार),?$)",
     re.IGNORECASE,
 )
+_NOTE_TITLE_WORDS = 10
+_NOTE_LABEL = re.compile(r"(?i)^\s*(date|title|subject|note|तारीख|दिनांक|शीर्षक|विषय)\s*:")
 _PLACEHOLDER = re.compile(r"\[[^\]\n]{1,40}\]|<[A-Z][a-z]+ ?[A-Za-z]*>")
 
 
@@ -608,7 +610,16 @@ def compose_shape(preset: str, output: str, signer: str = "") -> bool:
     if preset == "post":
         return len(re.findall(r"#\w+", output)) <= 2
     if preset == "note":
-        return sum(line.lstrip().startswith(("- ", "• ", "* ")) for line in lines) >= 2
+        # A short title line saying what the note is about, then the items as bullets; never
+        # a "Date:" line or markdown (owner, 2026-10-23).
+        title = lines[0].strip()
+        title_ok = (
+            not title.startswith(("- ", "• ", "* ", "#", "**"))
+            and len(title.split()) <= _NOTE_TITLE_WORDS
+            and not _NOTE_LABEL.match(title)
+        )
+        bullets = sum(line.lstrip().startswith(("- ", "• ", "* ")) for line in lines[1:])
+        return title_ok and bullets >= 2
     return True
 
 
