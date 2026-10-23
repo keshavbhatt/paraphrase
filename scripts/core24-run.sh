@@ -31,4 +31,5 @@ exec docker run --rm "${tty[@]}" \
     --env HOME=/tmp \
     --env GIT_CONFIG_COUNT=1 --env GIT_CONFIG_KEY_0=safe.directory --env GIT_CONFIG_VALUE_0='*' \
     --env PARAPHRASE_BUILD_DIR --env PARAPHRASE_BUILD_TYPE --env PARAPHRASE_CMAKE_ARGS \
+    --env PARAPHRASE_SCREENSHOTS --env PARAPHRASE_THEME \
     "$TAG" "$@"
