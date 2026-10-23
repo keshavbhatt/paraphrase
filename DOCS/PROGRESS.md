@@ -14,6 +14,25 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-23 (night) - The result pane shows its work, menus with icons, Write 6
+
+- Mocks `main-window-busy.html` and `menus.html`, approved by the owner on 2026-10-23.
+- App: while a run goes, the result pane shows a working pill with the step in words
+  ("Reading your text", "Writing", "Checking, writing again", "Writing 3 replies") and the
+  seconds so far, and until the first word the shape of the answer (lines with a shimmer, three
+  cards for quick replies); the text then streams with a blinking caret. A rewrite of the result
+  (Shorter, Make it polite) keeps the result and shows only the pill. Owner: "the only way to
+  understand if the app is doing something".
+- App: Tone, Format and My actions menus have an icon per item (the user's own actions their
+  first letter), the Tone picker in Write and Full reply shows the tone's icon, and Translate
+  shows each language's script and its name in its own writing, never a flag. The "Best effort"
+  heading shows its text again.
+- Write 6: no "[Your name]" under a note, message or post (owner report). Numbers in
+  DOCS/models.md.
+- GitHub repository created (private for now): https://github.com/keshavbhatt/paraphrase, linked
+  from the AppStream data. The dev run installs a desktop file, so the desktop's shortcut
+  settings list the app as "Paraphrase (dev)" instead of the terminal that started it.
+
 ## 2026-10-23 (evening) - Full reply keeps the sender's plans theirs, Write signs with the name, options run again
 
 - Owner report: "Thanks Gabri, cool idea" as the note on a long announcement that ended in the
