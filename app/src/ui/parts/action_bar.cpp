@@ -2,6 +2,7 @@
 
 #include "ui/common/chip_button.h"
 #include "ui/common/flow_layout.h"
+#include "ui/common/menu_icons.h"
 #include "ui/core/languages.h"
 #include "util/language_detector.h"
 
@@ -114,13 +115,32 @@ QMenu* ActionBar::presetMenu(ChipButton* button, const QString& base)
         const QString id = v->id;
         connect(item, &QAction::triggered, this, [this, id] { Q_EMIT chosen(id, {}); });
     }
+    // Icons when it opens, in the colours of the theme then (menus.html).
+    const bool own = base == m_catalog->userActionsBase();
+    connect(menu, &QMenu::aboutToShow, this, [this, menu, own] { decorate(menu, own); });
     return menu;
+}
+
+void ActionBar::decorate(QMenu* menu, bool ownActions) const
+{
+    for (QAction* item : menu->actions()) {
+        if (item->isSeparator()) {
+            continue;
+        }
+        if (item->objectName() == u"newAction"_s) {
+            item->setIcon(menuIcon(u"plus"_s, m_tokens));
+        } else if (ownActions) {
+            item->setIcon(letterBadge(item->text(), m_tokens)); // the user's own: no fixed icon fits
+        } else {
+            item->setIcon(menuIcon(presetIcon(item->objectName().section(u'.', 1)), m_tokens));
+        }
+    }
 }
 
 QMenu* ActionBar::languageMenu(ChipButton* button, const QString& skillId)
 {
     // Filled when it opens, so the text's own language is left out.
-    auto* menu = new QMenu(button);
+    auto* menu = new NativeNamesMenu(button);
     connect(menu, &QMenu::aboutToShow, this, [this, menu, skillId] { fillLanguages(menu, skillId); });
     return menu;
 }
@@ -136,10 +156,20 @@ void ActionBar::fillLanguages(QMenu* menu, const QString& skillId)
             continue;
         }
         if (!lang.tested && !bestEffort) {
-            menu->addSection(tr("Best effort"));
+            if (auto* names = qobject_cast<NativeNamesMenu*>(menu)) {
+                names->addCaption(tr("Best effort")); // a style-sheet section shows no text
+            } else {
+                menu->addSection(tr("Best effort"));
+            }
             bestEffort = true;
         }
         QAction* item = menu->addAction(name);
+        item->setIcon(scriptBadge(lang.code, m_tokens));
+        // The name in its own writing, muted at the right edge (menus.html).
+        if (auto* names = qobject_cast<NativeNamesMenu*>(menu)) {
+            names->setMuted(m_tokens.muted);
+            names->setNativeName(item, nativeLanguageName(lang.code));
+        }
         item->setObjectName(u"lang-"_s + lang.code);
         const QString code = lang.code;
         connect(item, &QAction::triggered, this, [this, skillId, code] { Q_EMIT chosen(skillId, code); });

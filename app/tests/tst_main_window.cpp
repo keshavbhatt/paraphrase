@@ -7,6 +7,7 @@
 #include "app_daemon.h"
 #include "daemon_client.h"
 #include "ui/common/chip_button.h"
+#include "ui/common/menu_icons.h"
 #include "ui/main/main_window.h"
 #include "ui/parts/input_pages.h"
 #include "ui/parts/tone_picker.h"
@@ -72,6 +73,8 @@ private Q_SLOTS:
     void initTestCase()
     {
         QVERIFY(m_settingsDir.isValid());
+        // As main.cpp does: menus draw their icons at the size menus.html shows.
+        QApplication::setStyle(new paraphrase::app::MenuIconStyle(QApplication::style()->name()));
         QSettings::setPath(QSettings::NativeFormat, QSettings::UserScope, m_settingsDir.path());
     }
     void init() { QSettings().clear(); } // a tone or kind one test picks never reaches the next
@@ -362,6 +365,84 @@ private Q_SLOTS:
         QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 1, kTimeoutMs);
         QVERIFY(!w.busy());
         QVERIFY(w.findChild<QLabel*>(u"outInfo"_s)->text().contains(u"stopped"_s));
+    }
+
+    void showsWhatItIsDoingWhileItRuns()
+    {
+        // main-window-busy.html: the working pill and the shape of the answer until its first
+        // word, then the words with the pill saying "Writing"; the summary line comes back after.
+        startDaemon({u"fast-model"_s});
+        {
+            const QMutexLocker lock(&m_daemon.state->lock);
+            m_daemon.state->defaultAnswer = QString(u"word "_s).repeated(200).trimmed();
+            m_daemon.state->pieceDelayMs = 20;
+        }
+        MainWindow w;
+        w.start();
+        w.findChild<QPlainTextEdit*>(u"text"_s)->setPlainText(u"Their going home."_s);
+        const auto* pill = w.findChild<QWidget*>(u"busyPill"_s);
+        const auto* skeleton = w.findChild<QWidget*>(u"skeleton"_s);
+        const auto* info = w.findChild<QLabel*>(u"outInfo"_s);
+        QVERIFY(!pill->isVisibleTo(&w));
+        const QSignalSpy finished(&w, &MainWindow::finished);
+        w.run();
+        QVERIFY(pill->isVisibleTo(&w));
+        QCOMPARE(pill->accessibleDescription(), u"Reading your text"_s);
+        QVERIFY(skeleton->isVisibleTo(&w));
+        QVERIFY(!info->isVisibleTo(&w));
+        const int width = pill->sizeHint().width();
+        // PARAPHRASE_SCREENSHOTS=<dir>: both steps, to compare with the mock.
+        const QString dir = qEnvironmentVariable("PARAPHRASE_SCREENSHOTS");
+        const QString theme = qEnvironmentVariable("PARAPHRASE_THEME", u"light"_s);
+        if (!dir.isEmpty()) {
+            w.resize(1180, 720);
+            w.show();
+            // Laid out, but no socket events yet: the first word must not land before the grab.
+            QApplication::sendPostedEvents(nullptr, QEvent::LayoutRequest);
+            QVERIFY(w.grab().save(dir + u"/main-window-reading-%1.png"_s.arg(theme)));
+        }
+        QTRY_VERIFY_WITH_TIMEOUT(outputText(w).size() > 120, kTimeoutMs);
+        if (!dir.isEmpty()) {
+            QVERIFY(grabNow(w).save(dir + u"/main-window-writing-%1.png"_s.arg(theme)));
+        }
+        QCOMPARE(pill->accessibleDescription(), u"Writing"_s);
+        QCOMPARE(pill->sizeHint().width(), width); // another step, the same width: nothing beside it moves
+        QVERIFY(!skeleton->isVisibleTo(&w));
+        w.cancel();
+        QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 1, kTimeoutMs);
+        QVERIFY(!pill->isVisibleTo(&w));
+        QVERIFY(info->isVisibleTo(&w));
+    }
+
+    void menusShowAnIconPerItem()
+    {
+        // menus.html: tones and formats their own icon, languages their script.
+        startDaemon({u"fast-model"_s});
+        MainWindow w;
+        w.start();
+        w.findChild<QPlainTextEdit*>(u"text"_s)->setPlainText(u"See you at the station at noon."_s);
+        for (const QString& base : {u"rewrite"_s, u"format"_s, u"translate"_s}) {
+            QMenu* menu = w.findChild<paraphrase::app::ChipButton*>(u"action-"_s + base)->menu();
+            Q_EMIT menu->aboutToShow();
+            for (const QAction* a : menu->actions()) {
+                QVERIFY2(a->isSeparator() || a->property("caption").isValid() || !a->icon().isNull(),
+                         qPrintable(a->objectName()));
+            }
+        }
+        const QMenu* translate = w.findChild<paraphrase::app::ChipButton*>(u"action-translate"_s)->menu();
+        QCOMPARE(translate->findChild<QAction*>(u"lang-hi"_s)->property("nativeName").toString(), u"हिन्दी"_s);
+        // PARAPHRASE_SCREENSHOTS=<dir>: the menus open, to compare with menus.html.
+        if (const QString dir = qEnvironmentVariable("PARAPHRASE_SCREENSHOTS"); !dir.isEmpty()) {
+            const QString theme = qEnvironmentVariable("PARAPHRASE_THEME", u"light"_s);
+            w.show();
+            for (const QString& base : {u"rewrite"_s, u"format"_s, u"translate"_s}) {
+                QMenu* menu = w.findChild<paraphrase::app::ChipButton*>(u"action-"_s + base)->menu();
+                menu->popup(w.mapToGlobal(QPoint(40, 200)));
+                QApplication::processEvents();
+                QVERIFY(menu->grab().save(dir + u"/menu-%1-%2.png"_s.arg(base, theme)));
+                menu->hide();
+            }
+        }
     }
 
     void saysSoWhenTheDaemonStopsMidAnswer()

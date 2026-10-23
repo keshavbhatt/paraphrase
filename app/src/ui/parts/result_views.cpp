@@ -10,6 +10,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QPainter>
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QShortcut>
@@ -17,6 +18,7 @@
 #include <QTextBrowser>
 #include <QTextCursor>
 #include <QTextDocument>
+#include <QTimer>
 #include <QVBoxLayout>
 
 #include <algorithm>
@@ -59,9 +61,64 @@ QVBoxLayout* viewLayout(QWidget* view, int top = 14)
 
 } // namespace
 
+/// The caret at the end of text that is still being written (main-window-busy.html, b): a
+/// blinking accent bar over the text box, which has no focus and so no caret of its own.
+class StreamCaret : public QWidget
+{
+public:
+    explicit StreamCaret(QWidget* viewport)
+        : QWidget(viewport)
+    {
+        setAttribute(Qt::WA_TransparentForMouseEvents);
+        m_blink.setInterval(kBlinkMs);
+        QObject::connect(&m_blink, &QTimer::timeout, this, [this] {
+            m_on = !m_on;
+            update();
+        });
+        hide();
+    }
+
+    /// At the end of the text: `cursor` is the text box's cursor rectangle there.
+    void showAt(const QRect& cursor)
+    {
+        setGeometry(cursor.left(), cursor.top(), kWidth, cursor.height());
+        m_on = true;
+        show();
+        raise();
+        if (!m_blink.isActive()) {
+            m_blink.start();
+        }
+        update();
+    }
+
+    void stop()
+    {
+        m_blink.stop();
+        hide();
+    }
+
+    void setColour(const QColor& colour) { m_colour = colour; }
+
+protected:
+    void paintEvent(QPaintEvent* /*event*/) override
+    {
+        if (m_on) {
+            QPainter(this).fillRect(rect(), m_colour);
+        }
+    }
+
+private:
+    static constexpr int kWidth = 2;
+    static constexpr int kBlinkMs = 500; // mock.css: blink 1s, half on
+    QTimer m_blink;
+    QColor m_colour;
+    bool m_on = true;
+};
+
 TextResultView::TextResultView(QWidget* parent)
     : QWidget(parent)
     , m_output(new QTextBrowser)
+    , m_caret(new StreamCaret(m_output->viewport()))
     , m_changes(new ChangeList)
 {
     QVBoxLayout* layout = viewLayout(this, 12);
@@ -83,6 +140,7 @@ TextResultView::TextResultView(QWidget* parent)
 
 void TextResultView::clear()
 {
+    m_caret->stop();
     m_diff.reset();
     m_undone.clear();
     m_result.clear();
@@ -94,6 +152,12 @@ void TextResultView::stream(const QString& soFar)
 {
     setReadableText(m_output, soFar);
     m_output->moveCursor(QTextCursor::End);
+    m_caret->showAt(m_output->cursorRect());
+}
+
+void TextResultView::endStream()
+{
+    m_caret->stop();
 }
 
 void TextResultView::showText(const QString& text)
@@ -153,6 +217,7 @@ qsizetype TextResultView::changeCount() const
 void TextResultView::applyTheme(const Tokens& t)
 {
     m_tokens = t;
+    m_caret->setColour(t.accent);
     m_changes->applyTheme(t);
     render();
 }
@@ -285,6 +350,7 @@ void QuickRepliesView::applyTheme(const Tokens& t)
 FullReplyView::FullReplyView(QWidget* parent)
     : QWidget(parent)
     , m_edit(new QPlainTextEdit)
+    , m_caret(new StreamCaret(m_edit->viewport()))
 {
     QVBoxLayout* layout = viewLayout(this);
     m_edit->setObjectName(u"draftOut"_s);
@@ -306,6 +372,17 @@ void FullReplyView::stream(const QString& soFar)
 {
     m_edit->setPlainText(soFar);
     m_edit->moveCursor(QTextCursor::End);
+    m_caret->showAt(m_edit->cursorRect());
+}
+
+void FullReplyView::endStream()
+{
+    m_caret->stop();
+}
+
+void FullReplyView::applyTheme(const Tokens& t)
+{
+    m_caret->setColour(t.accent);
 }
 
 void FullReplyView::addVersion(const QString& text)
@@ -320,6 +397,7 @@ void FullReplyView::showVersion(qsizetype index)
         return;
     }
     m_index = index;
+    m_caret->stop();
     m_edit->setPlainText(m_versions.at(index));
     Q_EMIT versionsChanged();
 }
@@ -328,6 +406,7 @@ void FullReplyView::reset()
 {
     m_versions.clear();
     m_index = -1;
+    m_caret->stop();
     m_edit->clear();
     Q_EMIT versionsChanged();
 }

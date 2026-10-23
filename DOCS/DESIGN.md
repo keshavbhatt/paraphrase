@@ -68,6 +68,8 @@ holds the main action (Replace or Insert, Enter) and Copy and Retry.
 |---|---|---|
 | `main-window.html` | Standalone: your text, every action, the diff, Copy, the missing-integration notice (ADR-013) | M2 |
 | `main-window-reply.html` | Standalone reply: message, optional draft, three replies to copy | M2 |
+| `main-window-busy.html` | While a run goes: the working pill (step in words, seconds so far), the shape of the answer until its first word, the caret while it streams | M2 |
+| `menus.html` | Tone, Format, Translate and My actions menus with an icon per item; languages in their own script | M2 |
 | `popup-actions.html` | Captured text, numbered actions, reading ahead | M2 |
 | `popup-proofread.html` | Word diff, one line per change with Undo, Replace | M2 |
 | `popup-reply.html` | Three replies in the message's language, edit, Insert | M2 |
@@ -88,7 +90,10 @@ holds the main action (Replace or Insert, Enter) and Copy and Retry.
 - A change is always visible before it is applied: proofread shows a diff, rewrite shows
   the facts it kept, and every change can be undone one at a time.
 - Slow is shown honestly: text streams in, the status line says what is happening, and no
-  progress bar pretends to know the end. Estimates say "about".
+  progress bar pretends to know the end. Estimates say "about". While a run goes the result
+  pane shows the working pill and, until the first word, the shape of the answer
+  (`main-window-busy.html`): the eye is on the result, so that is where the work shows.
+- A language is never shown as a flag: it is not a country. Menus show its script instead.
 - "On this device" is on every popup; the only network use (model downloads) shows its
   exact source and its check.
 - Colour is never the only signal: deletions are struck out, insertions underlined, states

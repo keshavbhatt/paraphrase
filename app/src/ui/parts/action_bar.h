@@ -64,6 +64,8 @@ private:
     [[nodiscard]] QMenu* presetMenu(ChipButton* button, const QString& base);
     [[nodiscard]] QMenu* languageMenu(ChipButton* button, const QString& skillId);
     void fillLanguages(QMenu* menu, const QString& skillId);
+    /// The menu's icons: a preset's own, or the first letter of the user's own actions.
+    void decorate(QMenu* menu, bool ownActions) const;
     void updateArrows();
 
     const util::LanguageDetector& m_detector;

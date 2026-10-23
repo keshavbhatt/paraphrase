@@ -141,7 +141,7 @@ void MainWindow::connectParts()
     connect(m_runner, &RequestRunner::token, this, &MainWindow::onToken);
     connect(m_runner, &RequestRunner::retrying, this, [this] {
         m_streamed.clear();
-        m_output->setInfo(tr("· the answer was not right; writing it again..."));
+        m_output->setStep(OutputPane::Step::Retrying);
     });
     connect(m_runner, &RequestRunner::finished, this, &MainWindow::onFinished);
     connect(m_runner, &RequestRunner::failed, this, &MainWindow::onFailed);
@@ -348,8 +348,7 @@ void MainWindow::run()
         m_fullReplyKey = key; // a new message or kind: start the versions again
         m_output->fullView()->reset();
     }
-    m_output->setInfo(tr("· writing..."));
-    m_output->setRunning(true);
+    m_output->startWork();
 }
 
 void MainWindow::cancel()
@@ -409,13 +408,13 @@ void MainWindow::rewriteResult(const QString& skillId)
     }
     m_rewriting = true;
     m_streamed.clear();
-    m_output->setInfo(tr("· writing..."));
-    m_output->setRunning(true);
+    m_output->startWork(false); // the result stays on screen until its new version comes
 }
 
 void MainWindow::onToken(const QString& piece)
 {
     m_streamed += piece;
+    m_output->setStep(OutputPane::Step::Writing);
     // The answer streams in as the model writes; quick replies wait for the whole set.
     const SkillKind kind = m_catalog.kindOf(m_skill);
     if (m_rewriting || kind == SkillKind::QuickReply) {

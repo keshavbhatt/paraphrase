@@ -32,11 +32,13 @@ Q_SIGNALS:
 
 private:
     void choose(const QString& tone, const QString& title);
+    void showIcon();
 
     QString m_key;
     QString m_fallback;
     QString m_tone;
     QStringList m_titles; ///< every tone's title, so the button can keep the widest one's width
+    Tokens m_tokens;
 };
 
 } // namespace paraphrase::app

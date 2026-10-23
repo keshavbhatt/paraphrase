@@ -68,6 +68,7 @@ add_library(paraphrase_ui STATIC
     src/ui/settings/general_page.cpp
     src/ui/parts/action_bar.cpp
     src/ui/main/bars.cpp
+    src/ui/common/busy_pill.cpp
     src/ui/parts/change_list.cpp
     src/ui/common/chip_button.cpp
     src/ui/common/flow_layout.cpp
@@ -82,6 +83,7 @@ add_library(paraphrase_ui STATIC
     src/ui/core/preferences.cpp
     src/ui/settings/languages_section.cpp
     src/ui/main/main_window.cpp
+    src/ui/common/menu_icons.cpp
     src/ui/setup/model_card.cpp
     src/ui/models/model_info.cpp
     src/ui/setup/model_page.cpp
@@ -93,6 +95,7 @@ add_library(paraphrase_ui STATIC
     src/ui/parts/result_views.cpp
     src/ui/parts/tone_picker.cpp
     src/ui/setup/sample_run.cpp
+    src/ui/parts/skeleton_view.cpp
     src/ui/settings/settings_nav.cpp
     src/ui/settings/settings_window.cpp
     src/ui/settings/shortcut_settings_page.cpp
@@ -120,6 +123,9 @@ qt_add_resources(paraphrase_ui "icons"
         icons/alert.svg icons/check.svg icons/copy.svg icons/down.svg icons/expand.svg icons/forward.svg icons/left.svg icons/right.svg
         icons/info.svg icons/lock.svg icons/pen.svg icons/refresh.svg icons/stop.svg
         icons/undo.svg icons/x.svg icons/down-light.svg icons/down-dark.svg
+        icons/badge-check.svg icons/briefcase.svg icons/coffee.svg icons/enlarge.svg icons/hand-heart.svg
+        icons/list.svg icons/mail.svg icons/megaphone.svg icons/plus.svg icons/shrink.svg icons/smile.svg
+        icons/smile-plus.svg icons/table.svg
 )
 
 # The popup: a floating panel over any app, driven by the integration backends.

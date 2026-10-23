@@ -1,7 +1,9 @@
 #include "ui/main/output_pane.h"
 
+#include "ui/common/busy_pill.h"
 #include "ui/common/chip_button.h"
 #include "ui/parts/result_views.h"
+#include "ui/parts/skeleton_view.h"
 
 #include <QHBoxLayout>
 #include <QLabel>
@@ -62,11 +64,14 @@ OutputPane::OutputPane(QWidget* parent)
     , m_text(new TextResultView)
     , m_replies(new QuickRepliesView)
     , m_full(new FullReplyView)
+    , m_pill(new BusyPill)
+    , m_skeleton(new SkeletonView)
 {
     buildHead();
     m_pages->addWidget(m_text);
     m_pages->addWidget(m_replies);
     m_pages->addWidget(m_full);
+    m_pages->addWidget(m_skeleton);
     setBody(m_pages);
     buildFoot();
     connect(m_full, &FullReplyView::versionsChanged, this, &OutputPane::updateVersions);
@@ -89,7 +94,15 @@ void OutputPane::buildHead()
     m_prev->setAccessibleName(tr("Previous version"));
     m_next->setAccessibleName(tr("Next version"));
     head()->addWidget(m_title);
+    m_pill->setSteps({
+        stepText(Step::Reading),
+        stepText(Step::Writing),
+        stepText(Step::Retrying),
+        tr("Writing 3 replies"),
+    });
+    head()->addWidget(m_pill, 0, Qt::AlignVCenter);
     head()->addWidget(m_info, 1);
+    head()->addStretch(0); // keeps the pill beside the title while the line after it is hidden
     head()->addWidget(m_view);
     head()->addWidget(m_versionInfo);
     for (QPushButton* b : {m_prev, m_next}) {
@@ -125,14 +138,10 @@ void OutputPane::buildFoot()
 void OutputPane::showKind(SkillKind kind, const QString& title, bool proofread)
 {
     m_kind = kind;
-    if (kind == SkillKind::Text) {
-        m_pages->setCurrentWidget(m_text);
-    } else if (kind == SkillKind::QuickReply) {
-        m_pages->setCurrentWidget(m_replies);
-    } else {
-        m_pages->setCurrentWidget(m_full); // a full reply and Write share the draft view
-        m_full->setComposing(kind == SkillKind::Compose);
+    if (kind != SkillKind::Text && kind != SkillKind::QuickReply) {
+        m_full->setComposing(kind == SkillKind::Compose); // a full reply and Write share the draft view
     }
+    showPage();
     m_title->setText(title.toUpper());
     m_view->setVisible(proofread);
     if (proofread) {
@@ -158,8 +167,77 @@ QString OutputPane::info() const
 
 void OutputPane::setRunning(bool running)
 {
+    const bool ended = m_running && !running;
     m_running = running;
+    if (ended) {
+        m_placeholder = false;
+        m_pill->stop();
+        m_info->show();
+        m_text->endStream();
+        m_full->endStream();
+        showPage();
+    }
     updateButtons();
+}
+
+void OutputPane::startWork(bool placeholder)
+{
+    m_placeholder = placeholder;
+    m_step = Step::Reading;
+    m_info->hide(); // the pill says it; the summary comes back when the run ends
+    m_pill->start(stepText(m_step));
+    setRunning(true);
+    showPage();
+}
+
+void OutputPane::setStep(Step step)
+{
+    if (!m_running || step == m_step) {
+        return;
+    }
+    m_step = step;
+    m_pill->setStep(stepText(step));
+    showPage();
+}
+
+QString OutputPane::stepText(Step step) const
+{
+    if (m_kind == SkillKind::QuickReply && step != Step::Retrying && m_placeholder) {
+        return tr("Writing 3 replies"); // they come all at once, so there is no reading step to see
+    }
+    switch (step) {
+    case Step::Reading:
+        return tr("Reading your text");
+    case Step::Writing:
+        return tr("Writing");
+    case Step::Retrying:
+        break;
+    }
+    return tr("Checking, writing again");
+}
+
+void OutputPane::showPage()
+{
+    // The shape of the answer until its first word; quick replies come all at once.
+    const bool waiting = m_placeholder && (m_step != Step::Writing || m_kind == SkillKind::QuickReply);
+    if (waiting) {
+        SkeletonView::Shape shape = SkeletonView::Shape::Text;
+        if (m_kind == SkillKind::QuickReply) {
+            shape = SkeletonView::Shape::Replies;
+        } else if (m_kind != SkillKind::Text) {
+            shape = SkeletonView::Shape::Draft;
+        }
+        m_skeleton->setShape(shape);
+        m_pages->setCurrentWidget(m_skeleton);
+        return;
+    }
+    if (m_kind == SkillKind::Text) {
+        m_pages->setCurrentWidget(m_text);
+    } else if (m_kind == SkillKind::QuickReply) {
+        m_pages->setCurrentWidget(m_replies);
+    } else {
+        m_pages->setCurrentWidget(m_full);
+    }
 }
 
 QString OutputPane::result() const
@@ -181,6 +259,9 @@ void OutputPane::applyTheme(const Tokens& t)
     m_tokens = t;
     m_text->applyTheme(t);
     m_replies->applyTheme(t);
+    m_full->applyTheme(t);
+    m_pill->applyTheme(t);
+    m_skeleton->applyTheme(t);
     m_copy->setLeadingIcon(Theme::icon(u"copy"_s, QColor(Qt::white), kIconSize));
     updateButtons();
 }

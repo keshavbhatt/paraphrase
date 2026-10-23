@@ -9,6 +9,7 @@
 #include "paraphrase/version.h"
 #include "shell/app_service.h"
 #include "shell/application.h"
+#include "ui/common/menu_icons.h"
 
 #include <QApplication>
 #include <QCommandLineParser>
@@ -23,6 +24,8 @@ int main(int argc, char* argv[])
     QApplication::setApplicationVersion(
         QStringLiteral(PARAPHRASE_VERSION_STRING " (" PARAPHRASE_GIT_REVISION_STRING ")"));
     QApplication::setDesktopFileName(u"com.ktechpit.paraphrase"_s);
+    // Menus draw their icons a little larger than the style's default (menus.html).
+    QApplication::setStyle(new paraphrase::app::MenuIconStyle(QApplication::style()->name()));
 
     QCommandLineParser parser;
     parser.setApplicationDescription(u"Writing help that stays on this computer."_s);

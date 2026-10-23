@@ -1,5 +1,6 @@
 #include "ui/parts/tone_picker.h"
 
+#include "ui/common/menu_icons.h"
 #include "ui/common/widgets.h"
 
 #include <QMenu>
@@ -9,7 +10,8 @@ using namespace Qt::StringLiterals;
 
 namespace paraphrase::app {
 namespace {
-constexpr int kArrowSize = 14;
+constexpr int kIconSize = 14;
+constexpr int kIconGap = 4; // as setButtonIcon pads it: the mocks' 6 px gap
 } // namespace
 
 TonePicker::TonePicker(QString settingsKey, QString fallback, QWidget* parent)
@@ -20,6 +22,12 @@ TonePicker::TonePicker(QString settingsKey, QString fallback, QWidget* parent)
     setObjectName(u"toneChoice"_s);
     setCursor(Qt::PointingHandCursor);
     setMenu(new QMenu(this));
+    // Each tone's icon when it opens, in the theme's colours then (menus.html).
+    connect(menu(), &QMenu::aboutToShow, this, [this] {
+        for (QAction* item : menu()->actions()) {
+            item->setIcon(menuIcon(presetIcon(item->objectName().section(u'-', 1)), m_tokens));
+        }
+    });
 }
 
 void TonePicker::setTones(const QList<std::pair<QString, QString>>& tones)
@@ -52,13 +60,21 @@ void TonePicker::choose(const QString& tone, const QString& title)
 {
     m_tone = tone;
     setText(title);
+    showIcon();
+}
+
+void TonePicker::showIcon()
+{
+    // The chosen tone's icon before its name; the menu arrow after it is the style sheet's
+    // (QPushButton#toneChoice::menu-indicator), so a tone looks the same here and in the menu.
+    setIcon(Theme::icon(presetIcon(m_tone), m_tokens.muted, kIconSize, 0, kIconGap));
+    setIconSize(QSize(kIconSize + kIconGap, kIconSize));
 }
 
 void TonePicker::applyTheme(const Tokens& t)
 {
-    // The menu arrow after the tone's name, as on the actions.
-    setLayoutDirection(Qt::RightToLeft);
-    setButtonIcon(this, u"down"_s, t.muted, kArrowSize, true); // right to left: the gap goes before it
+    m_tokens = t;
+    showIcon();
     reserveWidth(this, m_titles);
 }
 

@@ -19,6 +19,7 @@ namespace paraphrase::app {
 
 class ChangeList;
 class ChipButton;
+class StreamCaret;
 
 /// A text result: streamed as it is written, then shown whole; for proofread the word diff
 /// with Undo per change (PLAN D6) or the corrected text alone.
@@ -33,6 +34,8 @@ public:
 
     void clear();
     void stream(const QString& soFar);
+    /// The run ended without a final text (stopped): the caret goes.
+    void endStream();
     void showText(const QString& text);
     void showProofread(const QString& before, const QString& after);
     void showMessage(const QString& message, bool problem);
@@ -55,6 +58,7 @@ private:
     [[nodiscard]] QString diffHtml(const client::WordDiff& diff) const;
 
     QTextBrowser* m_output = nullptr;
+    StreamCaret* m_caret = nullptr;
     ChangeList* m_changes = nullptr;
     std::optional<client::WordDiff> m_diff;
     QSet<qsizetype> m_undone;
@@ -99,6 +103,8 @@ public:
     ~FullReplyView() override = default;
 
     void stream(const QString& soFar);
+    void endStream();
+    void applyTheme(const Tokens& t);
     void addVersion(const QString& text);
     void showVersion(qsizetype index);
     /// Forgets the versions: the message or what to say changed.
@@ -115,6 +121,7 @@ Q_SIGNALS:
 
 private:
     QPlainTextEdit* m_edit = nullptr;
+    StreamCaret* m_caret = nullptr;
     QLabel* m_hint = nullptr;
     QStringList m_versions;
     qsizetype m_index = -1;
