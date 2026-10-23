@@ -28,6 +28,10 @@ using Tokens = std::vector<llama_token>;
 
 constexpr int kBatch = 2048; // llama-server's defaults (common_params)
 constexpr int kUbatch = 512;
+constexpr int kPrefixSlots = 4;         ///< system prompts kept besides the current request
+constexpr int kPrefixMaxTokens = 1024;  ///< a longer system prompt is not kept
+constexpr size_t kPrefixMinTokens = 32; ///< a shorter system prompt is not kept
+constexpr size_t kPrefixMinGain = 32;   ///< reuse a slot only when it saves at least this much
 
 /// llama.cpp logs through this: warnings and errors to our category, the rest dropped. It
 /// never sees user text (prompts are not logged by llama.cpp at these levels).
@@ -260,6 +264,7 @@ util::Result<bool> LlamaEngine::Run::preparePrompt(Generation& out)
     if (m_drafted) {
         keep = std::min(keep, commonPrefix(m_engine.m_draftCachedTokens, prompt));
     }
+    keep = m_engine.restorePrefix(prompt, keep, m_drafted);
     keep = std::min(keep, prompt.size() - 1);
     llama_memory_t memory = llama_get_memory(m_ctx);
     llama_memory_t draftMemory = m_drafted ? llama_get_memory(m_engine.m_draftInit->context()) : nullptr;
@@ -294,6 +299,7 @@ util::Result<bool> LlamaEngine::Run::preparePrompt(Generation& out)
         }
         m_engine.m_cachedTokens.assign(prompt.begin(), prompt.end());
     }
+    m_engine.savePrefix(prompt, m_engine.systemLength(m_request), m_drafted);
     prepareVariants(prompt);
     return util::Result<bool>::success(true);
 }
@@ -545,11 +551,13 @@ util::Result<bool> LlamaEngine::load(const EngineConfig& config)
     unload();
     common_params params;
     params.model.path = config.modelPath.toStdString();
-    params.n_ctx = config.contextSize * config.maxVariants;
+    // Room for every variant's context and for the kept system prompts (PrefixSlot), in one
+    // unified cache so sequences can share cells.
+    params.n_ctx = (config.contextSize * config.maxVariants) + (kPrefixSlots * kPrefixMaxTokens);
     params.n_batch = kBatch;
     params.n_ubatch = kUbatch;
-    params.n_parallel = config.maxVariants;
-    params.kv_unified = config.maxVariants > 1;
+    params.n_parallel = config.maxVariants + kPrefixSlots;
+    params.kv_unified = true;
     params.swa_full = true; // any cached prefix can be reused (see the class comment)
     params.n_gpu_layers = config.gpuLayers;
     params.flash_attn_type =
@@ -583,6 +591,11 @@ util::Result<bool> LlamaEngine::load(const EngineConfig& config)
     m_config = config;
     m_cachedTokens.clear();
     m_draftCachedTokens.clear();
+    m_slots.assign(kPrefixSlots, {});
+    for (int i = 0; i < kPrefixSlots; ++i) {
+        m_slots[static_cast<size_t>(i)].seq = config.maxVariants + i; // after the variants' sequences
+    }
+    m_systemLengths.clear();
     if (!config.draftModelPath.isEmpty()) {
         loadDraft(config, params);
     }
@@ -672,7 +685,122 @@ void LlamaEngine::unload()
     m_init.reset();
     m_cachedTokens.clear();
     m_draftCachedTokens.clear();
+    m_slots.clear();
+    m_systemLengths.clear();
     m_config = {};
+}
+
+void LlamaEngine::clearCache()
+{
+    if (!isLoaded()) {
+        return;
+    }
+    llama_memory_seq_rm(llama_get_memory(m_init->context()), -1, -1, -1);
+    if (m_draftInit) {
+        llama_memory_seq_rm(llama_get_memory(m_draftInit->context()), -1, -1, -1);
+    }
+    m_cachedTokens.clear();
+    m_draftCachedTokens.clear();
+    for (PrefixSlot& slot : m_slots) {
+        slot.tokens.clear();
+        slot.used = 0;
+        slot.draft = false;
+    }
+}
+
+size_t LlamaEngine::systemLength(const GenerationRequest& request)
+{
+    if (const auto it = m_systemLengths.find(request.system); it != m_systemLengths.end()) {
+        return it->second;
+    }
+    // Two prompts that differ only in the user's text part where that text starts.
+    const llama_vocab* vocab = llama_model_get_vocab(m_init->model());
+    GenerationRequest a = request;
+    GenerationRequest b = request;
+    a.user = QStringLiteral("a");
+    b.user = QStringLiteral("b");
+    const common_chat_session first(m_templates.get(), vocab, chatInputs(a));
+    const common_chat_session second(m_templates.get(), vocab, chatInputs(b));
+    const size_t length = commonPrefix(tokenize(vocab, first.prompt()), tokenize(vocab, second.prompt()));
+    m_systemLengths.emplace(request.system, length);
+    return length;
+}
+
+bool LlamaEngine::draftHasSlots() const
+{
+    // The draft context is made from the same parameters, so it has the slots' sequences too.
+    return m_draftInit &&
+           static_cast<int>(llama_n_seq_max(m_draftInit->context())) >= m_config.maxVariants + kPrefixSlots;
+}
+
+size_t LlamaEngine::restorePrefix(const std::vector<int>& prompt, size_t keep, bool drafted)
+{
+    PrefixSlot* best = nullptr;
+    size_t bestLength = keep;
+    for (PrefixSlot& slot : m_slots) {
+        if (drafted && !slot.draft) {
+            continue; // a drafted run needs the prefix in both contexts
+        }
+        const size_t n = commonPrefix(slot.tokens, prompt);
+        if (n >= bestLength + kPrefixMinGain) {
+            best = &slot;
+            bestLength = n;
+        }
+    }
+    if (best == nullptr) {
+        return keep;
+    }
+    // The slot's cells are shared, not copied: sequence 0 reads them as its own prefix.
+    llama_memory_t memory = llama_get_memory(m_init->context());
+    llama_memory_seq_rm(memory, 0, -1, -1);
+    llama_memory_seq_cp(memory, best->seq, 0, -1, -1);
+    m_cachedTokens = best->tokens;
+    if (drafted) {
+        llama_memory_t draftMemory = llama_get_memory(m_draftInit->context());
+        llama_memory_seq_rm(draftMemory, 0, -1, -1);
+        llama_memory_seq_cp(draftMemory, best->seq, 0, -1, -1);
+        m_draftCachedTokens = best->tokens;
+    }
+    best->used = ++m_slotClock;
+    return bestLength;
+}
+
+void LlamaEngine::savePrefix(const std::vector<int>& prompt, size_t length, bool drafted)
+{
+    if (m_slots.empty() || length < kPrefixMinTokens || length > static_cast<size_t>(kPrefixMaxTokens) ||
+        length > m_cachedTokens.size()) {
+        return;
+    }
+    const bool withDraft = drafted && draftHasSlots() && length <= m_draftCachedTokens.size();
+    const std::vector<int> prefix(prompt.begin(), prompt.begin() + static_cast<std::ptrdiff_t>(length));
+    PrefixSlot* target = nullptr;
+    for (PrefixSlot& slot : m_slots) {
+        if (slot.tokens == prefix && (slot.draft || !withDraft)) {
+            slot.used = ++m_slotClock; // already kept
+            return;
+        }
+        if (slot.tokens == prefix) {
+            target = &slot; // kept without the draft context: keep it again with it
+            break;
+        }
+        if (target == nullptr || slot.used < target->used) {
+            target = &slot; // a free slot (used 0) or the least recently used
+        }
+    }
+    const auto end = static_cast<llama_pos>(length);
+    llama_memory_t memory = llama_get_memory(m_init->context());
+    llama_memory_seq_rm(memory, target->seq, -1, -1);
+    llama_memory_seq_cp(memory, 0, target->seq, 0, end);
+    if (draftHasSlots()) {
+        llama_memory_t draftMemory = llama_get_memory(m_draftInit->context());
+        llama_memory_seq_rm(draftMemory, target->seq, -1, -1);
+        if (withDraft) {
+            llama_memory_seq_cp(draftMemory, 0, target->seq, 0, end);
+        }
+    }
+    target->tokens = prefix;
+    target->draft = withDraft;
+    target->used = ++m_slotClock;
 }
 
 EngineConfig LlamaEngine::loadedConfig() const

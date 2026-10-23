@@ -199,6 +199,47 @@ private Q_SLOTS:
         QVERIFY(other.value().cachedTokens < other.value().promptTokens - 1);
     }
 
+    void switchingSkillsKeepsTheirSystemPrompts()
+    {
+        // A skill's system prompt stays in a slot of its own: after another skill, it is shared
+        // back instead of read again. Reused cells change rounding a little (where cells sit
+        // changes the order of sums), exactly as the engine's ordinary prefix reuse does, so a
+        // near tie may resolve differently than from an empty cache: the answers are checked
+        // for shape, not for equality (draftedMatchesUndrafted is the bit-for-bit check).
+        GenerationRequest reply = request(u"reply/rp-en-001"_s);
+        reply.sampling = QJsonObject{{u"temperature"_s, 0.0}};
+        GenerationRequest french = request(u"reply/rp-fr-001"_s);
+        m_engine.clearCache();
+        QVERIFY(m_engine.generate(french, {}).ok());
+        const auto other = m_engine.generate(request(u"proofread/pr-en-001"_s), {});
+        QVERIFY(other.ok());
+        QVERIFY(other.value().cachedTokens < 40);        // the two skills share little but the template
+        const auto again = m_engine.generate(reply, {}); // the system prompt from its slot
+        QVERIFY(again.ok());
+        QVERIFY2(again.value().cachedTokens > 100, qPrintable(QString::number(again.value().cachedTokens)));
+        QVERIFY(again.value().texts.value(0).contains(u"\"replies\""_s));
+        // Another reply shares the same slot.
+        const auto proofread = m_engine.generate(request(u"proofread/pr-fr-001"_s), {});
+        QVERIFY(proofread.ok());
+        const auto shared = m_engine.generate(french, {});
+        QVERIFY(shared.ok());
+        QVERIFY(shared.value().cachedTokens > 100);
+
+        // A drafted skill keeps its prompt in the draft context too, so drafting resumes from the
+        // slot after another skill.
+        if (m_engine.canDraft()) {
+            GenerationRequest proof = request(u"proofread/pr-en-001"_s);
+            proof.sampling = QJsonObject{{u"temperature"_s, 0.0}, {u"top_k"_s, 1}};
+            const auto drafted = m_engine.generate(proof, {});
+            QVERIFY(drafted.ok());
+            QVERIFY(m_engine.generate(reply, {}).ok());
+            const auto back = m_engine.generate(proof, {});
+            QVERIFY(back.ok());
+            QVERIFY2(back.value().cachedTokens > 100, qPrintable(QString::number(back.value().cachedTokens)));
+            QVERIFY(back.value().draftTokens > 0);
+        }
+    }
+
     void replyFollowsTheGrammar()
     {
         const auto result = m_engine.generate(request(u"reply/rp-en-001"_s), {});
@@ -255,14 +296,17 @@ private Q_SLOTS:
             if (id.startsWith(u"reply/"_s)) {
                 continue; // reply is not drafted (ADR-004)
             }
-            // Greedy, so drafting may change the speed but never the answer. Undrafted first:
-            // the drafted run then starts from a cache only the model's context has.
+            // Greedy, so drafting may change the speed but never the answer.
             GenerationRequest req = request(id);
             req.sampling.insert(u"temperature"_s, 0.0);
             req.sampling.insert(u"top_k"_s, 1);
             req.draft = false;
+            // Both from an empty cache: where cells land changes rounding, and a near tie
+            // between two tokens could then differ without drafting being the cause.
+            m_engine.clearCache();
             const auto plain = m_engine.generate(req, {});
             req.draft = true;
+            m_engine.clearCache();
             QString streamed;
             const auto fast = m_engine.generate(req, [&](int, const QString& piece) { streamed += piece; });
             QVERIFY(plain.ok() && fast.ok());

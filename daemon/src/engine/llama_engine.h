@@ -5,6 +5,8 @@
 #include <QString>
 
 #include <atomic>
+#include <cstdint>
+#include <map>
 #include <memory>
 #include <vector>
 
@@ -56,6 +58,9 @@ public:
 
     void cancel() override;
     void resetCancel() override;
+    /// Forgets every cached prompt and kept system prompt: the next request reads all of its
+    /// prompt into an empty cache (tests that compare two runs bit for bit).
+    void clearCache();
 
 private:
     struct TemplatesDeleter
@@ -70,6 +75,26 @@ private:
     void loadDraft(const EngineConfig& config, common_params& params);
     class Run; // one generate() call, in llama_engine.cpp
 
+    /// A skill's system prompt, read once and kept in a sequence of its own: switching skills
+    /// shares those cache cells back instead of reading the prompt again (about 50 tokens a
+    /// second for E4B on a laptop CPU).
+    struct PrefixSlot
+    {
+        std::vector<int> tokens; ///< the prefix the slot's sequence holds, empty when free
+        int seq = 0;
+        std::uint64_t used = 0; ///< for least-recently-used reuse
+        bool draft = false;     ///< the draft context holds the prefix too (drafted runs can use it)
+    };
+    /// Tokens of the request's prompt before the user's message: where its system part ends.
+    [[nodiscard]] size_t systemLength(const GenerationRequest& request);
+    /// Shares a slot's prefix into sequence 0 when it matches more of `prompt` than `keep`
+    /// tokens already cached there; returns the tokens now reusable.
+    size_t restorePrefix(const std::vector<int>& prompt, size_t keep, bool drafted);
+    /// Keeps the first `length` tokens of sequence 0 (`prompt`) in a slot, in the draft context
+    /// too after a drafted run.
+    void savePrefix(const std::vector<int>& prompt, size_t length, bool drafted);
+    [[nodiscard]] bool draftHasSlots() const;
+
     std::unique_ptr<common_init_result> m_init;         ///< owns the model and the context
     std::unique_ptr<common_params_sampling> m_defaults; ///< after the model file's defaults
     std::unique_ptr<common_chat_templates, TemplatesDeleter> m_templates;
@@ -79,6 +104,9 @@ private:
     EngineConfig m_config;
     std::vector<int> m_cachedTokens;      ///< the tokens of sequence 0 in the KV cache
     std::vector<int> m_draftCachedTokens; ///< the same for the draft context
+    std::vector<PrefixSlot> m_slots;
+    std::uint64_t m_slotClock = 0;
+    std::map<QString, size_t> m_systemLengths; ///< by system prompt
     std::atomic<bool> m_cancel{false};
     double m_loadSeconds = 0.0;
 };
