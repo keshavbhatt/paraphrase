@@ -2066,6 +2066,18 @@
    "plain_name": "English"
   },
   {
+   "text": "Your parcel is being held at customs. To release it, pay the £2.99 handling fee by replying with your card number and the code on the back.",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Hi mum, new number, my old phone broke. A code just came to your phone, can you send it to me? Need it urgently.",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
    "text": "बेटा, रविवार को दादी का जन्मदिन है। सब लोग दोपहर 12 बजे तक घर आ जाना, खाना साथ में खाएँगे।",
    "lang": "hi",
    "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
@@ -2220,6 +2232,12 @@
    "lang": "hinglish",
    "prompt_name": "Hinglish: Hindi written in Latin letters as in chat messages. Keep it Hinglish even in a formal tone: do not translate it into English or Devanagari",
    "plain_name": "Hinglish (Hindi in Latin letters)"
+  },
+  {
+   "text": "आपका बिजली कनेक्शन आज रात काट दिया जाएगा। तुरंत इस नंबर पर अपना UPI PIN भेजें।",
+   "lang": "hi",
+   "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
+   "plain_name": "Hindi"
   },
   {
    "text": "¿Vienes a cenar el sábado? Cocino paella a las nueve.",
@@ -4106,6 +4124,24 @@
    "plain_name": "English"
   },
   {
+   "text": "Your parcel is being held at customs. To release it, pay the £2.99 handling fee by replying with your card number, expiry date and the 3-digit code on the back.\n\nParcel Services",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Hi mum, I dropped my phone in the sink, this is my new number. A code just came to your phone by text, can you send it to me quickly? Need it to get into my bank app.",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "IT Helpdesk\n\nYour mailbox has reached its limit and will stop receiving mail today. Reply with your username and password so we can increase your storage.",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
    "text": "आदरणीय सर,\n\nमैं आपको बताना चाहता हूँ कि हमारी कंपनी का सालाना कार्यक्रम 20 दिसंबर को होटल ग्रैंड में है। आपको मुख्य अतिथि के रूप में आमंत्रित करना हमारे लिए सम्मान की बात होगी। कृपया अपनी सहमति बताएँ।\n\nसादर,\nरमेश गुप्ता",
    "lang": "hi",
    "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
@@ -4176,6 +4212,18 @@
    "lang": "hi",
    "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
    "plain_name": "Hindi"
+  },
+  {
+   "text": "आपका बिजली कनेक्शन आज रात 9 बजे काट दिया जाएगा। बिल अपडेट करने के लिए तुरंत इस नंबर पर अपना UPI PIN भेजें।",
+   "lang": "hi",
+   "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
+   "plain_name": "Hindi"
+  },
+  {
+   "text": "Bhai urgent hai, galti se tere number pe ek OTP chala gaya, jaldi wo bhej de please",
+   "lang": "hinglish",
+   "prompt_name": "Hinglish: Hindi written in Latin letters as in chat messages. Keep it Hinglish even in a formal tone: do not translate it into English or Devanagari",
+   "plain_name": "Hinglish (Hindi in Latin letters)"
   },
   {
    "text": "We're opening our second bakery on Park Road this Saturday at 8am. The first 50 customers get a free croissant, and everything is 20% off all weekend.",
