@@ -14,6 +14,16 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-24 - Full reply never offers a password, code or card details
+
+- Full reply (draft 11): a reply to a phishing message no longer offers to send card details,
+  passwords or codes. Revision 10 did so in 9 of 70 runs on E4B and 32 of 70 on E2B, mostly
+  because "say I will send it or check" was the advice for what only the user knows; revision 11
+  in 1 and 3 of 80, without touching ordinary replies. Numbers and rejected wordings in
+  DOCS/models.md. Quick replies were already safe.
+- Eval: eight new scam items in English, Hindi and Hinglish, and patterns that catch an offer to
+  send a secret while letting a refusal pass, with a unit test.
+
 ## 2026-10-23 (late night) - The popup checked live, Write 7 note titles
 
 - The popup driven live on KDE Wayland (KWrite as the source, the owner's shortcut), compared
