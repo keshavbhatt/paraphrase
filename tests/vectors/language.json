@@ -4166,6 +4166,24 @@
    "plain_name": "English"
   },
   {
+   "text": "Hi,\n\nI asked for a password reset link three times today and waited ten minutes each time. Nothing arrived, not even in spam.\n\nPlease check your mail logs and tell me:\n\nWhether the reset emails were sent.\n\nWhich address they were sent from.\n\nWhether my provider rejected them.\n\nAlso, please give me another way to get into my account, I need my files today.\n\nThanks,\nLena",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Hello,\n\nThe Download invoice button gives me an error every time (order 55120). I tried two browsers and cleared the cache.\n\nCan you send me the invoice by email, and tell me when the button will work again?\n\nBest,\nOmar",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Is room 4B booked for tomorrow 10am? And can you send me the slides before then?",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
    "text": "आदरणीय सर,\n\nमैं आपको बताना चाहता हूँ कि हमारी कंपनी का सालाना कार्यक्रम 20 दिसंबर को होटल ग्रैंड में है। आपको मुख्य अतिथि के रूप में आमंत्रित करना हमारे लिए सम्मान की बात होगी। कृपया अपनी सहमति बताएँ।\n\nसादर,\nरमेश गुप्ता",
    "lang": "hi",
    "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
