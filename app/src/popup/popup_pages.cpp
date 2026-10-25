@@ -157,6 +157,7 @@ QWidget* PopupActionsPage::buildFoot()
     row->addWidget(m_busy);
     m_status = makeLabel(QString(), u"small"_s);
     m_status->setObjectName(u"popupStatus"_s);
+    m_status->setMinimumHeight(m_busy->sizeHint().height()); // the pill or the line: one height
     m_status->setWordWrap(true); // a longer notice wraps instead of stopping mid-sentence
     row->addWidget(m_status, 1);
     row->addStretch(); // the space stays here while the working pill hides the line

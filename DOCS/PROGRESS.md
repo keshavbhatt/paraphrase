@@ -14,6 +14,28 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-25 (evening) - The popup moves, shows it is working, and Tone keeps a chosen language
+
+- Mock `popup-working.html`, approved by the owner on 2026-10-25, and built:
+  - the header moves the popup (a grip at its left; the desktop's own move, so Wayland too);
+  - the actions page shows the working pill from the first second: "Loading the model",
+    "Reading the text for Tone", then "Ready for Tone" (from the daemon's Status, polled while
+    it reads ahead);
+  - a language the user chose is a pill beside the result ("हिन्दी · Hindi ×"); × reruns in
+    the text's own language; the next tone keeps the chosen one;
+  - a tone's line says what it did: "Elaborate · kept: Friday, Thai · 21 to 34 words";
+  - Settings, Shortcut: the shortcut opens the popup (the default) or Paraphrase's window with
+    the selected text in it.
+  Checked live in KWrite: dragged 300 px left and 150 px up, the footer's three steps, Hindi then
+  Elaborate then ×, and the shortcut opening the window.
+- Tone 11: a tone in another language is applied, not only translated (owner report: Elaborate in
+  Hindi read like a translation). Numbers in DOCS/models.md.
+- Facts check: across languages it counts numbers, not names (no more "check: Friday, Thai are
+  missing" on a Hindi result).
+- The popup tests wrote to the user's real settings (and so to which action is highlighted);
+  they use a temporary folder now, and the old popup counters were removed from the owner's
+  settings file (a backup was kept).
+
 ## 2026-10-25 - The popup's fixes checked live; the daemon comes back after its idle exit
 
 - Live check on KDE Wayland of the popup fixes from 2026-10-23: the popup fits its content,
