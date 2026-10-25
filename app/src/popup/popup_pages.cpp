@@ -141,6 +141,7 @@ QWidget* PopupActionsPage::buildFoot()
     row->addWidget(dot);
     m_status = makeLabel(QString(), u"small"_s);
     m_status->setObjectName(u"popupStatus"_s);
+    m_status->setWordWrap(true); // a longer notice wraps instead of stopping mid-sentence
     row->addWidget(m_status, 1);
     QLabel* esc = makeLabel(tr("Esc"), u"kbd"_s);
     row->addWidget(esc);

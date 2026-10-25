@@ -88,22 +88,10 @@ QString DaemonClient::connectToDaemon()
     const QDBusConnection bus = QDBusConnection::sessionBus();
     if (!forcePrivate && bus.isConnected()) {
         const QDBusConnectionInterface* names = bus.interface();
-        if (!names->isServiceRegistered(kService)) {
-            const QString program = daemonProgram();
-            if (program.isEmpty()) {
-                return tr("paraphrase-daemon was not found; set PARAPHRASE_DAEMON to its path.");
-            }
-            // Its logs must not land in this terminal, in the middle of an answer.
-            QProcess daemon;
-            daemon.setProgram(program);
-            daemon.setStandardOutputFile(QProcess::nullDevice());
-            daemon.setStandardErrorFile(QProcess::nullDevice());
-            daemon.startDetached();
-            const QDeadlineTimer deadline(kStartTimeoutMs);
-            while (!names->isServiceRegistered(kService) && !deadline.hasExpired()) {
-                pause();
-            }
+        if (!names->isServiceRegistered(kService) && daemonProgram().isEmpty()) {
+            return tr("paraphrase-daemon was not found; set PARAPHRASE_DAEMON to its path.");
         }
+        startOnBus();
         if (names->isServiceRegistered(kService)) {
             m_connection = bus;
             return subscribe() ? QString() : tr("Cannot listen to the daemon on the session bus.");
@@ -111,6 +99,49 @@ QString DaemonClient::connectToDaemon()
         // It could not own its name (a snap waiting for its name declaration): run it privately.
     }
     return startPrivately();
+}
+
+void DaemonClient::startOnBus()
+{
+    const QDBusConnection bus = QDBusConnection::sessionBus();
+    const QDBusConnectionInterface* names = bus.interface();
+    if (names->isServiceRegistered(kService)) {
+        return;
+    }
+    const QString program = daemonProgram();
+    if (program.isEmpty()) {
+        return;
+    }
+    // Its logs must not land in this terminal, in the middle of an answer.
+    QProcess daemon;
+    daemon.setProgram(program);
+    daemon.setStandardOutputFile(QProcess::nullDevice());
+    daemon.setStandardErrorFile(QProcess::nullDevice());
+    daemon.startDetached();
+    const QDeadlineTimer deadline(kStartTimeoutMs);
+    while (!names->isServiceRegistered(kService) && !deadline.hasExpired()) {
+        pause();
+    }
+}
+
+void DaemonClient::keepRunning()
+{
+    // The daemon quits after a long quiet spell (--idle-exit, 30 minutes); the app stays. A
+    // call after that starts it again instead of failing ("Paraphrase is not running", live
+    // check 2026-10-25). The signals follow the bus name to the new daemon.
+    if (!m_subscribed || m_peer) {
+        return;
+    }
+    if (m_private) {
+        if (m_private->state() == QProcess::NotRunning) {
+            m_subscribed = false;
+            m_private = nullptr;
+            QDBusConnection::disconnectFromPeer(kPrivateName); // else the dead socket's connection is reused
+            (void)startPrivately();
+        }
+        return;
+    }
+    startOnBus();
 }
 
 QString DaemonClient::startPrivately()
@@ -202,6 +233,7 @@ void DaemonClient::daemonLost()
 
 QDBusMessage DaemonClient::call(const QString& method, const QVariantList& args)
 {
+    keepRunning();
     QDBusMessage msg = QDBusMessage::createMethodCall((m_private || m_peer) ? QString() : kService, kPath,
                                                       kInterface, method);
     msg.setArguments(args);

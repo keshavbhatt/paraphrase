@@ -60,6 +60,10 @@ private:
 
     [[nodiscard]] static QString daemonProgram();
     [[nodiscard]] QString startPrivately();
+    /// Starts the daemon on the session bus unless it already owns its name; waits for it.
+    static void startOnBus();
+    /// Before a call: starts the daemon again if it quit while idle.
+    void keepRunning();
     [[nodiscard]] bool subscribe();
 
     QDBusConnection m_connection;
