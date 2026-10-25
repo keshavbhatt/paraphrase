@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Paraphrase mock: Popup, working and moving</title><link rel="stylesheet" href="mock.css"><script src="mock.js"></script>
+<style>
+  .desk { min-height: 1320px; }
+  .phead > * { white-space: nowrap; }
+  .phead .private { font-size: 11px; }
+  .phead.drag { cursor: move; }
+  .grip { width: 14px; height: 18px; color: var(--muted); opacity: .7; flex: none; }
+  /* The working pill (main-window-busy.html). */
+  .busy { display: inline-flex; align-items: center; gap: 8px; height: 26px; min-width: 218px; padding: 0 11px 0 9px; border-radius: 13px; background: var(--accent-soft); color: var(--accent); font-size: 12px; font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .busy .secs { margin-left: auto; font-weight: 400; }
+  .pulse { position: relative; width: 8px; height: 8px; border-radius: 4px; background: var(--accent); flex: none; }
+  .pulse::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 2px solid var(--accent); opacity: 0; animation: ring 1.4s ease-out infinite; }
+  @keyframes ring { 0% { transform: scale(.4); opacity: .9; } 100% { transform: scale(1.5); opacity: 0; } }
+  .sk { display: flex; flex-direction: column; gap: 12px; padding: 4px 0; }
+  .sk i { display: block; height: 12px; border-radius: 6px; background: linear-gradient(90deg, var(--border) 25%, var(--hover) 50%, var(--border) 75%); background-size: 300% 100%; animation: shimmer 1.6s linear infinite; }
+  @keyframes shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
+  @media (prefers-reduced-motion: reduce) { .pulse::after, .sk i { animation: none; } }
+  /* The language the user chose, as a pill that undoes it. */
+  .lang { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 4px 0 10px; border-radius: 12px; background: var(--accent-soft); color: var(--accent); font-size: 12px; font-weight: 600; }
+  .lang button { width: 18px; height: 18px; border: 0; border-radius: 9px; background: transparent; color: inherit; display: grid; place-items: center; padding: 0; }
+  .lang button:hover { background: var(--hover); }
+  .settings-cut { position: absolute; left: 40px; top: 840px; width: 700px; background: var(--panel); color: var(--text); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; box-shadow: var(--shadow); }
+  .opt { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 10px; }
+  .opt.on { border: 1.5px solid var(--accent); background: var(--accent-soft); }
+  .opt input { margin: 3px 0 0; accent-color: var(--accent-strong); }
+</style></head>
+<body>
+<div class="desk">
+  <div class="other" style="left: 40px; top: 30px; width: 1440px; height: 760px; background: #EEF1F4">
+    <div class="bar" style="background: #FFFFFF">Mia - Telegram</div>
+    <div class="chat">
+      <div class="msg">Dinner this week?</div>
+      <div style="flex: 1; min-height: 560px"></div>
+      <div class="compose"><mark>Are you free for dinner on Friday? Mia and I were thinking of trying the new Thai place near the station.</mark></div>
+    </div>
+  </div>
+
+  <!-- a. Actions, the model still loading: the header moves the popup. -->
+  <div class="popup" style="left: 70px; top: 80px">
+    <div class="phead drag" title="Drag to move">
+      <svg class="grip" viewBox="0 0 14 18" aria-hidden="true"><g fill="currentColor"><circle cx="4" cy="4" r="1.5"/><circle cx="10" cy="4" r="1.5"/><circle cx="4" cy="9" r="1.5"/><circle cx="10" cy="9" r="1.5"/><circle cx="4" cy="14" r="1.5"/><circle cx="10" cy="14" r="1.5"/></g></svg>
+      <svg class="ic mark"><use href="#i-pen"/></svg><b>Paraphrase</b><span class="small muted">from Telegram</span>
+      <span class="grow"></span>
+      <span class="private"><svg class="ic s"><use href="#i-lock"/></svg>On this device</span>
+      <button class="btn flat icon" aria-label="Open in window"><svg class="ic s"><use href="#i-expand"/></svg></button>
+      <button class="btn flat icon" aria-label="Close (Esc)"><svg class="ic s"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="pbody">
+      <div class="row"><span class="cap">Selected text</span><span class="small muted">· 21 words · English</span></div>
+      <div class="source">Are you free for dinner on Friday? Mia and I were thinking of trying the new Thai place near the station.</div>
+      <span class="cap">Actions</span>
+      <div class="row wrap">
+        <button class="action hot"><span class="num">1</span>Proofread</button>
+        <button class="action"><span class="num">2</span>Tone<svg class="ic s muted"><use href="#i-down"/></svg></button>
+        <button class="action"><span class="num">3</span>Reply</button>
+        <button class="action"><span class="num">4</span>Summarize</button>
+        <button class="action"><span class="num">5</span>Format<svg class="ic s muted"><use href="#i-down"/></svg></button>
+        <button class="action"><span class="num">6</span>Translate<svg class="ic s muted"><use href="#i-down"/></svg></button>
+        <button class="action"><span class="num">7</span>My actions<svg class="ic s muted"><use href="#i-down"/></svg></button>
+      </div>
+    </div>
+    <div class="pfoot">
+      <span class="busy" role="status"><span class="pulse" aria-hidden="true"></span>Loading the model<span class="secs">4 s</span></span>
+      <span class="grow"></span>
+      <span class="kbd">Esc</span><span class="small muted">close</span>
+    </div>
+  </div>
+
+  <!-- b. Tone in Hindi, while it writes. -->
+  <div class="popup" style="left: 560px; top: 80px">
+    <div class="phead drag" title="Drag to move">
+      <svg class="grip" viewBox="0 0 14 18" aria-hidden="true"><g fill="currentColor"><circle cx="4" cy="4" r="1.5"/><circle cx="10" cy="4" r="1.5"/><circle cx="4" cy="9" r="1.5"/><circle cx="10" cy="9" r="1.5"/><circle cx="4" cy="14" r="1.5"/><circle cx="10" cy="14" r="1.5"/></g></svg>
+      <a class="btn flat" href="popup-actions.html"><svg class="ic s"><use href="#i-left"/></svg>Actions</a>
+      <b style="font-size: 14px">Tone</b>
+      <span class="grow"></span>
+      <span class="private"><svg class="ic s"><use href="#i-lock"/></svg>On this device</span>
+      <button class="btn flat icon" aria-label="Close (Esc)"><svg class="ic s"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="pbody">
+      <div class="row wrap" role="group" aria-label="Tone">
+        <button class="tone">Professional</button><button class="tone">Casual</button><button class="tone">Polite</button><button class="tone">Friendly</button>
+        <button class="tone">Confident</button><button class="tone">Concise</button><button class="tone on" aria-pressed="true">Elaborate</button><button class="tone">Social</button><button class="tone">Emojify</button>
+      </div>
+      <div class="stack" style="gap: 6px">
+        <span class="cap">Your text</span>
+        <div class="source" style="font-size: 14px">Are you free for dinner on Friday? Mia and I were thinking of trying the new Thai place near the station.</div>
+      </div>
+      <div class="row">
+        <span class="busy" role="status"><span class="pulse" aria-hidden="true"></span>Reading your text<span class="secs">2 s</span></span>
+        <span class="grow"></span>
+        <span class="lang">हिन्दी · Hindi<button aria-label="Back to English"><svg class="ic s"><use href="#i-x"/></svg></button></span>
+      </div>
+      <div class="result"><div class="sk"><i style="width: 96%"></i><i style="width: 90%"></i><i style="width: 70%"></i></div></div>
+    </div>
+    <div class="pfoot">
+      <button class="btn big primary disabled">Replace in Telegram <span class="num">Enter</span></button>
+      <button class="btn big disabled"><svg class="ic s"><use href="#i-copy"/></svg>Copy</button>
+      <button class="btn big"><svg class="ic s"><use href="#i-stop"/></svg>Stop</button>
+    </div>
+  </div>
+
+  <!-- c. The same, done. -->
+  <div class="popup" style="left: 1030px; top: 80px">
+    <div class="phead drag" title="Drag to move">
+      <svg class="grip" viewBox="0 0 14 18" aria-hidden="true"><g fill="currentColor"><circle cx="4" cy="4" r="1.5"/><circle cx="10" cy="4" r="1.5"/><circle cx="4" cy="9" r="1.5"/><circle cx="10" cy="9" r="1.5"/><circle cx="4" cy="14" r="1.5"/><circle cx="10" cy="14" r="1.5"/></g></svg>
+      <a class="btn flat" href="popup-actions.html"><svg class="ic s"><use href="#i-left"/></svg>Actions</a>
+      <b style="font-size: 14px">Tone</b>
+      <span class="grow"></span>
+      <span class="private"><svg class="ic s"><use href="#i-lock"/></svg>On this device</span>
+      <button class="btn flat icon" aria-label="Close (Esc)"><svg class="ic s"><use href="#i-x"/></svg></button>
+    </div>
+    <div class="pbody">
+      <div class="row wrap" role="group" aria-label="Tone">
+        <button class="tone">Professional</button><button class="tone">Casual</button><button class="tone">Polite</button><button class="tone">Friendly</button>
+        <button class="tone">Confident</button><button class="tone">Concise</button><button class="tone on" aria-pressed="true">Elaborate</button><button class="tone">Social</button><button class="tone">Emojify</button>
+      </div>
+      <div class="stack" style="gap: 6px">
+        <span class="cap">Your text</span>
+        <div class="source" style="font-size: 14px">Are you free for dinner on Friday? Mia and I were thinking of trying the new Thai place near the station.</div>
+      </div>
+      <div class="row">
+        <span class="small muted">Elaborate · kept: Friday, 21 to 34 words</span>
+        <span class="grow"></span>
+        <span class="lang">हिन्दी · Hindi<button aria-label="Back to English"><svg class="ic s"><use href="#i-x"/></svg></button></span>
+      </div>
+      <div class="result">क्या आप इस शुक्रवार रात के खाने के लिए हमारे साथ आ सकते हैं? Mia और मैं स्टेशन के पास हाल ही में खुले नए थाई रेस्टोरेंट में जाने के बारे में सोच रहे थे, और हमें लगा कि आपको भी साथ चलना अच्छा लगेगा।</div>
+    </div>
+    <div class="pfoot">
+      <button class="btn big primary">Replace in Telegram <span class="num">Enter</span></button>
+      <button class="btn big"><svg class="ic s"><use href="#i-copy"/></svg>Copy</button>
+      <button class="btn big"><svg class="ic s"><use href="#i-refresh"/></svg>Retry</button>
+    </div>
+  </div>
+
+  <!-- d. Settings, Shortcut: what the shortcut opens. -->
+  <div class="settings-cut">
+    <h2>The shortcut opens</h2>
+    <label class="opt on"><input type="radio" name="opens" checked><span class="stack" style="gap: 2px"><b>The popup, over the app you are in</b><span class="small muted">Pick an action and the result goes back where the text was. Recommended.</span></span></label>
+    <label class="opt"><input type="radio" name="opens"><span class="stack" style="gap: 2px"><b>Paraphrase's window</b><span class="small muted">The selected text opens in the main window, ready for any action. Copy the result yourself.</span></span></label>
+  </div>
+
+  <span class="pin" style="left: 60px; top: 92px">1</span>
+  <span class="pin" style="left: 60px; top: 440px">2</span>
+  <span class="pin" style="left: 990px; top: 340px">3</span>
+  <span class="pin" style="left: 1020px; top: 400px">4</span>
+  <span class="pin" style="left: 30px; top: 852px">5</span>
+</div>
+<section class="notes"><h2>Notes</h2><ol>
+  <li><b>Move it</b>: the header, with a grip at its left, drags the popup (the desktop's own window move, so it works on Wayland too). It stays where it is put until it closes; the next one opens near the cursor again, where the desktop allows.</li>
+  <li><b>Working, from the first second</b>: the footer shows the same working pill as the main window (main-window-busy.html), with the step in words: "Loading the model" the first time after a while, then "Reading the text for Proofread" while it works ahead; it gives way to "Ready" once the likely action is read.</li>
+  <li><b>The language you chose</b> is a pill beside the result: its own name and the English one, and × to go back to the text's language. A tone picked next keeps it, and the pill shows that it does. "Write it in another language" stays for choosing one.</li>
+  <li><b>What changed</b>, in one line: the tone, the facts kept and how the length moved ("21 to 34 words") for Concise and Elaborate, so Elaborate in another language visibly elaborated. Names are checked in the language they are written in; across languages only numbers are.</li>
+  <li><b>The shortcut opens</b> (Settings, Shortcut): the popup, or Paraphrase's window with the selected text in it. The popup's ⤢ still hands its text to the window either way.</li>
+</ol></section>
+</body></html>
