@@ -1,0 +1,95 @@
+{
+  "model": "gemma-4-e2b-qat-q4_0",
+  "skill": "rewrite.concise",
+  "skill_version": 5,
+  "skill_revision": 10,
+  "profile": "B-cpu",
+  "load_s": 2.78,
+  "peak_rss_mb": 4838,
+  "backend": "daemon",
+  "tag": "rw10b-hard",
+  "when": "2026-10-25 21:37",
+  "groups": {
+    "all": {
+      "n": 33,
+      "lang_floor_fail": [
+        "rw-en-123",
+        "rw-en-124",
+        "rw-en-125",
+        "rw-hi-108"
+      ],
+      "ttft_s_median": 1.16,
+      "total_s_median": 1.81,
+      "gen_tps_median": 34.0,
+      "retried_pct": 0.0,
+      "lang_warned": [],
+      "changed_pct": 84.8,
+      "protected_kept_pct": 99.2,
+      "preamble_pct": 0.0,
+      "length_ratio_median": 0.83
+    },
+    "lang=en": {
+      "n": 25,
+      "lang_floor_fail": [
+        "rw-en-123",
+        "rw-en-124",
+        "rw-en-125"
+      ],
+      "ttft_s_median": 1.109,
+      "total_s_median": 1.772,
+      "gen_tps_median": 33.5,
+      "retried_pct": 0.0,
+      "lang_warned": [],
+      "changed_pct": 92.0,
+      "protected_kept_pct": 99.1,
+      "preamble_pct": 0.0,
+      "length_ratio_median": 0.79
+    },
+    "lang=hi": {
+      "n": 4,
+      "lang_floor_fail": [
+        "rw-hi-108"
+      ],
+      "ttft_s_median": 1.217,
+      "total_s_median": 1.714,
+      "gen_tps_median": 35.6,
+      "retried_pct": 0.0,
+      "lang_warned": [],
+      "changed_pct": 75.0,
+      "protected_kept_pct": 100.0,
+      "preamble_pct": 0.0,
+      "length_ratio_median": 0.94
+    },
+    "lang=hinglish": {
+      "n": 4,
+      "lang_floor_fail": [],
+      "ttft_s_median": 1.46,
+      "total_s_median": 2.087,
+      "gen_tps_median": 36.8,
+      "retried_pct": 0.0,
+      "lang_warned": [],
+      "changed_pct": 50.0,
+      "protected_kept_pct": 100.0,
+      "preamble_pct": 0.0,
+      "length_ratio_median": 0.97
+    },
+    "set=hard": {
+      "n": 33,
+      "lang_floor_fail": [
+        "rw-en-123",
+        "rw-en-124",
+        "rw-en-125",
+        "rw-hi-108"
+      ],
+      "ttft_s_median": 1.16,
+      "total_s_median": 1.81,
+      "gen_tps_median": 34.0,
+      "retried_pct": 0.0,
+      "lang_warned": [],
+      "changed_pct": 84.8,
+      "protected_kept_pct": 99.2,
+      "preamble_pct": 0.0,
+      "length_ratio_median": 0.83
+    }
+  }
+}

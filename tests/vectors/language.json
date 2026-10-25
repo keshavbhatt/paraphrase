@@ -3062,6 +3062,24 @@
    "plain_name": "English"
   },
   {
+   "text": "Are you free for dinner on Friday? Mia and I were thinking of trying the new Thai place near the station.",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "The meeting moved to 3pm tomorrow. Please bring the budget sheet and the list of open orders.",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Your refund of 2,450 rupees for order 7781 will reach your account in 5 working days.",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
    "text": "कल नहीं आऊँगा, तबीयत खराब है। काम कोई और देख ले।",
    "lang": "hi",
    "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
@@ -3282,6 +3300,12 @@
    "lang": "hinglish",
    "prompt_name": "Hinglish: Hindi written in Latin letters as in chat messages. Keep it Hinglish even in a formal tone: do not translate it into English or Devanagari",
    "plain_name": "Hinglish (Hindi in Latin letters)"
+  },
+  {
+   "text": "कल की मीटिंग 11 बजे है, कृपया अपनी रिपोर्ट समय पर भेज दें।",
+   "lang": "hi",
+   "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
+   "plain_name": "Hindi"
   },
   {
    "text": "oye, mañana no voy, estoy malo. que alguien cubra mi turno.",

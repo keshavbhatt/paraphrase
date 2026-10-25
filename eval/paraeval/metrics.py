@@ -330,7 +330,17 @@ class RewriteScore:
 def score_rewrite(item: dict[str, Any], output: str) -> RewriteScore:
     src_words = max(len(item["text"].split()), 1)
     kept, total = protected_kept(item["text"], output, item.get("protected"))
-    ok, why = language_check(item["lang"], item["text"], output)
+    target = item.get("target_lang") or item["lang"]
+    if target == item["lang"]:
+        ok, why = language_check(item["lang"], item["text"], output)
+    else:
+        # The user chose another language: the answer is checked against that one, by script.
+        deva, _latin = script_shares(output)
+        if target == "hi":
+            ok, why = (deva >= 0.5 and not devanagari_broken(output)), "not in Hindi"
+        else:
+            ok, why = deva < 0.2, f"not in {target}"
+        why = "" if ok else why
     return RewriteScore(
         changed=normalise_ws(output) != normalise_ws(item["text"]),
         length_ratio=len(output.split()) / src_words,

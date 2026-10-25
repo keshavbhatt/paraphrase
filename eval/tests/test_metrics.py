@@ -239,3 +239,11 @@ def test_scam_items_catch_an_offer_to_send_a_secret() -> None:
     assert not caught("dr-hl-203", hinglish_no)
     assert caught("dr-hi-107", "मैं UPI PIN भेज दूँगा।")
     assert not caught("dr-hi-107", "मैं अपना UPI PIN कभी नहीं भेजता।")
+
+
+def test_rewrite_into_a_chosen_language() -> None:
+    item = {"lang": "en", "text": "Meet on Friday at 3pm.", "target_lang": "hi", "protected": ["3"]}
+    assert metrics.score_rewrite(item, "शुक्रवार को 3 बजे मिलते हैं।").lang_ok
+    assert not metrics.score_rewrite(item, "Let us meet on Friday at 3pm.").lang_ok
+    back = {"lang": "hi", "text": "कल 11 बजे मीटिंग है।", "target_lang": "en", "protected": ["11"]}
+    assert metrics.score_rewrite(back, "The meeting is tomorrow at 11.").lang_ok
