@@ -125,6 +125,7 @@ private:
     [[nodiscard]] QWidget* buildLanguagePill();
     void updateButtons();
     void showResultView();
+    void showView(QWidget* view);
     void fitInsertLabel();
 
     QLabel* m_title = nullptr;
@@ -144,7 +145,7 @@ private:
     QLabel* m_pick = nullptr;
     SkeletonView* m_skeleton = nullptr;
     SegmentedControl* m_view = nullptr;
-    QStackedWidget* m_results = nullptr;
+    QWidget* m_results = nullptr;
     TextResultView* m_text = nullptr;
     QuickRepliesView* m_replies = nullptr;
     ChipButton* m_insert = nullptr;

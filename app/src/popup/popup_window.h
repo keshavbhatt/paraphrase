@@ -34,6 +34,8 @@ public:
     /// Shows the popup near `point` (the cursor), kept on its screen. Wayland may place it itself.
     void openNear(const QPoint& point);
     void applyTheme();
+    /// Resizes to what the content needs at the popup's width.
+    void fitContent();
 
 Q_SIGNALS:
     void closed();

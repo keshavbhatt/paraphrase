@@ -190,6 +190,8 @@ void TextResultView::showMessage(const QString& message, bool problem)
 void TextResultView::setFitToText(bool fit)
 {
     m_fit = fit;
+    // The box hugs its text at the top; centred, it left an empty band above a short result.
+    layout()->setAlignment(fit ? Qt::AlignTop : Qt::Alignment());
     fitHeight();
 }
 

@@ -275,7 +275,12 @@ QWidget* PopupResultPage::buildBody()
     layout->addLayout(infoRow);
     m_pick = makeLabel(tr("PICK A REPLY"), u"caption"_s);
     layout->addWidget(m_pick);
-    m_results = new QStackedWidget;
+    // One result view shows at a time. Not a QStackedWidget: that is as tall as its tallest
+    // page (three reply cards), which left an empty band under a short text result.
+    m_results = new QWidget;
+    auto* views = new QVBoxLayout(m_results);
+    views->setContentsMargins(0, 0, 0, 0);
+    views->setSpacing(0);
     m_text = new TextResultView;
     m_text->setObjectName(u"resultBox"_s);
     m_text->setFitToText(true); // popup-proofread.html: the box hugs the text
@@ -286,10 +291,12 @@ QWidget* PopupResultPage::buildBody()
         view->layout()->setContentsMargins(0, 0, 0, 0);
     }
     m_skeleton = new SkeletonView;
-    m_results->addWidget(m_text);
-    m_results->addWidget(m_replies);
-    m_results->addWidget(m_skeleton);
-    layout->addWidget(m_results, 1);
+    views->addWidget(m_text);
+    views->addWidget(m_replies);
+    views->addWidget(m_skeleton);
+    m_replies->hide();
+    m_skeleton->hide();
+    layout->addWidget(m_results);
     m_otherLanguage = buildLanguageLink();
     layout->addWidget(m_otherLanguage, 0, Qt::AlignLeft);
     connect(m_view, &SegmentedControl::changed, this,
@@ -411,9 +418,17 @@ void PopupResultPage::begin(SkillKind kind, const QString& title, const QString&
     updateButtons();
 }
 
+void PopupResultPage::showView(QWidget* view)
+{
+    for (QWidget* w : {static_cast<QWidget*>(m_text), static_cast<QWidget*>(m_replies),
+                       static_cast<QWidget*>(m_skeleton)}) {
+        w->setVisible(w == view);
+    }
+}
+
 void PopupResultPage::showResultView()
 {
-    showOnly(m_results, m_kind != SkillKind::Text ? static_cast<QWidget*>(m_replies) : m_text);
+    showView(m_kind != SkillKind::Text ? static_cast<QWidget*>(m_replies) : m_text);
 }
 
 void PopupResultPage::setPresets(const QList<const SkillInfo*>& presets, const QString& currentId)
@@ -464,7 +479,7 @@ void PopupResultPage::setRunning(bool running)
             std::max(1, fm.lineSpacing());
         m_skeleton->setShape(reply ? SkeletonView::Shape::Replies : SkeletonView::Shape::Text);
         m_skeleton->setCompact(std::clamp(lines, 1, 12));
-        showOnly(m_results, m_skeleton);
+        showView(m_skeleton);
     } else if (ended) {
         m_busy->stop();
         m_info->setVisible(!reply);
@@ -486,7 +501,7 @@ void PopupResultPage::retrying()
 {
     if (m_running) {
         m_busy->setStep(tr("Checking, writing again"));
-        showOnly(m_results, m_skeleton);
+        showView(m_skeleton);
     }
 }
 

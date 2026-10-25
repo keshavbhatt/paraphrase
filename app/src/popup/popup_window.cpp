@@ -12,6 +12,8 @@
 #include <QVBoxLayout>
 #include <QWindow>
 
+#include <algorithm>
+
 using namespace Qt::StringLiterals;
 
 namespace paraphrase::app {
@@ -58,19 +60,19 @@ void PopupWindow::showActions()
 {
     m_result->hide();
     m_actions->show();
-    adjustSize();
+    fitContent();
 }
 
 void PopupWindow::showResult()
 {
     m_actions->hide();
     m_result->show();
-    adjustSize();
+    fitContent();
 }
 
 void PopupWindow::openNear(const QPoint& point)
 {
-    adjustSize();
+    fitContent();
     QPoint at = point + QPoint(kOffset, kOffset);
     if (const QScreen* screen = QGuiApplication::screenAt(point)) {
         const QRect area = screen->availableGeometry();
@@ -128,6 +130,21 @@ void PopupWindow::changeEvent(QEvent* event)
     QWidget::changeEvent(event);
 }
 
+void PopupWindow::fitContent()
+{
+    // As tall as the content needs at the popup's width. adjustSize() goes by size hints, and
+    // a wrapping row (the tones) hints at one item per line: 336 px of tone chips, and a
+    // 574 px popup for a three-line result.
+    if (layout() == nullptr) {
+        adjustSize();
+        return;
+    }
+    layout()->activate();
+    const int height =
+        layout()->hasHeightForWidth() ? layout()->totalHeightForWidth(kWidth) : sizeHint().height();
+    resize(kWidth, std::max(height, layout()->totalMinimumSize().height()));
+}
+
 bool PopupWindow::event(QEvent* event)
 {
     const bool handled = QWidget::event(event);
@@ -135,7 +152,7 @@ bool PopupWindow::event(QEvent* event)
     // it shows asks for more or less room, the window follows, after Qt laid it out.
     if (event->type() == QEvent::LayoutRequest && !m_fitting) {
         m_fitting = true;
-        adjustSize();
+        fitContent();
         m_fitting = false;
     }
     return handled;

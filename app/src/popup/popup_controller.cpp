@@ -235,7 +235,7 @@ void PopupController::run(const QString& skillId, const QString& targetLang)
         return;
     }
     page->setRunning(true);
-    m_window->adjustSize(); // as tall as the shape of the answer, not the last result
+    m_window->fitContent(); // as tall as the shape of the answer, not the last result
 }
 
 void PopupController::onFinished(const QJsonObject& result)
@@ -285,7 +285,7 @@ void PopupController::onFinished(const QJsonObject& result)
     if (!result.value(u"warning"_s).toString().isEmpty()) {
         page->setInfo(languageWarning(language), u"warning"_s);
     }
-    m_window->adjustSize();
+    m_window->fitContent();
     Q_EMIT finished();
 }
 
