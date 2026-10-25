@@ -128,7 +128,7 @@ qt_add_resources(paraphrase_ui "icons"
         icons/undo.svg icons/x.svg icons/down-light.svg icons/down-dark.svg
         icons/badge-check.svg icons/briefcase.svg icons/coffee.svg icons/enlarge.svg icons/hand-heart.svg
         icons/list.svg icons/mail.svg icons/megaphone.svg icons/plus.svg icons/shrink.svg icons/smile.svg
-        icons/smile-plus.svg icons/table.svg icons/keyboard.svg icons/text-cursor-input.svg
+        icons/smile-plus.svg icons/table.svg icons/keyboard.svg icons/text-cursor-input.svg icons/grip.svg
 )
 
 # The popup: a floating panel over any app, driven by the integration backends.

@@ -1,14 +1,19 @@
 #include "ui/settings/shortcut_settings_page.h"
 
 #include "ui/common/widgets.h"
+#include "ui/core/preferences.h"
 #include "ui/setup/desktop_access.h"
 
 #include <QApplication>
+#include <QButtonGroup>
 #include <QClipboard>
+#include <QFrame>
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
+#include <QRadioButton>
+#include <QStyle>
 #include <QVBoxLayout>
 
 #include <utility>
@@ -58,10 +63,62 @@ ShortcutSettingsPage::ShortcutSettingsPage(QWidget* parent)
     // shortcut has its own cards below.
     m_access->setShowsShortcut(false);
     column->addWidget(m_access);
+    column->addWidget(opensCard());
     m_cards->setSpacing(18);
     column->addLayout(m_cards);
     column->addStretch();
     setSupport({});
+}
+
+QWidget* ShortcutSettingsPage::opensCard()
+{
+    // popup-working.html, d: what the shortcut opens; saved at once.
+    auto* card = new QFrame;
+    card->setObjectName(u"card"_s);
+    auto* col = new QVBoxLayout(card);
+    col->setContentsMargins(18, 16, 18, 16);
+    col->setSpacing(12);
+    col->addWidget(makeLabel(tr("The shortcut opens"), u"h2"_s));
+    const bool window = Preferences::shortcutOpensWindow();
+    auto* group = new QButtonGroup(card);
+    const auto option = [&](const QString& name, const QString& title, const QString& detail, bool on) {
+        auto* box = new QFrame;
+        box->setProperty("role", u"opt"_s);
+        box->setProperty("on", on);
+        auto* row = new QHBoxLayout(box);
+        row->setContentsMargins(14, 12, 14, 12);
+        row->setSpacing(10);
+        auto* radio = new QRadioButton;
+        radio->setObjectName(name);
+        radio->setChecked(on);
+        radio->setAccessibleName(title);
+        group->addButton(radio);
+        row->addWidget(radio, 0, Qt::AlignTop);
+        auto* text = new QVBoxLayout;
+        text->setSpacing(2);
+        QLabel* head = makeLabel(u"<b>%1</b>"_s.arg(title.toHtmlEscaped()));
+        head->setBuddy(radio);
+        text->addWidget(head);
+        QLabel* more = makeLabel(detail, u"small"_s);
+        more->setWordWrap(true);
+        text->addWidget(more);
+        row->addLayout(text, 1);
+        connect(radio, &QRadioButton::toggled, box, [box](bool checked) {
+            box->setProperty("on", checked);
+            box->style()->unpolish(box);
+            box->style()->polish(box);
+        });
+        col->addWidget(box);
+        return radio;
+    };
+    option(u"opensPopup"_s, tr("The popup, over the app you are in"),
+           tr("Pick an action and the result goes back where the text was. Recommended."), !window);
+    const QRadioButton* toWindow = option(
+        u"opensWindow"_s, tr("Paraphrase's window"),
+        tr("The selected text opens in the main window, ready for any action. Copy the result yourself."),
+        window);
+    connect(toWindow, &QRadioButton::toggled, this, [](bool on) { Preferences::setShortcutOpensWindow(on); });
+    return card;
 }
 
 void ShortcutSettingsPage::applyTheme(const Tokens& t)

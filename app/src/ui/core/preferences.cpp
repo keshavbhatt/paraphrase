@@ -11,6 +11,7 @@ namespace {
 
 const QString kKeepInTray = u"general/keepInTray"_s;
 const QString kAppearance = u"general/appearance"_s;
+const QString kShortcutOpens = u"shortcut/opens"_s;
 
 } // namespace
 
@@ -46,6 +47,16 @@ void Preferences::setAppearance(const QString& appearance)
 {
     QSettings().setValue(kAppearance, appearance);
     Q_EMIT appearanceChanged();
+}
+
+bool Preferences::shortcutOpensWindow()
+{
+    return QSettings().value(kShortcutOpens, u"popup"_s).toString() == u"window"_s;
+}
+
+void Preferences::setShortcutOpensWindow(bool window)
+{
+    QSettings().setValue(kShortcutOpens, window ? u"window"_s : u"popup"_s);
 }
 
 } // namespace paraphrase::app

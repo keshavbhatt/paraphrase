@@ -59,6 +59,15 @@ QPushButton* iconButton(const QString& name, const QString& accessible)
     return b;
 }
 
+/// The grip at the start of a header: the header moves the popup (popup-working.html, note 1).
+QLabel* grip()
+{
+    auto* l = new QLabel;
+    l->setObjectName(u"grip"_s);
+    l->setToolTip(QObject::tr("Drag to move"));
+    return l;
+}
+
 QHBoxLayout* privacyLine(QLabel*& lock)
 {
     auto* row = new QHBoxLayout;
@@ -111,8 +120,10 @@ QWidget* PopupActionsPage::buildHead()
 {
     QFrame* head = band(u"popupHead"_s);
     auto* row = new QHBoxLayout(head);
-    row->setContentsMargins(12, 10, 10, 10);
+    row->setContentsMargins(8, 10, 10, 10);
     row->setSpacing(10);
+    m_grip = grip();
+    row->addWidget(m_grip);
     m_mark = new QLabel;
     row->addWidget(m_mark);
     row->addWidget(makeLabel(u"<b>Paraphrase</b>"_s));
@@ -135,14 +146,20 @@ QWidget* PopupActionsPage::buildFoot()
     auto* row = new QHBoxLayout(foot);
     row->setContentsMargins(16, 12, 16, 12); // .pfoot padding 12px 16px
     row->setSpacing(8);
-    auto* dot = new QLabel;
-    dot->setObjectName(u"dot"_s);
-    dot->setFixedSize(8, 8);
-    row->addWidget(dot);
+    m_dot = new QLabel;
+    m_dot->setObjectName(u"dot"_s);
+    m_dot->setFixedSize(8, 8);
+    row->addWidget(m_dot);
+    // While it works ahead: the working pill (main-window-busy.html), else a plain line.
+    m_busy = new BusyPill;
+    m_busy->setObjectName(u"popupBusy"_s);
+    m_busy->setSteps({tr("Loading the model"), tr("Reading the text for %1").arg(tr("My actions"))});
+    row->addWidget(m_busy);
     m_status = makeLabel(QString(), u"small"_s);
     m_status->setObjectName(u"popupStatus"_s);
     m_status->setWordWrap(true); // a longer notice wraps instead of stopping mid-sentence
     row->addWidget(m_status, 1);
+    row->addStretch(); // the space stays here while the working pill hides the line
     QLabel* esc = makeLabel(tr("Esc"), u"kbd"_s);
     row->addWidget(esc);
     row->addWidget(makeLabel(tr("close"), u"small"_s));
@@ -159,12 +176,28 @@ void PopupActionsPage::showText(const QString& text, const QString& appName, con
 
 void PopupActionsPage::setStatus(const QString& status)
 {
+    m_busy->stop();
+    m_dot->show();
+    m_status->show();
     m_status->setText(status);
+}
+
+void PopupActionsPage::showWorking(const QString& step)
+{
+    m_dot->hide();
+    m_status->hide();
+    if (m_busy->isHidden()) {
+        m_busy->start(step);
+    } else {
+        m_busy->setStep(step);
+    }
 }
 
 void PopupActionsPage::applyTheme(const Tokens& t)
 {
     m_mark->setPixmap(Theme::icon(u"pen"_s, t.accent, kMarkSize).pixmap(kMarkSize, kMarkSize));
+    m_grip->setPixmap(Theme::icon(u"grip"_s, t.muted, kIconSize).pixmap(kIconSize, kIconSize));
+    m_busy->applyTheme(t);
     m_lock->setPixmap(Theme::icon(u"lock"_s, t.privacy, kIconSize).pixmap(kIconSize, kIconSize));
     m_expand->setIcon(Theme::icon(u"expand"_s, t.muted, kIconSize));
     m_close->setIcon(Theme::icon(u"x"_s, t.muted, kIconSize));
@@ -187,8 +220,10 @@ QWidget* PopupResultPage::buildHead()
 {
     QFrame* head = band(u"popupHead"_s);
     auto* row = new QHBoxLayout(head);
-    row->setContentsMargins(12, 10, 10, 10);
+    row->setContentsMargins(8, 10, 10, 10);
     row->setSpacing(10);
+    m_grip = grip();
+    row->addWidget(m_grip);
     m_back = makeButton(tr("Actions"), u"flat"_s);
     m_back->setObjectName(u"backToActions"_s);
     m_title = makeLabel(QString());
@@ -235,6 +270,7 @@ QWidget* PopupResultPage::buildBody()
     infoRow->addWidget(m_info, 1);
     infoRow->addStretch(0); // keeps the pill at the start while the line is hidden
     infoRow->addWidget(m_view);
+    infoRow->addWidget(buildLanguagePill());
     layout->addLayout(infoRow);
     m_pick = makeLabel(tr("PICK A REPLY"), u"caption"_s);
     layout->addWidget(m_pick);
@@ -258,6 +294,35 @@ QWidget* PopupResultPage::buildBody()
     connect(m_view, &SegmentedControl::changed, this,
             [this](int index) { m_text->setShowResult(index == 1); });
     return body;
+}
+
+QWidget* PopupResultPage::buildLanguagePill()
+{
+    // The language the user chose, with × to go back to the text's own (popup-working.html, 3).
+    m_chosen = new QFrame;
+    m_chosen->setObjectName(u"chosenLanguage"_s);
+    auto* row = new QHBoxLayout(m_chosen);
+    row->setContentsMargins(10, 0, 4, 0);
+    row->setSpacing(6);
+    m_chosenName = new QLabel;
+    m_chosenName->setObjectName(u"chosenLanguageName"_s);
+    m_clearLanguage = makeButton(QString(), u"flat"_s);
+    m_clearLanguage->setObjectName(u"clearLanguage"_s);
+    m_clearLanguage->setFixedSize(18, 18);
+    row->addWidget(m_chosenName);
+    row->addWidget(m_clearLanguage);
+    connect(m_clearLanguage, &QPushButton::clicked, this, &PopupResultPage::languageCleared);
+    m_chosen->hide();
+    return m_chosen;
+}
+
+void PopupResultPage::setChosenLanguage(const QString& native, const QString& name, const QString& own)
+{
+    m_chosenName->setText(native.isEmpty() || native == name ? name : u"%1 · %2"_s.arg(native, name));
+    m_clearLanguage->setToolTip(own.isEmpty() ? tr("Back to the text's language")
+                                              : tr("Back to %1").arg(own));
+    m_clearLanguage->setAccessibleName(m_clearLanguage->toolTip());
+    m_chosen->setVisible(!name.isEmpty());
 }
 
 QPushButton* PopupResultPage::buildLanguageLink()
@@ -499,6 +564,8 @@ void PopupResultPage::applyTheme(const Tokens& t)
 {
     m_tokens = t;
     m_lock->setPixmap(Theme::icon(u"lock"_s, t.privacy, kIconSize).pixmap(kIconSize, kIconSize));
+    m_grip->setPixmap(Theme::icon(u"grip"_s, t.muted, kIconSize).pixmap(kIconSize, kIconSize));
+    m_clearLanguage->setIcon(Theme::icon(u"x"_s, t.accent, 12));
     m_back->setIcon(Theme::icon(u"left"_s, t.text, kIconSize));
     m_close->setIcon(Theme::icon(u"x"_s, t.muted, kIconSize));
     setButtonIcon(m_copy, u"copy"_s, t.text, kIconSize);

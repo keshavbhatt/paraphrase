@@ -96,6 +96,10 @@ QFrame#actionRow[last="true"] { border-bottom: none; }
 QLabel[role="cmd"] { font-family: monospace; font-size: 13px; background: @sunk@; border-radius: 8px; padding: 8px 10px; }
 QFrame#popup { background: @panel@; border: 1px solid @border@; border-radius: 14px; }
 QFrame#popupHead { border: none; border-bottom: 1px solid @border@; }
+QFrame#chosenLanguage { background: @accentSoft@; border: none; border-radius: 12px; min-height: 24px; max-height: 24px; }
+QLabel#chosenLanguageName { color: @accent@; font-size: 12px; font-weight: 600; }
+QPushButton#clearLanguage { border: none; background: transparent; border-radius: 9px; padding: 0; min-height: 18px; }
+QPushButton#clearLanguage:hover { background: @hover@; }
 QFrame#popupFoot { border: none; border-top: 1px solid @border@; background: @bar@;
     border-bottom-left-radius: 14px; border-bottom-right-radius: 14px; }
 QLabel#source { background: @sunk@; border-radius: 10px; padding: 11px 14px; font-size: 15px; }

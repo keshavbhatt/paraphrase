@@ -4,10 +4,13 @@
 #include "ui/common/widgets.h"
 
 #include <QCloseEvent>
+#include <QFrame>
 #include <QKeyEvent>
+#include <QMouseEvent>
 #include <QPushButton>
 #include <QScreen>
 #include <QVBoxLayout>
+#include <QWindow>
 
 using namespace Qt::StringLiterals;
 
@@ -39,6 +42,12 @@ PopupWindow::PopupWindow(const util::LanguageDetector& detector, QWidget* parent
     m_result->hide();
     outer->addWidget(frame);
     setFixedWidth(kWidth);
+    // The header moves the popup (popup-working.html, note 1): the desktop's own move, which
+    // Wayland allows where setting a position does not.
+    for (QFrame* head : findChildren<QFrame*>(u"popupHead"_s)) {
+        head->installEventFilter(this);
+        head->setCursor(Qt::SizeAllCursor);
+    }
     connect(m_actions, &PopupActionsPage::closeRequested, this, &QWidget::close);
     connect(m_result, &PopupResultPage::closeRequested, this, &QWidget::close);
     connect(m_result, &PopupResultPage::back, this, &PopupWindow::showActions);
@@ -98,6 +107,16 @@ void PopupWindow::keyPressEvent(QKeyEvent* event)
         }
     }
     QWidget::keyPressEvent(event);
+}
+
+bool PopupWindow::eventFilter(QObject* watched, QEvent* event)
+{
+    if (event->type() == QEvent::MouseButtonPress &&
+        static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton && windowHandle() != nullptr &&
+        windowHandle()->startSystemMove()) {
+        return true;
+    }
+    return QWidget::eventFilter(watched, event);
 }
 
 void PopupWindow::changeEvent(QEvent* event)

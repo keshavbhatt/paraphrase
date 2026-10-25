@@ -34,6 +34,8 @@ public:
 
 private:
     void wire();
+    /// The shortcut or `paraphrase-app --popup`: the popup, or the window if Settings says so.
+    void openFromShortcut();
     /// With a tray and "keep running in the tray", closing the window leaves the app running.
     void applyKeepInTray();
     /// Appearance changed in Settings: every window takes the new colours.

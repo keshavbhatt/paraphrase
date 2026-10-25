@@ -5,6 +5,7 @@
 
 #include <QWidget>
 
+class QFrame;
 class QHBoxLayout;
 class QLabel;
 class QPushButton;
@@ -39,6 +40,8 @@ public:
     /// The text and where it came from: "from Telegram", "· 16 words · English".
     void showText(const QString& text, const QString& appName, const QString& origin);
     void setStatus(const QString& status);
+    /// The working pill in the footer, with the step in words ("Loading the model").
+    void showWorking(const QString& step);
     void applyTheme(const Tokens& t);
 
 Q_SIGNALS:
@@ -50,9 +53,12 @@ private:
     [[nodiscard]] QWidget* buildFoot();
 
     const util::LanguageDetector& m_detector;
+    QLabel* m_grip = nullptr;
     QLabel* m_mark = nullptr;
     QLabel* m_lock = nullptr;
     QLabel* m_from = nullptr;
+    QLabel* m_dot = nullptr;
+    BusyPill* m_busy = nullptr;
     QLabel* m_caption = nullptr;
     QLabel* m_info = nullptr;
     QLabel* m_source = nullptr;
@@ -92,6 +98,9 @@ public:
     /// Offers "Write it in another language" (popup-rewrite.html, note 5) for a skill that
     /// takes a target language; `own` is the text's language, left out of the menu.
     void offerOtherLanguages(bool offer, const QString& own);
+    /// The language the user chose as a pill ("हिन्दी · Hindi"), "" for none; `own` is the
+    /// text's language, for the pill's ×.
+    void setChosenLanguage(const QString& native, const QString& name, const QString& own);
     [[nodiscard]] TextResultView* textView() const { return m_text; }
     [[nodiscard]] QuickRepliesView* repliesView() const { return m_replies; }
     /// What Replace or Copy uses.
@@ -106,19 +115,25 @@ Q_SIGNALS:
     void againClicked();
     void presetChosen(const QString& skillId);
     void languageChosen(const QString& code);
+    void languageCleared();
 
 private:
     [[nodiscard]] QWidget* buildHead();
     [[nodiscard]] QWidget* buildBody();
     [[nodiscard]] QWidget* buildFoot();
     [[nodiscard]] QPushButton* buildLanguageLink();
+    [[nodiscard]] QWidget* buildLanguagePill();
     void updateButtons();
     void showResultView();
     void fitInsertLabel();
 
     QLabel* m_title = nullptr;
+    QLabel* m_grip = nullptr;
     QLabel* m_lock = nullptr;
     QPushButton* m_back = nullptr;
+    QFrame* m_chosen = nullptr;
+    QLabel* m_chosenName = nullptr;
+    QPushButton* m_clearLanguage = nullptr;
     QPushButton* m_close = nullptr;
     QWidget* m_presets = nullptr;
     QLabel* m_caption = nullptr;

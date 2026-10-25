@@ -27,6 +27,10 @@ public:
     void applyTheme(const Tokens& t);
 
 private:
+    [[nodiscard]] QWidget* opensCard();
+
+public:
+private:
     [[nodiscard]] static QWidget* shortcutCard(const DesktopSupport& support);
     [[nodiscard]] static QWidget* byHandCard(const DesktopSupport& support);
     [[nodiscard]] static QWidget* stepsCard(const DesktopSupport& support);

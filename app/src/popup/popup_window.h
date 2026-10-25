@@ -42,6 +42,7 @@ protected:
     void keyPressEvent(QKeyEvent* event) override;
     void closeEvent(QCloseEvent* event) override;
     bool event(QEvent* event) override;
+    bool eventFilter(QObject* watched, QEvent* event) override;
     void changeEvent(QEvent* event) override;
 
 private:

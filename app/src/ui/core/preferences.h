@@ -25,6 +25,10 @@ public:
     /// "system", "light" or "dark" (Theme::current reads it).
     [[nodiscard]] static QString appearance();
     void setAppearance(const QString& appearance);
+    /// What the global shortcut opens (popup-working.html, d): the popup over the app, or
+    /// Paraphrase's window with the selected text in it. The popup by default.
+    [[nodiscard]] static bool shortcutOpensWindow();
+    static void setShortcutOpensWindow(bool window);
 
 Q_SIGNALS:
     void startAtLoginChanged(bool on);

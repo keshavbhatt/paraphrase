@@ -13,11 +13,14 @@
 
 #include <QCoreApplication>
 #include <QDir>
+#include <QFrame>
 #include <QLabel>
 #include <QMenu>
 #include <QMutexLocker>
 #include <QPushButton>
+#include <QSettings>
 #include <QSignalSpy>
+#include <QTemporaryDir>
 #include <QTest>
 
 using namespace Qt::StringLiterals;
@@ -79,9 +82,18 @@ private:
         QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 1, AppDaemon::kTimeoutMs);
     }
 
+    QTemporaryDir m_settingsDir; ///< the tests' own QSettings, never the user's
+
 private Q_SLOTS:
+    void initTestCase()
+    {
+        QVERIFY(m_settingsDir.isValid());
+        QSettings::setPath(QSettings::NativeFormat, QSettings::UserScope, m_settingsDir.path());
+    }
+
     void init()
     {
+        QSettings().clear(); // the last action of one test never steers the next
         m_sent.clear();
         QVERIFY(m_daemon.start({u"fast-model"_s, u"quality-model"_s}));
     }
@@ -93,7 +105,11 @@ private Q_SLOTS:
         const auto backends = integrations(&owner);
         PopupController popup(*backends);
         popup.showText(selected(u"Mia dont know where the keys are"_s));
-        QVERIFY(popup.window()->findChild<QLabel*>(u"popupStatus"_s)->text().contains(u"Proofread"_s));
+        // It reads ahead for the likely action: the working pill says which.
+        QVERIFY(popup.window()
+                    ->findChild<QWidget*>(u"popupBusy"_s)
+                    ->accessibleDescription()
+                    .contains(u"Proofread"_s));
         m_daemon.setAnswers({u"Mia doesn't know where the keys are."_s});
         pick(popup, u"action-proofread"_s);
         QVERIFY(m_sent.isEmpty()); // nothing goes back without a click
@@ -154,8 +170,52 @@ private Q_SLOTS:
         m_daemon.setAnswers({u"क्या आप शुक्रवार तक रिपोर्ट भेज सकते हैं?"_s});
         other->menu()->findChild<QAction*>(u"lang-hi"_s)->trigger();
         QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 2, AppDaemon::kTimeoutMs);
+        {
+            const QMutexLocker lock(&m_daemon.state->lock);
+            QVERIFY(m_daemon.state->prompts.last().contains(u"Hindi"_s));
+        }
+        // popup-working.html, 3 and 4: the chosen language as a pill, no false "Friday is
+        // missing" across languages, and × goes back to the text's own language.
+        const auto* chosen = popup.window()->findChild<QFrame*>(u"chosenLanguage"_s);
+        QVERIFY(chosen != nullptr && !chosen->isHidden());
+        QVERIFY(popup.window()->findChild<QLabel*>(u"chosenLanguageName"_s)->text().contains(u"Hindi"_s));
+        QVERIFY(!popup.window()->findChild<QLabel*>(u"popupInfo"_s)->text().contains(u"missing"_s));
+        m_daemon.setAnswers({u"Could you send me the report by Friday?"_s});
+        popup.window()->findChild<QPushButton*>(u"clearLanguage"_s)->click();
+        QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 3, AppDaemon::kTimeoutMs);
+        QVERIFY(chosen->isHidden());
         const QMutexLocker lock(&m_daemon.state->lock);
-        QVERIFY(m_daemon.state->prompts.last().contains(u"Hindi"_s));
+        QVERIFY(!m_daemon.state->prompts.last().contains(u"chose Hindi"_s));
+    }
+
+    void saysWhatATonedChanged()
+    {
+        // popup-working.html, 4: the tone, and how the length moved for Elaborate.
+        QObject owner;
+        const auto backends = integrations(&owner);
+        PopupController popup(*backends);
+        popup.showText(selected(u"Meet on Friday at 3 pm."_s));
+        m_daemon.setAnswers(
+            {u"Could we meet on Friday at 3 pm, if that suits you and the rest of the team?"_s});
+        const auto* tone = popup.window()->findChild<ChipButton*>(u"action-rewrite"_s);
+        const QSignalSpy finished(&popup, &PopupController::finished);
+        tone->menu()->findChild<QAction*>(u"rewrite.elaborate"_s)->trigger();
+        QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 1, AppDaemon::kTimeoutMs);
+        const QString line = popup.window()->findChild<QLabel*>(u"popupInfo"_s)->text();
+        QVERIFY2(line.startsWith(u"Elaborate"_s) && line.contains(u"6 to 18 words"_s), qPrintable(line));
+    }
+
+    void showsItIsWorkingAhead()
+    {
+        // popup-working.html, 2: the footer's working pill while it reads ahead.
+        QObject owner;
+        const auto backends = integrations(&owner);
+        PopupController popup(*backends);
+        popup.showText(selected(u"Their going home."_s));
+        const auto* busy = popup.window()->findChild<QWidget*>(u"popupBusy"_s);
+        QVERIFY(busy != nullptr && !busy->isHidden());
+        QTRY_VERIFY_WITH_TIMEOUT(busy->isHidden(), 5000); // the fake daemon is quick: then "Ready for"
+        QVERIFY(popup.window()->findChild<QLabel*>(u"popupStatus"_s)->text().startsWith(u"Ready for"_s));
     }
 
     void escCloses()

@@ -5,9 +5,11 @@
 #include "ui/core/skill_catalog.h"
 #include "util/language_detector.h"
 
+#include <QElapsedTimer>
 #include <QJsonObject>
 #include <QObject>
 #include <QString>
+#include <QTimer>
 
 #include <memory>
 
@@ -54,6 +56,11 @@ private:
     void insert();
     void copy();
     [[nodiscard]] QString likelyBase() const;
+    /// While it reads ahead: the footer's working pill follows the daemon's status.
+    void pollWork();
+    /// "Elaborate · kept: Friday · 21 to 34 words": what the run changed (popup-working.html, 4).
+    [[nodiscard]] QString summaryLine(const SkillInfo& skill, const QString& output,
+                                      bool otherLanguage) const;
 
     const Integrations& m_integrations;
     std::unique_ptr<client::DaemonClient> m_ownClient;
@@ -66,6 +73,9 @@ private:
     QString m_skill;
     QString m_targetLang;
     QString m_streamed;
+    QTimer m_poll;
+    QElapsedTimer m_pollClock;
+    QString m_likelyTitle;
 };
 
 } // namespace paraphrase::app

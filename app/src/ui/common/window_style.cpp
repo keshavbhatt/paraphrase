@@ -23,6 +23,10 @@ QLabel[role="success"] { color: @success@; font-size: 12px; }
 QLabel[role="pill-accent"] { background: @accentSoft@; color: @accent@; border: 1px solid transparent; border-radius: 10px; padding: 1px 8px; font-size: 12px; }
 QLabel[role="pill-ok"] { background: @successBg@; color: @success@; border: 1px solid transparent; border-radius: 10px; padding: 1px 8px; font-size: 12px; }
 QLabel[role="pill-warn"] { background: @warningBg@; color: @warning@; border: 1px solid transparent; border-radius: 10px; padding: 1px 8px; font-size: 12px; }
+QRadioButton::indicator { width: 14px; height: 14px; border-radius: 8px; border: 1px solid @border@; background: @input@; }
+QRadioButton::indicator:checked { width: 6px; height: 6px; border: 5px solid @accentStrong@; background: @panel@; }
+QFrame[role="opt"] { border: 1px solid @border@; border-radius: 10px; background: transparent; }
+QFrame[role="opt"][on="true"] { border: 1.5px solid @accent@; background: @accentSoft@; }
 QFrame[role="grant"] { background: @panel@; border: 1px solid @border@; border-radius: 12px; }
 QLabel[role="grantBadge"] { background: @accentSoft@; border-radius: 10px; }
 QLabel[role="th"] { color: @muted@; font-size: 11px; font-weight: 700; letter-spacing: 1px; }

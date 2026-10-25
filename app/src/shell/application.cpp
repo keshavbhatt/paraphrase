@@ -56,9 +56,9 @@ void Application::wire()
             m_tray->applyTheme(Theme::current());
         }
     });
-    connect(m_service, &AppService::popupRequested, m_popup, &PopupController::show);
+    connect(m_service, &AppService::popupRequested, this, &Application::openFromShortcut);
     connect(m_service, &AppService::windowRequested, m_flow, &AppFlow::showMain);
-    connect(&m_integrations->shortcut(), &ShortcutBackend::activated, m_popup, &PopupController::show);
+    connect(&m_integrations->shortcut(), &ShortcutBackend::activated, this, &Application::openFromShortcut);
     connect(m_popup, &PopupController::newActionRequested, m_flow, &AppFlow::newAction);
     connect(m_popup, &PopupController::openInWindow, this, [this](const QString& text) {
         m_flow->showMain();
@@ -69,6 +69,20 @@ void Application::wire()
         connect(m_tray, &TrayIcon::popupRequested, m_popup, &PopupController::show);
         connect(m_tray, &TrayIcon::settingsRequested, m_flow, &AppFlow::showSettings);
         connect(m_tray, &TrayIcon::quitRequested, qApp, &QApplication::quit);
+    }
+}
+
+void Application::openFromShortcut()
+{
+    // Settings, Shortcut: the popup over the app, or the window with the selected text in it.
+    if (!Preferences::shortcutOpensWindow()) {
+        m_popup->show();
+        return;
+    }
+    const auto captured = m_integrations->capture().capture();
+    m_flow->showMain();
+    if (captured && !captured->text.trimmed().isEmpty()) {
+        m_flow->mainWindow().takeText(captured->text);
     }
 }
 

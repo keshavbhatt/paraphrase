@@ -3,6 +3,7 @@
 #include "integration/integrations.h"
 #include "popup/popup_pages.h"
 #include "popup/popup_window.h"
+#include "ui/common/menu_icons.h"
 #include "ui/core/app_names.h"
 #include "ui/core/facts_check.h"
 #include "ui/core/languages.h"
@@ -17,6 +18,8 @@
 #include <QDBusMessage>
 #include <QGuiApplication>
 #include <QJsonArray>
+#include <QJsonDocument>
+#include <QRegularExpression>
 #include <QSettings>
 
 using namespace Qt::StringLiterals;
@@ -25,6 +28,9 @@ namespace paraphrase::app {
 namespace {
 
 const QString kLastKey = u"popup/lastAction"_s;
+constexpr int kPollMs = 400;
+constexpr int kWarmStartMs = 1200; ///< RequestRunner's 800 ms pause and a margin
+constexpr int kPollGiveUpMs = 120'000;
 
 QVariantMap inputFor(SkillKind kind, const QString& text, const QString& targetLang)
 {
@@ -51,6 +57,8 @@ PopupController::PopupController(const Integrations& integrations, client::Daemo
     , m_window(std::make_unique<PopupWindow>(m_detector))
 {
     connectWindow();
+    m_poll.setInterval(kPollMs);
+    connect(&m_poll, &QTimer::timeout, this, &PopupController::pollWork);
     connect(m_runner, &RequestRunner::token, this, [this](const QString& piece) {
         m_streamed += piece;
         if (m_catalog.kindOf(m_skill) == SkillKind::Text) {
@@ -91,6 +99,7 @@ void PopupController::connectWindow()
             [this](const QString& id) { run(id, m_targetLang); });
     connect(result, &PopupResultPage::languageChosen, this,
             [this](const QString& code) { run(m_skill, code); });
+    connect(result, &PopupResultPage::languageCleared, this, [this] { run(m_skill, {}); });
     connect(result, &PopupResultPage::againClicked, this, [this] {
         if (m_runner->busy()) {
             m_runner->cancel(); // Stop keeps what is there
@@ -99,6 +108,7 @@ void PopupController::connectWindow()
         }
     });
     connect(m_window.get(), &PopupWindow::closed, m_runner, &RequestRunner::cancel);
+    connect(m_window.get(), &PopupWindow::closed, &m_poll, &QTimer::stop);
 }
 
 bool PopupController::ensureCatalog()
@@ -164,7 +174,29 @@ void PopupController::readAhead()
     }
     const SkillInfo* skill = variants.front();
     m_runner->warmLater(skill->id, inputFor(m_catalog.kindOf(skill->id), m_text.text, {}));
-    m_window->actionsPage()->setStatus(tr("Reading the text for %1...").arg(m_catalog.actionTitle(base)));
+    m_likelyTitle = m_catalog.actionTitle(base);
+    m_window->actionsPage()->showWorking(tr("Reading the text for %1").arg(m_likelyTitle));
+    m_pollClock.start();
+    m_poll.start();
+}
+
+void PopupController::pollWork()
+{
+    // The read-ahead starts after a short pause (RequestRunner::kWarmDelayMs) and says nothing
+    // when it ends, so the daemon's status tells: no model yet, busy reading, or ready.
+    const QJsonObject status =
+        QJsonDocument::fromJson(m_client.call(u"Status"_s, {}).arguments().value(0).toString().toUtf8())
+            .object();
+    PopupActionsPage* page = m_window->actionsPage();
+    const bool loading = status.value(u"model"_s).toString().isEmpty();
+    const bool busy = status.value(u"busy"_s).toBool();
+    if (m_pollClock.elapsed() > kPollGiveUpMs ||
+        (!loading && !busy && m_pollClock.elapsed() > kWarmStartMs)) {
+        m_poll.stop();
+        page->setStatus(tr("Ready for %1").arg(m_likelyTitle));
+        return;
+    }
+    page->showWorking(loading ? tr("Loading the model") : tr("Reading the text for %1").arg(m_likelyTitle));
 }
 
 void PopupController::run(const QString& skillId, const QString& targetLang)
@@ -174,6 +206,7 @@ void PopupController::run(const QString& skillId, const QString& targetLang)
         return;
     }
     m_runner->cancel();
+    m_poll.stop();
     m_skill = skillId;
     m_targetLang = targetLang;
     m_streamed.clear();
@@ -189,6 +222,12 @@ void PopupController::run(const QString& skillId, const QString& targetLang)
                               m_detector.detect(m_text.text));
     page->setLanguagePill(kind == SkillKind::Text ? QString()
                                                   : languageName(m_detector, m_detector.detect(m_text.text)));
+    // A language the user chose stays for the next tone; the pill says so and undoes it.
+    const QString own = m_detector.detect(m_text.text);
+    const bool other = !targetLang.isEmpty() && targetLang != own;
+    page->setChosenLanguage(other ? nativeLanguageName(targetLang) : QString(),
+                            other ? languageName(m_detector, targetLang) : QString(),
+                            languageName(m_detector, own));
     m_window->showResult();
     if (const QString problem = m_runner->start(skillId, inputFor(kind, m_text.text, targetLang));
         !problem.isEmpty()) {
@@ -218,7 +257,9 @@ void PopupController::onFinished(const QJsonObject& result)
         page->textView()->showText(output);
     }
     const bool chosen = !m_targetLang.isEmpty();
-    const FactsCheck check = keepsFacts(skill->base) ? checkFacts(m_text.text, page->result()) : FactsCheck{};
+    const bool sameLanguage = !chosen || m_targetLang == m_detector.detect(m_text.text);
+    const FactsCheck check =
+        keepsFacts(skill->base) ? checkFacts(m_text.text, page->result(), sameLanguage) : FactsCheck{};
     const QString language = languageName(m_detector, chosen ? m_targetLang : m_detector.detect(m_text.text));
     const ResultFacts facts{
         .kind = kind,
@@ -234,6 +275,9 @@ void PopupController::onFinished(const QJsonObject& result)
     if (summary.startsWith(u"· "_s)) {
         summary.remove(0, 2);
     }
+    if (skill->base == u"rewrite"_s) {
+        summary = summaryLine(*skill, output, !sameLanguage);
+    }
     page->setInfo(summary, check.missing.isEmpty() ? u"small"_s : u"warning"_s);
     if (facts.proofread && facts.changes == 0) {
         page->showNothingToFix();
@@ -243,6 +287,24 @@ void PopupController::onFinished(const QJsonObject& result)
     }
     m_window->adjustSize();
     Q_EMIT finished();
+}
+
+QString PopupController::summaryLine(const SkillInfo& skill, const QString& output, bool otherLanguage) const
+{
+    // The tone, the facts kept, and for Concise and Elaborate how the length moved; a language
+    // the user chose is the pill's, and a slip of language shows as a warning instead.
+    QStringList parts{SkillCatalog::presetTitle(skill)};
+    if (const QString facts = factsLine(checkFacts(m_text.text, output, !otherLanguage)); !facts.isEmpty()) {
+        parts.append(facts);
+    }
+    const QString preset = skill.id.section(u'.', 1);
+    if (preset == u"concise"_s || preset == u"elaborate"_s) {
+        static const QRegularExpression kSpace(u"\\s+"_s);
+        parts.append(tr("%1 to %2 words")
+                         .arg(m_text.text.split(kSpace, Qt::SkipEmptyParts).size())
+                         .arg(output.split(kSpace, Qt::SkipEmptyParts).size()));
+    }
+    return parts.join(u" · "_s);
 }
 
 void PopupController::onFailed(const QString& code, const QString& message)
