@@ -496,7 +496,8 @@ void MainWindow::showResult(const QJsonObject& result)
     ResultFacts shown = facts;
     FactsCheck check;
     if (s != nullptr && keepsFacts(s->base)) {
-        check = checkFacts(m_requestInput, m_output->result());
+        const bool sameLanguage = !chosen || m_targetLang == m_detector.detect(m_requestInput);
+        check = checkFacts(m_requestInput, m_output->result(), sameLanguage);
         shown.facts = factsLine(check);
     }
     m_output->setInfo(resultSummary(shown), check.missing.isEmpty() ? u"small"_s : u"warning"_s);

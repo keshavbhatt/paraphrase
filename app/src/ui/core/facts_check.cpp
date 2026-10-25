@@ -39,13 +39,21 @@ QStringList names(const QString& text)
 
 } // namespace
 
-FactsCheck checkFacts(const QString& source, const QString& result)
+FactsCheck checkFacts(const QString& source, const QString& result, bool sameLanguage)
 {
     FactsCheck check;
-    QStringList facts = protectedTokens(source);
-    for (const QString& n : names(source)) {
-        if (!facts.contains(n)) {
-            facts.append(n);
+    QStringList facts;
+    if (sameLanguage) {
+        facts = protectedTokens(source);
+        for (const QString& n : names(source)) {
+            if (!facts.contains(n)) {
+                facts.append(n);
+            }
+        }
+    } else {
+        static const QRegularExpression kDigits(u"\\d[\\d,.]*\\d|\\d"_s);
+        for (auto it = kDigits.globalMatch(source); it.hasNext();) {
+            facts.append(it.next().captured(0));
         }
     }
     for (const QString& f : facts) {
