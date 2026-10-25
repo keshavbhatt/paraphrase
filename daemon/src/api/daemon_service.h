@@ -52,6 +52,8 @@ class DaemonService : public QObject, protected QDBusContext
     Q_DISABLE_COPY_MOVE(DaemonService)
 
 public:
+    /// RunSkill's `variety` option: the temperature for another version of the same request.
+    static constexpr double kVarietyTemperature = 0.95;
     static constexpr auto kServiceName = "com.ktechpit.paraphrase.Daemon";
     static constexpr auto kObjectPath = "/com/ktechpit/paraphrase/Daemon";
     static constexpr auto kInterface = "com.ktechpit.paraphrase.Daemon1";

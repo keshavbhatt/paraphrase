@@ -117,6 +117,7 @@ private:
     bool m_rewriting = false;      ///< a Tone preset runs on the result
     bool m_ran = false;            ///< something ran on the current text, so option changes run again
     bool m_rerunAfterStop = false; ///< an option changed during a run
+    bool m_variety = false;        ///< the next run is another version (RunSkill's variety option)
 };
 
 } // namespace paraphrase::app

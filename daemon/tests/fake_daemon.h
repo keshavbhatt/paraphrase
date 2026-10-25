@@ -42,9 +42,10 @@ struct FakeState
     int pieceDelayMs = 0; ///< per streamed word
     int loadDelayMs = 0;  ///< per model load
     QList<EngineConfig> loads;
-    QStringList warmed;    ///< user prompts read ahead
-    QList<int> cachedHits; ///< per generate(): whether the prompt matched the last warm
-    QStringList prompts;   ///< per generate(): the user prompt the engine was given
+    QStringList warmed;         ///< user prompts read ahead
+    QList<int> cachedHits;      ///< per generate(): whether the prompt matched the last warm
+    QStringList prompts;        ///< per generate(): the user prompt the engine was given
+    QList<double> temperatures; ///< per generate(): the sampling temperature it was given
     bool loaded = false;
     std::atomic<bool> cancel{false};
 };
@@ -105,6 +106,7 @@ public:
             delay = m_state->pieceDelayMs;
             m_state->cachedHits.append(m_state->warmed.contains(request.user) ? 1 : 0);
             m_state->prompts.append(request.user);
+            m_state->temperatures.append(request.sampling.value(u"temperature"_s).toDouble());
         }
         Generation g;
         g.finishReason = u"stop"_s;

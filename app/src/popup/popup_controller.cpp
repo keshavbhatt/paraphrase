@@ -22,6 +22,8 @@
 #include <QRegularExpression>
 #include <QSettings>
 
+#include <utility>
+
 using namespace Qt::StringLiterals;
 
 namespace paraphrase::app {
@@ -104,6 +106,7 @@ void PopupController::connectWindow()
         if (m_runner->busy()) {
             m_runner->cancel(); // Stop keeps what is there
         } else {
+            m_variety = true; // Retry or "3 new ones": another take that differs
             run(m_skill, m_targetLang);
         }
     });
@@ -229,7 +232,8 @@ void PopupController::run(const QString& skillId, const QString& targetLang)
                             other ? languageName(m_detector, targetLang) : QString(),
                             languageName(m_detector, own));
     m_window->showResult();
-    if (const QString problem = m_runner->start(skillId, inputFor(kind, m_text.text, targetLang));
+    if (const QString problem =
+            m_runner->start(skillId, inputFor(kind, m_text.text, targetLang), std::exchange(m_variety, false));
         !problem.isEmpty()) {
         page->setInfo(problem, u"danger"_s);
         return;

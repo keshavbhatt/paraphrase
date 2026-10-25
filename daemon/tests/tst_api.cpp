@@ -164,6 +164,34 @@ private:
     }
 
 private Q_SLOTS:
+    void anotherVersionSamplesFreer()
+    {
+        // RunSkill's `variety` option (owner, 2026-10-25: "Another version" came back almost the
+        // same): a sampled skill runs hotter, a greedy one stays greedy.
+        startServer(32, {u"fast-model"_s, u"quality-model"_s});
+        QDBusConnection c = connect();
+        Listener l;
+        QVERIFY(l.listen(c));
+        const QVariantMap text{{u"text"_s, u"hey send it"_s}};
+        const QVariantMap variety{{u"variety"_s, true}};
+        const QString plain = runSkill(c, u"rewrite.professional"_s, text);
+        QTRY_VERIFY_WITH_TIMEOUT(l.done.contains(plain), kTimeoutMs);
+        const QString again = call(c, u"RunSkill"_s, {u"rewrite.professional"_s, text, variety})
+                                  .arguments()
+                                  .value(0)
+                                  .toString();
+        QTRY_VERIFY_WITH_TIMEOUT(l.done.contains(again), kTimeoutMs);
+        const QString greedy =
+            call(c, u"RunSkill"_s, {u"proofread"_s, text, variety}).arguments().value(0).toString();
+        QTRY_VERIFY_WITH_TIMEOUT(l.done.contains(greedy), kTimeoutMs);
+        const QMutexLocker lock(&m_state->lock);
+        const QList<double>& t = m_state->temperatures;
+        QCOMPARE(t.size(), 3);
+        QVERIFY(t.at(0) < DaemonService::kVarietyTemperature);
+        QCOMPARE(t.at(1), DaemonService::kVarietyTemperature);
+        QCOMPARE(t.at(2), 0.0);
+    }
+
     void cleanup()
     {
         for (int i = 1; i <= m_peers; ++i) {

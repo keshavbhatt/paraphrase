@@ -59,7 +59,9 @@ words, for a full reply) and `tone` (a tone the user picked, such as `profession
 the last two only for a skill whose prompt uses it, and never to replace a preset's own tone. Any other key is
 an error. **`options`**: `model` (a model id from `ListModels` with role `model`) runs the
 request on that model instead of the tier's (the eval harness); `tier` (`fast` or `quality`)
-runs it on that tier's model; any other key is an error. The skill that takes the user's
+runs it on that tier's model; `variety` (true) is for "Another version" of a request already
+answered: a sampled skill runs at temperature 0.95 (or its own, if higher) with a fresh seed,
+so the version differs; a greedy skill stays greedy. Any other key is an error. The skill that takes the user's
 actions (`custom`) also runs by itself with its values as inputs (`instruction`): Settings'
 Try it, before an action is saved.
 

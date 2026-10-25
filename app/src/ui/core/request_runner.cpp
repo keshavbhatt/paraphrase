@@ -55,10 +55,11 @@ RequestRunner::~RequestRunner()
     cancel();
 }
 
-QString RequestRunner::start(const QString& skillId, const QVariantMap& input)
+QString RequestRunner::start(const QString& skillId, const QVariantMap& input, bool variety)
 {
     m_warmTimer.stop();
-    const QDBusMessage reply = m_client.call(u"RunSkill"_s, {skillId, input, QVariantMap()});
+    const QVariantMap options = variety ? QVariantMap{{u"variety"_s, true}} : QVariantMap();
+    const QDBusMessage reply = m_client.call(u"RunSkill"_s, {skillId, input, options});
     if (reply.type() != QDBusMessage::ReplyMessage) {
         return reply.errorMessage();
     }

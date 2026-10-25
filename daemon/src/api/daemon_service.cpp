@@ -16,6 +16,8 @@
 #include <QSaveFile>
 #include <QUuid>
 
+#include <algorithm>
+
 using namespace Qt::StringLiterals;
 
 Q_LOGGING_CATEGORY(lcApi, "paraphrase.api")
@@ -299,10 +301,21 @@ QString DaemonService::RunSkill(const QString& skillId, const QVariantMap& input
         }
     }
     for (auto it = options.begin(); it != options.end(); ++it) {
-        if (it.key() != u"model"_s && it.key() != u"tier"_s) {
+        if (it.key() != u"model"_s && it.key() != u"tier"_s && it.key() != u"variety"_s) {
             replyError(u"InvalidInput"_s, tr("Unknown option \"%1\".").arg(it.key()));
             return {};
         }
+    }
+    // options.variety: "Another version" of the same request. The same prompt at the skill's
+    // temperature came back almost the same (owner, 2026-10-25), so this run samples freer and
+    // with a fresh seed. A greedy skill (temperature 0) stays greedy.
+    if (options.value(u"variety"_s).toBool() && job.skill.sampling.value(u"temperature"_s).toDouble() > 0.0) {
+        job.skill.sampling.insert(
+            u"temperature"_s,
+            std::max(job.skill.sampling.value(u"temperature"_s).toDouble(), kVarietyTemperature));
+        job.skill.sampling.insert(u"top_p"_s,
+                                  std::max(job.skill.sampling.value(u"top_p"_s).toDouble(0.9), 0.95));
+        job.skill.sampling.remove(u"seed"_s);
     }
     // options.tier: run on this tier's model (Settings' Try it for an action not saved yet).
     if (const QString tier = options.value(u"tier"_s).toString(); !tier.isEmpty()) {

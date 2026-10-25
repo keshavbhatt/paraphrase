@@ -76,6 +76,7 @@ private:
     QTimer m_poll;
     QElapsedTimer m_pollClock;
     QString m_likelyTitle;
+    bool m_variety = false; ///< the next run is another version (RunSkill's variety option)
 };
 
 } // namespace paraphrase::app

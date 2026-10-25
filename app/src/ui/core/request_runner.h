@@ -23,7 +23,9 @@ public:
     ~RequestRunner() override;
 
     /// Sends the request; "" when it runs, else the daemon's message.
-    [[nodiscard]] QString start(const QString& skillId, const QVariantMap& input);
+    /// `variety`: another version of a request already answered, sampled freer so it differs
+    /// (RunSkill's option, DOCS/api.md).
+    [[nodiscard]] QString start(const QString& skillId, const QVariantMap& input, bool variety = false);
     void cancel();
     [[nodiscard]] bool busy() const { return !m_requestId.isEmpty(); }
 

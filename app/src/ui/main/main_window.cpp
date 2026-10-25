@@ -24,6 +24,8 @@
 #include <QSplitter>
 #include <QVBoxLayout>
 
+#include <utility>
+
 using namespace Qt::StringLiterals;
 
 namespace paraphrase::app {
@@ -329,7 +331,9 @@ void MainWindow::run()
         m_output->showKind(SkillKind::Text, s->title.section(u':', 0, 0), false);
         return;
     }
-    if (const QString problem = m_runner->start(m_skill, in); !problem.isEmpty()) {
+    // "Another version", "3 new ones" and Retry ask for one that differs; a first run does not.
+    const bool variety = std::exchange(m_variety, false);
+    if (const QString problem = m_runner->start(m_skill, in, variety); !problem.isEmpty()) {
         m_output->textView()->showMessage(problem, true);
         Q_EMIT finished();
         return;
@@ -373,6 +377,7 @@ void MainWindow::rerun()
 void MainWindow::onSecondary()
 {
     if (m_catalog.kindOf(m_skill) != SkillKind::Text) {
+        m_variety = true;
         run(); // three new ones, another version
         return;
     }
@@ -392,6 +397,7 @@ void MainWindow::onRetry()
     } else if (writesDraft(kind)) {
         rewriteResult(u"rewrite.concise"_s);
     } else {
+        m_variety = true; // Retry: another take on the same text
         run();
     }
 }
