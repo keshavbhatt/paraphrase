@@ -41,4 +41,17 @@ QString languageWarning(const QString& language)
         .arg(language.isEmpty() ? QObject::tr("the right language") : language);
 }
 
+QString historyLabel(const SkillInfo& skill, const QString& language, int changes)
+{
+    QString label = skill.title;
+    label.replace(u": "_s, u" · "_s);
+    if (!language.isEmpty()) {
+        label += u" · "_s + QObject::tr("into %1").arg(language);
+    }
+    if (changes >= 0) {
+        label += u" · "_s + (changes == 1 ? QObject::tr("1 change") : QObject::tr("%1 changes").arg(changes));
+    }
+    return label;
+}
+
 } // namespace paraphrase::app

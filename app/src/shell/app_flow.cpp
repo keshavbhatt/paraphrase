@@ -71,6 +71,8 @@ MainWindow& AppFlow::mainWindow()
     if (!m_main) {
         m_main = std::make_unique<MainWindow>(&m_client);
         m_main->setGlobalShortcut(m_globalShortcut);
+        m_main->setHistory(m_history);
+        connect(m_main.get(), &MainWindow::privacyRequested, this, &AppFlow::showPrivacy);
         connect(m_main.get(), &MainWindow::settingsRequested, this, &AppFlow::showSettings);
         connect(m_main.get(), &MainWindow::newActionRequested, this, &AppFlow::newAction);
         connect(m_main.get(), &MainWindow::shortcutHelpRequested, this, &AppFlow::showShortcutHelp);
@@ -106,6 +108,12 @@ void AppFlow::showShortcutHelp()
     m_settings->showPage(SettingsWindow::Shortcut);
 }
 
+void AppFlow::showPrivacy()
+{
+    showSettings();
+    m_settings->showPage(SettingsWindow::Privacy);
+}
+
 void AppFlow::newAction()
 {
     showSettings();
@@ -115,7 +123,7 @@ void AppFlow::newAction()
 void AppFlow::showSettings()
 {
     if (!m_settings) {
-        m_settings = std::make_unique<SettingsWindow>(m_client, m_preferences, m_hasTray);
+        m_settings = std::make_unique<SettingsWindow>(m_client, m_preferences, m_hasTray, m_history);
         m_settings->setDesktopSupport(m_support);
     }
     m_settings->showPage(SettingsWindow::Models);

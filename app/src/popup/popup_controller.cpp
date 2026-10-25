@@ -1,5 +1,6 @@
 #include "popup/popup_controller.h"
 
+#include "history/history_keeper.h"
 #include "integration/integrations.h"
 #include "popup/popup_pages.h"
 #include "popup/popup_window.h"
@@ -232,8 +233,9 @@ void PopupController::run(const QString& skillId, const QString& targetLang)
                             other ? languageName(m_detector, targetLang) : QString(),
                             languageName(m_detector, own));
     m_window->showResult();
+    m_lastVariety = std::exchange(m_variety, false);
     if (const QString problem =
-            m_runner->start(skillId, inputFor(kind, m_text.text, targetLang), std::exchange(m_variety, false));
+            m_runner->start(skillId, inputFor(kind, m_text.text, targetLang), m_lastVariety);
         !problem.isEmpty()) {
         page->setInfo(problem, u"danger"_s);
         return;
@@ -249,8 +251,8 @@ void PopupController::onFinished(const QJsonObject& result)
     const SkillInfo* skill = m_catalog.find(m_skill);
     const SkillKind kind = m_catalog.kindOf(m_skill);
     const QString output = result.value(u"output"_s).toString();
+    QStringList replies;
     if (kind == SkillKind::QuickReply) {
-        QStringList replies;
         for (const auto& v : result.value(u"replies"_s).toArray()) {
             replies.append(v.toString());
         }
@@ -290,7 +292,37 @@ void PopupController::onFinished(const QJsonObject& result)
         page->setInfo(languageWarning(language), u"warning"_s);
     }
     m_window->fitContent();
+    keepInHistory(m_lastVariety, replies.isEmpty() ? page->result() : replies.join(u"\n\n"_s));
     Q_EMIT finished();
+}
+
+void PopupController::keepInHistory(bool sameRun, const QString& result)
+{
+    const SkillInfo* skill = m_catalog.find(m_skill);
+    // Text from an app the user left out is never kept (settings-privacy.html note 4).
+    if (m_history == nullptr || skill == nullptr || history::Keeper::isExcluded(m_text.appName) ||
+        history::Keeper::isExcluded(appDisplayName(m_text.appName))) {
+        return;
+    }
+    if (sameRun && m_historyId != 0 && m_history->update(m_historyId, result)) {
+        return;
+    }
+    const bool chosen = !m_targetLang.isEmpty() && m_targetLang != m_detector.detect(m_text.text);
+    const PopupResultPage* page = m_window->resultPage();
+    const bool proofread = skill->base == u"proofread"_s && page->textView()->hasDiff();
+    history::Entry entry;
+    entry.skillId = m_skill;
+    entry.label = historyLabel(*skill, chosen ? languageName(m_detector, m_targetLang) : QString(),
+                               proofread ? static_cast<int>(page->textView()->changeCount()) : -1);
+    entry.app = appDisplayName(m_text.appName);
+    entry.text = m_text.text;
+    entry.result = result;
+    QJsonObject options;
+    if (!m_targetLang.isEmpty()) {
+        options.insert(u"target_lang"_s, m_targetLang);
+    }
+    entry.options = QJsonDocument(options).toJson(QJsonDocument::Compact);
+    m_historyId = m_history->record(entry);
 }
 
 QString PopupController::summaryLine(const SkillInfo& skill, const QString& output, bool otherLanguage) const
@@ -331,6 +363,9 @@ void PopupController::insert()
     // (PasteInsert waits for it), and the popup on top would keep it.
     const QPoint at = m_window->pos();
     m_window->hide();
+    if (m_history != nullptr && m_historyId != 0) {
+        m_history->update(m_historyId, text); // the version put back, edited or not
+    }
     const InsertOutcome outcome = m_integrations.insert().insert(text, m_text);
     if (outcome == InsertOutcome::Typed) {
         m_window->close();
@@ -349,6 +384,9 @@ void PopupController::copy()
     const QString text = m_window->resultPage()->result();
     if (!text.isEmpty()) {
         QGuiApplication::clipboard()->setText(text);
+        if (m_history != nullptr && m_historyId != 0) {
+            m_history->update(m_historyId, text);
+        }
         m_window->resultPage()->setInfo(tr("· copied"));
     }
 }

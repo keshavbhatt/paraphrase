@@ -5,6 +5,8 @@
 #include <QJsonDocument>
 #include <QUrl>
 
+#include <algorithm>
+
 using namespace Qt::StringLiterals;
 
 namespace paraphrase::app {
@@ -101,6 +103,9 @@ QString formatSize(qint64 bytes)
     const auto b = static_cast<double>(bytes);
     if (b >= kGB) {
         return QCoreApplication::translate("Models", "%1 GB").arg(b / kGB, 0, 'f', 2);
+    }
+    if (b > 0 && b < kMB) {
+        return QCoreApplication::translate("Models", "%1 KB").arg(std::max(1, qRound(b / 1024.0)));
     }
     return QCoreApplication::translate("Models", "%1 MB").arg(qRound(b / kMB));
 }

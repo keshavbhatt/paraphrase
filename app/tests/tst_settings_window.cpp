@@ -5,7 +5,9 @@
 
 #include "app_daemon.h"
 #include "daemon_client.h"
+#include "fake_secrets.h"
 #include "ui/common/menu_icons.h"
+#include "ui/common/toggle_switch.h"
 #include "ui/core/preferences.h"
 #include "ui/settings/settings_window.h"
 
@@ -15,6 +17,7 @@
 #include <QClipboard>
 #include <QComboBox>
 #include <QCoreApplication>
+#include <QDateTime>
 #include <QDir>
 #include <QGuiApplication>
 #include <QJsonArray>
@@ -27,7 +30,10 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QScrollBar>
+#include <QSettings>
 #include <QSignalSpy>
+#include <QStandardPaths>
+#include <QTemporaryDir>
 #include <QTest>
 
 using namespace Qt::StringLiterals;
@@ -56,15 +62,133 @@ class TestSettingsWindow : public QObject
 
 private:
     AppDaemon m_daemon;
+    QTemporaryDir m_settingsDir; ///< the tests' own QSettings, never the user's
+
+    /// settings-privacy.html: (a) off, (b) on with entries, (c) Delete all asked on the page.
+    static void savePrivacy(DaemonClient& client, const QString& dir, QLatin1StringView theme)
+    {
+        namespace history = paraphrase::app::history;
+        QSettings().remove(u"history"_s);
+        const QTemporaryDir historyDir;
+        auto keeper = paraphrase::testing::fakeHistory(historyDir.filePath(u"history.sqlite"_s));
+        SettingsWindow w(client, nullptr, false, keeper.get());
+        w.resize(1180, 820);
+        w.show();
+        w.showPage(SettingsWindow::Privacy);
+        const auto grab = [&w, &dir, theme](const QString& name) {
+            QTest::qWait(50);
+            QCoreApplication::processEvents();
+            QVERIFY(w.grab().save(dir + u"/settings-privacy-%1-%2.png"_s.arg(name, theme)));
+        };
+        grab(u"off"_s);
+        w.findChild<paraphrase::app::ToggleSwitch*>(u"keepHistory"_s)->click();
+        for (int i = 0; i < 3; ++i) {
+            history::Entry e;
+            e.skillId = u"proofread"_s;
+            e.label = u"Proofread"_s;
+            e.when = QDateTime::currentDateTime().addDays(-2LL * i);
+            e.text = u"Their going home."_s;
+            e.result = u"They're going home."_s;
+            keeper->record(e);
+        }
+        grab(u"on"_s);
+        w.findChild<QPushButton*>(u"deleteAllHistory"_s)->click();
+        grab(u"confirm"_s);
+        QSettings().remove(u"history"_s);
+    }
 
 private Q_SLOTS:
     void initTestCase()
     {
+        // Never the user's settings or history file.
+        QStandardPaths::setTestModeEnabled(true);
+        QSettings::setPath(QSettings::NativeFormat, QSettings::UserScope, m_settingsDir.path());
         // As main.cpp does: menus and drop-down lists with round corners.
         QApplication::setStyle(new paraphrase::app::MenuIconStyle(QApplication::style()->name()));
     }
 
     void cleanup() { m_daemon.stop(); }
+    static void init() { QSettings().clear(); }
+
+    void privacyTurnsHistoryOnAndAsksBeforeDeleting()
+    {
+        using paraphrase::app::ToggleSwitch;
+        namespace history = paraphrase::app::history;
+        QVERIFY(m_daemon.start({u"fast-model"_s}));
+        DaemonClient client;
+        QVERIFY(client.connectToDaemon().isEmpty());
+        const QTemporaryDir dir;
+        const QString path = dir.filePath(u"history.sqlite"_s);
+        auto keeper = paraphrase::testing::fakeHistory(path);
+        SettingsWindow w(client, nullptr, false, keeper.get());
+        w.showPage(SettingsWindow::Privacy);
+        auto* on = w.findChild<ToggleSwitch*>(u"keepHistory"_s);
+        QVERIFY(on != nullptr && !on->isChecked());                       // off by default (PLAN D13)
+        QVERIFY(!w.findChild<QComboBox*>(u"keepFor"_s)->isVisibleTo(&w)); // the options show once on
+        on->click();
+        QVERIFY(history::Keeper::isOn());
+        QCOMPARE(w.findChild<QComboBox*>(u"keepFor"_s)->currentText(), u"30 days"_s);
+        QVERIFY(w.findChild<QPushButton*>(u"excluded-KeePassXC"_s) != nullptr);
+
+        history::Entry e;
+        e.skillId = u"proofread"_s;
+        e.label = u"Proofread"_s;
+        e.text = u"teh text"_s;
+        e.result = u"the text"_s;
+        QVERIFY(keeper->record(e) != 0);
+        QVERIFY(w.findChild<QLabel*>(u"historyKept"_s)->text().startsWith(u"1 entry, from"_s));
+
+        // Delete all asks on the page first; Keep them keeps them.
+        const auto* confirm = w.findChild<QFrame*>(u"confirm"_s);
+        QVERIFY(confirm->isHidden());
+        w.findChild<QPushButton*>(u"deleteAllHistory"_s)->click();
+        QVERIFY(!confirm->isHidden());
+        QCOMPARE(keeper->stats().count, 1);
+        w.findChild<QPushButton*>(u"keepThem"_s)->click();
+        QVERIFY(confirm->isHidden());
+        QCOMPARE(keeper->stats().count, 1);
+        w.findChild<QPushButton*>(u"deleteAllHistory"_s)->click();
+        w.findChild<QPushButton*>(u"confirmDeleteAll"_s)->click();
+        QCOMPARE(keeper->stats().count, 0);
+        QVERIFY(history::Keeper::isOn()); // stays on for what comes next
+
+        // Turning off with entries kept asks whether to delete them, keeping them by default.
+        keeper->record(e);
+        on->click();
+        QVERIFY(!history::Keeper::isOn());
+        QVERIFY(!confirm->isHidden());
+        w.findChild<QPushButton*>(u"keepThem"_s)->click();
+        QVERIFY(QFile::exists(path));
+
+        // An app added by hand is left out.
+        on->click();
+        w.findChild<QPushButton*>(u"addApp"_s)->click();
+        auto* name = w.findChild<QLineEdit*>(u"appName"_s);
+        name->setText(u"Signal"_s);
+        QTest::keyClick(name, Qt::Key_Return);
+        QVERIFY(history::Keeper::isExcluded(u"signal"_s));
+    }
+
+    void privacyWithoutAKeyringSaysWhy()
+    {
+        using paraphrase::app::ToggleSwitch;
+        namespace history = paraphrase::app::history;
+        QVERIFY(m_daemon.start({u"fast-model"_s}));
+        DaemonClient client;
+        QVERIFY(client.connectToDaemon().isEmpty());
+        const QTemporaryDir dir;
+        history::Keeper keeper(dir.filePath(u"history.sqlite"_s),
+                               [](const QString& /*kind*/) { return nullptr; });
+        SettingsWindow w(client, nullptr, false, &keeper);
+        w.showPage(SettingsWindow::Privacy);
+        auto* on = w.findChild<ToggleSwitch*>(u"keepHistory"_s);
+        on->click();
+        QVERIFY(!on->isChecked());
+        QVERIFY(!history::Keeper::isOn());
+        const auto* problem = w.findChild<QLabel*>(u"historyProblem"_s);
+        QVERIFY(!problem->isHidden());
+        QVERIFY(problem->text().contains(u"keyring"_s));
+    }
 
     void listsTheInstalledModels()
     {
@@ -279,6 +403,7 @@ private Q_SLOTS:
             QTest::qWait(50);
             QCoreApplication::processEvents(); // queued shows land first
             QVERIFY(actions.grab().save(dir + u"/settings-general-%1.png"_s.arg(QLatin1StringView(theme))));
+            savePrivacy(actionsClient, dir, QLatin1StringView(theme));
             m_daemon.stop();
         }
         qunsetenv("PARAPHRASE_THEME");

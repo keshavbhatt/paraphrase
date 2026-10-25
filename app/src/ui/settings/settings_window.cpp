@@ -1,5 +1,6 @@
 #include "ui/settings/settings_window.h"
 
+#include "history/history_keeper.h"
 #include "ui/common/window_style.h"
 #include "ui/core/preferences.h"
 #include "ui/models/models_controller.h"
@@ -7,9 +8,9 @@
 #include "ui/settings/actions_page.h"
 #include "ui/settings/general_page.h"
 #include "ui/settings/models_settings_page.h"
+#include "ui/settings/privacy_page.h"
 #include "ui/settings/settings_nav.h"
 #include "ui/settings/shortcut_settings_page.h"
-#include "ui/settings/text_page.h"
 
 #include <QEvent>
 #include <QHBoxLayout>
@@ -34,7 +35,7 @@ QWidget* scrolled(QWidget* page)
 } // namespace
 
 SettingsWindow::SettingsWindow(client::DaemonClient& client, Preferences* preferences, bool hasTray,
-                               QWidget* parent)
+                               history::Keeper* keeper, QWidget* parent)
     : QWidget(parent)
     , m_client(client)
     , m_tokens(Theme::current())
@@ -51,6 +52,8 @@ SettingsWindow::SettingsWindow(client::DaemonClient& client, Preferences* prefer
     , m_ownPreferences(preferences == nullptr ? std::make_unique<Preferences>() : nullptr)
     , m_preferences(preferences == nullptr ? m_ownPreferences.get() : preferences)
     , m_hasTray(hasTray)
+    , m_ownKeeper(keeper == nullptr ? std::make_unique<history::Keeper>() : nullptr)
+    , m_keeper(keeper == nullptr ? m_ownKeeper.get() : keeper)
 {
     setObjectName(u"settingsWindow"_s);
     setWindowTitle(tr("Paraphrase settings"));
@@ -77,15 +80,8 @@ void SettingsWindow::addPages()
     m_pages->addWidget(scrolled(m_actionsPage));
     m_modelsPage = new ModelsSettingsPage(*m_models);
     m_pages->addWidget(scrolled(m_modelsPage));
-    m_pages->addWidget(scrolled(new TextPage(
-        tr("Privacy"),
-        {
-            tr("What you write is read by the model on this computer and nowhere else. Paraphrase keeps "
-               "none of it: there is no history, no account and no usage data. It goes online only to "
-               "download a model you chose."),
-            tr("A history you can turn on, kept on this computer only, may come in a later version. It "
-               "will be off unless you turn it on."),
-        })));
+    m_privacyPage = new PrivacyPage(*m_keeper);
+    m_pages->addWidget(scrolled(m_privacyPage));
     m_aboutPage = new AboutPage(*m_models);
     m_pages->addWidget(scrolled(m_aboutPage));
 }
@@ -97,6 +93,7 @@ void SettingsWindow::showPage(Page page)
     m_models->refresh();
     m_actionsPage->reload();
     m_generalPage->reload();
+    m_privacyPage->reload();
 }
 
 void SettingsWindow::setDesktopSupport(const DesktopSupport& support)
@@ -118,6 +115,7 @@ void SettingsWindow::applyTheme()
     m_aboutPage->setTheme(m_tokens);
     m_generalPage->applyTheme(m_tokens);
     m_shortcutPage->applyTheme(m_tokens);
+    m_privacyPage->applyTheme(m_tokens);
 }
 
 void SettingsWindow::changeEvent(QEvent* event)

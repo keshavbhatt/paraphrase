@@ -47,6 +47,11 @@ goes through data-control, because a window that just lost focus may not set the
   token is kept in the app's settings (`integration/remoteDesktopToken`), so it is not asked
   again until the user revokes it.
 
+- History (off by default): turning it on asks the desktop's keyring for the history's key,
+  the Secret portal first, else the Secret Service (KWallet, GNOME Keyring). A locked wallet
+  may ask for its password then. Without a keyring the switch stays off and says why. The
+  keyring used is remembered (`history/secretKind`), so later runs ask the same one.
+
 ## Package formats
 
 | | snap | Flatpak | AppImage, native |
@@ -54,6 +59,7 @@ goes through data-control, because a window that just lost focus may not set the
 | X11 key grab, XTest | `x11` plug | `--socket=fallback-x11`, X11 sessions only | works |
 | GlobalShortcuts, RemoteDesktop portals | `desktop` plug | no extra permission | works |
 | data-control (KDE) | plain Wayland socket: unverified | reported hidden by Flatpak's Wayland security context: the clipboard fallbacks apply | works |
+| History key: Secret portal, else Secret Service | Secret portal via `desktop`; the Secret Service needs `password-manager-service` | Secret portal, no permission | Secret portal on KDE; the Secret Service elsewhere |
 | KWin window tracker (`org.kde.KWin` on the session bus) | needs a D-Bus plug for `org.kde.KWin`: unverified; without it nothing is typed | needs `--talk-name=org.kde.KWin` | works |
 
 ## Building and dependencies
@@ -86,4 +92,5 @@ Runtime: the kf6-core24 content snap ships `libxcb`, `libxcb-xtest` and `libwayl
 - The X11 key grab and XTest paste on a real X11 session (no X11 session or Xvfb on the
   development laptop).
 - GNOME and wlroots sessions.
+- The Secret portal's app secret for an app that is not sandboxed, on GNOME (KDE answers it).
 - Each package format (table above).

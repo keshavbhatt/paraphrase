@@ -10,6 +10,9 @@ class DaemonClient;
 
 namespace paraphrase::app {
 
+namespace history {
+class Keeper;
+}
 class AppFlow;
 class AppService;
 class Integrations;
@@ -48,6 +51,7 @@ private:
     TrayIcon* m_tray = nullptr;
     AppService* m_service = nullptr;
     Preferences* m_preferences = nullptr;
+    history::Keeper* m_history = nullptr; ///< the opt-in history, shared by the window and the popup
 };
 
 } // namespace paraphrase::app

@@ -34,16 +34,37 @@ HeaderBar::HeaderBar(QWidget* parent)
     privacy->addWidget(m_lock);
     privacy->addWidget(makeLabel(tr("On this device"), u"private"_s));
     row->addLayout(privacy);
-    QPushButton* settings = makeButton(tr("Settings"), u"flat"_s);
-    settings->setObjectName(u"settings"_s);
-    row->addWidget(settings);
-    connect(settings, &QPushButton::clicked, this, &HeaderBar::settingsClicked);
+    m_history = makeButton(tr("History"), u"flat"_s);
+    m_history->setObjectName(u"history"_s);
+    m_history->setCheckable(true);
+    m_history->setToolTip(tr("History (Ctrl+H)"));
+    m_history->hide();
+    row->addWidget(m_history);
+    m_settings = makeButton(tr("Settings"), u"flat"_s);
+    m_settings->setObjectName(u"settings"_s);
+    row->addWidget(m_settings);
+    connect(m_history, &QPushButton::clicked, this, &HeaderBar::historyClicked);
+    connect(m_settings, &QPushButton::clicked, this, &HeaderBar::settingsClicked);
+}
+
+void HeaderBar::setHistoryShown(bool shown)
+{
+    m_history->setVisible(shown);
+}
+
+void HeaderBar::setHistoryOpen(bool open)
+{
+    m_history->setChecked(open);
+    setButtonIcon(m_history, u"history"_s, open ? m_tokens.accent : m_tokens.text, kSmallIcon);
 }
 
 void HeaderBar::applyTheme(const Tokens& t)
 {
+    m_tokens = t;
     m_mark->setPixmap(Theme::icon(u"pen"_s, t.accent, kMarkSize).pixmap(kMarkSize, kMarkSize));
     m_lock->setPixmap(Theme::icon(u"lock"_s, t.privacy, kSmallIcon).pixmap(kSmallIcon, kSmallIcon));
+    setButtonIcon(m_history, u"history"_s, m_history->isChecked() ? t.accent : t.text, kSmallIcon);
+    setButtonIcon(m_settings, u"settings"_s, t.text, kSmallIcon);
 }
 
 NoticeBar::NoticeBar(QWidget* parent)

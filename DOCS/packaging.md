@@ -44,6 +44,7 @@ stack); **documented** = the format's or the protocol's own documentation says s
 | Read the selection without focus, Wayland | KDE exposes `ext-data-control-v1`; whether it reaches a snap's plain Wayland socket: **unverified** | **reported not to work**: Flatpak's Wayland security context hides data-control from sandboxed apps; GNOME has no data-control at all | works on KDE and wlroots (not GNOME) |
 | Read the clipboard | works while our popup has focus (all formats; Wayland rule, not a sandbox rule) | same | same |
 | Tray icon | StatusNotifierItem over D-Bus (KDE); GNOME needs an extension | needs `--talk-name=org.kde.StatusNotifierWatcher` | works |
+| History key (ADR-017, 2026-10-25) | the Secret portal through the `desktop` plug; the Secret Service fallback needs the `password-manager-service` plug (store review). Verify which one a strict snap gets on KDE and GNOME | the Secret portal, no extra permission (its app secret is made for sandboxed apps); the fallback would need `--talk-name=org.freedesktop.secrets`, which Flathub questions, so leave it out | the Secret portal where the desktop answers it for host apps (KDE does), else the Secret Service directly |
 
 The practical difference for users: in a **Flatpak on Wayland** the hotkey works on the
 **copied** text (press Ctrl+C, then the shortcut), not the **selected** text. PLAN 6
@@ -123,6 +124,8 @@ moves. Good as a portable "try it" build, not the main channel.
 - [ ] Flatpak: Background portal autostart on KDE and GNOME.
 - [ ] Portable llama.cpp build (`GGML_CPU_ALL_VARIANTS`) speed against the M0 numbers.
 - [ ] GNOME: RemoteDesktop portal typing from a Flatpak.
+- [ ] History key: the Secret portal from the snap and the Flatpak on KDE and GNOME, and from
+  a native build on GNOME (KDE answers it for host apps).
 
 ## Sources
 

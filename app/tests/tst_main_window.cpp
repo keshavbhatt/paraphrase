@@ -6,8 +6,10 @@
 
 #include "app_daemon.h"
 #include "daemon_client.h"
+#include "fake_secrets.h"
 #include "ui/common/chip_button.h"
 #include "ui/common/menu_icons.h"
+#include "ui/main/history_view.h"
 #include "ui/main/main_window.h"
 #include "ui/parts/change_list.h"
 #include "ui/parts/input_pages.h"
@@ -16,6 +18,7 @@
 #include <QAbstractButton>
 #include <QApplication>
 #include <QClipboard>
+#include <QDateTime>
 #include <QDir>
 #include <QLabel>
 #include <QLineEdit>
@@ -25,6 +28,7 @@
 #include <QPushButton>
 #include <QSettings>
 #include <QSignalSpy>
+#include <QStandardPaths>
 #include <QTemporaryDir>
 #include <QTest>
 #include <QTextBrowser>
@@ -70,6 +74,41 @@ private:
 
     QTemporaryDir m_settingsDir; ///< the tests' own QSettings, never the user's
 
+    /// The entries main-window-history.html shows.
+    static void seedHistory(paraphrase::app::history::Keeper& keeper)
+    {
+        const QDate today = QDate::currentDate();
+        const QDate yesterday = today.addDays(-1);
+        const auto add = [&keeper](const QString& skill, const QString& label, const QString& app,
+                                   const QDateTime& when, const QString& text, const QString& result) {
+            paraphrase::app::history::Entry e;
+            e.skillId = skill;
+            e.label = label;
+            e.app = app;
+            e.when = when;
+            e.text = text;
+            e.result = result;
+            QVERIFY(keeper.record(e) != 0);
+        };
+        add(u"format.bullets"_s, u"Format · Bullets"_s, {}, QDateTime(yesterday, QTime(9, 5)),
+            u"Book the venue, send the invites and order the cake."_s,
+            u"- Book the venue\n- Send the invites\n- Order the cake"_s);
+        add(u"compose.email"_s, u"Write · Email"_s, {}, QDateTime(yesterday, QTime(18, 30)),
+            u"Tell the team the office is closed on Monday."_s,
+            u"Subject: Office closed on Monday\n\nHi everyone,\n\nThe office is closed on Monday."_s);
+        add(u"reply"_s, u"Reply"_s, u"Telegram"_s, QDateTime(today, QTime(20, 12)), u"Dinner on Friday?"_s,
+            u"Friday sounds good!"_s);
+        add(u"proofread"_s, u"Proofread · 5 changes"_s, u"KWrite"_s, QDateTime(today, QTime(21, 47)),
+            u"Their going to the market tommorow and we needs to buy egg's."_s,
+            u"They're going to the market tomorrow and we need to buy eggs."_s);
+        add(u"rewrite.elaborate"_s, u"Tone · Elaborate · into Hindi"_s, u"KWrite"_s,
+            QDateTime(today, QTime(22, 8)),
+            u"Are you free for dinner on Friday? Mia and I were thinking of trying the new Thai place near "
+            "the station."_s,
+            u"क्या आप शुक्रवार को रात के खाने के लिए उपलब्ध हैं? मैं और Mia स्टेशन के पास उस नए थाई रेस्तरां को "
+            "आज़माने के बारे में सोच रहे थे।"_s);
+    }
+
 private Q_SLOTS:
     void initTestCase()
     {
@@ -77,6 +116,7 @@ private Q_SLOTS:
         // As main.cpp does: menus draw their icons at the size menus.html shows.
         QApplication::setStyle(new paraphrase::app::MenuIconStyle(QApplication::style()->name()));
         QSettings::setPath(QSettings::NativeFormat, QSettings::UserScope, m_settingsDir.path());
+        QStandardPaths::setTestModeEnabled(true); // never the user's history file
     }
     void init() { QSettings().clear(); } // a tone or kind one test picks never reaches the next
     void cleanup() { m_daemon.stop(); }
@@ -363,6 +403,98 @@ private Q_SLOTS:
         QVERIFY(outputText(w).contains(u"No model is installed"_s));
     }
 
+    void keepsFinishedRunsInHistory()
+    {
+        namespace history = paraphrase::app::history;
+        startDaemon({u"fast-model"_s});
+        const QTemporaryDir dir;
+        auto keeper = fakeHistory(dir.filePath(u"history.sqlite"_s));
+        MainWindow w;
+        w.setHistory(keeper.get());
+        w.start();
+        auto* text = w.findChild<QPlainTextEdit*>(u"text"_s);
+        text->setPlainText(u"Whisk the egg's with the milk"_s);
+        w.selectSkill(u"proofread"_s);
+
+        // Off (the default): nothing is kept.
+        setAnswers({u"Whisk the eggs with the milk."_s});
+        runAndWait(w);
+        QVERIFY(keeper->entries().isEmpty());
+
+        QCOMPARE(keeper->turnOn(), history::Keeper::Problem::None);
+        setAnswers({u"Whisk the eggs with the milk."_s});
+        runAndWait(w);
+        QList<history::Entry> kept = keeper->entries();
+        QCOMPARE(kept.size(), 1);
+        QCOMPARE(kept.at(0).text, u"Whisk the egg's with the milk"_s);
+        QCOMPARE(kept.at(0).result, u"Whisk the eggs with the milk."_s);
+        QVERIFY(kept.at(0).label.startsWith(u"Proofread"_s));
+        QVERIFY(kept.at(0).app.isEmpty()); // the window has no app
+
+        // Retry is another take on the same run: the entry keeps the newest.
+        setAnswers({u"Whisk the eggs into the milk."_s});
+        const QSignalSpy finished(&w, &MainWindow::finished);
+        w.findChild<QPushButton*>(u"retry"_s)->click();
+        QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 1, kTimeoutMs);
+        kept = keeper->entries();
+        QCOMPARE(kept.size(), 1);
+        QCOMPARE(kept.at(0).result, u"Whisk the eggs into the milk."_s);
+
+        // History in place of the panes; search; Use again.
+        QVERIFY(!w.historyOpen());
+        w.show(); // shortcuts need the active window
+        w.activateWindow();
+        QVERIFY(QTest::qWaitForWindowActive(&w));
+        QTest::keyClick(&w, Qt::Key_H, Qt::ControlModifier);
+        QVERIFY(w.historyOpen());
+        const auto* view = w.findChild<paraphrase::app::HistoryView*>();
+        QCOMPARE(view->shownCount(), 1);
+        QCOMPARE(view->openResult(), u"Whisk the eggs into the milk."_s);
+        auto* search = view->findChild<QLineEdit*>(u"historySearch"_s);
+        search->setText(u"zebra"_s);
+        QCOMPARE(view->shownCount(), 0);
+        search->setText(u"MILK"_s);
+        QCOMPARE(view->shownCount(), 1);
+        view->findChild<QPushButton*>(u"filter-reply"_s)->click();
+        QCOMPARE(view->shownCount(), 0);
+        view->findChild<QPushButton*>(u"filter-all"_s)->click();
+        QCOMPARE(view->shownCount(), 1);
+        text->setPlainText(u"something else"_s);
+        view->findChild<QPushButton*>(u"useAgain"_s)->click();
+        QVERIFY(!w.historyOpen());
+        QCOMPARE(text->toPlainText(), u"Whisk the egg's with the milk"_s);
+        QCOMPARE(w.currentSkill(), u"proofread"_s);
+
+        // Delete one entry, asked in its header first.
+        w.showHistory(true);
+        view->findChild<QPushButton*>(u"deleteEntry"_s)->click();
+        QCOMPARE(keeper->entries().size(), 1);
+        view->findChild<QPushButton*>(u"confirmDeleteEntry"_s)->click();
+        QVERIFY(keeper->entries().isEmpty());
+        QCOMPARE(view->shownCount(), 0);
+    }
+
+    void historyOffSaysSo()
+    {
+        startDaemon({u"fast-model"_s});
+        const QTemporaryDir dir;
+        const auto keeper = fakeHistory(dir.filePath(u"history.sqlite"_s));
+        MainWindow w;
+        w.start();
+        QVERIFY(w.findChild<QPushButton*>(u"history"_s)->isHidden()); // no history given: no button
+        w.setHistory(keeper.get());
+        QVERIFY(!w.findChild<QPushButton*>(u"history"_s)->isHidden());
+        w.findChild<QPushButton*>(u"history"_s)->click();
+        QVERIFY(w.historyOpen());
+        const auto* view = w.findChild<paraphrase::app::HistoryView*>();
+        QVERIFY(!view->findChild<QWidget*>(u"historyOff"_s)->isHidden());
+        const QSignalSpy privacy(&w, &MainWindow::privacyRequested);
+        view->findChild<QPushButton*>(u"turnOnHistory"_s)->click();
+        QCOMPARE(privacy.size(), 1);
+        view->findChild<QPushButton*>(u"offBack"_s)->click();
+        QVERIFY(!w.historyOpen());
+    }
+
     void stopsARunningRequest()
     {
         startDaemon({u"fast-model"_s});
@@ -572,6 +704,21 @@ private Q_SLOTS:
                     QVERIFY(
                         grabNow(w).save(dir + u"/main-window-write-%1.png"_s.arg(QLatin1StringView(theme))));
                 }
+                // main-window-history.html: (b) off, then (a) with one entry open.
+                QSettings().remove(u"history"_s); // each theme starts with history off
+                const QTemporaryDir historyDir;
+                auto keeper = fakeHistory(historyDir.filePath(u"history.sqlite"_s));
+                w.setHistory(keeper.get());
+                w.showHistory(true);
+                QVERIFY(grabNow(w).save(dir +
+                                        u"/main-window-history-off-%1.png"_s.arg(QLatin1StringView(theme))));
+                w.showHistory(false);
+                QCOMPARE(keeper->turnOn(), paraphrase::app::history::Keeper::Problem::None);
+                seedHistory(*keeper);
+                w.showHistory(true);
+                QVERIFY(
+                    grabNow(w).save(dir + u"/main-window-history-%1.png"_s.arg(QLatin1StringView(theme))));
+                w.showHistory(false);
             }
             cleanup();
         }

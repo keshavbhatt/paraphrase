@@ -15,7 +15,12 @@ class QSplitter;
 
 namespace paraphrase::app {
 
+namespace history {
+class Keeper;
+struct Entry;
+} // namespace history
 class ActionBar;
+class HistoryView;
 class HeaderBar;
 class InputPane;
 class NoticeBar;
@@ -48,6 +53,13 @@ public:
     /// With a global shortcut there is nothing to say; without one the notice explains how
     /// to add one by hand (ADR-013).
     void setGlobalShortcut(bool available);
+    /// The app's history (main-window-history.html): History in the header, and every
+    /// finished run kept while it is on. Without one the window keeps nothing and shows no
+    /// History.
+    void setHistory(history::Keeper* keeper);
+    /// Opens History in place of the panes, or goes back to writing.
+    void showHistory(bool open);
+    [[nodiscard]] bool historyOpen() const;
 
     // What the window shows, for tests and screenshots.
     [[nodiscard]] QString resultText() const;
@@ -69,6 +81,7 @@ Q_SIGNALS:
     void settingsRequested();     ///< the header's Settings, or the notice's link
     void newActionRequested();    ///< "New action..." under My actions
     void shortcutHelpRequested(); ///< the notice's "Add a shortcut by hand"
+    void privacyRequested();      ///< History's "Turn on history" and "Privacy settings"
 
 protected:
     void changeEvent(QEvent* event) override;
@@ -90,6 +103,9 @@ private:
     void onFinished(const QJsonObject& result);
     void onFailed(const QString& code, const QString& message);
     void showResult(const QJsonObject& result);
+    /// Keeps the finished run, or for another version of it, its newest result.
+    void keepInHistory(bool sameRun, const QString& replies);
+    void useAgain(const history::Entry& entry);
     [[nodiscard]] QString inputLanguageName() const;
     [[nodiscard]] QString chosenPreset(const SkillInfo& s) const;
 
@@ -107,6 +123,10 @@ private:
     OutputPane* m_output = nullptr;
     StatusBar* m_status = nullptr;
     QSplitter* m_panes = nullptr;
+    QWidget* m_body = nullptr;
+    history::Keeper* m_history = nullptr;
+    HistoryView* m_historyView = nullptr;
+    qint64 m_historyId = 0; ///< the entry the result on screen was kept as
 
     QString m_skill;        ///< the selected action
     QString m_targetLang;   ///< the language picked in a language menu
@@ -118,6 +138,7 @@ private:
     bool m_ran = false;            ///< something ran on the current text, so option changes run again
     bool m_rerunAfterStop = false; ///< an option changed during a run
     bool m_variety = false;        ///< the next run is another version (RunSkill's variety option)
+    bool m_lastVariety = false;    ///< the running request is another version
 };
 
 } // namespace paraphrase::app

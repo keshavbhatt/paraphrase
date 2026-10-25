@@ -15,6 +15,9 @@
 
 namespace paraphrase::app {
 
+namespace history {
+class Keeper;
+}
 class Integrations;
 class PopupWindow;
 class RequestRunner;
@@ -38,6 +41,8 @@ public:
     void show();
     /// Opens the popup on this text (tests, and the main window's hand-over in the other way).
     void showText(const CapturedText& text);
+    /// The app's history: finished runs are kept there while it is on (settings-privacy.html).
+    void setHistory(history::Keeper* keeper) { m_history = keeper; }
     [[nodiscard]] PopupWindow* window() const { return m_window.get(); }
 
 Q_SIGNALS:
@@ -55,6 +60,8 @@ private:
     void onFailed(const QString& code, const QString& message);
     void insert();
     void copy();
+    /// Keeps the finished run, or for another version of it, its newest result.
+    void keepInHistory(bool sameRun, const QString& result);
     [[nodiscard]] QString likelyBase() const;
     /// While it reads ahead: the footer's working pill follows the daemon's status.
     void pollWork();
@@ -76,7 +83,10 @@ private:
     QTimer m_poll;
     QElapsedTimer m_pollClock;
     QString m_likelyTitle;
-    bool m_variety = false; ///< the next run is another version (RunSkill's variety option)
+    bool m_variety = false;     ///< the next run is another version (RunSkill's variety option)
+    bool m_lastVariety = false; ///< the running request is another version
+    history::Keeper* m_history = nullptr;
+    qint64 m_historyId = 0; ///< the entry the result on screen was kept as
 };
 
 } // namespace paraphrase::app

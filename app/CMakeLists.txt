@@ -60,6 +60,26 @@ else()
     message(STATUS "Wayland data-control: off (wayland-client, wayland-scanner or wayland-protocols missing)")
 endif()
 
+# The opt-in history (ADR-017): an SQLite file with sealed fields, its key from the desktop.
+find_package(Qt6 ${PARAPHRASE_QT_MIN_VERSION} REQUIRED COMPONENTS Sql)
+# The KDE SDK has OpenSSL's headers but its libcrypto.so link dangles: the library itself is
+# core24's libcrypto.so.3, which every snap and the build image have.
+find_library(OPENSSL_CRYPTO_LIBRARY NAMES crypto libcrypto.so.3)
+find_package(OpenSSL REQUIRED COMPONENTS Crypto)
+add_library(paraphrase_history STATIC
+    src/history/history_crypto.cpp
+    src/history/history_keeper.cpp
+    src/history/history_store.cpp
+    src/history/secret_source.cpp
+)
+paraphrase_set_warnings(paraphrase_history)
+target_include_directories(paraphrase_history PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
+target_link_libraries(paraphrase_history PUBLIC Qt6::Sql Qt6::DBus PRIVATE paraphrase_integration OpenSSL::Crypto)
+# Its opensslconf.h sits in the multiarch folder, which the SDK's compiler does not search.
+if(EXISTS "${OPENSSL_INCLUDE_DIR}/${CMAKE_LIBRARY_ARCHITECTURE}/openssl/opensslconf.h")
+    target_include_directories(paraphrase_history SYSTEM PRIVATE "${OPENSSL_INCLUDE_DIR}/${CMAKE_LIBRARY_ARCHITECTURE}")
+endif()
+
 add_library(paraphrase_ui STATIC
     src/ui/settings/about_page.cpp
     src/ui/settings/action_editor.cpp
@@ -85,6 +105,7 @@ add_library(paraphrase_ui STATIC
     src/ui/core/preferences.cpp
     src/ui/parts/language_menu.cpp
     src/ui/settings/languages_section.cpp
+    src/ui/main/history_view.cpp
     src/ui/main/main_window.cpp
     src/ui/common/menu_icons.cpp
     src/ui/setup/model_card.cpp
@@ -92,6 +113,7 @@ add_library(paraphrase_ui STATIC
     src/ui/setup/model_page.cpp
     src/ui/models/models_controller.cpp
     src/ui/settings/models_settings_page.cpp
+    src/ui/settings/privacy_page.cpp
     src/ui/main/output_pane.cpp
     src/ui/core/request_runner.cpp
     src/ui/core/result_summary.cpp
@@ -107,7 +129,6 @@ add_library(paraphrase_ui STATIC
     src/ui/core/skill_catalog.cpp
     src/ui/core/user_actions_client.cpp
     src/ui/setup/step_header.cpp
-    src/ui/settings/text_page.cpp
     src/ui/common/theme.cpp
     src/ui/common/toggle_switch.cpp
     src/ui/settings/tier_pickers.cpp
@@ -118,7 +139,7 @@ add_library(paraphrase_ui STATIC
 paraphrase_set_warnings(paraphrase_ui)
 target_include_directories(paraphrase_ui PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 # The language shown next to the word count comes from the same detector the daemon uses.
-target_link_libraries(paraphrase_ui PUBLIC paraphrase_client paraphrase_util Qt6::Widgets Qt6::Svg)
+target_link_libraries(paraphrase_ui PUBLIC paraphrase_client paraphrase_util paraphrase_history Qt6::Widgets Qt6::Svg)
 qt_add_resources(paraphrase_ui "icons"
     PREFIX "/"
     BASE "${CMAKE_CURRENT_SOURCE_DIR}"
@@ -129,6 +150,7 @@ qt_add_resources(paraphrase_ui "icons"
         icons/badge-check.svg icons/briefcase.svg icons/coffee.svg icons/enlarge.svg icons/hand-heart.svg
         icons/list.svg icons/mail.svg icons/megaphone.svg icons/plus.svg icons/shrink.svg icons/smile.svg
         icons/smile-plus.svg icons/table.svg icons/keyboard.svg icons/text-cursor-input.svg icons/grip.svg
+        icons/trash.svg icons/history.svg icons/settings.svg icons/search.svg
 )
 
 # The popup: a floating panel over any app, driven by the integration backends.

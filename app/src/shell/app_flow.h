@@ -12,6 +12,9 @@ class DaemonClient;
 
 namespace paraphrase::app {
 
+namespace history {
+class Keeper;
+}
 class MainWindow;
 class Preferences;
 class SettingsWindow;
@@ -29,6 +32,8 @@ public:
 
     /// What Settings shows on General and Shortcut, from the app.
     void setSettingsContext(Preferences* preferences, bool hasTray, const DesktopSupport& support);
+    /// The app's history, for the main window and Settings, Privacy.
+    void setHistory(history::Keeper* keeper) { m_history = keeper; }
     ~AppFlow() override;
 
     /// Opens setup on first run, else the main window (or keeps it hidden: tray autostart).
@@ -38,6 +43,8 @@ public:
     void showSettings();
     /// Settings, Shortcut: how to open Paraphrase over other apps on this desktop.
     void showShortcutHelp();
+    /// Settings, Privacy: the history switch.
+    void showPrivacy();
     /// Settings, My actions, with the editor on a new action.
     void newAction();
     /// The main window, created on first use.
@@ -55,6 +62,7 @@ private:
     std::unique_ptr<SettingsWindow> m_settings;
     bool m_globalShortcut = false;
     Preferences* m_preferences = nullptr;
+    history::Keeper* m_history = nullptr;
     bool m_hasTray = false;
     DesktopSupport m_support;
 };

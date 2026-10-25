@@ -123,6 +123,8 @@ void OutputPane::buildFoot()
     m_copy->setObjectName(u"copy"_s);
     m_secondary = makeButton(QString());
     m_retry = makeButton(QString());
+    m_retry->setObjectName(u"retry"_s);
+    m_secondary->setObjectName(u"secondary"_s);
     for (QPushButton* b : {m_secondary, m_retry}) {
         b->setProperty("btnSize", u"big"_s);
     }

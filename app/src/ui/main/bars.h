@@ -12,7 +12,7 @@ class QPushButton;
 
 namespace paraphrase::app {
 
-/// The header band (`.mwhead`): the mark, the privacy line, Settings.
+/// The header band (`.mwhead`): the mark, the privacy line, History and Settings.
 class HeaderBar : public QFrame
 {
     Q_OBJECT
@@ -22,13 +22,21 @@ public:
     explicit HeaderBar(QWidget* parent = nullptr);
     ~HeaderBar() override = default;
     void applyTheme(const Tokens& t);
+    /// History shows only when the app keeps one (MainWindow::setHistory).
+    void setHistoryShown(bool shown);
+    /// Highlights History while its view is open.
+    void setHistoryOpen(bool open);
 
 Q_SIGNALS:
     void settingsClicked();
+    void historyClicked();
 
 private:
     QLabel* m_mark = nullptr;
     QLabel* m_lock = nullptr;
+    QPushButton* m_history = nullptr;
+    QPushButton* m_settings = nullptr;
+    Tokens m_tokens;
 };
 
 /// The notice band for what the desktop does not offer (ADR-013): never an error, can be hidden.

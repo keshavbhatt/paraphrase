@@ -25,5 +25,8 @@ struct ResultFacts
 [[nodiscard]] QString resultSummary(const ResultFacts& facts);
 /// The warning when the language check failed after its retry: shown, never hidden (ADR-006).
 [[nodiscard]] QString languageWarning(const QString& language);
+/// The action as the history lists it: "Tone · Elaborate · into Hindi", "Proofread · 5 changes".
+/// `language` is a chosen language's name ("" for none); `changes` < 0 says nothing of them.
+[[nodiscard]] QString historyLabel(const SkillInfo& skill, const QString& language, int changes = -1);
 
 } // namespace paraphrase::app

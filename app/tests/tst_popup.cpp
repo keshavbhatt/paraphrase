@@ -4,6 +4,7 @@
 // PARAPHRASE_SCREENSHOTS=<dir> it also saves its pages in light and dark for review.
 
 #include "app_daemon.h"
+#include "fake_secrets.h"
 #include "integration/clipboard_backends.h"
 #include "integration/integrations.h"
 #include "popup/popup_controller.h"
@@ -122,6 +123,31 @@ private Q_SLOTS:
                  qPrintable(label));
         insert->click();
         QCOMPARE(m_sent, QStringList{u"Mia doesn't know where the keys are."_s});
+    }
+
+    void keepsRunsFromAppsNotLeftOut()
+    {
+        const QTemporaryDir dir;
+        auto keeper = paraphrase::testing::fakeHistory(dir.filePath(u"history.sqlite"_s));
+        QCOMPARE(keeper->turnOn(), history::Keeper::Problem::None);
+        QObject owner;
+        const auto backends = integrations(&owner);
+        PopupController popup(*backends);
+        popup.setHistory(keeper.get());
+        popup.showText(selected(u"Mia dont know where the keys are"_s));
+        m_daemon.setAnswers({u"Mia doesn't know where the keys are."_s});
+        pick(popup, u"action-proofread"_s);
+        const QList<history::Entry> kept = keeper->entries();
+        QCOMPARE(kept.size(), 1);
+        QCOMPARE(kept.at(0).app, u"Telegram"_s);
+        QCOMPARE(kept.at(0).result, u"Mia doesn't know where the keys are."_s);
+
+        // Text from an app the user left out is never kept.
+        keeper->setExcludedApps({u"Telegram"_s});
+        popup.showText(selected(u"Their going home."_s));
+        m_daemon.setAnswers({u"They're going home."_s});
+        pick(popup, u"action-proofread"_s);
+        QCOMPARE(keeper->entries().size(), 1);
     }
 
     void saysLooksGoodWhenNothingNeedsFixing()

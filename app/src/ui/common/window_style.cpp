@@ -65,9 +65,6 @@ QComboBoxPrivateContainer { background: transparent; border: none; padding: 0; m
 QPushButton[kind="nav"] { text-align: left; background: transparent; border: none; border-radius: 8px; padding: 0 12px; min-height: 38px; }
 QPushButton[kind="nav"]:hover { background: @hover@; }
 QPushButton[kind="nav"]:checked { background: @accentSoft@; color: @accent@; font-weight: 500; }
-QPushButton[kind="danger"] { background: transparent; border-color: transparent; color: @danger@; }
-QPushButton[kind="danger"]:hover { background: @hover@; }
-QPushButton[kind="dangerSolid"] { background: @danger@; border-color: @danger@; color: @accentText@; font-weight: 500; }
 )";
 
 } // namespace

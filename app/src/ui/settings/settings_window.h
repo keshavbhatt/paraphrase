@@ -15,6 +15,9 @@ class DaemonClient;
 
 namespace paraphrase::app {
 
+namespace history {
+class Keeper;
+}
 class AboutPage;
 class ActionsPage;
 class GeneralPage;
@@ -22,6 +25,7 @@ class Preferences;
 class ShortcutSettingsPage;
 class ModelsController;
 class ModelsSettingsPage;
+class PrivacyPage;
 class SettingsNav;
 
 /// Settings (settings-models.html): the page list and the pages. Models is complete; General,
@@ -42,9 +46,11 @@ public:
         About,
     };
 
-    /// `preferences` is the app's (General); without one the window keeps its own.
+    /// `preferences` and `keeper` are the app's (General, Privacy); without them the window
+    /// keeps its own.
     explicit SettingsWindow(client::DaemonClient& client, Preferences* preferences = nullptr,
-                            bool hasTray = false, QWidget* parent = nullptr);
+                            bool hasTray = false, history::Keeper* keeper = nullptr,
+                            QWidget* parent = nullptr);
     ~SettingsWindow() override;
 
     /// Opens a page and reads the models again.
@@ -74,6 +80,9 @@ private:
     bool m_hasTray = false;
     GeneralPage* m_generalPage = nullptr;
     ShortcutSettingsPage* m_shortcutPage = nullptr;
+    std::unique_ptr<history::Keeper> m_ownKeeper;
+    history::Keeper* m_keeper = nullptr;
+    PrivacyPage* m_privacyPage = nullptr;
 };
 
 } // namespace paraphrase::app

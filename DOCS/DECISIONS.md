@@ -308,3 +308,35 @@ tier runs on the fast model otherwise. The fast model runs on any computer, as A
 **Consequences.** The rule is measured on one CPU; the bench on a real older laptop (before
 M5) checks it there. Settings can override the thread count. GPU offload waits for the
 timing run the first-run mock describes, which names a GPU it does not use.
+
+## ADR-017: The history lives in the app, encrypted, its key from the desktop's secret store (2026-10-25)
+
+**Status.** Accepted (mocks settings-privacy.html and main-window-history.html, approved by the
+owner on 2026-10-25).
+
+**Context.** PLAN D13: history is off by default, stored locally and encrypted, wiped in one
+click. CLAUDE.md allows user text to persist only in this opt-in store. SQLCipher is not in
+the KDE build SDK; Qt's SQL module with its SQLite driver and OpenSSL's libcrypto are, and
+QtKeychain is in the runtime without headers. The desktop offers secrets two ways: the
+Secret portal (`org.freedesktop.portal.Secret`, one secret per app, no permission needed in a
+Flatpak or snap) and the Secret Service (`org.freedesktop.secrets`: KWallet's ksecretd,
+GNOME Keyring).
+
+**Decision.** The app, not the daemon, keeps the history: the daemon stays free of stored
+text. One SQLite file (`history.sqlite` in the app's data folder) through Qt SQL; each entry
+keeps its time, action, preset or language and app name in clear (to list and filter), and
+its text and result sealed with AES-256-GCM (libcrypto, a random 96-bit nonce per field). The
+key is 32 bytes derived (HKDF-SHA256) from a secret the desktop keeps: the Secret portal's
+app secret first, else one stored in the Secret Service under "Paraphrase history". Without
+either, history cannot be turned on and Settings says why. Search decrypts in memory. Delete
+all removes the file and forgets the stored secret. The key also mixes in a random salt kept in
+the file, so a portal secret that cannot be forgotten still opens nothing once the file is
+gone, and a sealed check value tells a wrong key from a damaged file (the file is then left as
+it was and Settings offers Delete all). Old entries are deleted from their clear times, so
+pruning at start needs no keyring.
+
+**Consequences.** Text never reaches the disk unsealed; the metadata (when, which action,
+which app) does, which the Privacy page says. A lost keyring makes the history unreadable,
+which is the point. The snap needs the `password-manager-service` plug only for the Secret
+Service fallback; the portal needs nothing. Unverified: the portal's app secret for an
+unsandboxed app on GNOME (KDE answers it).

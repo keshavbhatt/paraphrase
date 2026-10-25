@@ -56,6 +56,7 @@ QPushButton:focus { border: 1px solid @accent@; }
 QPushButton:disabled { color: @muted@; }
 QPushButton[kind="flat"] { background: transparent; border-color: transparent; }
 QPushButton[kind="flat"]:hover { background: @hover@; }
+QPushButton[kind="flat"]:checked { background: @accentSoft@; color: @accent@; }
 QPushButton[kind="link"] { background: transparent; border-color: transparent; color: @link@; min-height: 26px; padding: 0 8px; }
 QPushButton[kind="link"]:hover { background: @hover@; }
 QPushButton[kind="icon"] { padding: 0; min-width: 32px; max-width: 32px; min-height: 32px; max-height: 32px; }
@@ -110,6 +111,24 @@ QLabel[role="kbd"] { border: 1px solid @border@; border-bottom-width: 2px; borde
 QPushButton[kind="tone"] { border-radius: 16px; min-height: 30px; padding: 0 12px; font-size: 13px; }
 QPushButton[kind="tone"]:checked { background: @accentStrong@; border-color: @accentStrong@; color: @accentText@;
     font-weight: 500; }
+QPushButton[kind="danger"] { background: transparent; border-color: transparent; color: @danger@; }
+QPushButton[kind="danger"]:hover { background: @hover@; }
+QPushButton[kind="dangerSolid"] { background: @danger@; border-color: @danger@; color: @accentText@; font-weight: 500; }
+QPushButton[kind="dangerOutline"] { color: @danger@; }
+QPushButton[kind="pill"] { background: @hover@; color: @muted@; border: none; border-radius: 11px; padding: 0 9px;
+    min-height: 22px; max-height: 22px; font-size: 12px; }
+QPushButton[kind="pill"]:hover { color: @text@; }
+QFrame#confirm { border: 1px solid @danger@; border-radius: 10px; }
+QPushButton[kind="filter"] { border-radius: 14px; min-height: 26px; max-height: 28px; padding: 0 11px; font-size: 12px; }
+QPushButton[kind="filter"]:checked { background: @accentStrong@; border-color: @accentStrong@; color: @accentText@;
+    font-weight: 500; }
+QPlainTextEdit[role="box"] { padding: 10px 12px; }
+QPlainTextEdit[role="box"][sunk="true"] { background: @sunk@; border-color: transparent; }
+QListWidget#historyList { background: transparent; border: none; outline: 0; }
+QFrame#search { background: @input@; border: 1px solid @border@; border-radius: 8px; }
+QFrame#search QLineEdit { background: transparent; border: none; padding: 0; }
+QLabel[role="h2"] { font-size: 15px; font-weight: 600; }
+QLabel[role="day"] { color: @muted@; font-size: 11px; font-weight: 700; letter-spacing: 1px; }
 
 QMenu { background: @elevated@; color: @text@; border: 1px solid @border@; border-radius: 8px; padding: 4px; }
 QMenu::item { padding: 6px 18px; border-radius: 6px; }

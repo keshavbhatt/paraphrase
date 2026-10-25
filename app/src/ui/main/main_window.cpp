@@ -1,11 +1,13 @@
 #include "ui/main/main_window.h"
 
+#include "history/history_keeper.h"
 #include "ui/core/facts_check.h"
 #include "ui/core/languages.h"
 #include "ui/core/request_runner.h"
 #include "ui/core/result_summary.h"
 #include "ui/core/user_actions_client.h"
 #include "ui/main/bars.h"
+#include "ui/main/history_view.h"
 #include "ui/main/input_pane.h"
 #include "ui/main/output_pane.h"
 #include "ui/parts/action_bar.h"
@@ -79,8 +81,8 @@ void MainWindow::buildUi()
     m_panes->addWidget(m_input);
     m_panes->addWidget(m_output);
 
-    auto* body = new QWidget;
-    auto* main = new QVBoxLayout(body);
+    m_body = new QWidget;
+    auto* main = new QVBoxLayout(m_body);
     main->setContentsMargins(16, 14, 16, 16);
     main->setSpacing(14);
     main->addWidget(m_actions);
@@ -91,13 +93,14 @@ void MainWindow::buildUi()
     root->setSpacing(0);
     root->addWidget(m_header);
     root->addWidget(m_notice);
-    root->addWidget(body, 1);
+    root->addWidget(m_body, 1);
     root->addWidget(m_status);
 }
 
 void MainWindow::connectParts()
 {
     connect(m_header, &HeaderBar::settingsClicked, this, &MainWindow::settingsRequested);
+    connect(m_header, &HeaderBar::historyClicked, this, [this] { showHistory(!historyOpen()); });
     connect(m_notice, &NoticeBar::linkClicked, this, &MainWindow::shortcutHelpRequested);
     connect(m_actions, &ActionBar::chosen, this, [this](const QString& id, const QString& lang) {
         m_targetLang = lang;
@@ -157,6 +160,60 @@ void MainWindow::connectParts()
             &MainWindow::cancel);
 }
 
+void MainWindow::setHistory(history::Keeper* keeper)
+{
+    if (m_history != nullptr || keeper == nullptr) {
+        return;
+    }
+    m_history = keeper;
+    m_historyView = new HistoryView(*keeper);
+    m_historyView->hide();
+    static_cast<QVBoxLayout*>(layout())->insertWidget(layout()->indexOf(m_body) + 1, m_historyView, 1);
+    m_historyView->applyTheme(m_tokens);
+    m_header->setHistoryShown(true);
+    connect(m_historyView, &HistoryView::backRequested, this, [this] { showHistory(false); });
+    connect(m_historyView, &HistoryView::privacyRequested, this, &MainWindow::privacyRequested);
+    connect(m_historyView, &HistoryView::useAgain, this, &MainWindow::useAgain);
+    connect(new QShortcut(QKeySequence(u"Ctrl+H"_s), this), &QShortcut::activated, this,
+            [this] { showHistory(!historyOpen()); });
+}
+
+void MainWindow::showHistory(bool open)
+{
+    if (m_historyView == nullptr) {
+        return;
+    }
+    // In place of the panes; the text on the left stays as it was (note 1).
+    m_body->setVisible(!open);
+    m_status->setVisible(!open);
+    m_historyView->setVisible(open);
+    m_header->setHistoryOpen(open);
+    if (open) {
+        m_historyView->reload();
+        m_historyView->setFocus();
+    } else {
+        m_input->setFocus();
+    }
+}
+
+bool MainWindow::historyOpen() const
+{
+    return m_historyView != nullptr && !m_historyView->isHidden();
+}
+
+void MainWindow::useAgain(const history::Entry& entry)
+{
+    // The text back on the left with the same action and options, ready to run (note 4).
+    showHistory(false);
+    m_targetLang = QJsonDocument::fromJson(entry.options).object().value(u"target_lang"_s).toString();
+    if (m_catalog.find(entry.skillId) != nullptr) {
+        selectSkill(entry.skillId);
+    }
+    m_input->page()->setSubject(entry.text);
+    m_ran = false;
+    m_output->textView()->showMessage(tr("Your text is back. Run it again with Ctrl+Enter."), false);
+}
+
 void MainWindow::applyTheme()
 {
     m_tokens = Theme::current();
@@ -168,6 +225,9 @@ void MainWindow::applyTheme()
     m_input->composeInput()->applyTheme(m_tokens);
     m_output->applyTheme(m_tokens);
     m_status->applyTheme(m_tokens);
+    if (m_historyView != nullptr) {
+        m_historyView->applyTheme(m_tokens);
+    }
 }
 
 void MainWindow::changeEvent(QEvent* event)
@@ -333,6 +393,7 @@ void MainWindow::run()
     }
     // "Another version", "3 new ones" and Retry ask for one that differs; a first run does not.
     const bool variety = std::exchange(m_variety, false);
+    m_lastVariety = variety;
     if (const QString problem = m_runner->start(m_skill, in, variety); !problem.isEmpty()) {
         m_output->textView()->showMessage(problem, true);
         Q_EMIT finished();
@@ -455,11 +516,12 @@ void MainWindow::onFinished(const QJsonObject& result)
             m_output->fullView()->addVersion(output);
             m_output->setInfo(tr("· shorter version"));
         }
+        keepInHistory(true, {});
         Q_EMIT finished();
         return;
     }
+    QStringList replies;
     if (kind == SkillKind::QuickReply) {
-        QStringList replies;
         for (const auto& v : result.value(u"replies"_s).toArray()) {
             replies.append(v.toString());
         }
@@ -472,8 +534,36 @@ void MainWindow::onFinished(const QJsonObject& result)
         m_output->textView()->showText(output);
     }
     showResult(result);
+    keepInHistory(m_lastVariety, replies.join(u"\n\n"_s));
     loadStatus(); // the model that answered, and its memory
     Q_EMIT finished();
+}
+
+void MainWindow::keepInHistory(bool sameRun, const QString& replies)
+{
+    const SkillInfo* s = m_catalog.find(m_skill);
+    if (m_history == nullptr || s == nullptr) {
+        return;
+    }
+    // Quick replies keep all three; a chosen or polite one replaces them when copied.
+    const QString result = replies.isEmpty() ? resultText() : replies;
+    if (sameRun && m_historyId != 0 && m_history->update(m_historyId, result)) {
+        return; // another version of the same run: the entry keeps the newest
+    }
+    const bool chosen = !m_targetLang.isEmpty() && m_catalog.picksLanguage(s->base);
+    const bool proofread = s->base == u"proofread"_s && m_output->textView()->hasDiff();
+    history::Entry entry;
+    entry.skillId = m_skill;
+    entry.label = historyLabel(*s, chosen ? languageName(m_detector, m_targetLang) : QString(),
+                               proofread ? static_cast<int>(m_output->textView()->changeCount()) : -1);
+    entry.text = m_requestInput;
+    entry.result = result;
+    QJsonObject options;
+    if (!m_targetLang.isEmpty()) {
+        options.insert(u"target_lang"_s, m_targetLang);
+    }
+    entry.options = QJsonDocument(options).toJson(QJsonDocument::Compact);
+    m_historyId = m_history->record(entry);
 }
 
 void MainWindow::showResult(const QJsonObject& result)
@@ -549,6 +639,9 @@ void MainWindow::copyResult()
     const QString text = resultText();
     if (!text.isEmpty()) {
         QApplication::clipboard()->setText(text);
+        if (m_history != nullptr && m_historyId != 0) {
+            m_history->update(m_historyId, text); // the version copied, edited or not
+        }
         m_output->setInfo(m_output->info() + tr(" · copied"));
     }
 }

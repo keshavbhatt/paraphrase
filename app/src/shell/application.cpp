@@ -1,6 +1,7 @@
 #include "shell/application.h"
 
 #include "daemon_client.h"
+#include "history/history_keeper.h"
 #include "integration/integrations.h"
 #include "popup/popup_controller.h"
 #include "shell/app_flow.h"
@@ -22,7 +23,10 @@ Application::Application(QObject* parent)
     , m_popup(new PopupController(*m_integrations, m_client.get(), this))
     , m_service(new AppService(this))
     , m_preferences(new Preferences(this))
+    , m_history(new history::Keeper(this))
 {
+    m_flow->setHistory(m_history);
+    m_popup->setHistory(m_history);
     if (TrayIcon::available()) {
         m_tray = new TrayIcon(this);
         m_tray->applyTheme(Theme::current());
