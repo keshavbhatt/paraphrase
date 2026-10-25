@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Paraphrase mock: Settings, privacy and history</title><link rel="stylesheet" href="mock.css"><script src="mock.js"></script>
+<style>
+  .opt { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .opt:last-child { border-bottom: 0; }
+  .opt .what { flex: 1; min-width: 0; }
+  .switch { width: 38px; height: 22px; border-radius: 11px; background: var(--border); position: relative; flex: none; margin-top: 2px; }
+  .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 8px; background: var(--panel); }
+  .switch.on { background: var(--accent-strong); }
+  .switch.on::after { left: 19px; }
+  .facts { display: grid; grid-template-columns: max-content 1fr; gap: 6px 16px; font-size: 13px; }
+  .facts dt { color: var(--muted); }
+  .facts dd { margin: 0; }
+  .confirm { border: 1px solid var(--danger); border-radius: 10px; padding: 12px 14px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+  .btn.dangerfill { background: var(--danger); border-color: var(--danger); color: #FFFFFF; font-weight: 500; }
+  .state { max-width: 1180px; margin: 24px auto 0; padding: 0 16px; }
+</style></head>
+<body>
+<p class="state cap">a. History off (the default)</p>
+<div class="window" style="margin-top: 8px">
+  <div class="titlebar"><div class="lights"><i></i><i></i><i></i></div><div class="title">Paraphrase settings</div><div class="wc"><span>−</span><span>□</span><span>✕</span></div></div>
+  <div class="settings">
+    <nav aria-label="Settings sections">
+      <a href="#">General</a><a href="#">Shortcut</a><a href="#">My actions</a>
+      <a href="#">Models</a><a class="on" href="#" aria-current="page">Privacy</a><a href="#">About</a>
+    </nav>
+    <main>
+      <h1>Privacy</h1>
+      <p style="max-width: 640px">What you write is read by the model on this computer and nowhere else. There is no account and no usage data. Paraphrase goes online only to download a model you chose.</p>
+      <section class="card">
+        <div class="opt"><div class="what"><b>Keep a history</b><p class="small muted">Keep what you worked on and the results, so you can copy or reuse them later. Off: nothing you write is kept after you close it.</p></div><span class="switch" role="switch" aria-checked="false" aria-label="Keep a history"></span></div>
+      </section>
+    </main>
+  </div>
+  <span class="pin" style="left: 790px; top: 190px">1</span>
+</div>
+
+<p class="state cap">b. History on</p>
+<div class="window" style="margin-top: 8px">
+  <div class="titlebar"><div class="lights"><i></i><i></i><i></i></div><div class="title">Paraphrase settings</div><div class="wc"><span>−</span><span>□</span><span>✕</span></div></div>
+  <div class="settings">
+    <nav aria-label="Settings sections">
+      <a href="#">General</a><a href="#">Shortcut</a><a href="#">My actions</a>
+      <a href="#">Models</a><a class="on" href="#" aria-current="page">Privacy</a><a href="#">About</a>
+    </nav>
+    <main>
+      <h1>Privacy</h1>
+      <p style="max-width: 640px">What you write is read by the model on this computer and nowhere else. There is no account and no usage data. Paraphrase goes online only to download a model you chose.</p>
+      <section class="card">
+        <div class="opt"><div class="what"><b>Keep a history</b><p class="small muted">Keep what you worked on and the results, so you can copy or reuse them later. Open it from History in the main window.</p></div><span class="switch on" role="switch" aria-checked="true" aria-label="Keep a history"></span></div>
+        <div class="opt"><div class="what"><b>Keep entries for</b><p class="small muted">Older entries are deleted on their own.</p></div><select class="input" aria-label="Keep entries for"><option>7 days</option><option selected>30 days</option><option>1 year</option><option>Until I delete them</option></select></div>
+        <div class="opt"><div class="what"><b>Not from these apps</b><p class="small muted">Text from these apps is never kept, even with history on.</p>
+          <div class="row wrap" style="margin-top: 8px"><span class="pill">KeePassXC ✕</span><span class="pill">Bitwarden ✕</span><button class="btn flat"><svg class="ic s"><use href="#i-plus"/></svg>Add an app</button></div></div></div>
+        <div class="opt"><div class="what">
+          <dl class="facts">
+            <dt>Kept</dt><dd>142 entries, the oldest from 26 September</dd>
+            <dt>Where</dt><dd class="row" style="gap: 6px"><span class="private"><svg class="ic s"><use href="#i-lock"/></svg></span>Encrypted on this computer, with a key in your system's keyring</dd>
+            <dt>Size</dt><dd>1.2 MB</dd>
+          </dl></div>
+          <button class="btn danger"><svg class="ic s"><use href="#i-trash"/></svg>Delete all history</button></div>
+      </section>
+    </main>
+  </div>
+  <span class="pin" style="left: 790px; top: 190px">2</span>
+  <span class="pin" style="left: 790px; top: 262px">3</span>
+  <span class="pin" style="left: 790px; top: 336px">4</span>
+  <span class="pin" style="left: 790px; top: 440px">5</span>
+</div>
+
+<p class="state cap">c. Delete all history, asked on the page</p>
+<div class="window" style="margin-top: 8px">
+  <div class="titlebar"><div class="lights"><i></i><i></i><i></i></div><div class="title">Paraphrase settings</div><div class="wc"><span>−</span><span>□</span><span>✕</span></div></div>
+  <div class="settings">
+    <nav aria-label="Settings sections">
+      <a href="#">General</a><a href="#">Shortcut</a><a href="#">My actions</a>
+      <a href="#">Models</a><a class="on" href="#" aria-current="page">Privacy</a><a href="#">About</a>
+    </nav>
+    <main>
+      <h1>Privacy</h1>
+      <section class="card">
+        <div class="opt"><div class="what">
+          <dl class="facts">
+            <dt>Kept</dt><dd>142 entries, the oldest from 26 September</dd>
+            <dt>Size</dt><dd>1.2 MB</dd>
+          </dl></div></div>
+        <div class="confirm" role="alertdialog" aria-label="Delete all history">
+          <span class="grow"><b>Delete all 142 entries?</b> <span class="small muted">This cannot be undone. History stays on for what comes next.</span></span>
+          <button class="btn">Keep them</button>
+          <button class="btn dangerfill"><svg class="ic s"><use href="#i-trash"/></svg>Delete all</button>
+        </div>
+      </section>
+    </main>
+  </div>
+  <span class="pin" style="left: 790px; top: 190px">6</span>
+</div>
+
+<section class="notes"><h2>Notes</h2><ol>
+  <li><b>Off by default</b> (PLAN D13). With it off, nothing the user writes outlives the window or popup it was written in: no file, no log, no cache of text.</li>
+  <li><b>On</b>: every finished run in the main window or the popup keeps one entry: the action, the text, the result the user saw last (the edited one when they edited it, the version they copied or replaced with), the app it came from, and the time. Stopped and failed runs are not kept. A run that only read ahead is never kept.</li>
+  <li><b>Keep entries for</b> 7 days, 30 days (the default), 1 year or until deleted; older entries go on their own, when the app starts and once a day.</li>
+  <li><b>Not from these apps</b>: password managers are listed from the start (KeePassXC, Bitwarden, 1Password, KeePass), and the user adds others; the popup knows the app a text came from. The main window has no app, so its runs are always kept while history is on.</li>
+  <li><b>Where</b>: an encrypted SQLite file in the app's data folder, its key in the system keyring (KWallet, GNOME Keyring through the Secret portal); without a keyring the switch stays off and says why. "Delete all history" removes the file and its key.</li>
+  <li><b>Asked on the page</b>, not in a dialog: Delete all, or Keep them. Turning history off asks the same question ("Delete the 142 entries kept so far?"), with Keep them as the default.</li>
+</ol></section>
+</body></html>
