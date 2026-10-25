@@ -10,8 +10,8 @@
   .pane .pb { flex: 1; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-height: 0; }
   .pane .pf { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 14px; border-top: 1px solid var(--border); }
   .search { display: flex; align-items: center; gap: 8px; border: 1px solid var(--border); border-radius: 8px; background: var(--input); padding: 0 10px; min-height: 36px; color: var(--muted); }
-  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
-  .chips .tone { min-height: 28px; font-size: 12px; }
+  .chips { display: flex; flex-wrap: nowrap; gap: 6px; overflow: hidden; }
+  .chips .tone { display: inline-flex; align-items: center; gap: 4px; height: 28px; min-height: 28px; padding: 0 11px; border-radius: 14px; font-size: 12px; white-space: nowrap; flex: none; }
   .day { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 8px 2px 2px; }
   .entry { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 4px 10px; align-items: center; padding: 9px 10px; border-radius: 8px; }
   .entry:hover { background: var(--hover); }
@@ -36,7 +36,7 @@
       <span class="grow"></span>
       <span class="private"><svg class="ic s"><use href="#i-lock"/></svg>On this device</span>
       <button class="btn flat on" aria-pressed="true"><svg class="ic s"><use href="#i-history"/></svg>History</button>
-      <button class="btn flat">Settings</button>
+      <button class="btn flat"><svg class="ic s"><use href="#i-settings"/></svg>Settings</button>
     </div>
     <div class="hist">
       <section class="pane" aria-label="Entries">
@@ -44,7 +44,7 @@
         <div class="pb">
           <div class="search"><svg class="ic s"><use href="#i-search"/></svg><span>Search your history</span></div>
           <div class="chips" role="group" aria-label="Show">
-            <span class="tone on">All</span><span class="tone">Proofread</span><span class="tone">Tone</span><span class="tone">Reply</span><span class="tone">Write</span><span class="tone">Translate</span><span class="tone">More</span>
+            <span class="tone on">All</span><span class="tone">Proofread</span><span class="tone">Tone</span><span class="tone">Reply</span><span class="tone">More<svg class="ic s muted"><use href="#i-down"/></svg></span>
           </div>
           <div class="day">Today</div>
           <div class="entry on">
@@ -106,7 +106,7 @@
       <span class="grow"></span>
       <span class="private"><svg class="ic s"><use href="#i-lock"/></svg>On this device</span>
       <button class="btn flat on" aria-pressed="true"><svg class="ic s"><use href="#i-history"/></svg>History</button>
-      <button class="btn flat">Settings</button>
+      <button class="btn flat"><svg class="ic s"><use href="#i-settings"/></svg>Settings</button>
     </div>
     <div class="empty">
       <div class="stack" style="align-items: center; gap: 10px; max-width: 460px">
@@ -122,7 +122,7 @@
 
 <section class="notes"><h2>Notes</h2><ol>
   <li><b>History</b> sits in the window's header beside Settings and opens in place of the two panes; "Back to writing" returns with the text as it was. Ctrl+H opens it too. The popup has no history of its own: its runs land here.</li>
-  <li><b>Search and filter</b>: search looks through the text and the result of every entry (on this computer, in the decrypted database); the chips filter by action. Entries come newest first, grouped by day.</li>
+  <li><b>Search and filter</b>: search looks through the text and the result of every entry (on this computer, in the decrypted database); the chips filter by action, one row of them, the other actions (Write, Summarize, Format, Translate, My actions) under More. Entries come newest first, grouped by day.</li>
   <li><b>One line per entry</b>: the action with its preset or language, the app it came from (or none for the window), the time, and the start of the result. Arrow keys move through them; Enter copies the result.</li>
   <li><b>The entry</b>: the text and the result as kept (for Proofread, the diff as in main-window.html). Copy result copies it; Use again puts the text back on the left with the same action and options, ready to run; the bin deletes this entry alone, asked on the page.</li>
   <li><b>Where it lives</b> is always said at the bottom, with a way to the privacy settings (settings-privacy.html).</li>
