@@ -14,6 +14,19 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-25 - The popup's fixes checked live; the daemon comes back after its idle exit
+
+- Live check on KDE Wayland of the popup fixes from 2026-10-23: the popup fits its content,
+  number keys open the Tone menu on its first item, the language list scrolls (End reaches the
+  last language), and a run shows the working pill and the shape of the answer in the result's
+  own outline, the answer then about as tall.
+- Found on the way: after 30 quiet minutes the daemon exits (`--idle-exit`) and the app's
+  client still counted itself connected, so the popup said "Paraphrase is not running" and a
+  run in the main window would fail. Before each call the client now starts the daemon again
+  when its name is gone (or the private daemon has ended). Checked live: the daemon stopped,
+  the shortcut opened the popup with its actions and a new daemon. A longer status line in the
+  popup wraps instead of stopping mid-sentence.
+
 ## 2026-10-24 - Full reply never offers a password, code or card details
 
 - Full reply (draft 11): a reply to a phishing message no longer offers to send card details,
