@@ -1,9 +1,9 @@
 # reply with gemma-4-e2b-qat-q4_0
 
-Profile `B-cpu`, skill version 5, run 2026-10-24 23:55.
+Profile `B-cpu`, skill version 5, run 2026-10-26 00:42.
 
 | group | n | ttft_s_median | total_s_median | gen_tps_median | retried_pct | valid_pct | distinct_pct | over_15_words_pct | language floor failures |
 |---|---|---|---|---|---|---|---|---|---|
-| all | 5 | 1.35 | 3.054 | 20.0 | 0.0 | 100.0 | 100.0 | 0.0 | none |
-| lang=en | 5 | 1.35 | 3.054 | 20.0 | 0.0 | 100.0 | 100.0 | 0.0 | none |
-| set=generated | 5 | 1.35 | 3.054 | 20.0 | 0.0 | 100.0 | 100.0 | 0.0 | none |
+| all | 5 | 1.441 | 2.832 | 21.3 | 0.0 | 100.0 | 100.0 | 0.0 | none |
+| lang=en | 5 | 1.441 | 2.832 | 21.3 | 0.0 | 100.0 | 100.0 | 0.0 | none |
+| set=generated | 5 | 1.441 | 2.832 | 21.3 | 0.0 | 100.0 | 100.0 | 0.0 | none |

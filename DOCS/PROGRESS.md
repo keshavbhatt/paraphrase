@@ -14,6 +14,38 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-25 (night) - History, off by default, kept encrypted on this computer
+
+- Mocks `settings-privacy.html` and `main-window-history.html`, approved by the owner on
+  2026-10-25 (recorded in DOCS/mocks/index.html) (after one round: the filter pills on one row, a gear on Settings), and built:
+  - Settings, Privacy: "Keep a history" (off by default, PLAN D13); keep entries for 7 days,
+    30 days (the default), 1 year or until deleted; "Not from these apps" with KeePassXC,
+    Bitwarden, 1Password and KeePass from the start; what is kept, where and its size; Delete
+    all, asked on the page; turning off asks whether to delete what was kept, keeping it by
+    default. Without a keyring the switch stays off and says why.
+  - The main window: History beside Settings (Ctrl+H) in place of the panes; entries by day,
+    newest first, search through text and result, filters (All, Proofread, Tone, Reply, More);
+    the open entry with Copy result, Use again (text, action and language back on the left)
+    and delete, asked in its header; the off state with "Turn on history".
+  - Kept: each finished run in the window or the popup, with the app it came from; another
+    version, Retry, a shorter or politer rewrite and an edited copy update the same entry.
+    Stopped and failed runs and the popup's read-ahead are never kept.
+- Another version, Retry and "3 new ones" now ask the daemon for `variety`: a sampled skill
+  runs at temperature 0.95 with a fresh seed, so the new version differs (owner report: it came
+  back almost the same). Checked live on Casual: the variety runs also changed the sentence's
+  shape, not only a word.
+- Full reply 12: notes that begin mid-thought ("until we fix X, you can do Y") no longer turn
+  into a refusal (the owner's .de email case). Signing with the greeted name was tried and
+  dropped: the small model then wrote "[Your Name]". Numbers in DOCS/models.md.
+- ADR-017: an SQLite file in the app's data folder; text, result and options sealed with
+  AES-256-GCM, the key from the desktop's keyring (Secret portal, else Secret Service) and a
+  salt in the file. Tests: `tst_history` (sealing, a wrong key, delete all, nothing in clear on
+  disk) and history cases in the window, settings and popup tests; screenshots of both screens
+  in light and dark compared with the mocks.
+- Not checked live: turning history on against the real keyring, which stores a secret in the
+  owner's KWallet; left for the owner. Still open: E2B offers a PIN to the Hindi scam item in
+  about 1 run in 10 (revision 11 the same).
+
 ## 2026-10-25 (evening) - The popup moves, shows it is working, and Tone keeps a chosen language
 
 - Mock `popup-working.html`, approved by the owner on 2026-10-25, and built:
