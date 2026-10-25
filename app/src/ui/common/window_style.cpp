@@ -42,6 +42,7 @@ QFrame#modelCard { background: @panel@; border: 1px solid @border@; border-radiu
 QFrame#modelCard[on="true"] { border: 2px solid @accent@; }
 QFrame#modelCard[enabled="false"] { background: @sunk@; }
 QFrame#lang { border: 1px solid @border@; border-radius: 10px; }
+QLabel[role="strong"] { font-weight: 600; }
 QFrame#rule { border: none; background: @border@; max-height: 1px; min-height: 1px; }
 
 QProgressBar { background: @border@; border: none; border-radius: 3px; max-height: 6px; min-height: 6px; }

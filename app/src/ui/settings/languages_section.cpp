@@ -19,9 +19,9 @@ QFrame* testedBox(const QString& name)
     auto* col = new QVBoxLayout(box);
     col->setContentsMargins(14, 11, 14, 11);
     col->setSpacing(2);
-    QLabel* title = makeLabel(name);
-    title->setStyleSheet(u"font-weight: 600;"_s);
-    col->addWidget(title);
+    // A style role, not a widget style sheet: that one measured the label in another font, and
+    // the descenders were cut ("Enalish").
+    col->addWidget(makeLabel(name, u"strong"_s));
     col->addWidget(makeLabel(LanguagesSection::tr("Tested · all actions"), u"success"_s));
     return box;
 }

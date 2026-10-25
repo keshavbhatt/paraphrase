@@ -116,7 +116,7 @@ QWidget* InstalledModelsTable::nameCell(const QString& name, const QString& deta
     col->setContentsMargins(0, 10, 0, 10);
     col->setSpacing(1);
     QLabel* title = makeLabel(name);
-    title->setStyleSheet(u"font-weight: 600;"_s);
+    title->setProperty("role", u"strong"_s); // not a widget style sheet: it clipped descenders
     col->addWidget(title);
     col->addWidget(makeLabel(detail, u"small"_s));
     return cell;
