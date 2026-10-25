@@ -275,6 +275,16 @@ QWidget* PopupResultPage::buildBody()
     layout->addLayout(infoRow);
     m_pick = makeLabel(tr("PICK A REPLY"), u"caption"_s);
     layout->addWidget(m_pick);
+    layout->addWidget(buildResults());
+    m_otherLanguage = buildLanguageLink();
+    layout->addWidget(m_otherLanguage, 0, Qt::AlignLeft);
+    connect(m_view, &SegmentedControl::changed, this,
+            [this](int index) { m_text->setShowResult(index == 1); });
+    return body;
+}
+
+QWidget* PopupResultPage::buildResults()
+{
     // One result view shows at a time. Not a QStackedWidget: that is as tall as its tallest
     // page (three reply cards), which left an empty band under a short text result.
     m_results = new QWidget;
@@ -296,12 +306,7 @@ QWidget* PopupResultPage::buildBody()
     views->addWidget(m_skeleton);
     m_replies->hide();
     m_skeleton->hide();
-    layout->addWidget(m_results);
-    m_otherLanguage = buildLanguageLink();
-    layout->addWidget(m_otherLanguage, 0, Qt::AlignLeft);
-    connect(m_view, &SegmentedControl::changed, this,
-            [this](int index) { m_text->setShowResult(index == 1); });
-    return body;
+    return m_results;
 }
 
 QWidget* PopupResultPage::buildLanguagePill()
@@ -420,8 +425,11 @@ void PopupResultPage::begin(SkillKind kind, const QString& title, const QString&
 
 void PopupResultPage::showView(QWidget* view)
 {
-    for (QWidget* w : {static_cast<QWidget*>(m_text), static_cast<QWidget*>(m_replies),
-                       static_cast<QWidget*>(m_skeleton)}) {
+    for (QWidget* w : {
+             static_cast<QWidget*>(m_text),
+             static_cast<QWidget*>(m_replies),
+             static_cast<QWidget*>(m_skeleton),
+         }) {
         w->setVisible(w == view);
     }
 }

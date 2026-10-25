@@ -123,6 +123,7 @@ private:
     [[nodiscard]] QWidget* buildFoot();
     [[nodiscard]] QPushButton* buildLanguageLink();
     [[nodiscard]] QWidget* buildLanguagePill();
+    [[nodiscard]] QWidget* buildResults();
     void updateButtons();
     void showResultView();
     void showView(QWidget* view);
