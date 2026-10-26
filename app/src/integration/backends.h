@@ -61,6 +61,42 @@ public:
     [[nodiscard]] virtual bool available() const = 0;
     /// The text now, or nothing when there is none. Never logged (CLAUDE.md).
     [[nodiscard]] virtual std::optional<CapturedText> capture() = 0;
+
+    /// Text a result was just put in place of. It is gone from the app, so a selection that
+    /// still reads as it is stale: some apps (a browser's canvas editor, a select-all from
+    /// the keyboard) never update the highlighted text, and the popup opened on the old text.
+    /// `clipboard` is what the clipboard held then, and holds again once the paste restores
+    /// it: after a stale selection it counts only once the user copies something new.
+    void setReplaced(const QString& text, const QString& clipboard)
+    {
+        m_replaced = text.trimmed();
+        m_clipboardThen = clipboard.trimmed();
+    }
+    /// The last capture passed over that stale text.
+    [[nodiscard]] bool skippedReplaced() const { return m_skipped; }
+
+protected:
+    /// For the backends: call first in capture().
+    void beginCapture() { m_skipped = false; }
+    /// For the backends: true, and noted, for a selection that is only the replaced text.
+    [[nodiscard]] bool isReplaced(const QString& selection)
+    {
+        const bool gone = !m_replaced.isEmpty() && selection.trimmed() == m_replaced;
+        m_skipped = m_skipped || gone;
+        return gone;
+    }
+    /// For the backends: the same for the clipboard, which after a stale selection must also
+    /// have changed since the result went in.
+    [[nodiscard]] bool isStaleClipboard(const QString& copied)
+    {
+        const bool unchanged = m_skipped && copied.trimmed() == m_clipboardThen;
+        return isReplaced(copied) || unchanged;
+    }
+
+private:
+    QString m_replaced;
+    QString m_clipboardThen;
+    bool m_skipped = false;
 };
 
 /// Puts a result back where the text came from, only after an explicit user action

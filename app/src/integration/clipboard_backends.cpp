@@ -14,14 +14,16 @@ QString ClipboardCapture::name() const
 
 std::optional<CapturedText> ClipboardCapture::capture()
 {
+    beginCapture();
     const QClipboard* clipboard = QGuiApplication::clipboard();
     if (clipboard->supportsSelection()) {
-        if (const QString selected = clipboard->text(QClipboard::Selection); !selected.trimmed().isEmpty()) {
+        if (const QString selected = clipboard->text(QClipboard::Selection);
+            !selected.trimmed().isEmpty() && !isReplaced(selected)) {
             return CapturedText{.text = selected, .origin = u"selection"_s, .appName = {}, .window = {}};
         }
     }
     const QString copied = clipboard->text(QClipboard::Clipboard);
-    if (copied.trimmed().isEmpty()) {
+    if (copied.trimmed().isEmpty() || isStaleClipboard(copied)) {
         return std::nullopt;
     }
     return CapturedText{.text = copied, .origin = u"clipboard"_s, .appName = {}, .window = {}};

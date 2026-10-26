@@ -24,6 +24,15 @@ An X11 app on a Wayland session (Xwayland, `QT_QPA_PLATFORM=xcb`) gets no key gr
 XTest: Xwayland drops XTest input and only grabs keys for X windows. `x11::isXwayland` makes
 those backends step aside and the portals take over.
 
+## A highlighted text that went stale
+
+Some apps never update the highlighted text: a browser's canvas editor, or a select-all from the
+keyboard. After a result was put in place of a text, the PRIMARY selection can still hold the
+old text, and the next popup opened on it (owner report, 2026-10-26). Every capture backend now
+skips a selection (or clipboard) that reads as the text just replaced, which is gone from the
+app. After such a skip the clipboard counts only if it changed since the result went in; else
+the popup asks the user to copy the new text with Ctrl+C.
+
 ## Never typing into the wrong window
 
 Text is typed only into the window the text came from (PLAN 6). The window is recorded when

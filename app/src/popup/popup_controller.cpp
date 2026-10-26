@@ -152,7 +152,10 @@ void PopupController::showText(const CapturedText& text)
         return;
     }
     if (text.text.trimmed().isEmpty()) {
-        page->setStatus(tr("Select or copy some text first, then open Paraphrase again."));
+        page->setStatus(m_integrations.capture().skippedReplaced()
+                            ? tr("Paraphrase could not read the new selection here. Copy it with Ctrl+C, "
+                                 "then open Paraphrase again.")
+                            : tr("Select or copy some text first, then open Paraphrase again."));
         return;
     }
     readAhead();
@@ -385,8 +388,11 @@ void PopupController::insert()
     if (m_history != nullptr && m_historyId != 0) {
         m_history->update(m_historyId, text); // the version put back, edited or not
     }
+    // The clipboard before the paste, which the paste puts back (read while the popup has focus).
+    const QString clipboardThen = QGuiApplication::clipboard()->text();
     const InsertOutcome outcome = m_integrations.insert().insert(text, m_text);
     if (outcome == InsertOutcome::Typed) {
+        m_integrations.capture().setReplaced(m_text.text, clipboardThen); // gone from the app now
         m_window->close();
         return;
     }

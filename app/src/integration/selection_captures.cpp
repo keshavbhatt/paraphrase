@@ -22,13 +22,14 @@ QString DataControlCapture::name() const
 
 std::optional<CapturedText> DataControlCapture::capture()
 {
+    beginCapture();
     CapturedText out;
     if (const auto selected = m_client->readText(DataControlClient::Which::Selection);
-        selected && !selected->trimmed().isEmpty()) {
+        selected && !selected->trimmed().isEmpty() && !isReplaced(*selected)) {
         out.text = *selected;
         out.origin = u"selection"_s;
     } else if (const auto copied = m_client->readText(DataControlClient::Which::Clipboard);
-               copied && !copied->trimmed().isEmpty()) {
+               copied && !copied->trimmed().isEmpty() && !isStaleClipboard(*copied)) {
         out.text = *copied;
         out.origin = u"clipboard"_s;
     } else {
@@ -50,12 +51,15 @@ bool X11SelectionCapture::available() const
 
 std::optional<CapturedText> X11SelectionCapture::capture()
 {
+    beginCapture();
     const QClipboard* clipboard = QGuiApplication::clipboard();
     CapturedText out;
-    if (const QString selected = clipboard->text(QClipboard::Selection); !selected.trimmed().isEmpty()) {
+    if (const QString selected = clipboard->text(QClipboard::Selection);
+        !selected.trimmed().isEmpty() && !isReplaced(selected)) {
         out.text = selected;
         out.origin = u"selection"_s;
-    } else if (const QString copied = clipboard->text(QClipboard::Clipboard); !copied.trimmed().isEmpty()) {
+    } else if (const QString copied = clipboard->text(QClipboard::Clipboard);
+               !copied.trimmed().isEmpty() && !isStaleClipboard(copied)) {
         out.text = copied;
         out.origin = u"clipboard"_s;
     } else {

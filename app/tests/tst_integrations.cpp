@@ -88,6 +88,21 @@ private Q_SLOTS:
         QCOMPARE(i.insert().insert(u"the result"_s, got), InsertOutcome::OnClipboard);
         QCOMPARE(QGuiApplication::clipboard()->text(), u"the result"_s);
     }
+
+    void neverCapturesTextThatWasReplaced()
+    {
+        // A result went in place of this text: a selection that still reads as it is stale (a
+        // browser canvas kept the old highlighted text), and so is the clipboard the paste put
+        // back. Only something copied since counts.
+        ClipboardCapture capture;
+        QGuiApplication::clipboard()->setText(u"Single appointment: we printing?"_s);
+        capture.setReplaced(u"Single appointment: we printing?"_s, u"an older copy"_s);
+        QVERIFY(!capture.capture().has_value());
+        QVERIFY(capture.skippedReplaced()); // the popup says to copy the new text
+        QGuiApplication::clipboard()->setText(u"Series appointment: we printing?"_s);
+        QCOMPARE(capture.capture().value_or(CapturedText{}).text, u"Series appointment: we printing?"_s);
+        QVERIFY(!capture.skippedReplaced());
+    }
 };
 
 QTEST_MAIN(TestIntegrations)
