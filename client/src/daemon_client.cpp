@@ -40,6 +40,14 @@ DaemonClient::DaemonClient(QObject* parent)
 
 DaemonClient::~DaemonClient()
 {
+    // Stop the daemon's signals before the connection closes: closing it delivers one more
+    // ("Disconnected"), and a delivery queued for this half-destroyed client crashed in Qt
+    // (tst_cli, about 1 run in 30). Queued ones are dropped while the connection still lives.
+    unsubscribe();
+    if (m_private) {
+        QObject::disconnect(m_private.get(), nullptr, this, nullptr); // its exit is expected now
+    }
+    QCoreApplication::removePostedEvents(this);
     if (m_peer) {
         QDBusConnection::disconnectFromPeer(kPrivateName);
     }
@@ -199,6 +207,29 @@ bool DaemonClient::subscribe()
         watchDaemon();
     }
     return m_subscribed;
+}
+
+void DaemonClient::unsubscribe()
+{
+    if (!m_subscribed) {
+        return;
+    }
+    m_subscribed = false;
+    const QString service = (m_private || m_peer) ? QString() : kService;
+    m_connection.disconnect(service, kPath, kInterface, u"Token"_s, this,
+                            SLOT(onToken(QString, int, QString)));
+    m_connection.disconnect(service, kPath, kInterface, u"Retrying"_s, this,
+                            SLOT(onRetrying(QString, QString)));
+    m_connection.disconnect(service, kPath, kInterface, u"Done"_s, this, SLOT(onDone(QString, QString)));
+    m_connection.disconnect(service, kPath, kInterface, u"Error"_s, this,
+                            SLOT(onError(QString, QString, QString)));
+    m_connection.disconnect(service, kPath, kInterface, u"DownloadProgress"_s, this,
+                            SLOT(onDownloadProgress(QString)));
+    m_connection.disconnect(service, kPath, kInterface, u"SkillsChanged"_s, this, SLOT(onSkillsChanged()));
+    if (m_private || m_peer) {
+        m_connection.disconnect(QString(), u"/org/freedesktop/DBus/Local"_s, u"org.freedesktop.DBus.Local"_s,
+                                u"Disconnected"_s, this, SLOT(onDisconnected()));
+    }
 }
 
 void DaemonClient::watchDaemon()

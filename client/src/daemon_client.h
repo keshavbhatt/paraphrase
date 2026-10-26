@@ -65,6 +65,8 @@ private:
     /// Before a call: starts the daemon again if it quit while idle.
     void keepRunning();
     [[nodiscard]] bool subscribe();
+    /// Drops the daemon's signals, before the connection closes.
+    void unsubscribe();
 
     QDBusConnection m_connection;
     std::unique_ptr<QProcess> m_private; ///< the private daemon, when there is one
