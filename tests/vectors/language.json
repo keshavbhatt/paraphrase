@@ -3740,6 +3740,18 @@
    "plain_name": "Hindi"
   },
   {
+   "text": "मैंने बुधवार की स्प्रिंट प्लानिंग का कैलेंडर इनवाइट भेज दिया है। एजेंडा Confluence पेज पर डाल दिया है, कृपया मीटिंग से पहले एक बार देख लें। @Rohan डिज़ाइन फ़ाइलें अब Figma में हैं, पुराना Sketch फ़ोल्डर बंद कर दिया है।",
+   "lang": "hi",
+   "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
+   "plain_name": "Hindi"
+  },
+  {
+   "text": "नमस्ते मैडम, मेरी बेटी अनन्या कक्षा 6-B में है। वह 28 अक्टूबर से 2 नवंबर तक नानी के घर जा रही है, इसलिए स्कूल नहीं आ पाएगी। छूटा हुआ काम हम घर पर करवा देंगे। - सुनीता शर्मा",
+   "lang": "hi",
+   "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
+   "plain_name": "Hindi"
+  },
+  {
    "text": "इसे अंग्रेज़ी में लिख दो। बैंक जाकर पासबुक अपडेट करानी है, बिजली का बिल 20 तारीख से पहले भरना है और गैस की बुकिंग करनी है।",
    "lang": "hi",
    "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
@@ -3756,6 +3768,12 @@
    "lang": "hinglish",
    "prompt_name": "Hinglish: Hindi written in Latin letters as in chat messages. Keep it Hinglish even in a formal tone: do not translate it into English or Devanagari",
    "plain_name": "Hinglish (Hindi in Latin letters)"
+  },
+  {
+   "text": "टीम, सर्वर का माइग्रेशन शनिवार रात 11 बजे शुरू होगा और करीब दो घंटे चलेगा। इस दौरान Jira और GitLab बंद रहेंगे। कोई ज़रूरी डिप्लॉय हो तो शुक्रवार शाम तक कर लें।",
+   "lang": "hi",
+   "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
+   "plain_name": "Hindi"
   },
   {
    "text": "The meeting has been moved to Thursday at 3 pm. Please bring the sales report.",
