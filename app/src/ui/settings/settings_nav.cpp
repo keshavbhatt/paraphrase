@@ -16,7 +16,7 @@ SettingsNav::SettingsNav(const QStringList& pages, QWidget* parent)
     , m_group(new QButtonGroup(this))
 {
     auto* col = new QVBoxLayout(this);
-    col->setContentsMargins(0, 0, 0, 0);
+    col->setContentsMargins(0, 24, 0, 24); // the window's gutter, as on the pages beside it
     col->setSpacing(2);
     for (int i = 0; i < pages.size(); ++i) {
         QPushButton* b = makeButton(pages.at(i), u"nav"_s);

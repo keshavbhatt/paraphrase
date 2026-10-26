@@ -19,6 +19,7 @@
 #include <QCoreApplication>
 #include <QDateTime>
 #include <QDir>
+#include <QFontMetrics>
 #include <QGuiApplication>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -32,6 +33,7 @@
 #include <QScrollBar>
 #include <QSettings>
 #include <QSignalSpy>
+#include <QStackedWidget>
 #include <QStandardPaths>
 #include <QTemporaryDir>
 #include <QTest>
@@ -317,6 +319,41 @@ private Q_SLOTS:
         tray->click(); // leave the preference as it was
     }
 
+    void pagesFitTheWindowAtItsOpeningSize()
+    {
+        // Wider than its column, a page was cut off at the right under the scroll bar.
+        QVERIFY(m_daemon.start({u"fast-model"_s, u"quality-model"_s, u"fast-draft"_s}));
+        DaemonClient client;
+        QVERIFY(client.connectToDaemon().isEmpty());
+        SettingsWindow w(client);
+        if (!QFontMetrics(w.font()).inFont(u'a')) {
+            QSKIP("no fonts here: every letter is a wide box, so widths mean nothing");
+        }
+        w.show();
+        // Each page as it is shown: a hidden page's scroll area is not laid out.
+        for (const auto page : {
+                 SettingsWindow::General,
+                 SettingsWindow::Shortcut,
+                 SettingsWindow::MyActions,
+                 SettingsWindow::Models,
+                 SettingsWindow::Privacy,
+                 SettingsWindow::About,
+             }) {
+            w.showPage(page);
+            QTest::qWait(50);
+            const auto* area =
+                qobject_cast<const QScrollArea*>(w.findChild<QStackedWidget*>()->currentWidget());
+            QVERIFY(area != nullptr);
+            const int needs = area->widget()->minimumSizeHint().width();
+            QVERIFY2(needs <= area->viewport()->width(),
+                     qPrintable(u"%1 needs %2 px, has %3"_s
+                                    .arg(QLatin1StringView(area->widget()->metaObject()->className()))
+                                    .arg(needs)
+                                    .arg(area->viewport()->width())));
+        }
+        m_daemon.stop();
+    }
+
     void savesScreenshots()
     {
         const QString dir = qEnvironmentVariable("PARAPHRASE_SCREENSHOTS");
@@ -337,6 +374,12 @@ private Q_SLOTS:
                 QTest::qWait(50);
                 QCoreApplication::processEvents(); // queued shows land first
                 QVERIFY(w.grab().save(dir + u"/settings-models-%1.png"_s.arg(QLatin1StringView(theme))));
+                // At the size it opens at, where the page scrolls: the scroll bar and its gaps.
+                w.resize(1080, 780);
+                QTest::qWait(50);
+                QVERIFY(
+                    w.grab().save(dir + u"/settings-models-scroll-%1.png"_s.arg(QLatin1StringView(theme))));
+                w.resize(1180, 1000);
                 // A drop-down's list has the round corners of the menus (menus.html).
                 auto* quality = w.findChild<QComboBox*>(u"tierQuality"_s);
                 quality->showPopup();

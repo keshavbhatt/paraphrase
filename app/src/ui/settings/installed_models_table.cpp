@@ -118,8 +118,13 @@ QWidget* InstalledModelsTable::nameCell(const QString& name, const QString& deta
     col->setSpacing(1);
     QLabel* title = makeLabel(name);
     title->setProperty("role", u"strong"_s); // not a widget style sheet: it clipped descenders
+    // Both wrap: unwrapped, the speed-up's line made the table 866 px wide, more than the
+    // window gives it at its opening size, and the cards were cut off at the right.
+    title->setWordWrap(true);
     col->addWidget(title);
-    col->addWidget(makeLabel(detail, u"small"_s));
+    QLabel* line = makeLabel(detail, u"small"_s);
+    line->setWordWrap(true);
+    col->addWidget(line);
     return cell;
 }
 

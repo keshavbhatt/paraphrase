@@ -22,12 +22,19 @@ using namespace Qt::StringLiterals;
 namespace paraphrase::app {
 namespace {
 
+constexpr int kGutter = 24; // settings .settings padding
+
 QWidget* scrolled(QWidget* page)
 {
     auto* area = new QScrollArea;
     area->setWidgetResizable(true);
     area->setFrameShape(QFrame::NoFrame);
-    area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    // Pages fit the window's opening width (pagesFitTheWindowAtItsOpeningSize); with larger
+    // fonts one may not, and then it scrolls sideways rather than being cut off.
+    area->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    // The window's gutter is inside the scrolled area: the scroll bar sits at the window's
+    // edge with the gap before the content, not squeezed between the two.
+    page->setContentsMargins(0, kGutter, kGutter, kGutter);
     area->setWidget(page);
     return area;
 }
@@ -59,7 +66,7 @@ SettingsWindow::SettingsWindow(client::DaemonClient& client, Preferences* prefer
     setWindowTitle(tr("Paraphrase settings"));
     resize(1080, 780);
     auto* root = new QHBoxLayout(this);
-    root->setContentsMargins(24, 24, 24, 24);
+    root->setContentsMargins(kGutter, 0, 0, 0); // the rest is inside each column
     root->setSpacing(28);
     root->addWidget(m_nav, 0, Qt::AlignTop);
     root->addWidget(m_pages, 1);
