@@ -2,8 +2,13 @@
 
 #include "ui/common/theme.h"
 
+#include <QList>
 #include <QObject>
+#include <QString>
 
+#include <utility>
+
+class QAction;
 class QSystemTrayIcon;
 
 namespace paraphrase::app {
@@ -30,6 +35,8 @@ Q_SIGNALS:
 
 private:
     QSystemTrayIcon* m_tray = nullptr;
+    /// Each item and its icon: the desktop's own name, and ours where the theme has none.
+    QList<std::pair<QAction*, std::pair<QString, QString>>> m_icons;
 };
 
 } // namespace paraphrase::app

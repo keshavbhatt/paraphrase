@@ -29,6 +29,9 @@ on 2026-10-26 (recorded in DOCS/mocks/index.html), and built:
 - The hand-over is in memory only; history keeps the run once, where it finished.
 - Settings: the scroll bar sits at the window's edge, and the Models table wraps so every page
   fits the window at its opening size (a test checks this with real fonts).
+- Tray menu: an icon per item, as in the app's menus (owner request, 2026-10-26). The desktop
+  draws this menu, so it gets the theme's icons by name (document-edit, edit-select-text,
+  configure, application-exit), with our Lucide icons where a theme lacks them.
 
 ## 2026-10-26 - Spacing and consistency pass against the mocks
 
