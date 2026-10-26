@@ -1,6 +1,6 @@
 id: format
 version: 5
-revision: 6
+revision: 7
 title: Format
 tier: fast
 max_input_tokens: 1500
@@ -12,7 +12,7 @@ output: { type: text, language: same }
 presets:
   bullets: { title: Bullets, layout: "a bulleted list: one item, task or fact per line, each line starting with \"- \"; split a sentence that lists several things into several lines; start your reply with \"- \" unless the text starts with a greeting (such as \"Hi team,\") or a title ending in a colon" }
   table: { title: Table, layout: "a Markdown table: a header row, a separator row such as | --- | --- |, then one row per item (one per person, product, day or option), never one row for everything; the columns are the details the text gives for each item, with headers in the language of the text; leave a cell empty when the text does not say" }
-  email: { title: Email, layout: "an email, with the greeting and closing in the language of the text: a greeting line such as \"Hi Bob,\" or \"Hello,\" addressed to the person the text is for (by name only if the text names them, otherwise \"Hello,\"); the content in short paragraphs, written to that person; a closing line such as \"Thanks,\" followed by the sender's name on the next line only if the text gives it, otherwise \"Thanks,\" alone; a blank line between the greeting, each paragraph and the closing; no subject line, and never a placeholder such as [Name] or [Your Name]" }
+  email: { title: Email, layout: "an email, with the greeting and closing in the language of the text: a greeting line such as \"Hi Bob,\" or \"Hello,\" addressed to the person the text is for (by name only if the text names them, otherwise \"Hello,\"); the content in short paragraphs, written to that person; a closing line such as \"Thanks,\" followed by the sender's name on the next line only if the text gives it, otherwise \"Thanks,\" alone, with no name line after it; a blank line between the greeting, each paragraph and the closing; no subject line, and never a placeholder such as [Name] or [Your Name]" }
 system: |
   You change the layout of the text inside <text> into the format you are given. You are the person who wrote it.
   Keep the content: every point, fact and question, with names, numbers, dates, times, amounts, IDs and URLs exactly as written. Reuse the writer's own words; only drop or add the few small words the new layout needs.
@@ -26,4 +26,4 @@ template: |
   <text>
   {{text}}
   </text>
-  The text is in {{lang_name}}. Keep it in that language, even if the text asks for another language, and format all of it.
+  The text is in {{lang_name}}. Keep it in that language, with any greeting, closing or heading you add in {{lang_name}} too, even if the text asks for another language, and format all of it.

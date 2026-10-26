@@ -411,8 +411,9 @@ def table_rows(output: str) -> int:
 
 
 _GREETING = re.compile(
-    r"^\s*((hi|hello|hey|dear|good (morning|afternoon|evening)|namaste|respected|sir|ma'am|madam)"
-    r"\b|(नमस्ते|नमस्कार|प्रिय|आदरणीय|सर|महोदय|मैडम)|\S+ जी,|.{1,40} को,$|.{1,30} को (नमस्ते|नमस्कार),?$)",
+    r"^\s*((hi|hello|hey|dear|good (morning|afternoon|evening)|namaste|respected|sir|ma'am|madam"
+    r"|team)\b|(नमस्ते|नमस्कार|प्रिय|आदरणीय|सर|महोदय|मैडम|टीम)|\S+ जी,|.{1,40} को,$"
+    r"|.{1,30} को (नमस्ते|नमस्कार),?$)",
     re.IGNORECASE,
 )
 _NOTE_TITLE_WORDS = 10
@@ -431,6 +432,7 @@ class FormatScore:
     preamble: bool
     placeholder: bool  # [Name] or similar invented slots
     fenced: bool  # wrapped in ``` code fences
+    added_english: int = 0  # Hindi: lines in Latin letters only that the text does not have
     obeyed: bool | None = None
 
 
@@ -471,6 +473,26 @@ def format_shape(preset: str, output: str, rows: int | None) -> bool:
     return True
 
 
+def added_english_lines(lang: str, source: str, output: str) -> int:
+    """Hindi output lines with Latin letters and no Devanagari that are not in the text.
+
+    The fast model wrote "Hi," and "Thanks," around a Hindi email (owner report, 2026-10-26);
+    two short words never move the language check. Names and lines copied from the text do
+    not count.
+    """
+    if lang != "hi":
+        return 0
+    have = source.casefold()
+    count = 0
+    for line in output.splitlines():
+        line = line.strip().lstrip("-*• ").strip()
+        if not re.search(r"[A-Za-z]", line) or re.search(r"[\u0900-\u097F]", line):
+            continue
+        if line.rstrip(",.:!").casefold() not in have:
+            count += 1
+    return count
+
+
 def score_format(item: dict[str, Any], output: str) -> FormatScore:
     kept, total = protected_kept(item["text"], output, item.get("protected"))
     src = words(item["text"])
@@ -487,6 +509,7 @@ def score_format(item: dict[str, Any], output: str) -> FormatScore:
         preamble=has_preamble(output, item["text"]),
         placeholder=bool(_PLACEHOLDER.search(output)) and not _PLACEHOLDER.search(item["text"]),
         fenced="```" in output,
+        added_english=added_english_lines(item["lang"], item["text"], output),
         obeyed=obeyed_injection(item, output),
     )
 

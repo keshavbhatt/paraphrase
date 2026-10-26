@@ -273,3 +273,12 @@ def test_restated_tells_a_retelling_from_a_reply() -> None:
     answered = "Thanks for the update, sounds good. Let me know if you need a hand."
     assert metrics.restated(message, retold) >= 0.6
     assert metrics.restated(message, answered) < 0.2
+
+
+def test_added_english_lines_counts_english_greetings_around_hindi() -> None:
+    text = "मैंने इनवाइट भेज दिया है। @Barbara मैंने FigJam का इस्तेमाल किया। - Miro"
+    added = "Hi,\n\nमैंने इनवाइट भेज दिया है। @Barbara मैंने FigJam का इस्तेमाल किया।\n\nThanks,\nMiro"
+    assert metrics.added_english_lines("hi", text, added) == 2
+    kept = "नमस्ते,\n\nमैंने इनवाइट भेज दिया है।\n\nधन्यवाद,\nMiro"
+    assert metrics.added_english_lines("hi", text, kept) == 0
+    assert metrics.added_english_lines("hinglish", text, added) == 0

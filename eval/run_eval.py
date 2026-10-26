@@ -140,6 +140,7 @@ def summarise(skill: Skill, rows: list[dict[str, Any]]) -> dict[str, Any]:
             "placeholder_pct": _pct(sum(x["placeholder"] for x in s), n),
             "fenced_pct": _pct(sum(x["fenced"] for x in s), n),
             "preamble_pct": _pct(sum(x["preamble"] for x in s), n),
+            "added_english_pct": _pct(sum(x.get("added_english", 0) > 0 for x in s), n),
         }
     elif skill.base_id == "translate":
         kept, prot = sum(x["kept"] for x in s), sum(x["protected"] for x in s)
