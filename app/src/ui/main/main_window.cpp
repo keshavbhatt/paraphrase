@@ -24,6 +24,7 @@
 #include <QSettings>
 #include <QShortcut>
 #include <QSplitter>
+#include <QStackedWidget>
 #include <QVBoxLayout>
 
 #include <utility>
@@ -88,13 +89,23 @@ void MainWindow::buildUi()
     main->addWidget(m_actions);
     main->addWidget(m_panes, 1);
 
+    // Writing and history share one place. A stack swaps them in one step and is as tall
+    // as the taller of the two, so opening or closing history never resizes the window.
+    auto* writing = new QWidget;
+    auto* writingColumn = new QVBoxLayout(writing);
+    writingColumn->setContentsMargins(0, 0, 0, 0);
+    writingColumn->setSpacing(0);
+    writingColumn->addWidget(m_body, 1);
+    writingColumn->addWidget(m_status);
+    m_area = new QStackedWidget;
+    m_area->addWidget(writing);
+
     auto* root = new QVBoxLayout(this);
     root->setContentsMargins(0, 0, 0, 0);
     root->setSpacing(0);
     root->addWidget(m_header);
     root->addWidget(m_notice);
-    root->addWidget(m_body, 1);
-    root->addWidget(m_status);
+    root->addWidget(m_area, 1);
 }
 
 void MainWindow::connectParts()
@@ -167,8 +178,7 @@ void MainWindow::setHistory(history::Keeper* keeper)
     }
     m_history = keeper;
     m_historyView = new HistoryView(*keeper);
-    m_historyView->hide();
-    static_cast<QVBoxLayout*>(layout())->insertWidget(layout()->indexOf(m_body) + 1, m_historyView, 1);
+    m_area->addWidget(m_historyView);
     m_historyView->applyTheme(m_tokens);
     m_header->setHistoryShown(true);
     connect(m_historyView, &HistoryView::backRequested, this, [this] { showHistory(false); });
@@ -184,12 +194,12 @@ void MainWindow::showHistory(bool open)
         return;
     }
     // In place of the panes; the text on the left stays as it was (note 1).
-    m_body->setVisible(!open);
-    m_status->setVisible(!open);
-    m_historyView->setVisible(open);
-    m_header->setHistoryOpen(open);
     if (open) {
         m_historyView->reload();
+    }
+    m_area->setCurrentIndex(open ? 1 : 0);
+    m_header->setHistoryOpen(open);
+    if (open) {
         m_historyView->setFocus();
     } else {
         m_input->setFocus();
@@ -198,7 +208,7 @@ void MainWindow::showHistory(bool open)
 
 bool MainWindow::historyOpen() const
 {
-    return m_historyView != nullptr && !m_historyView->isHidden();
+    return m_historyView != nullptr && m_area->currentWidget() == m_historyView;
 }
 
 void MainWindow::useAgain(const history::Entry& entry)

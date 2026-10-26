@@ -495,6 +495,35 @@ private Q_SLOTS:
         QVERIFY(!w.historyOpen());
     }
 
+    void historyKeepsWindowSize()
+    {
+        startDaemon({u"fast-model"_s});
+        const QTemporaryDir dir;
+        const auto keeper = fakeHistory(dir.filePath(u"history.sqlite"_s));
+        MainWindow w;
+        w.setHistory(keeper.get());
+        w.start();
+        w.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&w));
+        for (const bool on : {false, true}) {
+            if (on) {
+                QCOMPARE(keeper->turnOn(), paraphrase::app::history::Keeper::Problem::None);
+                seedHistory(*keeper);
+            }
+            for (const QSize size : {QSize(1180, 760), w.minimumSize()}) {
+                w.resize(size);
+                QCoreApplication::processEvents();
+                const QSize before = w.size();
+                w.showHistory(true);
+                QCoreApplication::processEvents();
+                QCOMPARE(w.size(), before);
+                w.showHistory(false);
+                QCoreApplication::processEvents();
+                QCOMPARE(w.size(), before);
+            }
+        }
+    }
+
     void stopsARunningRequest()
     {
         startDaemon({u"fast-model"_s});

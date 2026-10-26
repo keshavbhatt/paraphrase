@@ -232,6 +232,9 @@ HistoryView::HistoryView(history::Keeper& keeper, QWidget* parent)
 
     root->addWidget(m_off, 1);
     root->addWidget(m_on, 1);
+    // One of the two from the start: the window's height goes by the view's while it is hidden.
+    m_off->setVisible(!history::Keeper::isOn());
+    m_on->setVisible(history::Keeper::isOn());
 
     // The status band: where it lives, always said (note 5).
     auto* status = new QFrame;

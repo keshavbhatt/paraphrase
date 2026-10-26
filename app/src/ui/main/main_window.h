@@ -12,6 +12,7 @@
 #include <memory>
 
 class QSplitter;
+class QStackedWidget;
 
 namespace paraphrase::app {
 
@@ -124,6 +125,7 @@ private:
     StatusBar* m_status = nullptr;
     QSplitter* m_panes = nullptr;
     QWidget* m_body = nullptr;
+    QStackedWidget* m_area = nullptr; ///< writing, or history in its place
     history::Keeper* m_history = nullptr;
     HistoryView* m_historyView = nullptr;
     qint64 m_historyId = 0; ///< the entry the result on screen was kept as
