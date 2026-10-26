@@ -14,6 +14,28 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-26 - Spacing and consistency pass against the mocks
+
+Every screen (main window, popup, setup, settings; light and dark) compared with its approved
+mock at the mock CSS values. No new design: each fix brings a screen back to its mock.
+- Main window: your text now has the result's line spacing (15px/1.7; QPlainTextEdit ignored
+  line height, so the fields are a plain-text QTextEdit, `TextField`); change rows are 12 px
+  with smaller Undo links, 34 px apart; the run button no longer moves by a pixel between labels.
+- Shared: a disabled primary button is the filled one faded to 45%, readable in both themes
+  (it was white on grey); pills are 22 px with full rounding; the change list's "end" pill is
+  round again; reply choices use the normal weight; items in a wrapping row share its centre.
+- Layout shifts removed: a chosen option or ticked model card no longer moves its content by a
+  pixel when its border thickens.
+- Setup: a real checkbox (it drew as a black square), a check for finished steps, grant cards
+  16 px apart and flush with their padding, download card padding 16/18.
+- Settings: form labels line up with their fields, no empty gap above Cancel/Save, a sunk
+  Try it sample, no stray rule or padding on Privacy while history is off, the Privacy intro at
+  640 px, the models table inset like the shortcut table, Remove and Turn off aligned.
+- Popup: header padding 12, the Esc key cap its own height, 12 px between replies, the result
+  box on the panel colour in dark.
+- Left for the owner: dark "Delete all" (white on #FF8A80, about 2.2:1) matches the mock but is
+  low contrast; a change needs a mock update.
+
 ## 2026-10-26 - A run button, and history keeps the window's size
 
 - Mock `main-window-run.html`, approved by the owner on 2026-10-26 (recorded in

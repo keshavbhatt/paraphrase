@@ -37,7 +37,7 @@ DesktopAccess::DesktopAccess(QWidget* parent)
 {
     auto* col = new QVBoxLayout(this);
     col->setContentsMargins(0, 0, 0, 0);
-    col->setSpacing(12);
+    col->setSpacing(16); // .stack
     m_shortcut =
         buildRow(tr("Shortcut"), tr("Opens Paraphrase on the text you selected, over the app you are in."));
     m_typing = buildRow(tr("Put the result back"), QString());
@@ -79,6 +79,7 @@ DesktopAccess::Row DesktopAccess::buildRow(const QString& title, const QString& 
     text->addStretch();
     line->addLayout(text, 1);
     row.side = new QVBoxLayout;
+    row.side->setContentsMargins(0, 0, 0, 0); // flush with the card's padding, like the badge
     row.side->setSpacing(6);
     row.side->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
     auto* sideBox = new QWidget;

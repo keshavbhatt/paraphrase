@@ -20,13 +20,13 @@ QLabel[role="h2"] { font-size: 15px; font-weight: 600; }
 QLabel[role="title"] { font-size: 16px; font-weight: 600; }
 QLabel[role="mono"] { font-family: monospace; font-size: 12px; color: @text@; }
 QLabel[role="success"] { color: @success@; font-size: 12px; }
-QLabel[role="pill-accent"] { background: @accentSoft@; color: @accent@; border: 1px solid transparent; border-radius: 10px; padding: 1px 8px; font-size: 12px; }
-QLabel[role="pill-ok"] { background: @successBg@; color: @success@; border: 1px solid transparent; border-radius: 10px; padding: 1px 8px; font-size: 12px; }
-QLabel[role="pill-warn"] { background: @warningBg@; color: @warning@; border: 1px solid transparent; border-radius: 10px; padding: 1px 8px; font-size: 12px; }
+QLabel[role="pill-accent"] { background: @accentSoft@; color: @accent@; border: 1px solid transparent; border-radius: 11px; padding: 2px 9px; font-size: 12px; }
+QLabel[role="pill-ok"] { background: @successBg@; color: @success@; border: 1px solid transparent; border-radius: 11px; padding: 2px 9px; font-size: 12px; }
+QLabel[role="pill-warn"] { background: @warningBg@; color: @warning@; border: 1px solid transparent; border-radius: 11px; padding: 2px 9px; font-size: 12px; }
 QRadioButton::indicator { width: 14px; height: 14px; border-radius: 8px; border: 1px solid @border@; background: @input@; }
 QRadioButton::indicator:checked { width: 6px; height: 6px; border: 5px solid @accentStrong@; background: @panel@; }
-QFrame[role="opt"] { border: 1px solid @border@; border-radius: 10px; background: transparent; }
-QFrame[role="opt"][on="true"] { border: 1.5px solid @accent@; background: @accentSoft@; }
+QFrame[role="opt"] { border: 1px solid @border@; border-radius: 10px; background: transparent; padding: 1px; }
+QFrame[role="opt"][on="true"] { border: 2px solid @accent@; background: @accentSoft@; padding: 0; }
 QFrame[role="grant"] { background: @panel@; border: 1px solid @border@; border-radius: 12px; }
 QLabel[role="grantBadge"] { background: @accentSoft@; border-radius: 10px; }
 QLabel[role="th"] { color: @muted@; font-size: 11px; font-weight: 700; letter-spacing: 1px; }
@@ -35,11 +35,12 @@ QLabel[step="todo"] { color: @muted@; font-size: 13px; }
 QLabel[step="on"] { color: @text@; font-size: 13px; font-weight: 600; }
 QLabel[step="done"] { color: @success@; font-size: 13px; }
 QLabel[badge="todo"] { color: @muted@; border: 1px solid @border@; border-radius: 9px; font-family: monospace; font-size: 11px; font-weight: 600; }
+QLabel[badge="done"] { border: none; background: transparent; }
 QLabel[badge="on"] { color: @accentText@; background: @accentStrong@; border: 1px solid @accentStrong@; border-radius: 9px; font-family: monospace; font-size: 11px; font-weight: 600; }
 
 QFrame#card { background: @panel@; border: 1px solid @border@; border-radius: 12px; }
-QFrame#modelCard { background: @panel@; border: 1px solid @border@; border-radius: 12px; }
-QFrame#modelCard[on="true"] { border: 2px solid @accent@; }
+QFrame#modelCard { background: @panel@; border: 1px solid @border@; border-radius: 12px; padding: 1px; }
+QFrame#modelCard[on="true"] { border: 2px solid @accent@; padding: 0; }
 QFrame#modelCard[enabled="false"] { background: @sunk@; }
 QFrame#lang { border: 1px solid @border@; border-radius: 10px; }
 QLabel[role="strong"] { font-weight: 600; }
@@ -49,11 +50,15 @@ QProgressBar { background: @border@; border: none; border-radius: 3px; max-heigh
 QProgressBar::chunk { background: @accentStrong@; border-radius: 3px; }
 
 QCheckBox { spacing: 8px; }
-QCheckBox::indicator { width: 18px; height: 18px; }
+QCheckBox::indicator { width: 16px; height: 16px; border: 1px solid @border@; border-radius: 4px; background: @input@; }
+QCheckBox::indicator:hover { border-color: @accent@; }
+QCheckBox::indicator:checked { background: @accentStrong@; border-color: @accentStrong@; image: url(:/icons/check-white.svg); }
+QCheckBox::indicator:disabled { background: @sunk@; }
+QFrame#modelCard QCheckBox { spacing: 0; }
 
 QComboBox { background: @input@; color: @text@; border: 1px solid @border@; border-radius: 8px; padding: 0 10px; min-height: 36px; }
 QComboBox:focus { border: 1px solid @accent@; }
-QLabel[role="pill"] { border: 1px solid transparent; border-radius: 10px; padding: 1px 8px; }
+QLabel[role="pill"] { border: 1px solid transparent; border-radius: 11px; padding: 2px 9px; }
 QComboBox::drop-down { border: none; background: transparent; width: 28px; }
 QComboBox::down-arrow { image: url(:/icons/down-@scheme@.svg); width: 14px; height: 14px; }
 QComboBox QAbstractItemView { background: @elevated@; color: @text@; selection-background-color: @hover@; selection-color: @text@;

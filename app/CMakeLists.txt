@@ -130,6 +130,7 @@ add_library(paraphrase_ui STATIC
     src/ui/core/user_actions_client.cpp
     src/ui/setup/step_header.cpp
     src/ui/common/theme.cpp
+    src/ui/common/text_field.cpp
     src/ui/common/toggle_switch.cpp
     src/ui/settings/tier_pickers.cpp
     src/ui/setup/try_page.cpp
@@ -146,7 +147,7 @@ qt_add_resources(paraphrase_ui "icons"
     FILES
         icons/alert.svg icons/check.svg icons/copy.svg icons/down.svg icons/expand.svg icons/forward.svg icons/left.svg icons/right.svg
         icons/info.svg icons/lock.svg icons/pen.svg icons/refresh.svg icons/stop.svg
-        icons/undo.svg icons/x.svg icons/down-light.svg icons/down-dark.svg
+        icons/undo.svg icons/x.svg icons/down-light.svg icons/down-dark.svg icons/check-white.svg
         icons/badge-check.svg icons/briefcase.svg icons/coffee.svg icons/enlarge.svg icons/hand-heart.svg
         icons/list.svg icons/mail.svg icons/megaphone.svg icons/plus.svg icons/shrink.svg icons/smile.svg
         icons/smile-plus.svg icons/table.svg icons/keyboard.svg icons/text-cursor-input.svg icons/grip.svg

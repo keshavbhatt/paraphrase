@@ -109,6 +109,7 @@ PopupActionsPage::PopupActionsPage(const util::LanguageDetector& detector, QWidg
     captionRow->addWidget(m_info, 1);
     bodyLayout->addLayout(captionRow);
     bodyLayout->addWidget(m_source);
+    bodyLayout->addSpacing(4); // the caption's own margin-top (popup-actions.html)
     bodyLayout->addWidget(makeLabel(tr("ACTIONS"), u"caption"_s));
     bodyLayout->addWidget(m_actions);
     bodyLayout->addStretch();
@@ -120,7 +121,7 @@ QWidget* PopupActionsPage::buildHead()
 {
     QFrame* head = band(u"popupHead"_s);
     auto* row = new QHBoxLayout(head);
-    row->setContentsMargins(8, 10, 10, 10);
+    row->setContentsMargins(12, 10, 12, 10); // .phead
     row->setSpacing(10);
     m_grip = grip();
     row->addWidget(m_grip);
@@ -162,8 +163,8 @@ QWidget* PopupActionsPage::buildFoot()
     row->addWidget(m_status, 1);
     row->addStretch(); // the space stays here while the working pill hides the line
     QLabel* esc = makeLabel(tr("Esc"), u"kbd"_s);
-    row->addWidget(esc);
-    row->addWidget(makeLabel(tr("close"), u"small"_s));
+    row->addWidget(esc, 0, Qt::AlignVCenter); // a key cap, not as tall as the working pill
+    row->addWidget(makeLabel(tr("close"), u"small"_s), 0, Qt::AlignVCenter);
     return foot;
 }
 
@@ -221,7 +222,7 @@ QWidget* PopupResultPage::buildHead()
 {
     QFrame* head = band(u"popupHead"_s);
     auto* row = new QHBoxLayout(head);
-    row->setContentsMargins(8, 10, 10, 10);
+    row->setContentsMargins(12, 10, 12, 10); // .phead
     row->setSpacing(10);
     m_grip = grip();
     row->addWidget(m_grip);

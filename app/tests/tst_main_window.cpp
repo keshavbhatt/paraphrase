@@ -24,7 +24,6 @@
 #include <QLineEdit>
 #include <QMenu>
 #include <QMutexLocker>
-#include <QPlainTextEdit>
 #include <QPushButton>
 #include <QSettings>
 #include <QSignalSpy>
@@ -32,6 +31,7 @@
 #include <QTemporaryDir>
 #include <QTest>
 #include <QTextBrowser>
+#include <QTextEdit>
 
 using namespace Qt::StringLiterals;
 using namespace paraphrase::testing;
@@ -144,7 +144,7 @@ private Q_SLOTS:
         startDaemon({u"fast-model"_s});
         MainWindow w;
         w.start();
-        w.findChild<QPlainTextEdit*>(u"text"_s)->setPlainText(u"Whisk the egg's with the milk"_s);
+        w.findChild<QTextEdit*>(u"text"_s)->setPlainText(u"Whisk the egg's with the milk"_s);
         setAnswers({u"Whisk the eggs with the milk."_s});
         w.selectSkill(u"proofread"_s);
         runAndWait(w);
@@ -188,8 +188,8 @@ private Q_SLOTS:
         MainWindow w;
         w.start();
         w.selectSkill(u"reply"_s);
-        w.findChild<QPlainTextEdit*>(u"message"_s)->setPlainText(u"Are you free for dinner on Friday?"_s);
-        w.findChild<QPlainTextEdit*>(u"draft"_s)->setPlainText(u"Yes"_s);
+        w.findChild<QTextEdit*>(u"message"_s)->setPlainText(u"Are you free for dinner on Friday?"_s);
+        w.findChild<QTextEdit*>(u"draft"_s)->setPlainText(u"Yes"_s);
         setAnswers(
             {uR"({"replies": ["Yes, Friday works!", "Yes, what time?", "Yes, can I bring dessert?"]})"_s});
         runAndWait(w);
@@ -206,7 +206,7 @@ private Q_SLOTS:
         startDaemon({u"fast-model"_s, u"quality-model"_s});
         MainWindow w;
         w.start();
-        w.findChild<QPlainTextEdit*>(u"text"_s)->setPlainText(u"send me the file now"_s);
+        w.findChild<QTextEdit*>(u"text"_s)->setPlainText(u"send me the file now"_s);
         setAnswers({u"Could you send me the file, please?"_s});
         const QSignalSpy finished(&w, &MainWindow::finished);
         const auto* tone = w.findChild<paraphrase::app::ChipButton*>(u"action-rewrite"_s);
@@ -220,7 +220,7 @@ private Q_SLOTS:
         QCOMPARE(w.currentSkill(), u"rewrite.polite"_s);
         QCOMPARE(w.resultText(), u"Could you send me the file, please?"_s);
         // A rewrite that drops a fact says so (popup-rewrite.html, note 4).
-        w.findChild<QPlainTextEdit*>(u"text"_s)->setPlainText(u"tell Priya the report is due Friday"_s);
+        w.findChild<QTextEdit*>(u"text"_s)->setPlainText(u"tell Priya the report is due Friday"_s);
         setAnswers({u"Could you let her know the report is due soon?"_s});
         runAndWait(w);
         QVERIFY(w.findChild<QLabel*>(u"outInfo"_s)->text().contains(u"check: Priya, Friday are missing"_s));
@@ -238,7 +238,7 @@ private Q_SLOTS:
         MainWindow w;
         w.start();
         auto* run = w.findChild<paraphrase::app::ChipButton*>(u"run"_s);
-        auto* text = w.findChild<QPlainTextEdit*>(u"text"_s);
+        auto* text = w.findChild<QTextEdit*>(u"text"_s);
         const auto primary = [run] { return run->property("kind").toString() == u"primary"_s; };
         QCOMPARE(run->label(), u"Proofread"_s);
         QVERIFY(!run->isEnabled()); // nothing to run yet
@@ -291,8 +291,8 @@ private Q_SLOTS:
         }
         full->click();
         QVERIFY(w.currentSkill().startsWith(u"draft."_s));
-        w.findChild<QPlainTextEdit*>(u"fullMessage"_s)->setPlainText(u"Can we meet on Thursday at 3 pm?"_s);
-        w.findChild<QPlainTextEdit*>(u"intent"_s)->setPlainText(u"Thursday is bad, offer Friday 11 am"_s);
+        w.findChild<QTextEdit*>(u"fullMessage"_s)->setPlainText(u"Can we meet on Thursday at 3 pm?"_s);
+        w.findChild<QTextEdit*>(u"intent"_s)->setPlainText(u"Thursday is bad, offer Friday 11 am"_s);
         setAnswers({
             u"Hi Dan, Thursday does not work for me. Would Friday at 11 am suit you? Best, Priya"_s,
             u"Hi Dan, could we do Friday at 11 am instead? Thanks, Priya"_s,
@@ -321,7 +321,7 @@ private Q_SLOTS:
         if (translate == nullptr) {
             QSKIP("no translate skill in this tree");
         }
-        w.findChild<QPlainTextEdit*>(u"text"_s)->setPlainText(u"The meeting moved to Friday."_s);
+        w.findChild<QTextEdit*>(u"text"_s)->setPlainText(u"The meeting moved to Friday."_s);
         setAnswers({u"La réunion a été déplacée à vendredi."_s});
         Q_EMIT translate->menu()->aboutToShow(); // the menu fills itself when it opens
         auto* french = translate->menu()->findChild<QAction*>(u"lang-fr"_s);
@@ -348,8 +348,7 @@ private Q_SLOTS:
         write->click(); // nothing described yet: it says so
         w.findChild<QPushButton*>(u"composeMessage"_s)->click();
         QCOMPARE(w.currentSkill(), u"compose.message"_s);
-        w.findChild<QPlainTextEdit*>(u"composeText"_s)
-            ->setPlainText(u"office closed Monday, standup at 10 am"_s);
+        w.findChild<QTextEdit*>(u"composeText"_s)->setPlainText(u"office closed Monday, standup at 10 am"_s);
         setAnswers({u"Heads up: the office is closed on Monday. Standup at 10 am on video."_s});
         runAndWait(w);
         QVERIFY(w.resultText().contains(u"Monday"_s));
@@ -376,7 +375,7 @@ private Q_SLOTS:
             const QMutexLocker lock(&m_daemon.state->lock);
             return m_daemon.state->prompts.size();
         };
-        auto* text = w.findChild<QPlainTextEdit*>(u"composeText"_s);
+        auto* text = w.findChild<QTextEdit*>(u"composeText"_s);
         text->setPlainText(u"office closed Monday"_s);
         w.findChild<QPushButton*>(u"composeNote"_s)->click(); // nothing ran yet: no run
         QApplication::processEvents();
@@ -432,7 +431,7 @@ private Q_SLOTS:
         QVERIFY(other.connectToDaemon().isEmpty());
         (void)other.call(u"SaveAction"_s, {QString(), u"Tweet"_s, u"Turn this into a tweet"_s, u"fast"_s});
         QTRY_VERIFY_WITH_TIMEOUT(w.findChild<QAction*>(u"custom.tweet"_s) != nullptr, kTimeoutMs);
-        w.findChild<QPlainTextEdit*>(u"text"_s)->setPlainText(u"We launch on March 12."_s);
+        w.findChild<QTextEdit*>(u"text"_s)->setPlainText(u"We launch on March 12."_s);
         setAnswers({u"Launching March 12!"_s});
         const QSignalSpy finished(&w, &MainWindow::finished);
         w.findChild<QAction*>(u"custom.tweet"_s)->trigger();
@@ -446,7 +445,7 @@ private Q_SLOTS:
         MainWindow w;
         w.start();
         QVERIFY(w.findChild<QLabel*>(u"statusText"_s)->text().contains(u"No model"_s));
-        w.findChild<QPlainTextEdit*>(u"text"_s)->setPlainText(u"teh cat"_s);
+        w.findChild<QTextEdit*>(u"text"_s)->setPlainText(u"teh cat"_s);
         runAndWait(w);
         QVERIFY(outputText(w).contains(u"No model is installed"_s));
     }
@@ -460,7 +459,7 @@ private Q_SLOTS:
         MainWindow w;
         w.setHistory(keeper.get());
         w.start();
-        auto* text = w.findChild<QPlainTextEdit*>(u"text"_s);
+        auto* text = w.findChild<QTextEdit*>(u"text"_s);
         text->setPlainText(u"Whisk the egg's with the milk"_s);
         w.selectSkill(u"proofread"_s);
 
@@ -582,7 +581,7 @@ private Q_SLOTS:
         }
         MainWindow w;
         w.start();
-        w.findChild<QPlainTextEdit*>(u"text"_s)->setPlainText(u"Their going home."_s);
+        w.findChild<QTextEdit*>(u"text"_s)->setPlainText(u"Their going home."_s);
         const QSignalSpy finished(&w, &MainWindow::finished);
         w.run();
         QTRY_VERIFY_WITH_TIMEOUT(!outputText(w).isEmpty(), kTimeoutMs); // it streams
@@ -604,7 +603,7 @@ private Q_SLOTS:
         }
         MainWindow w;
         w.start();
-        w.findChild<QPlainTextEdit*>(u"text"_s)->setPlainText(u"Their going home."_s);
+        w.findChild<QTextEdit*>(u"text"_s)->setPlainText(u"Their going home."_s);
         const auto* pill = w.findChild<QWidget*>(u"busyPill"_s);
         const auto* skeleton = w.findChild<QWidget*>(u"skeleton"_s);
         const auto* info = w.findChild<QLabel*>(u"outInfo"_s);
@@ -645,7 +644,7 @@ private Q_SLOTS:
         startDaemon({u"fast-model"_s});
         MainWindow w;
         w.start();
-        w.findChild<QPlainTextEdit*>(u"text"_s)->setPlainText(u"See you at the station at noon."_s);
+        w.findChild<QTextEdit*>(u"text"_s)->setPlainText(u"See you at the station at noon."_s);
         for (const QString& base : {u"rewrite"_s, u"format"_s, u"translate"_s}) {
             QMenu* menu = w.findChild<paraphrase::app::ChipButton*>(u"action-"_s + base)->menu();
             Q_EMIT menu->aboutToShow();
@@ -696,7 +695,7 @@ private Q_SLOTS:
         }
         MainWindow w;
         w.start();
-        w.findChild<QPlainTextEdit*>(u"text"_s)->setPlainText(u"Their going home."_s);
+        w.findChild<QTextEdit*>(u"text"_s)->setPlainText(u"Their going home."_s);
         const QSignalSpy finished(&w, &MainWindow::finished);
         w.run();
         QTRY_VERIFY_WITH_TIMEOUT(!outputText(w).isEmpty(), kTimeoutMs);
@@ -722,7 +721,7 @@ private Q_SLOTS:
                 w.resize(1180, 720);
                 w.show();
                 w.start();
-                w.findChild<QPlainTextEdit*>(u"text"_s)->setPlainText(
+                w.findChild<QTextEdit*>(u"text"_s)->setPlainText(
                     u"Pancakes (serves 4)\n1. Mix the flour, sugar and a pinch of salt in a large bowl.\n"
                     "2. Whisk the egg's with the milk and add it slowly to the dry ingredients\n"
                     "3. Let the batter rest for 10 minute.\n4. Cook on a medium heat until bubbles appears."_s);
@@ -735,7 +734,7 @@ private Q_SLOTS:
                 QVERIFY(
                     grabNow(w).save(dir + u"/main-window-proofread-%1.png"_s.arg(QLatin1StringView(theme))));
                 w.selectSkill(u"reply"_s);
-                w.findChild<QPlainTextEdit*>(u"message"_s)
+                w.findChild<QTextEdit*>(u"message"_s)
                     ->setPlainText(u"बेटा, रविवार को दादी का जन्मदिन है। सब लोग दोपहर 12 बजे तक घर आ जाना।"_s);
                 setAnswers(
                     {uR"({"replies": ["ठीक है, मैं 12 बजे तक आ जाऊँगा।", "क्या मैं कुछ लेकर आऊँ?", "ज़रूर, दादी को मेरी ओर से बधाई!"]})"_s});
@@ -744,13 +743,13 @@ private Q_SLOTS:
                 if (auto* full = w.findChild<QPushButton*>(u"fullReply"_s);
                     full != nullptr && !full->parentWidget()->isHidden()) {
                     full->click();
-                    w.findChild<QPlainTextEdit*>(u"fullMessage"_s)
+                    w.findChild<QTextEdit*>(u"fullMessage"_s)
                         ->setPlainText(u"Hi Priya,\n\nThanks for sending the Q3 vendor report. Could we get "
                                        u"on a call this "
                                        "Thursday at 3 pm to go through the delivery delays? I'd also like "
                                        "the updated cost "
                                        "sheet before then, if possible.\n\nBest,\nDaniel"_s);
-                    w.findChild<QPlainTextEdit*>(u"intent"_s)
+                    w.findChild<QTextEdit*>(u"intent"_s)
                         ->setPlainText(
                             u"Thursday doesn't work, offer Friday 11 am. Cost sheet by Wednesday."_s);
                     setAnswers({
@@ -765,7 +764,7 @@ private Q_SLOTS:
                 }
                 if (auto* write = w.findChild<paraphrase::app::ChipButton*>(u"action-compose"_s)) {
                     write->click();
-                    w.findChild<QPlainTextEdit*>(u"composeText"_s)
+                    w.findChild<QTextEdit*>(u"composeText"_s)
                         ->setPlainText(
                             u"Tell the team the office is closed on Monday for the plumbing repair. Everyone "
                             "works from home; the standup moves to the video call at 10 am. Thank Ravi for "

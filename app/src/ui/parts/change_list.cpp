@@ -37,7 +37,7 @@ ChangeList::ChangeList(QWidget* parent)
     auto* content = new QWidget;
     m_rows = new QVBoxLayout(content);
     m_rows->setContentsMargins(0, 0, 0, 0);
-    m_rows->setSpacing(2);
+    m_rows->setSpacing(4); // .changes rows: 30 px each, 34 apart (main-window.html)
     setWidget(content);
     setVisible(false);
 }

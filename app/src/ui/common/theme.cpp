@@ -8,6 +8,7 @@
 #include <QStyleHints>
 #include <QSvgRenderer>
 
+#include <cmath>
 #include <utility>
 
 using namespace Qt::StringLiterals;
@@ -28,7 +29,7 @@ QLabel[role="caption"] { font-size: 11px; font-weight: 700; letter-spacing: 1px;
 QLabel[role="private"] { color: @private@; font-size: 12px; }
 QLabel[role="warning"] { color: @warning@; }
 QLabel[role="danger"] { color: @danger@; }
-QLabel[role="pill"] { background: @hover@; color: @muted@; border: 1px solid transparent; border-radius: 10px; padding: 1px 8px; font-size: 12px; }
+QLabel[role="pill"] { background: @hover@; color: @muted@; border: 1px solid transparent; border-radius: 11px; padding: 2px 9px; font-size: 12px; }
 
 QFrame#header { background: @bar@; border-bottom: 1px solid @border@; }
 QFrame#notice { background: @warningBg@; border-bottom: 1px solid @border@; }
@@ -41,12 +42,12 @@ QFrame#pane { background: @panel@; border: 1px solid @border@; border-radius: 12
 QFrame#paneHead { border: none; border-bottom: 1px solid @border@; border-radius: 0; }
 QFrame#paneFoot { border: none; border-top: 1px solid @border@; border-radius: 0; }
 
-QPlainTextEdit, QTextBrowser, QLineEdit {
+QPlainTextEdit, QTextEdit, QLineEdit {
     background: @input@; color: @text@; border: 1px solid @border@; border-radius: 10px;
     padding: 6px 8px; font-size: 15px; selection-background-color: @accentSoft@; selection-color: @text@; }
 QLineEdit { border-radius: 8px; min-height: 26px; }
-QPlainTextEdit:focus, QLineEdit:focus { border: 1px solid @accent@; }
-QPlainTextEdit#text, QTextBrowser#output { background: transparent; border: none; padding: 0; }
+QPlainTextEdit:focus, QTextEdit[field="true"]:focus, QLineEdit:focus { border: 1px solid @accent@; }
+QTextEdit#text, QTextBrowser#output { background: transparent; border: none; padding: 0; }
 
 QPushButton, QToolButton {
     background: @panel@; color: @text@; border: 1px solid @border@; border-radius: 8px;
@@ -59,26 +60,30 @@ QPushButton[kind="flat"]:hover { background: @hover@; }
 QPushButton[kind="flat"]:checked { background: @accentSoft@; color: @accent@; }
 QPushButton[kind="link"] { background: transparent; border-color: transparent; color: @link@; min-height: 26px; padding: 0 8px; }
 QPushButton[kind="link"]:hover { background: @hover@; }
+QWidget#installedModels QPushButton[kind="link"] { padding: 0 14px; }
+QWidget#changes QPushButton[kind="link"] { font-size: 12px; min-height: 28px; padding: 0 8px; }
 QPushButton[kind="icon"] { padding: 0; min-width: 32px; max-width: 32px; min-height: 32px; max-height: 32px; }
 QPushButton[kind="icon"][flat="true"] { background: transparent; border-color: transparent; }
 QPushButton[kind="icon"][flat="true"]:hover { background: @hover@; }
 QPushButton[btnSize="big"] { min-height: 42px; border-radius: 10px; }
 QPushButton[kind="primary"] { background: @accentStrong@; border-color: @accentStrong@; color: @accentText@; font-weight: 500; }
 QPushButton[kind="primary"]:hover { background: @accentHover@; }
-QPushButton[kind="primary"]:disabled { background: @hover@; border-color: @hover@; color: @muted@; }
+QPushButton[kind="primary"]:disabled { background: @primaryOff@; border-color: @primaryOff@; color: @primaryOffText@; }
 QPushButton[kind="action"] { min-height: 42px; border-radius: 10px; font-weight: 500; padding: 0; }
 QPushButton[kind="action"]:hover { border-color: @accent@; background: @panel@; }
 QPushButton[kind="action"]:checked { background: @accentStrong@; border-color: @accentStrong@; }
 QPushButton::menu-indicator { image: none; width: 0; }
 QPushButton[kind="choice"] { min-height: 46px; border-radius: 10px; padding: 0; text-align: left; }
 QPushButton[kind="choice"]:checked { background: @accentSoft@; border: 2px solid @accent@; }
-QPushButton[kind="choice"] QLabel#label { font-size: 15px; }
+QPushButton[kind="choice"] QLabel#label { font-size: 15px; font-weight: 400; }
 
 QLabel#num { font-family: monospace; font-size: 11px; font-weight: 600; border-radius: 4px;
     padding: 1px 5px; background: @hover@; color: @muted@; }
 QLabel#num[on="true"] { background: rgba(255, 255, 255, 51); color: @accentText@; }
 QLabel#label { font-weight: 500; }
 QLabel#label[on="true"] { color: @accentText@; }
+QLabel#label[on="off"], QLabel#num[on="off"] { color: @primaryOffText@; }
+QLabel#num[on="off"] { background: rgba(255, 255, 255, 51); }
 
 QFrame#seg { background: @hover@; border-radius: 8px; }
 QPushButton[kind="segment"] { background: transparent; border: none; border-radius: 6px; padding: 0 10px;
@@ -90,6 +95,7 @@ QLabel[chip="del"] { color: @del@; background: @delBg@; border-radius: 3px; padd
 QLabel[chip="ins"] { color: @ins@; background: @insBg@; border-radius: 3px; padding: 0 2px;
     border-bottom: 2px solid @ins@; font-family: monospace; font-size: 12px; }
 QLabel[chip="pill"] { color: @muted@; background: @hover@; border-radius: 9px; padding: 0 8px;
+    min-height: 18px; max-height: 18px;
     font-family: monospace; font-size: 12px; }
 
 QFrame#actionRow { border: none; border-bottom: 1px solid @border@; }
@@ -104,7 +110,7 @@ QPushButton#clearLanguage:hover { background: @hover@; }
 QFrame#popupFoot { border: none; border-top: 1px solid @border@; background: @bar@;
     border-bottom-left-radius: 14px; border-bottom-right-radius: 14px; }
 QLabel#source { background: @sunk@; border-radius: 10px; padding: 11px 14px; font-size: 15px; }
-QWidget#resultBox QTextBrowser#output { border: 1px solid @border@; border-radius: 10px; padding: 12px 14px; }
+QWidget#resultBox QTextBrowser#output { background: @panel@; border: 1px solid @border@; border-radius: 10px; padding: 12px 14px; }
 QLabel#popupTitle { font-weight: 600; }
 QLabel[role="kbd"] { border: 1px solid @border@; border-bottom-width: 2px; border-radius: 5px;
     padding: 0 6px; font-size: 12px; }
@@ -148,6 +154,16 @@ QScrollBar::add-line, QScrollBar::sub-line { width: 0; height: 0; border: none; 
 QScrollBar::add-page, QScrollBar::sub-page { background: none; }
 QAbstractScrollArea::corner { background: transparent; }
 )";
+
+constexpr double kDisabledOpacity = 0.45;
+
+QColor blend(const QColor& top, const QColor& under, double alpha)
+{
+    const auto mix = [alpha](int a, int b) {
+        return static_cast<int>(std::lround((alpha * a) + ((1.0 - alpha) * b)));
+    };
+    return {mix(top.red(), under.red()), mix(top.green(), under.green()), mix(top.blue(), under.blue())};
+}
 
 } // namespace
 
@@ -260,6 +276,11 @@ QString Theme::styleSheet(const Tokens& t)
     for (const auto& [name, colour] : colours) {
         css.replace(name.toString(), colour.name());
     }
+    // A disabled primary button is the filled one at 45% (mock.css .btn:disabled), worked out
+    // over the pane it sits on: a grey fill read as a different, plain button.
+    const QColor off = blend(t.accentStrong, t.panel, kDisabledOpacity);
+    css.replace(u"@primaryOffText@"_s, blend(QColor(Qt::white), off, kDisabledOpacity).name());
+    css.replace(u"@primaryOff@"_s, off.name());
     return css;
 }
 

@@ -38,6 +38,8 @@ QString html(const QString& text)
 }
 
 constexpr int kLineHeight = 125;
+constexpr int kReplyGap = 10;
+constexpr int kPopupReplyGap = 12;
 
 /// Plain text at the mocks' reading line height (mock.css: 15px/1.7). Qt scales the font's own
 /// line spacing, about 1.36 em, so 1.7 em is kLineHeight percent.
@@ -315,6 +317,7 @@ void QuickRepliesView::setForPopup(bool popup)
         copy->setVisible(!popup);
     }
     m_editLabel->setText(popup ? tr("Edit before sending") : tr("Edit before copying"));
+    layout()->setSpacing(popup ? kPopupReplyGap : kReplyGap); // popup-reply.html .stack: 12
 }
 
 void QuickRepliesView::setReplies(const QStringList& replies)

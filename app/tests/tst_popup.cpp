@@ -284,7 +284,7 @@ private Q_SLOTS:
                 uR"({"replies": ["Haan, rakh do main check karta hoon.", "Thoda time do, main call karta hoon.", "Abhi nahi, main khud utha lunga."]})"_s,
             });
             pick(popup, u"action-reply"_s);
-            QCoreApplication::processEvents(); // queued shows land first
+            QTest::qWait(100); // as above: the replies settle and the popup fits them
             QVERIFY(popup.window()->grab().save(dir + u"/popup-reply-%1.png"_s.arg(name)));
         }
         qunsetenv("PARAPHRASE_THEME");

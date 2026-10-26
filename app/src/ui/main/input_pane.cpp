@@ -1,6 +1,7 @@
 #include "ui/main/input_pane.h"
 
 #include "ui/common/chip_button.h"
+#include "ui/common/text_field.h"
 #include "ui/core/languages.h"
 #include "ui/parts/input_pages.h"
 #include "util/language_detector.h"
@@ -10,7 +11,6 @@
 #include <QFontMetrics>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QPlainTextEdit>
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QStackedWidget>
@@ -131,8 +131,8 @@ bool InputPane::isEmpty() const
 
 void InputPane::focusField() const
 {
-    const auto fields = page()->findChildren<QPlainTextEdit*>();
-    const auto first = std::ranges::find_if(fields, [](const QPlainTextEdit* f) { return !f->isReadOnly(); });
+    const auto fields = page()->findChildren<TextField*>();
+    const auto first = std::ranges::find_if(fields, [](const TextField* f) { return !f->isReadOnly(); });
     if (first != fields.end()) {
         (*first)->setFocus();
     }
@@ -191,14 +191,16 @@ void InputPane::updateRun()
     m_run->setLabel(m_runLabel);
     label->ensurePolished(); // the theme's font, not the default one
     const QFontMetrics metrics(label->font());
-    const int parts = m_run->sizeHint().width() - metrics.horizontalAdvance(m_runLabel);
+    // The label's own hint, as the layout uses it: the text's advance rounds differently per
+    // label and moved the button by a pixel.
+    const int parts = m_run->sizeHint().width() - label->sizeHint().width();
     // Measured in the bolder weight, so the filled and the plain button share one width.
     QFont bold = label->font();
     bold.setWeight(QFont::DemiBold);
     const QFontMetrics boldMetrics(bold);
     int longest = 0;
     for (const QString& fixed : {tr("Write the reply"), tr("Write 3 replies"), tr("Summarize")}) {
-        longest = std::max(longest, boldMetrics.horizontalAdvance(fixed));
+        longest = std::max(longest, boldMetrics.boundingRect(QRect(), Qt::TextSingleLine, fixed).width());
     }
     const int width = std::max(kRunWidth, parts + longest);
     m_run->setFixedWidth(width);

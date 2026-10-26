@@ -13,10 +13,10 @@
 #include <QDir>
 #include <QLabel>
 #include <QMenu>
-#include <QPlainTextEdit>
 #include <QPushButton>
 #include <QSignalSpy>
 #include <QTest>
+#include <QTextEdit>
 
 using namespace Qt::StringLiterals;
 using paraphrase::app::MainWindow;
@@ -110,7 +110,7 @@ private Q_SLOTS:
                 qWarning("skipped %s: no skill %s", qPrintable(c.name), qPrintable(c.skill));
                 continue;
             }
-            w.findChild<QPlainTextEdit*>(u"text"_s)->setPlainText(c.text);
+            w.findChild<QTextEdit*>(u"text"_s)->setPlainText(c.text);
             runAndWait(w);
             QVERIFY2(!w.resultText().trimmed().isEmpty(), qPrintable(c.name));
             QVERIFY(w.grab().save(m_dir + u"/real-window-"_s + c.name + u".png"_s));
@@ -124,7 +124,7 @@ private Q_SLOTS:
         w.show();
         w.start();
         w.selectSkill(u"reply"_s);
-        w.findChild<QPlainTextEdit*>(u"message"_s)
+        w.findChild<QTextEdit*>(u"message"_s)
             ->setPlainText(u"bhaiya parcel aapke ghar ke bahar rakh du? koi phone nahi utha raha"_s);
         runAndWait(w);
         QVERIFY(!w.resultText().isEmpty());
@@ -134,11 +134,11 @@ private Q_SLOTS:
             return;
         }
         full->click();
-        w.findChild<QPlainTextEdit*>(u"fullMessage"_s)
+        w.findChild<QTextEdit*>(u"fullMessage"_s)
             ->setPlainText(
                 u"Hi Priya, could we get on a call this Thursday at 3 pm to go through the delivery "
                 "delays? I'd also like the updated cost sheet before then. Best, Daniel"_s);
-        w.findChild<QPlainTextEdit*>(u"intent"_s)
+        w.findChild<QTextEdit*>(u"intent"_s)
             ->setPlainText(u"Thursday doesn't work, offer Friday 11 am. Cost sheet by Wednesday."_s);
         runAndWait(w);
         QVERIFY(w.resultText().contains(u"11"_s));

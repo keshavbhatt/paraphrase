@@ -91,7 +91,9 @@ void ChipButton::setWordWrap(bool wrap)
 {
     m_label->setWordWrap(wrap);
     m_layout->setContentsMargins(14, 10, 14, 10);
-    setSizePolicy(wrap ? QSizePolicy::Expanding : QSizePolicy::Fixed, QSizePolicy::Preferred);
+    QSizePolicy policy(wrap ? QSizePolicy::Expanding : QSizePolicy::Fixed, QSizePolicy::Preferred);
+    policy.setHeightForWidth(wrap);
+    setSizePolicy(policy);
 }
 
 QSize ChipButton::sizeHint() const
@@ -104,8 +106,23 @@ QSize ChipButton::sizeHint() const
 QSize ChipButton::minimumSizeHint() const
 {
     QSize size = m_layout->minimumSize();
+    if (hasHeightForWidth()) {
+        // A wrapped label's minimum is every word on its own line: the popup sized itself to
+        // that and left a gap under the replies. Its height comes from heightForWidth().
+        size.setHeight(0);
+    }
     size.setHeight(std::max(size.height(), minimumHeight()));
     return size;
+}
+
+bool ChipButton::hasHeightForWidth() const
+{
+    return m_label->wordWrap();
+}
+
+int ChipButton::heightForWidth(int width) const
+{
+    return std::max(m_layout->totalHeightForWidth(width), minimumHeight());
 }
 
 void ChipButton::restyle()
@@ -113,8 +130,10 @@ void ChipButton::restyle()
     // "on": the label sits on the accent (a checked action, the primary button).
     const QString kind = property("kind").toString();
     const bool on = (isChecked() && kind == u"action"_s) || kind == u"primary"_s;
+    // "off": the same, disabled, faded like the button under it.
+    const QVariant state = on ? QVariant(isEnabled() ? u"true"_s : u"off"_s) : QVariant(false);
     for (QLabel* l : {m_chip, m_label}) {
-        l->setProperty("on", on);
+        l->setProperty("on", state);
         l->style()->unpolish(l);
         l->style()->polish(l);
     }
@@ -122,7 +141,7 @@ void ChipButton::restyle()
 
 bool ChipButton::event(QEvent* e)
 {
-    if (e->type() == QEvent::DynamicPropertyChange) {
+    if (e->type() == QEvent::DynamicPropertyChange || e->type() == QEvent::EnabledChange) {
         restyle();
     }
     return QPushButton::event(e);

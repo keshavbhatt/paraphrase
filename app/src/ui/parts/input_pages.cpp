@@ -1,5 +1,6 @@
 #include "ui/parts/input_pages.h"
 
+#include "ui/common/text_field.h"
 #include "ui/common/widgets.h"
 #include "ui/parts/tone_picker.h"
 
@@ -8,7 +9,6 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMenu>
-#include <QPlainTextEdit>
 #include <QPushButton>
 #include <QSettings>
 #include <QVBoxLayout>
@@ -31,9 +31,10 @@ const QString kComposeToneKey = u"compose/tone"_s;
 /// The compose presets, in the order of the switch (main-window-compose.html).
 constexpr std::array<QStringView, 4> kComposeKinds = {u"email", u"message", u"post", u"note"};
 
-QPlainTextEdit* field(const QString& name, const QString& placeholder)
+TextField* field(const QString& name, const QString& placeholder,
+                 int lineHeight = TextField::kFieldLineHeight)
 {
-    auto* edit = new QPlainTextEdit;
+    auto* edit = new TextField(lineHeight);
     edit->setObjectName(name);
     edit->setPlaceholderText(placeholder);
     // A long link or word wraps instead of scrolling sideways.
@@ -58,13 +59,13 @@ bool filled(const QString& s)
 
 TextInput::TextInput(QWidget* parent)
     : InputPage(parent)
-    , m_text(field(u"text"_s, tr("Type or paste your text")))
+    , m_text(field(u"text"_s, tr("Type or paste your text"), TextField::kTextLineHeight))
 {
     auto* layout = new QVBoxLayout(this);
     layout->setContentsMargins(14, 12, 14, 12);
     m_text->document()->setDocumentMargin(0); // the page's margins are the whole inset
     layout->addWidget(m_text);
-    connect(m_text, &QPlainTextEdit::textChanged, this, &InputPage::edited);
+    connect(m_text, &QTextEdit::textChanged, this, &InputPage::edited);
 }
 
 QString TextInput::subject() const
@@ -107,8 +108,8 @@ QuickReplyInput::QuickReplyInput(QWidget* parent)
     m_draft->setFixedHeight(kDraftHeight);
     layout->addWidget(m_draft);
     layout->addStretch();
-    for (const QPlainTextEdit* edit : {m_message, m_draft}) {
-        connect(edit, &QPlainTextEdit::textChanged, this, &InputPage::edited);
+    for (const TextField* edit : {m_message, m_draft}) {
+        connect(edit, &QTextEdit::textChanged, this, &InputPage::edited);
     }
 }
 
@@ -185,8 +186,8 @@ FullReplyInput::FullReplyInput(QWidget* parent)
         Q_EMIT kindChanged();
     });
     connect(m_tone, &TonePicker::changed, this, &FullReplyInput::toneChanged);
-    for (const QPlainTextEdit* edit : {m_message, m_intent}) {
-        connect(edit, &QPlainTextEdit::textChanged, this, &InputPage::edited);
+    for (const TextField* edit : {m_message, m_intent}) {
+        connect(edit, &QTextEdit::textChanged, this, &InputPage::edited);
     }
 }
 
@@ -277,7 +278,7 @@ ComposeInput::ComposeInput(QWidget* parent)
         Q_EMIT kindChanged();
     });
     connect(m_tone, &TonePicker::changed, this, &ComposeInput::toneChanged);
-    connect(m_description, &QPlainTextEdit::textChanged, this, &InputPage::edited);
+    connect(m_description, &QTextEdit::textChanged, this, &InputPage::edited);
 }
 
 QString ComposeInput::subject() const

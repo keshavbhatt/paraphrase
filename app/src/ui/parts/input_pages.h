@@ -11,12 +11,12 @@
 #include <utility>
 
 class QLabel;
-class QPlainTextEdit;
 class QPushButton;
 
 namespace paraphrase::app {
 
 class SegmentedControl;
+class TextField;
 class TonePicker;
 
 /// What a kind of action needs from the user, as one page of the input pane. Each page owns
@@ -64,7 +64,7 @@ public:
     void clear() override;
 
 private:
-    QPlainTextEdit* m_text = nullptr;
+    TextField* m_text = nullptr;
 };
 
 /// The message you got and, optionally, the reply you started (main-window-reply.html).
@@ -83,8 +83,8 @@ public:
     void clear() override;
 
 private:
-    QPlainTextEdit* m_message = nullptr;
-    QPlainTextEdit* m_draft = nullptr;
+    TextField* m_message = nullptr;
+    TextField* m_draft = nullptr;
 };
 
 /// The message, what you want to say, email or chat message, and a tone
@@ -116,8 +116,8 @@ Q_SIGNALS:
 
 private:
     QLabel* m_language = nullptr;
-    QPlainTextEdit* m_message = nullptr;
-    QPlainTextEdit* m_intent = nullptr;
+    TextField* m_message = nullptr;
+    TextField* m_intent = nullptr;
     SegmentedControl* m_kind = nullptr;
     TonePicker* m_tone = nullptr;
 };
@@ -148,7 +148,7 @@ Q_SIGNALS:
     void toneChanged();
 
 private:
-    QPlainTextEdit* m_description = nullptr;
+    TextField* m_description = nullptr;
     SegmentedControl* m_kind = nullptr;
     TonePicker* m_tone = nullptr;
 };

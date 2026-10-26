@@ -37,6 +37,9 @@ public:
 
     [[nodiscard]] QSize sizeHint() const override;
     [[nodiscard]] QSize minimumSizeHint() const override;
+    /// A wrapping label is as tall as its lines at the given width, not at its narrowest.
+    [[nodiscard]] bool hasHeightForWidth() const override;
+    [[nodiscard]] int heightForWidth(int width) const override;
 
 protected:
     bool event(QEvent* e) override;

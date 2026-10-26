@@ -45,14 +45,14 @@ void setButtonIcon(QPushButton* button, const QString& name, const QColor& color
     button->setIconSize(QSize(size + kExtraGap, size));
 }
 
-QVBoxLayout* pageHeading(const QString& title, const QString& intro)
+QVBoxLayout* pageHeading(const QString& title, const QString& intro, int maxWidth)
 {
     auto* heading = new QVBoxLayout;
     heading->setSpacing(6);
     heading->addWidget(makeLabel(title, u"h1"_s));
     QLabel* text = makeLabel(intro, u"muted"_s);
     text->setWordWrap(true);
-    text->setMaximumWidth(560);
+    text->setMaximumWidth(maxWidth); // the mocks' max-width: 64ch, or 640 px on Privacy
     heading->addWidget(text);
     return heading;
 }

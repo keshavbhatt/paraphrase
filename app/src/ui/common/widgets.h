@@ -20,7 +20,7 @@ namespace paraphrase::app {
 /// text on a click, such as Retry to Stop, never moves the buttons beside it.
 void reserveWidth(QPushButton* button, const QStringList& texts, const QIcon& icon = {});
 /// A settings page's title and its intro, 6 px apart (settings mocks: h1 and intro in a .stack).
-[[nodiscard]] QVBoxLayout* pageHeading(const QString& title, const QString& intro);
+[[nodiscard]] QVBoxLayout* pageHeading(const QString& title, const QString& intro, int maxWidth = 560);
 /// An icon beside a button's text with the mocks' 6 px gap: before the text, or after it (a menu
 /// arrow). An empty name clears the icon.
 void setButtonIcon(QPushButton* button, const QString& name, const QColor& color, int size,

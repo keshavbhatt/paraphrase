@@ -5,10 +5,14 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QPixmap>
 
 using namespace Qt::StringLiterals;
 
 namespace paraphrase::app {
+namespace {
+constexpr int kCheckSize = 14;
+} // namespace
 
 StepHeader::StepHeader(const QString& title, const QStringList& steps, QWidget* parent)
     : QFrame(parent)
@@ -45,8 +49,18 @@ void StepHeader::setStep(int current, const QList<int>& done)
             state = u"done"_s;
         }
         m_names.at(i)->setProperty("step", state);
-        m_badges.at(i)->setProperty("badge", state == u"on"_s ? u"on"_s : u"todo"_s);
-        m_badges.at(i)->setText(state == u"done"_s ? u"✓"_s : QString::number(i + 1));
+        // A finished step shows a bare check in the success colour (setup-model.html li.done),
+        // in the same 18 px box, so the names beside it stay put.
+        QLabel* badge = m_badges.at(i);
+        badge->setProperty("badge", state);
+        if (state == u"done"_s) {
+            badge->setText(QString());
+            badge->setPixmap(
+                Theme::icon(u"check"_s, Theme::current().success, kCheckSize).pixmap(kCheckSize));
+        } else {
+            badge->setPixmap(QPixmap());
+            badge->setText(QString::number(i + 1));
+        }
         repolish(m_names.at(i));
         repolish(m_badges.at(i));
     }

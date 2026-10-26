@@ -91,7 +91,7 @@ DownloadPanel::DownloadPanel(const ModelInfo& model, QWidget* parent)
 {
     setObjectName(u"card"_s);
     auto* col = new QVBoxLayout(this);
-    col->setContentsMargins(18, 14, 18, 14);
+    col->setContentsMargins(18, 16, 18, 16); // .card
     col->setSpacing(10);
     auto* top = new QHBoxLayout;
     top->setSpacing(10);
