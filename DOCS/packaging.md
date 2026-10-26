@@ -119,8 +119,9 @@ moves. Good as a portable "try it" build, not the main channel.
 
 `snap/snapcraft.yaml` builds the whole tree with the **kde-neon-6** extension (Qt 6.11 from
 the `kf6-core24` content snap, the runtime `scripts/dev-run.sh` targets), as Omnidict does.
-GitHub builds it (`.github/workflows/snap.yml`, amd64; this machine has no LXD) and keeps it as
-a workflow artifact for `sudo snap install --dangerous`. Grade `devel` and no store upload
+GitHub builds it (`.github/workflows/snap.yml`, amd64; this machine has no LXD) and attaches
+it to the draft release `snap-edge` (workflow artifacts hit the account's storage quota) for
+`sudo snap install --dangerous`. Grade `devel` and no store upload
 until the D-Bus names are approved (M5).
 
 - Apps: `paraphrase` is the app (`paraphrase-app`; the desktop file, the autostart entry and

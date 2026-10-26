@@ -9,10 +9,34 @@ Newest first. One entry per working session.
 | M0 Feasibility spike | done: go (DOCS/models.md, 2026-10-22) |
 | M1 Daemon | done (2026-10-22) |
 | M2 Main window + popup on X11 + KDE Wayland | in progress: main window, popup, backends built; live desktop checks left |
-| M3 Polish + GNOME/wlroots | todo |
+| M3 Polish + GNOME/wlroots | in progress (owner, 2026-10-27: M3, then the snap first): settings, model manager, My actions, Write, history, autostart and MTP drafting built; GNOME clipboard flow fixed in code; live GNOME check and first-run timing left |
 | M4 Mail | todo |
 | M5 Release | todo |
 | M6 IME + Windows | todo |
+
+## 2026-10-27 - Hindi email greetings, M3 gaps, the snap recipe
+
+Owner asked for M3, then a snap first (2026-10-26). M2's live app checks stay open.
+
+- Format 7 (owner report): a Hindi text formatted as an email got "Hi," and "Thanks,". The
+  line that names the text's language now also covers any greeting, closing or heading the
+  layout adds, and the closing is "Thanks," alone "with no name line after it". English lines
+  added to Hindi emails: E2B 6 to 2, E4B 4 to 1; "[Sender Name]" on E2B 1 to 0. New metric
+  `added_english`, 3 new Hindi email items. First output about +0.2 s. DOCS/models.md.
+- M3 survey: settings, model manager, My actions, Write, optional history, login autostart
+  and MTP drafting were already built during M2. Left: GNOME, the snap, first-run timing.
+- GNOME: Wayland sends the clipboard only to the window with focus, and the popup read it
+  before it had focus. The clipboard backend now says it `needsFocus`, and the popup reads
+  again when it gets focus and on each clipboard change until an action runs
+  (`readsTheClipboardAgainOnceItHasFocus`). Not run on a GNOME session yet.
+- The command to bind and the login entry now name the package's own command
+  (`launchLine`): `paraphrase --popup` in the snap, `flatpak run com.ktechpit.paraphrase`,
+  the AppImage path, or `paraphrase-app`. The snap's autostart file goes to
+  `$SNAP_USER_DATA/.config/autostart`.
+- Packaging: install rules for the daemon, the CLI, the skills and llama.cpp's libraries, with
+  the per-CPU libraries in `lib/paraphrase/ggml` and relative RUNPATHs. A staged install ran
+  a real proofread. `snap/snapcraft.yaml` and a GitHub workflow that builds it
+  (DOCS/packaging.md, 5a).
 
 ## 2026-10-26 - The popup opens in the main window with what it shows
 

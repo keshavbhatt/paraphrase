@@ -1,5 +1,6 @@
 #include "ui/settings/shortcut_settings_page.h"
 
+#include "ui/common/elided_label.h"
 #include "ui/common/widgets.h"
 #include "ui/core/preferences.h"
 #include "ui/setup/desktop_access.h"
@@ -185,9 +186,9 @@ QWidget* ShortcutSettingsPage::byHandCard(const DesktopSupport& support)
                                  "settings that runs this command:"),
                               u"small"_s));
     auto* row = new QHBoxLayout;
-    QLabel* command = makeLabel(support.command, u"cmd"_s);
+    auto* command = new ElidedLabel(support.command);
+    command->setProperty("role", u"cmd"_s);
     command->setObjectName(u"popupCommand"_s);
-    command->setTextInteractionFlags(Qt::TextSelectableByMouse);
     QPushButton* copy = makeButton(tr("Copy"));
     copy->setObjectName(u"copyCommand"_s);
     row->addWidget(command, 1);

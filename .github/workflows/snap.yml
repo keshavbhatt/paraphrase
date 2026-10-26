@@ -1,5 +1,8 @@
-# Builds the snap on GitHub's CI (this machine has no LXD) and keeps it as a workflow artifact
-# for a local `snap install --dangerous`. Store publishing comes later (M5), as in Omnidict.
+# Builds the snap on GitHub's CI (this machine has no LXD) and attaches it to the draft
+# release "snap-edge" (drafts are seen only by the repo's collaborators; release files do not
+# count against the Actions storage quota, which workflow artifacts hit). Install it with
+#   gh release download snap-edge -p '*.snap' && sudo snap install --dangerous paraphrase_*.snap
+# Store publishing comes later (M5), as in Omnidict.
 name: snap
 
 on:
@@ -25,6 +28,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write # the draft release
     steps:
       - uses: actions/checkout@v5
         with:
@@ -35,8 +40,17 @@ jobs:
         uses: snapcore/action-build@v1
         id: build
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: paraphrase-snap-amd64
-          path: ${{ steps.build.outputs.snap }}
-          retention-days: 14
+      - name: Attach to the draft release snap-edge
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SNAP_FILE: ${{ steps.build.outputs.snap }}
+        run: |
+          if ! gh release view snap-edge >/dev/null 2>&1; then
+            gh release create snap-edge --draft --prerelease --title "Snap (edge build)" \
+              --notes "The latest snap built from main, for testing: sudo snap install --dangerous"
+          fi
+          # One snap at a time: the newest replaces the others.
+          for old in $(gh release view snap-edge --json assets -q '.assets[].name'); do
+            gh release delete-asset snap-edge "$old" --yes
+          done
+          gh release upload snap-edge "$SNAP_FILE"

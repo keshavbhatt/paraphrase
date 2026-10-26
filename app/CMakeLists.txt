@@ -131,6 +131,7 @@ add_library(paraphrase_ui STATIC
     src/ui/core/user_actions_client.cpp
     src/ui/setup/step_header.cpp
     src/ui/common/theme.cpp
+    src/ui/common/elided_label.cpp
     src/ui/common/text_field.cpp
     src/ui/common/toggle_switch.cpp
     src/ui/settings/tier_pickers.cpp
