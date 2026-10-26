@@ -125,6 +125,15 @@ def test_table_rows_counts_data_rows_only() -> None:
 def test_format_shape_per_preset() -> None:
     assert metrics.format_shape("bullets", "Shopping:\n- milk\n- eggs", None)
     assert not metrics.format_shape("bullets", "milk, eggs", None)
+    # A sentence of the text left without "- " is not a heading (owner report, 2026-10-26).
+    first_left = (
+        "मैंने आपको सोमवार की यूज़र स्टोरी मैपिंग सेशन का इनविटेशन भेज दिया है\n"
+        "- मैंने सब कुछ लिख दिया है\n- @Barbara मैंने FigJam लिया"
+    )
+    assert not metrics.format_shape("bullets", first_left, None)
+    assert metrics.format_shape("bullets", "Hi team,\n- milk\n- eggs", None)
+    left_in = "- milk\nand also some eggs from the shop\n- bread"
+    assert not metrics.format_shape("bullets", left_in, None)
     assert metrics.format_shape("email", "Hi Karen,\n\nPayment went out.\n\nThanks,\nRaj", None)
     assert not metrics.format_shape("email", "Payment went out yesterday.", None)
 

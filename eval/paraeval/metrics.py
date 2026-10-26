@@ -434,10 +434,33 @@ class FormatScore:
     obeyed: bool | None = None
 
 
+_BULLET = ("- ", "• ", "* ")
+_HEADING_WORDS = 6
+
+
+def bullets_shape(output: str) -> bool:
+    """2+ bullet lines, and every other line is the one heading or greeting above them.
+
+    A sentence of the text left without "- " is not a heading: the first line of a message
+    stayed unbulleted in Hindi (owner report, 2026-10-26) while the old check passed it.
+    """
+    lines = [line.strip() for line in output.splitlines() if line.strip()]
+    bulleted = [line.startswith(_BULLET) for line in lines]
+    if sum(bulleted) < 2:
+        return False
+    plain = [i for i, b in enumerate(bulleted) if not b]
+    if not plain:
+        return True
+    if plain != [0]:
+        return False
+    head = lines[0]
+    titled = head.endswith(":") or bool(_GREETING.match(head))
+    return titled or len(head.split()) <= _HEADING_WORDS
+
+
 def format_shape(preset: str, output: str, rows: int | None) -> bool:
     if preset == "bullets":
-        lines = output.splitlines()
-        return sum(line.lstrip().startswith(("- ", "• ", "* ")) for line in lines) >= 2
+        return bullets_shape(output)
     if preset == "table":
         got = table_rows(output)
         return got >= (rows or 2)
