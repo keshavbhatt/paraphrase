@@ -13,9 +13,11 @@
 #include "ui/common/chip_button.h"
 #include "ui/core/handover.h"
 
+#include <QClipboard>
 #include <QCoreApplication>
 #include <QDir>
 #include <QFrame>
+#include <QGuiApplication>
 #include <QLabel>
 #include <QMenu>
 #include <QMutexLocker>
@@ -49,6 +51,28 @@ public:
 
 private:
     QStringList& m_sent;
+};
+
+/// The clipboard as GNOME gives it: nothing until the popup has focus.
+class FocusCapture final : public CaptureBackend
+{
+public:
+    explicit FocusCapture(const QString& clipboard)
+        : m_clipboard(clipboard)
+    {}
+    [[nodiscard]] QString name() const override { return u"focus"_s; }
+    [[nodiscard]] bool available() const override { return true; }
+    [[nodiscard]] bool needsFocus() const override { return true; }
+    [[nodiscard]] std::optional<CapturedText> capture() override
+    {
+        if (m_clipboard.isEmpty()) {
+            return std::nullopt;
+        }
+        return CapturedText{.text = m_clipboard, .origin = u"clipboard"_s, .appName = {}, .window = {}};
+    }
+
+private:
+    const QString& m_clipboard;
 };
 
 CapturedText selected(const QString& text)
@@ -302,6 +326,33 @@ private Q_SLOTS:
         QVERIFY(busy != nullptr && !busy->isHidden());
         QTRY_VERIFY_WITH_TIMEOUT(busy->isHidden(), 5000); // the fake daemon is quick: then "Ready for"
         QVERIFY(popup.window()->findChild<QLabel*>(u"popupStatus"_s)->text().startsWith(u"Ready for"_s));
+    }
+
+    void readsTheClipboardAgainOnceItHasFocus()
+    {
+        // GNOME: the copied text reaches the popup only once it has focus.
+        QString clipboard;
+        std::vector<std::unique_ptr<CaptureBackend>> capture;
+        capture.push_back(std::make_unique<FocusCapture>(clipboard));
+        std::vector<std::unique_ptr<InsertBackend>> insert;
+        insert.push_back(std::make_unique<RecordingInsert>(m_sent));
+        QObject owner;
+        const Integrations backends(std::move(capture), std::move(insert),
+                                    std::vector<ShortcutBackend*>{new CommandShortcut(&owner)});
+        PopupController popup(backends);
+        popup.show();
+        const auto* status = popup.window()->findChild<QLabel*>(u"popupStatus"_s);
+        QVERIFY(status->text().startsWith(u"Select or copy"_s));
+        clipboard = u"Mia dont know where the keys are"_s;
+        Q_EMIT QGuiApplication::clipboard()->dataChanged();
+        QVERIFY(status->isHidden()); // reading ahead on the new text
+        m_daemon.setAnswers({u"Mia doesn't know where the keys are."_s});
+        pick(popup, u"action-proofread"_s);
+        // Once an action runs, the text stays: the result going to the clipboard is not new text.
+        clipboard = u"something else"_s;
+        Q_EMIT QGuiApplication::clipboard()->dataChanged();
+        QVERIFY(popup.window()->findChild<ChipButton*>(u"insert"_s)->isVisible());
+        popup.window()->close();
     }
 
     void escCloses()

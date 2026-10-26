@@ -8,6 +8,7 @@ find_package(Qt6 ${PARAPHRASE_QT_MIN_VERSION} REQUIRED COMPONENTS DBus Gui Widge
 add_library(paraphrase_integration STATIC
     src/integration/backends.h
     src/integration/clipboard_backends.cpp
+    src/integration/launch_command.cpp
     src/integration/integrations.cpp
     src/integration/kwin_window_tracker.cpp
     src/integration/paste_insert.cpp

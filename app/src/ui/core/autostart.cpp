@@ -1,5 +1,7 @@
 #include "ui/core/autostart.h"
 
+#include "integration/launch_command.h"
+
 #include <QDBusConnection>
 #include <QDBusMessage>
 #include <QDBusPendingCall>
@@ -20,7 +22,14 @@ const QString kFlatpakKey = u"general/startAtLogin"_s;
 
 QString entryPath()
 {
-    return QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) + u"/autostart/"_s + kFile;
+    // Inside a snap, snapd reads the snap's own config folder, whatever XDG_CONFIG_HOME the
+    // desktop extension sets, and starts the app the file is named for (snapcraft.yaml,
+    // `autostart:`).
+    const QString snapData = qEnvironmentVariable("SNAP_USER_DATA");
+    const QString config = !qEnvironmentVariableIsEmpty("SNAP") && !snapData.isEmpty()
+                               ? snapData + u"/.config"_s
+                               : QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation);
+    return config + u"/autostart/"_s + kFile;
 }
 
 bool inFlatpak()
@@ -67,8 +76,10 @@ void Autostart::setEnabled(bool on)
     QDir().mkpath(QFileInfo(entryPath()).absolutePath());
     QSaveFile file(entryPath());
     if (file.open(QIODevice::WriteOnly)) {
-        file.write("[Desktop Entry]\nType=Application\nName=Paraphrase\nExec=paraphrase-app --hidden\n"
-                   "Icon=com.ktechpit.paraphrase\nX-GNOME-Autostart-enabled=true\nNoDisplay=true\n");
+        file.write(u"[Desktop Entry]\nType=Application\nName=Paraphrase\nExec=%1\n"
+                   "Icon=com.ktechpit.paraphrase\nX-GNOME-Autostart-enabled=true\nNoDisplay=true\n"_s
+                       .arg(launchLine({u"--hidden"_s}))
+                       .toUtf8());
         (void)file.commit();
     }
 }

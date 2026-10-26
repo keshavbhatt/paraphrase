@@ -69,6 +69,7 @@ private:
     [[nodiscard]] QString likelyBase() const;
     /// While it reads ahead: the footer's working pill follows the daemon's status.
     void pollWork();
+    void readAgain();
     /// "Elaborate · kept: Friday · 21 to 34 words": what the run changed (popup-working.html, 4).
     [[nodiscard]] QString summaryLine(const SkillInfo& skill, const QString& output,
                                       bool otherLanguage) const;
@@ -88,6 +89,7 @@ private:
     QTimer m_poll;
     QElapsedTimer m_pollClock;
     QString m_likelyTitle;
+    bool m_rereading = false;   ///< the text may still come once the popup has focus
     bool m_variety = false;     ///< the next run is another version (RunSkill's variety option)
     bool m_lastVariety = false; ///< the running request is another version
     history::Keeper* m_history = nullptr;

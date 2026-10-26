@@ -1,5 +1,7 @@
 #include "clipboard_backends.h"
 
+#include "integration/launch_command.h"
+
 #include <QClipboard>
 #include <QGuiApplication>
 
@@ -29,6 +31,12 @@ std::optional<CapturedText> ClipboardCapture::capture()
     return CapturedText{.text = copied, .origin = u"clipboard"_s, .appName = {}, .window = {}};
 }
 
+bool ClipboardCapture::needsFocus() const
+{
+    // Wayland sends the clipboard to the window with keyboard focus only; X11 answers anyone.
+    return QGuiApplication::platformName().startsWith(u"wayland"_s);
+}
+
 QString ClipboardInsert::name() const
 {
     return QObject::tr("Clipboard");
@@ -47,7 +55,8 @@ QString CommandShortcut::name() const
 
 QString CommandShortcut::description() const
 {
-    return tr("Add a custom shortcut in your desktop's settings that runs: paraphrase-app --popup");
+    return tr("Add a custom shortcut in your desktop's settings that runs: %1")
+        .arg(launchLine({u"--popup"_s}));
 }
 
 } // namespace paraphrase::app

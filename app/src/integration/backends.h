@@ -61,6 +61,9 @@ public:
     [[nodiscard]] virtual bool available() const = 0;
     /// The text now, or nothing when there is none. Never logged (CLAUDE.md).
     [[nodiscard]] virtual std::optional<CapturedText> capture() = 0;
+    /// The text only reaches a window that has focus (the clipboard on Wayland, GNOME's only
+    /// way in): the popup reads it again once it has focus.
+    [[nodiscard]] virtual bool needsFocus() const { return false; }
 
     /// Text a result was just put in place of. It is gone from the app, so a selection that
     /// still reads as it is stale: some apps (a browser's canvas editor, a select-all from

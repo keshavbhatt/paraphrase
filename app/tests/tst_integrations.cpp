@@ -3,6 +3,7 @@
 
 #include "integration/clipboard_backends.h"
 #include "integration/integrations.h"
+#include "integration/launch_command.h"
 
 #include <QClipboard>
 #include <QGuiApplication>
@@ -57,6 +58,20 @@ class TestIntegrations : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void namesTheCommandForEachPackage()
+    {
+        // The shortcut to bind and the login entry start the app the way its package does.
+        qputenv("SNAP_NAME", "paraphrase");
+        QCOMPARE(launchLine({u"--popup"_s}), u"paraphrase --popup"_s);
+        qunsetenv("SNAP_NAME");
+        qputenv("FLATPAK_ID", "com.ktechpit.paraphrase");
+        QCOMPARE(launchLine({u"--hidden"_s}), u"flatpak run com.ktechpit.paraphrase --hidden"_s);
+        qunsetenv("FLATPAK_ID");
+        qputenv("APPIMAGE", "/home/a b/Paraphrase.AppImage");
+        QCOMPARE(launchLine({u"--popup"_s}), u"\"/home/a b/Paraphrase.AppImage\" --popup"_s);
+        qunsetenv("APPIMAGE");
+    }
+
     void usesTheFirstBackendThatWorks()
     {
         std::vector<std::unique_ptr<CaptureBackend>> capture;
@@ -80,7 +95,7 @@ private Q_SLOTS:
         QObject owner;
         const Integrations i = Integrations::forThisSession(&owner);
         QVERIFY(!i.hasGlobalShortcut());
-        QVERIFY(i.shortcut().description().contains(u"paraphrase-app --popup"_s));
+        QVERIFY(i.shortcut().description().endsWith(u" --popup"_s));
         QGuiApplication::clipboard()->setText(u"copied text"_s);
         const CapturedText got = i.capture().capture().value_or(CapturedText{});
         QVERIFY(!got.text.isEmpty());

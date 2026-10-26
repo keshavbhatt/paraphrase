@@ -22,6 +22,7 @@
 #include <QJsonDocument>
 #include <QRegularExpression>
 #include <QSettings>
+#include <QWindow>
 
 #include <utility>
 
@@ -112,6 +113,13 @@ void PopupController::connectWindow()
     });
     connect(m_window.get(), &PopupWindow::closed, m_runner, &RequestRunner::cancel);
     connect(m_window.get(), &PopupWindow::closed, &m_poll, &QTimer::stop);
+    connect(m_window.get(), &PopupWindow::closed, this, [this] { m_rereading = false; });
+    connect(QGuiApplication::clipboard(), &QClipboard::dataChanged, this, &PopupController::readAgain);
+    connect(qGuiApp, &QGuiApplication::focusWindowChanged, this, [this](QWindow* window) {
+        if (window != nullptr && window == m_window->windowHandle()) {
+            readAgain();
+        }
+    });
 }
 
 bool PopupController::ensureCatalog()
@@ -139,6 +147,20 @@ void PopupController::show()
     const auto captured = m_integrations.capture().capture();
     showText(captured.value_or(CapturedText{}));
     m_window->openNear(QCursor::pos());
+    m_rereading = m_integrations.capture().needsFocus();
+}
+
+void PopupController::readAgain()
+{
+    // GNOME (and any Wayland session without data-control): the clipboard reached the popup
+    // only now that it has focus. Until the user runs an action, take the newer text.
+    if (!m_rereading || !m_window->isVisible()) {
+        return;
+    }
+    const auto captured = m_integrations.capture().capture();
+    if (captured && captured->text != m_text.text) {
+        showText(*captured);
+    }
 }
 
 void PopupController::showText(const CapturedText& text)
@@ -213,6 +235,7 @@ void PopupController::run(const QString& skillId, const QString& targetLang)
     }
     m_runner->cancel();
     m_poll.stop();
+    m_rereading = false;
     m_skill = skillId;
     m_targetLang = targetLang;
     m_streamed.clear();

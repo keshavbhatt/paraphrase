@@ -1,5 +1,7 @@
 #pragma once
 
+#include "integration/launch_command.h"
+
 #include <QList>
 #include <QString>
 
@@ -36,7 +38,7 @@ struct DesktopSupport
     std::function<Typing()> askTyping;
     QString shortcut; ///< "Ctrl+Alt+Space", or "" without a global shortcut
     QString changeIt; ///< where to change it, e.g. "System Settings, Shortcuts"
-    QString command = QStringLiteral("paraphrase-app --popup");
+    QString command = launchLine({QStringLiteral("--popup")});
     QList<Step> steps;
 };
 

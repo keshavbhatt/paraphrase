@@ -6,6 +6,7 @@
 #include "app_daemon.h"
 #include "daemon_client.h"
 #include "fake_secrets.h"
+#include "integration/launch_command.h"
 #include "ui/common/menu_icons.h"
 #include "ui/common/toggle_switch.h"
 #include "ui/core/preferences.h"
@@ -311,11 +312,11 @@ private Q_SLOTS:
         w.showPage(SettingsWindow::Shortcut);
         const auto* command = w.findChild<QLabel*>(u"popupCommand"_s);
         QVERIFY(command != nullptr);
-        QCOMPARE(command->text(), u"paraphrase-app --popup"_s);
+        QCOMPARE(command->text(), paraphrase::app::launchLine({u"--popup"_s}));
         auto* copy = w.findChild<QPushButton*>(u"copyCommand"_s);
         QVERIFY(copy != nullptr);
         copy->click();
-        QCOMPARE(QGuiApplication::clipboard()->text(), u"paraphrase-app --popup"_s);
+        QCOMPARE(QGuiApplication::clipboard()->text(), paraphrase::app::launchLine({u"--popup"_s}));
         tray->click(); // leave the preference as it was
     }
 

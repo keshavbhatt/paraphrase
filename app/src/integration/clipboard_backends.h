@@ -12,6 +12,7 @@ public:
     [[nodiscard]] QString name() const override;
     [[nodiscard]] bool available() const override { return true; }
     [[nodiscard]] std::optional<CapturedText> capture() override;
+    [[nodiscard]] bool needsFocus() const override;
 };
 
 /// Leaves the result on the clipboard; the popup tells the user to press Ctrl+V. Works
