@@ -256,3 +256,20 @@ def test_rewrite_into_a_chosen_language() -> None:
     assert not metrics.score_rewrite(item, "Let us meet on Friday at 3pm.").lang_ok
     back = {"lang": "hi", "text": "कल 11 बजे मीटिंग है।", "target_lang": "en", "protected": ["11"]}
     assert metrics.score_rewrite(back, "The meeting is tomorrow at 11.").lang_ok
+
+
+def test_restated_tells_a_retelling_from_a_reply() -> None:
+    # Owner report, 2026-10-26: the full reply retold the sender's update as the user's own.
+    message = (
+        "Right now I am moving our logging from log4j 1.2 to log4j2, which needs slf4j 2.x. "
+        "The billing service already uses slf4j 2.x. "
+        "The reporting jobs were still on log4j from 2012."
+    )
+    retold = (
+        "I will check on moving the logging from log4j 1.2 to log4j2 and slf4j 2.x, since the "
+        "billing service already uses slf4j 2.x and the reporting jobs have been on log4j "
+        "since 2012."
+    )
+    answered = "Thanks for the update, sounds good. Let me know if you need a hand."
+    assert metrics.restated(message, retold) >= 0.6
+    assert metrics.restated(message, answered) < 0.2

@@ -4208,6 +4208,30 @@
    "plain_name": "English"
   },
   {
+   "text": "I will try to sort out what I can in the meantime. Right now I am moving our logging from log4j 1.2 to log4j2, which needs slf4j 2.x. The billing service already uses slf4j 2.x. The reporting jobs were still on log4j from 2012.",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Quick heads-up: I'm deploying the payment hotfix tonight at 22:00 and will watch the error logs until midnight. Rollback plan is in ticket PAY-381.",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Hi all,\n\nThe office will be closed on Friday 3 May for the electrical inspection. Tom Reed from the building team will be on site from 8:00. Please take your laptops home on Thursday evening.\n\nThanks,\nAnna",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Finished the first pass on the onboarding doc. I rewrote the setup section and dropped the old VPN steps since IT moved everyone to the new client last week. Still need to add screenshots.",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
    "text": "आदरणीय सर,\n\nमैं आपको बताना चाहता हूँ कि हमारी कंपनी का सालाना कार्यक्रम 20 दिसंबर को होटल ग्रैंड में है। आपको मुख्य अतिथि के रूप में आमंत्रित करना हमारे लिए सम्मान की बात होगी। कृपया अपनी सहमति बताएँ।\n\nसादर,\nरमेश गुप्ता",
    "lang": "hi",
    "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
@@ -4287,6 +4311,24 @@
   },
   {
    "text": "Bhai urgent hai, galti se tere number pe ek OTP chala gaya, jaldi wo bhej de please",
+   "lang": "hinglish",
+   "prompt_name": "Hinglish: Hindi written in Latin letters as in chat messages. Keep it Hinglish even in a formal tone: do not translate it into English or Devanagari",
+   "plain_name": "Hinglish (Hindi in Latin letters)"
+  },
+  {
+   "text": "मैं आज शाम तक सर्वर का बैकअप ले लूँगा, उसके बाद पुराना डेटाबेस बंद कर देंगे। नया डेटाबेस 2023 से चल रहा है, उसमें कोई दिक्कत नहीं है।",
+   "lang": "hi",
+   "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
+   "plain_name": "Hindi"
+  },
+  {
+   "text": "सभी को नमस्ते,\n\nअगले सोमवार से ऑफिस का समय सुबह 9:30 से शाम 6 बजे तक रहेगा। कैंटीन दोपहर 1 से 2 बजे तक खुली रहेगी।\n\nधन्यवाद,\nसुनीता",
+   "lang": "hi",
+   "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
+   "plain_name": "Hindi"
+  },
+  {
+   "text": "Main kal se leave pe hoon, Rahul meri jagah standup lega. Jira tickets maine usko assign kar diye hain.",
    "lang": "hinglish",
    "prompt_name": "Hinglish: Hindi written in Latin letters as in chat messages. Keep it Hinglish even in a formal tone: do not translate it into English or Devanagari",
    "plain_name": "Hinglish (Hindi in Latin letters)"

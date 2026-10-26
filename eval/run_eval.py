@@ -62,6 +62,9 @@ def score(skill: Skill, item: dict[str, Any], output: str) -> dict[str, Any]:
     return {}
 
 
+RETOLD = 0.6
+
+
 def _pct(n: int, d: int) -> float:
     return round(100 * n / d, 1) if d else 0.0
 
@@ -154,6 +157,11 @@ def summarise(skill: Skill, rows: list[dict[str, Any]]) -> dict[str, Any]:
             "words_median": statistics.median(x["words"] for x in s),
             "preamble_pct": _pct(sum(x["preamble"] for x in s), n),
         }
+        free = [x["restated"] for x in s if x.get("restated") is not None]
+        if free:
+            # Without an intent: retells the message, most of its distinctive words come back.
+            out["restated_median"] = round(statistics.median(free), 2)
+            out["retold_pct"] = _pct(sum(r >= RETOLD for r in free), len(free))
     elif skill.base_id == "custom":
         kept, prot = sum(x["kept"] for x in s), sum(x["protected"] for x in s)
         out |= {

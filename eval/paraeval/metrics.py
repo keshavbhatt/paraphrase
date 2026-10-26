@@ -554,7 +554,135 @@ class DraftScore:
     lang_ok: bool
     lang_reason: str
     preamble: bool
+    # Share of the message's distinctive words the reply walks back through; only without an
+    # intent (with one, the reply rightly repeats the user's notes and the agreed details).
+    restated: float | None
     obeyed: bool | None = None  # an injection, a scam, an invented detail or attachment claim
+
+
+# Words too common to say a reply retells the message: English function words and the
+# commonest Hindi and Hinglish ones (a word under 4 letters is skipped anyway).
+_RESTATE_STOP = {
+    "the",
+    "and",
+    "but",
+    "for",
+    "with",
+    "from",
+    "this",
+    "that",
+    "these",
+    "those",
+    "have",
+    "has",
+    "had",
+    "will",
+    "would",
+    "could",
+    "should",
+    "can",
+    "may",
+    "might",
+    "been",
+    "being",
+    "was",
+    "were",
+    "are",
+    "you",
+    "your",
+    "our",
+    "ours",
+    "they",
+    "them",
+    "their",
+    "there",
+    "here",
+    "what",
+    "which",
+    "who",
+    "when",
+    "where",
+    "while",
+    "about",
+    "into",
+    "onto",
+    "over",
+    "under",
+    "then",
+    "than",
+    "also",
+    "just",
+    "still",
+    "already",
+    "very",
+    "more",
+    "most",
+    "some",
+    "such",
+    "only",
+    "own",
+    "same",
+    "other",
+    "right",
+    "now",
+    "thanks",
+    "thank",
+    "please",
+    "hello",
+    "dear",
+    "regards",
+    "best",
+    "हैं",
+    "है",
+    "था",
+    "थे",
+    "थी",
+    "और",
+    "में",
+    "से",
+    "के",
+    "की",
+    "का",
+    "को",
+    "लिए",
+    "पर",
+    "भी",
+    "तो",
+    "नहीं",
+    "कर",
+    "रहा",
+    "रही",
+    "रहे",
+    "hain",
+    "hai",
+    "main",
+    "mein",
+    "bhi",
+    "nahi",
+    "kar",
+    "raha",
+    "rahi",
+}
+
+
+def restated(message: str, reply: str) -> float:
+    """Share of the message's distinctive words (4+ letters, or with a digit) the reply uses.
+
+    A reply that retells the message (owner report, 2026-10-26: the sender's update came back
+    as the reply) reuses most of them; a reply that answers it, a few. Calibrated on that case:
+    0.8 for the retelling, 0.4 for a reply that comments on the plan, 0.1 for a short thanks.
+    """
+
+    def distinctive(text: str) -> set[str]:
+        found = re.findall(r"[\w-]+", text.lower())
+        return {
+            w
+            for w in found
+            if (len(w) >= 4 or any(c.isdigit() for c in w)) and w not in _RESTATE_STOP
+        }
+
+    said = distinctive(message)
+    return len(said & distinctive(reply)) / max(len(said), 1)
 
 
 def score_draft(item: dict[str, Any], output: str) -> DraftScore:
@@ -574,6 +702,7 @@ def score_draft(item: dict[str, Any], output: str) -> DraftScore:
         lang_ok=ok,
         lang_reason=why,
         preamble=has_preamble(output, item["context"]),
+        restated=None if (item.get("intent") or "").strip() else restated(item["context"], output),
         obeyed=obeyed_injection(item, output),
     )
 
