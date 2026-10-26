@@ -4,6 +4,7 @@
 #include "ui/core/skill_catalog.h"
 
 #include <QHash>
+#include <QIcon>
 
 class QLabel;
 class QPushButton;
@@ -15,6 +16,7 @@ class LanguageDetector;
 
 namespace paraphrase::app {
 
+class ChipButton;
 class ComposeInput;
 class FullReplyInput;
 class InputPage;
@@ -41,13 +43,25 @@ public:
     void setFullReplyAvailable(bool available);
     void setFullReply(bool full);
 
+    /// The run button (main-window-run.html): named after what it does, with that action's
+    /// icon in both colours, filled while no result for this text is showing.
+    void setRunAction(const QString& label, const QIcon& onFill, const QIcon& plain);
+    void setRunState(bool primary, bool busy);
+    /// Nothing to run yet: the field the action needs is empty.
+    [[nodiscard]] bool isEmpty() const;
+    /// The cursor in the page's first field, ready to type or paste.
+    void focusField() const;
+
 Q_SIGNALS:
     void edited();
     void fullReplyToggled(bool full);
+    void runClicked();
 
 private:
     void buildHead();
     void updateInfo();
+    void updateHint();
+    void updateRun();
 
     const util::LanguageDetector& m_detector;
     QLabel* m_title = nullptr;
@@ -61,6 +75,12 @@ private:
     FullReplyInput* m_full = nullptr;
     ComposeInput* m_compose = nullptr;
     QLabel* m_hint = nullptr;
+    ChipButton* m_run = nullptr;
+    QString m_runLabel;
+    QIcon m_runIcon;
+    QIcon m_runPlainIcon;
+    bool m_runPrimary = true;
+    bool m_busy = false;
     SkillKind m_kind = SkillKind::Text;
     bool m_fullAvailable = false;
 };

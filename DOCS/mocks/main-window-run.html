@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Paraphrase mock: Main window, run button</title><link rel="stylesheet" href="mock.css"><script src="mock.js"></script>
+<style>
+  .mw { display: flex; flex-direction: column; }
+  .mwhead { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--bar); border-bottom: 1px solid var(--border); }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; padding: 14px 16px 0; }
+  .panes { flex: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 14px 16px 16px; }
+  .pane { background: var(--panel); border: 1px solid var(--border); border-radius: var(--r-card); display: flex; flex-direction: column; min-width: 0; }
+  .pane .ph { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--border); min-height: 53px; }
+  .pane .pb { flex: 1; padding: 14px; display: flex; flex-direction: column; gap: 10px; font-size: 15px; line-height: 1.7; white-space: pre-wrap; min-height: 230px; }
+  .pane .pf { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-top: 1px solid var(--border); min-height: 65px; }
+  .pane .pf .hint { flex: 1; min-width: 0; }
+  textarea.text { width: 100%; flex: 1; min-height: 200px; border: 0; resize: none; background: transparent; color: var(--text); font: 15px/1.7 var(--font); padding: 0; }
+  textarea.field { width: 100%; border: 1px solid var(--border); border-radius: 10px; resize: vertical; background: var(--input); color: var(--text); font: 15px/1.6 var(--font); padding: 10px 12px; white-space: normal; }
+  .opts { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; white-space: normal; }
+  /* The run button: one width whatever the action, the label elided if it ever had to be. */
+  .run { position: relative; overflow: visible; width: 236px; justify-content: space-between; flex: none; }
+  .run > .pin { left: -10px; top: -10px; opacity: 1; }
+  .run .lbl { display: inline-flex; align-items: center; gap: 6px; overflow: hidden; text-overflow: ellipsis; }
+  .waiting { flex: 1; display: grid; place-items: center; text-align: center; color: var(--muted); font-size: 14px; white-space: normal; }
+  .changes { display: flex; flex-direction: column; gap: 2px; padding: 0 14px 12px; }
+  .draft { flex: 1; border: 1px solid var(--border); border-radius: 10px; background: var(--input); padding: 12px 14px; font-size: 15px; line-height: 1.65; white-space: pre-wrap; }
+  .status { display: flex; align-items: center; gap: 10px; padding: 7px 16px; border-top: 1px solid var(--border); background: var(--bar); font-size: 12px; color: var(--muted); }
+  .state { max-width: 1180px; margin: 24px auto 0; padding: 0 16px; }
+  @media (max-width: 820px) { .panes { grid-template-columns: 1fr; } }
+</style></head>
+<body>
+
+<p class="state cap">a. Text pasted, nothing run yet</p>
+<div class="window" style="margin-top: 8px">
+  <div class="titlebar"><div class="lights"><i></i><i></i><i></i></div><div class="title">Paraphrase</div><div class="wc"><span>−</span><span>□</span><span>✕</span></div></div>
+  <div class="mw">
+    <div class="mwhead">
+      <svg class="ic mark"><use href="#i-pen"/></svg><b>Paraphrase</b><span class="grow"></span>
+      <span class="private"><svg class="ic s"><use href="#i-lock"/></svg>On this device</span>
+      <button class="btn flat"><svg class="ic s"><use href="#i-history"/></svg>History</button>
+      <button class="btn flat"><svg class="ic s"><use href="#i-settings"/></svg>Settings</button>
+    </div>
+    <div class="actions" role="group" aria-label="Actions">
+      <button class="action hot" aria-pressed="true"><span class="num">Ctrl 1</span>Proofread</button>
+      <button class="action"><span class="num">Ctrl 2</span>Tone<svg class="ic s muted"><use href="#i-down"/></svg></button>
+      <button class="action"><span class="num">Ctrl 3</span>Reply</button>
+      <button class="action"><span class="num">Ctrl 4</span>Summarize</button>
+      <button class="action"><span class="num">Ctrl 5</span>Format<svg class="ic s muted"><use href="#i-down"/></svg></button>
+      <button class="action"><span class="num">Ctrl 6</span>Translate<svg class="ic s muted"><use href="#i-down"/></svg></button>
+      <button class="action"><span class="num">Ctrl 7</span>Write</button>
+      <button class="action"><span class="num">Ctrl 8</span>My actions<svg class="ic s muted"><use href="#i-down"/></svg></button>
+    </div>
+    <div class="panes">
+      <section class="pane" aria-labelledby="a-in">
+        <div class="ph"><h2 id="a-in" class="cap" style="font-size: 11px">Your text</h2><span class="small muted">· 49 words · English</span><span class="grow"></span><button class="btn flat">Paste</button><button class="btn flat">Clear</button></div>
+        <div class="pb"><textarea class="text" aria-label="Your text">Pancakes (serves 4)
+1. Mix the flour, sugar and a pinch of salt in a large bowl.
+2. Whisk the egg's with the milk and add it slowly to the dry ingredients
+3. Let the batter rest for 10 minute.
+4. Cook on a medium heat until bubbles appears.</textarea></div>
+        <div class="pf">
+          <span class="hint small muted">Type or paste anything, then run the action.</span>
+          <button class="btn big primary run"><span class="pin">1</span><span class="lbl"><svg class="ic s"><use href="#i-check"/></svg>Proofread</span><span class="num">Ctrl Enter</span></button>
+        </div>
+      </section>
+      <section class="pane" aria-labelledby="a-out">
+        <div class="ph"><h2 id="a-out" class="cap" style="font-size: 11px">Proofread</h2><span class="grow"></span></div>
+        <div class="pb"><div class="waiting">The corrected text shows here.</div></div>
+        <div class="pf">
+          <button class="btn big primary disabled"><svg class="ic s"><use href="#i-copy"/></svg>Copy result <span class="num">Ctrl Shift C</span></button>
+        </div>
+      </section>
+    </div>
+    <div class="status"><span class="dot" aria-hidden="true"></span><span>Gemma 4 E2B (fast) · about 4.6 GB memory in use</span><span class="grow"></span><span>Nothing leaves this computer</span></div>
+  </div>
+  <span class="pin" style="left: 8px; top: 525px">2</span>
+</div>
+
+<p class="state cap">b. After a run: Copy is the main step, the run button steps back</p>
+<div class="window" style="margin-top: 8px">
+  <div class="titlebar"><div class="lights"><i></i><i></i><i></i></div><div class="title">Paraphrase</div><div class="wc"><span>−</span><span>□</span><span>✕</span></div></div>
+  <div class="mw">
+    <div class="mwhead">
+      <svg class="ic mark"><use href="#i-pen"/></svg><b>Paraphrase</b><span class="grow"></span>
+      <span class="private"><svg class="ic s"><use href="#i-lock"/></svg>On this device</span>
+      <button class="btn flat"><svg class="ic s"><use href="#i-history"/></svg>History</button>
+      <button class="btn flat"><svg class="ic s"><use href="#i-settings"/></svg>Settings</button>
+    </div>
+    <div class="actions" role="group" aria-label="Actions">
+      <button class="action hot" aria-pressed="true"><span class="num">Ctrl 1</span>Proofread</button>
+      <button class="action"><span class="num">Ctrl 2</span>Tone<svg class="ic s muted"><use href="#i-down"/></svg></button>
+      <button class="action"><span class="num">Ctrl 3</span>Reply</button>
+      <button class="action"><span class="num">Ctrl 4</span>Summarize</button>
+      <button class="action"><span class="num">Ctrl 5</span>Format<svg class="ic s muted"><use href="#i-down"/></svg></button>
+      <button class="action"><span class="num">Ctrl 6</span>Translate<svg class="ic s muted"><use href="#i-down"/></svg></button>
+      <button class="action"><span class="num">Ctrl 7</span>Write</button>
+      <button class="action"><span class="num">Ctrl 8</span>My actions<svg class="ic s muted"><use href="#i-down"/></svg></button>
+    </div>
+    <div class="panes">
+      <section class="pane" aria-labelledby="b-in">
+        <div class="ph"><h2 id="b-in" class="cap" style="font-size: 11px">Your text</h2><span class="small muted">· 49 words · English</span><span class="grow"></span><button class="btn flat">Paste</button><button class="btn flat">Clear</button></div>
+        <div class="pb"><textarea class="text" aria-label="Your text">Pancakes (serves 4)
+1. Mix the flour, sugar and a pinch of salt in a large bowl.
+2. Whisk the egg's with the milk and add it slowly to the dry ingredients
+3. Let the batter rest for 10 minute.
+4. Cook on a medium heat until bubbles appears.</textarea></div>
+        <div class="pf">
+          <span class="hint small muted">Type or paste anything, then run the action.</span>
+          <button class="btn big run"><span class="pin">3</span><span class="lbl"><svg class="ic s"><use href="#i-check"/></svg>Proofread</span><span class="num">Ctrl Enter</span></button>
+        </div>
+      </section>
+      <section class="pane" aria-labelledby="b-out">
+        <div class="ph">
+          <h2 id="b-out" class="cap" style="font-size: 11px">Proofread</h2><span class="small muted">· 4 changes · kept in English</span><span class="grow"></span>
+          <span class="seg" role="group" aria-label="View"><span class="on">Changes</span><span>Result</span></span>
+        </div>
+        <div class="pb"><div>Pancakes (serves 4)
+1. Mix the flour, sugar and a pinch of salt in a large bowl.
+2. Whisk the <del class="d">egg's</del> <ins class="d">eggs</ins> with the milk and add it slowly to the dry ingredients<ins class="d">.</ins>
+3. Let the batter rest for 10 <del class="d">minute</del> <ins class="d">minutes</ins>.
+4. Cook on a medium heat until bubbles <del class="d">appears</del> <ins class="d">appear</ins>.</div></div>
+        <div class="pf">
+          <button class="btn big primary"><svg class="ic s"><use href="#i-copy"/></svg>Copy result <span class="num">Ctrl Shift C</span></button>
+          <button class="btn big">Use as my text</button>
+          <button class="btn big"><svg class="ic s"><use href="#i-refresh"/></svg>Retry</button>
+        </div>
+      </section>
+    </div>
+    <div class="status"><span class="dot" aria-hidden="true"></span><span>Gemma 4 E2B (fast) · about 4.6 GB memory in use</span><span class="grow"></span><span>Nothing leaves this computer</span></div>
+  </div>
+</div>
+
+<p class="state cap">c. Full reply, filled in</p>
+<div class="window" style="margin-top: 8px">
+  <div class="titlebar"><div class="lights"><i></i><i></i><i></i></div><div class="title">Paraphrase</div><div class="wc"><span>−</span><span>□</span><span>✕</span></div></div>
+  <div class="mw">
+    <div class="mwhead">
+      <svg class="ic mark"><use href="#i-pen"/></svg><b>Paraphrase</b><span class="grow"></span>
+      <span class="private"><svg class="ic s"><use href="#i-lock"/></svg>On this device</span>
+      <button class="btn flat"><svg class="ic s"><use href="#i-history"/></svg>History</button>
+      <button class="btn flat"><svg class="ic s"><use href="#i-settings"/></svg>Settings</button>
+    </div>
+    <div class="actions" role="group" aria-label="Actions">
+      <button class="action"><span class="num">Ctrl 1</span>Proofread</button>
+      <button class="action"><span class="num">Ctrl 2</span>Tone<svg class="ic s muted"><use href="#i-down"/></svg></button>
+      <button class="action hot" aria-pressed="true"><span class="num">Ctrl 3</span>Reply</button>
+      <button class="action"><span class="num">Ctrl 4</span>Summarize</button>
+      <button class="action"><span class="num">Ctrl 5</span>Format<svg class="ic s muted"><use href="#i-down"/></svg></button>
+      <button class="action"><span class="num">Ctrl 6</span>Translate<svg class="ic s muted"><use href="#i-down"/></svg></button>
+      <button class="action"><span class="num">Ctrl 7</span>Write</button>
+      <button class="action"><span class="num">Ctrl 8</span>My actions<svg class="ic s muted"><use href="#i-down"/></svg></button>
+    </div>
+    <div class="panes">
+      <section class="pane" aria-labelledby="c-in">
+        <div class="ph"><h2 id="c-in" class="cap" style="font-size: 11px">Message you got</h2><span class="grow"></span>
+          <span class="seg" role="group" aria-label="Kind of reply"><span>Quick replies</span><span class="on">Full reply</span></span></div>
+        <div class="pb">
+          <textarea class="field" rows="6" aria-label="The message you got">Hi Priya,
+
+Could we get on a call this Thursday at 3 pm to go through the delivery delays? I'd also like the updated cost sheet before then.
+
+Daniel</textarea>
+          <span class="small muted" style="white-space: normal">What do you want to say?</span>
+          <textarea class="field" rows="2" aria-label="What do you want to say?">Thursday doesn't work, offer Friday 11 am. Cost sheet by Wednesday.</textarea>
+          <div class="opts">
+            <span class="small muted">Write it as</span>
+            <span class="seg" role="group" aria-label="Write it as"><span class="on">Email</span><span>Chat message</span></span>
+          </div>
+        </div>
+        <div class="pf">
+          <span class="hint small muted">Leave "What do you want to say?" empty for a reply that simply answers.</span>
+          <button class="btn big primary run"><span class="pin">1</span><span class="lbl"><svg class="ic s"><use href="#i-forward"/></svg>Write the reply</span><span class="num">Ctrl Enter</span></button>
+        </div>
+      </section>
+      <section class="pane" aria-labelledby="c-out">
+        <div class="ph"><h2 id="c-out" class="cap" style="font-size: 11px">Your reply</h2><span class="grow"></span></div>
+        <div class="pb"><div class="waiting">Your reply shows here, ready to edit and copy.</div></div>
+        <div class="pf">
+          <button class="btn big primary disabled"><svg class="ic s"><use href="#i-copy"/></svg>Copy reply <span class="num">Ctrl Shift C</span></button>
+        </div>
+      </section>
+    </div>
+    <div class="status"><span class="dot" aria-hidden="true"></span><span>Gemma 4 E4B (quality) · about 5.9 GB memory in use</span><span class="grow"></span><span>Nothing leaves this computer</span></div>
+  </div>
+</div>
+
+<p class="state cap">d. Write, just opened: nothing to run yet</p>
+<div class="window" style="margin-top: 8px">
+  <div class="titlebar"><div class="lights"><i></i><i></i><i></i></div><div class="title">Paraphrase</div><div class="wc"><span>−</span><span>□</span><span>✕</span></div></div>
+  <div class="mw">
+    <div class="mwhead">
+      <svg class="ic mark"><use href="#i-pen"/></svg><b>Paraphrase</b><span class="grow"></span>
+      <span class="private"><svg class="ic s"><use href="#i-lock"/></svg>On this device</span>
+      <button class="btn flat"><svg class="ic s"><use href="#i-history"/></svg>History</button>
+      <button class="btn flat"><svg class="ic s"><use href="#i-settings"/></svg>Settings</button>
+    </div>
+    <div class="actions" role="group" aria-label="Actions">
+      <button class="action"><span class="num">Ctrl 1</span>Proofread</button>
+      <button class="action"><span class="num">Ctrl 2</span>Tone<svg class="ic s muted"><use href="#i-down"/></svg></button>
+      <button class="action"><span class="num">Ctrl 3</span>Reply</button>
+      <button class="action"><span class="num">Ctrl 4</span>Summarize</button>
+      <button class="action"><span class="num">Ctrl 5</span>Format<svg class="ic s muted"><use href="#i-down"/></svg></button>
+      <button class="action"><span class="num">Ctrl 6</span>Translate<svg class="ic s muted"><use href="#i-down"/></svg></button>
+      <button class="action hot" aria-pressed="true"><span class="num">Ctrl 7</span>Write</button>
+      <button class="action"><span class="num">Ctrl 8</span>My actions<svg class="ic s muted"><use href="#i-down"/></svg></button>
+    </div>
+    <div class="panes">
+      <section class="pane" aria-labelledby="d-in">
+        <div class="ph"><h2 id="d-in" class="cap" style="font-size: 11px">What to write</h2><span class="grow"></span><button class="btn flat">Paste</button></div>
+        <div class="pb">
+          <span class="small muted" style="white-space: normal">Describe it in your own words, in the language you want it in</span>
+          <textarea class="field" rows="6" aria-label="What to write" placeholder="For example: tell the team the office is closed on Monday"></textarea>
+          <div class="opts">
+            <span class="small muted">Write it as</span>
+            <span class="seg" role="group" aria-label="Write it as"><span class="on">Email</span><span>Message</span><span>Social post</span><span>Note</span></span>
+          </div>
+        </div>
+        <div class="pf">
+          <span class="hint small muted">Say what to write first. Names, dates and numbers come only from what you wrote.</span>
+          <span style="position: relative; display: inline-flex"><span class="pin" style="left: -10px; top: -10px">5</span><button class="btn big primary run disabled" aria-disabled="true"><span class="lbl"><svg class="ic s"><use href="#i-mail"/></svg>Write it</span><span class="num">Ctrl Enter</span></button></span>
+        </div>
+      </section>
+      <section class="pane" aria-labelledby="d-out">
+        <div class="ph"><h2 id="d-out" class="cap" style="font-size: 11px">Your text</h2><span class="grow"></span></div>
+        <div class="pb"><div class="waiting">What you describe is written here, ready to edit and copy.</div></div>
+        <div class="pf">
+          <button class="btn big primary disabled"><svg class="ic s"><use href="#i-copy"/></svg>Copy <span class="num">Ctrl Shift C</span></button>
+        </div>
+      </section>
+    </div>
+    <div class="status"><span class="dot" aria-hidden="true"></span><span>Gemma 4 E4B (quality) · about 5.9 GB memory in use</span><span class="grow"></span><span>Nothing leaves this computer</span></div>
+  </div>
+  <span class="pin" style="left: 968px; top: 96px">4</span>
+</div>
+
+<section class="notes"><h2>Notes</h2><ol>
+  <li><b>The run button</b> sits at the bottom right of the left pane, below what it works on, and is named after what it does: the selected action and preset ("Proofread", "Casual", "Into Hindi", "Bullets"), "Write 3 replies" or "Write the reply" for Reply, "Write it" for Write. Its icon is the action's, as in the menus and History. It shows Ctrl Enter as a chip, the way Copy shows its keys, so the shortcut is learned by seeing it. It keeps one width whatever the label; a label that would not fit is cut with "…" and shown whole in its tooltip.</li>
+  <li><b>The hint</b> no longer carries the shortcut: "Type or paste anything, then run the action." Messages that named Ctrl+Enter say "Run it again" instead.</li>
+  <li><b>Primary or not</b>: the run button is the main (filled) button while there is no result for the text on screen: before the first run, and again once the text or an option has changed after a run. When a result for it is showing, it steps back to a plain button and Copy is the only filled one. Only the fill changes, never the size or place.</li>
+  <li><b>Reply and Write wait for you</b>: choosing them opens their form with the cursor in the first field and runs nothing while that field is empty. Choosing them with the form filled runs at once, as now. Every other action still runs as soon as it is clicked; the button is for running again and for the forms.</li>
+  <li><b>Nothing to run</b>: while the field it needs is empty, the button is shown but disabled, and the hint says what is missing ("Paste the message you got first", "Say what to write first", "Type or paste some text first"). It enables as soon as there is text.</li>
+  <li><b>While a run goes</b> the button is disabled at the same width; Stop stays where it is on the right (main-window-busy.html).</li>
+</ol></section>
+</body></html>

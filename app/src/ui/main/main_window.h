@@ -91,6 +91,7 @@ protected:
 private:
     void buildUi();
     void connectParts();
+    void connectInput();
     void applyTheme();
     void loadSkills();
     void loadStatus();
@@ -109,6 +110,13 @@ private:
     void useAgain(const history::Entry& entry);
     [[nodiscard]] QString inputLanguageName() const;
     [[nodiscard]] QString chosenPreset(const SkillInfo& s) const;
+    /// The run button's name for an action: "Proofread", "Casual", "Into Hindi", "Write it".
+    [[nodiscard]] QString runLabel(const SkillInfo& s) const;
+    /// What a result is for: the action, its options and the text.
+    [[nodiscard]] QString runKey() const;
+    void updateRun();
+    /// Reply and Write: run when their form is filled, else put the cursor in it.
+    void runOrWait();
 
     std::unique_ptr<client::DaemonClient> m_ownClient;
     client::DaemonClient& m_client;
@@ -139,6 +147,8 @@ private:
     bool m_rewriting = false;      ///< a Tone preset runs on the result
     bool m_ran = false;            ///< something ran on the current text, so option changes run again
     bool m_rerunAfterStop = false; ///< an option changed during a run
+    QString m_runKey;              ///< the action, options and text of the running request
+    QString m_resultKey;           ///< the same for the result on screen, empty while there is none
     bool m_variety = false;        ///< the next run is another version (RunSkill's variety option)
     bool m_lastVariety = false;    ///< the running request is another version
 };

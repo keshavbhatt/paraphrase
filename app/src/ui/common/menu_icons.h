@@ -14,6 +14,8 @@ inline constexpr int kMenuIconSize = 20;
 
 /// The Lucide icon for a tone or format preset ("professional", "bullets"), or "" if none.
 [[nodiscard]] QString presetIcon(const QString& preset);
+/// The Lucide icon for an action, by its skill id: History's badges and the run button.
+[[nodiscard]] QString actionIcon(const QString& skillId);
 /// A Lucide icon in a menu's icon box, muted.
 [[nodiscard]] QIcon menuIcon(const QString& name, const Tokens& t);
 /// A language's badge: a letter of its own script on a soft square ("अ" for Hindi), never a

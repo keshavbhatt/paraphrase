@@ -14,6 +14,25 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-26 - A run button, and history keeps the window's size
+
+- Mock `main-window-run.html`, approved by the owner on 2026-10-26 (recorded in
+  DOCS/mocks/index.html), and built (owner question: Ctrl+Enter is hidden from people who use
+  the mouse):
+  - A run button at the bottom right of the left pane, named after what it does ("Proofread",
+    "Polite", "Into Hindi", "Write 3 replies", "Write the reply", "Write it"), with the action's
+    icon and Ctrl Enter as its chip. One width whatever the label; a longer one is cut with "..."
+    and shown whole as a tip.
+  - Filled while no result for this text and these options is showing; plain once it shows, so
+    Copy is the one filled button; filled again after an edit. Disabled while the field it needs
+    is empty and while a run goes.
+  - Reply and Write open their form with the cursor in it and run only when it is filled. The
+    hints say what is missing instead of naming the keys.
+- Opening or closing History no longer changes the window's height: writing and history now
+  share one stacked area, so the window's minimum never changes between them (it grew because
+  both showed for a moment while swapping). `historyKeepsWindowSize` checks it, failing on the
+  old code under a real Wayland compositor.
+
 ## 2026-10-25 (night) - History, off by default, kept encrypted on this computer
 
 - Mocks `settings-privacy.html` and `main-window-history.html`, approved by the owner on

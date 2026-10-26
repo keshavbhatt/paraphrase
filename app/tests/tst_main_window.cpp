@@ -231,6 +231,54 @@ private Q_SLOTS:
         QVERIFY(w.findChild<QLabel*>(u"outInfo"_s)->text().startsWith(u"· polite"_s));
     }
 
+    void runButtonNamesTheActionAndWaitsForText()
+    {
+        // main-window-run.html: a run button for those who do not use Ctrl+Enter.
+        startDaemon({u"fast-model"_s, u"quality-model"_s});
+        MainWindow w;
+        w.start();
+        auto* run = w.findChild<paraphrase::app::ChipButton*>(u"run"_s);
+        auto* text = w.findChild<QPlainTextEdit*>(u"text"_s);
+        const auto primary = [run] { return run->property("kind").toString() == u"primary"_s; };
+        QCOMPARE(run->label(), u"Proofread"_s);
+        QVERIFY(!run->isEnabled()); // nothing to run yet
+        const int width = run->width();
+
+        // Filled before the first run, plain once its result shows, filled again after an edit.
+        text->setPlainText(u"teh cat"_s);
+        QVERIFY(run->isEnabled());
+        QVERIFY(primary());
+        setAnswers({u"The cat."_s});
+        const QSignalSpy finished(&w, &MainWindow::finished);
+        run->click();
+        QTRY_COMPARE_WITH_TIMEOUT(finished.size(), 1, kTimeoutMs);
+        QCOMPARE(w.resultText(), u"The cat."_s);
+        QVERIFY(run->isEnabled());
+        QVERIFY(!primary());
+        text->setPlainText(u"teh dog"_s);
+        QVERIFY(primary());
+
+        // Named after the preset; one width whatever the label.
+        w.selectSkill(u"rewrite.polite"_s);
+        QCOMPARE(run->label(), u"Polite"_s);
+        QCOMPARE(run->width(), width);
+
+        // Reply and Write open their form and wait while it is empty.
+        text->clear();
+        const qsizetype runs = finished.size();
+        w.findChild<QPushButton*>(u"action-reply"_s)->click();
+        QCOMPARE(w.currentSkill().section(u'.', 0, 0) == u"draft"_s ? u"Write the reply"_s
+                                                                    : u"Write 3 replies"_s,
+                 run->label());
+        QVERIFY(!run->isEnabled());
+        w.findChild<QPushButton*>(u"action-compose"_s)->click();
+        QCOMPARE(run->label(), u"Write it"_s);
+        QVERIFY(!run->isEnabled());
+        QApplication::processEvents();
+        QCOMPARE(finished.size(), runs); // nothing ran
+        QCOMPARE(run->width(), width);
+    }
+
     void writesAFullReplyAndKeepsItsVersions()
     {
         startDaemon({u"fast-model"_s, u"quality-model"_s});

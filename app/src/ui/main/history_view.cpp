@@ -68,28 +68,6 @@ QString baseOf(const QString& skillId)
     return base == u"draft"_s ? u"reply"_s : base; // a full reply is a Reply
 }
 
-QString badgeIcon(const QString& skillId)
-{
-    const QString base = skillId.section(u'.', 0, 0);
-    QString preset = presetIcon(skillId.section(u'.', 1));
-    if (base == u"proofread"_s) {
-        return u"check"_s;
-    }
-    if (base == u"reply"_s || base == u"draft"_s) {
-        return u"forward"_s;
-    }
-    if (base == u"compose"_s) {
-        return u"mail"_s;
-    }
-    if (base == u"summarize"_s) {
-        return u"shrink"_s;
-    }
-    if (!preset.isEmpty()) {
-        return preset;
-    }
-    return base == u"rewrite"_s ? u"smile"_s : u"pen"_s;
-}
-
 QString dayName(const QDate& day)
 {
     const QDate today = QDate::currentDate();
@@ -162,7 +140,7 @@ public:
         QPainterPath badgePath;
         badgePath.addRoundedRect(QRectF(badge), 7, 7);
         p->fillPath(badgePath, selected ? t.panel : t.hover);
-        Theme::icon(badgeIcon(e.skillId), selected ? t.accent : t.muted, kSmallIcon)
+        Theme::icon(actionIcon(e.skillId), selected ? t.accent : t.muted, kSmallIcon)
             .paint(p, badge.adjusted(6, 6, -6, -6));
 
         const int left = badge.right() + 11;

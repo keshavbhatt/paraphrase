@@ -102,6 +102,6 @@ holds the main action (Replace or Insert, Enter) and Copy and Retry.
   the focus ring is the accent.
 - A result on screen always matches the options shown beside it: once something ran on the
   current text, picking another kind, tone or quick/full reply runs it again at once (a run
-  still going stops and starts over). Before the first run, options only wait for Ctrl+Enter.
+  still going stops and starts over). Before the first run, options only wait for the run button or Ctrl+Enter.
 - Dark and light are both first class; screenshots for the owner are taken in both.
 - Nothing in the UI mentions accounts or app licensing.

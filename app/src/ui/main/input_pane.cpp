@@ -1,20 +1,31 @@
 #include "ui/main/input_pane.h"
 
+#include "ui/common/chip_button.h"
 #include "ui/core/languages.h"
 #include "ui/parts/input_pages.h"
 #include "util/language_detector.h"
 
 #include <QApplication>
 #include <QClipboard>
+#include <QFontMetrics>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QPlainTextEdit>
 #include <QPushButton>
 #include <QRegularExpression>
 #include <QStackedWidget>
+#include <QStyle>
+
+#include <algorithm>
 
 using namespace Qt::StringLiterals;
 
 namespace paraphrase::app {
+namespace {
+
+constexpr int kRunWidth = 236; ///< main-window-run.html .run: one width whatever the label
+
+} // namespace
 
 InputPane::InputPane(const util::LanguageDetector& detector, QWidget* parent)
     : Pane(parent)
@@ -34,13 +45,20 @@ InputPane::InputPane(const util::LanguageDetector& detector, QWidget* parent)
         m_pages->addWidget(p);
         connect(p, &InputPage::edited, this, [this] {
             updateInfo();
+            updateHint();
+            updateRun();
             Q_EMIT edited();
         });
     }
     setBody(m_pages);
     m_hint = makeLabel(QString(), u"small"_s);
     m_hint->setWordWrap(true);
-    footRow()->addWidget(m_hint);
+    m_run = new ChipButton(QString(), tr("Ctrl Enter"), ChipButton::ChipSide::After);
+    m_run->setObjectName(u"run"_s);
+    m_run->setProperty("btnSize", u"big"_s);
+    footRow()->addWidget(m_hint, 1);
+    footRow()->addWidget(m_run);
+    connect(m_run, &QPushButton::clicked, this, &InputPane::runClicked);
     showKind(SkillKind::Text);
 }
 
@@ -88,21 +106,14 @@ void InputPane::showKind(SkillKind kind)
     const bool compose = kind == SkillKind::Compose;
     if (compose) {
         m_title->setText(tr("WHAT TO WRITE"));
-        m_hint->setText(tr("Ctrl+Enter writes it. Names, dates and numbers come only from what you wrote."));
-    } else if (kind == SkillKind::FullReply) {
-        m_title->setText(tr("MESSAGE YOU GOT"));
-        m_hint->setText(
-            tr("Ctrl+Enter writes the reply. Leave \"What do you want to say?\" empty for a reply "
-               "that simply answers the message."));
     } else {
         m_title->setText(text ? tr("YOUR TEXT") : tr("MESSAGE YOU GOT"));
-        m_hint->setText(tr("Type or paste anything. Ctrl+Enter runs the selected action."));
     }
-    // main-window-reply.html: the language as a pill, no word count, no Clear, no hint line;
-    // main-window-reply-draft.html keeps the hint for a full reply.
+    // main-window-reply.html: the language as a pill, no word count, no Clear.
     m_clear->setVisible(text);
     m_paste->setVisible(!page()->showsLanguage());
-    foot()->setVisible(kind != SkillKind::QuickReply);
+    updateHint();
+    updateRun();
     m_replyKind->setVisible(!text && !compose && m_fullAvailable);
     m_replyKind->setCurrent(kind == SkillKind::FullReply ? 1 : 0);
     updateInfo();
@@ -111,6 +122,90 @@ void InputPane::showKind(SkillKind kind)
 InputPage* InputPane::page() const
 {
     return qobject_cast<InputPage*>(m_pages->currentWidget());
+}
+
+bool InputPane::isEmpty() const
+{
+    return page()->subject().trimmed().isEmpty();
+}
+
+void InputPane::focusField() const
+{
+    const auto fields = page()->findChildren<QPlainTextEdit*>();
+    const auto first = std::ranges::find_if(fields, [](const QPlainTextEdit* f) { return !f->isReadOnly(); });
+    if (first != fields.end()) {
+        (*first)->setFocus();
+    }
+}
+
+void InputPane::setRunAction(const QString& label, const QIcon& onFill, const QIcon& plain)
+{
+    m_runLabel = label;
+    m_runIcon = onFill;
+    m_runPlainIcon = plain;
+    updateRun();
+}
+
+void InputPane::setRunState(bool primary, bool busy)
+{
+    m_runPrimary = primary;
+    m_busy = busy;
+    updateRun();
+}
+
+void InputPane::updateHint()
+{
+    // main-window-run.html note 2: the hint says what is missing, never the keys.
+    const bool empty = isEmpty();
+    if (m_kind == SkillKind::Compose) {
+        m_hint->setText(empty ? tr("Say what to write first. Names, dates and numbers come only from what "
+                                   "you wrote.")
+                              : tr("Names, dates and numbers come only from what you wrote."));
+    } else if (m_kind == SkillKind::FullReply) {
+        m_hint->setText(empty ? tr("Paste the message you got first.")
+                              : tr("Leave \"What do you want to say?\" empty for a reply that simply "
+                                   "answers."));
+    } else if (m_kind == SkillKind::QuickReply) {
+        m_hint->setText(empty ? tr("Paste the message you got first.") : QString());
+    } else {
+        m_hint->setText(empty ? tr("Type or paste some text first.")
+                              : tr("Type or paste anything, then run the action."));
+    }
+}
+
+void InputPane::updateRun()
+{
+    if (m_run == nullptr) {
+        return;
+    }
+    m_run->setEnabled(!m_busy && !isEmpty());
+    const bool fill = m_runPrimary && m_run->isEnabled();
+    m_run->setProperty("kind", m_runPrimary ? u"primary"_s : QString());
+    m_run->style()->unpolish(m_run);
+    m_run->style()->polish(m_run);
+    m_run->setLeadingIcon(fill ? m_runIcon : m_runPlainIcon);
+
+    // One width for every label (main-window-run.html note 1): room for the longest of the
+    // fixed ones, and a label that would not fit is cut with "..." and shown whole as a tip.
+    const auto* label = m_run->findChild<QLabel*>(u"label"_s);
+    m_run->setLabel(m_runLabel);
+    label->ensurePolished(); // the theme's font, not the default one
+    const QFontMetrics metrics(label->font());
+    const int parts = m_run->sizeHint().width() - metrics.horizontalAdvance(m_runLabel);
+    // Measured in the bolder weight, so the filled and the plain button share one width.
+    QFont bold = label->font();
+    bold.setWeight(QFont::DemiBold);
+    const QFontMetrics boldMetrics(bold);
+    int longest = 0;
+    for (const QString& fixed : {tr("Write the reply"), tr("Write 3 replies"), tr("Summarize")}) {
+        longest = std::max(longest, boldMetrics.horizontalAdvance(fixed));
+    }
+    const int width = std::max(kRunWidth, parts + longest);
+    m_run->setFixedWidth(width);
+    const QString shown = metrics.elidedText(m_runLabel, Qt::ElideRight, width - parts);
+    m_run->setLabel(shown);
+    m_run->setAccessibleName(m_runLabel);
+    m_run->setToolTip(shown == m_runLabel ? QString() : m_runLabel);
 }
 
 QString InputPane::language() const

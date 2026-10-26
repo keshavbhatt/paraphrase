@@ -1,6 +1,7 @@
 #include "ui/main/main_window.h"
 
 #include "history/history_keeper.h"
+#include "ui/common/menu_icons.h"
 #include "ui/core/facts_check.h"
 #include "ui/core/languages.h"
 #include "ui/core/request_runner.h"
@@ -34,6 +35,7 @@ using namespace Qt::StringLiterals;
 namespace paraphrase::app {
 namespace {
 
+constexpr int kRunIconSize = 14;
 constexpr int kNarrowWidth = 820; ///< below this the panes stack (main-window.html, note 6)
 const QString kFullReplyKey = u"reply/full"_s;
 
@@ -119,37 +121,12 @@ void MainWindow::connectParts()
         run();
     });
     connect(m_actions, &ActionBar::newActionRequested, this, &MainWindow::newActionRequested);
+    // Reply and Write open their form and wait for it (main-window-run.html note 4).
     connect(m_actions, &ActionBar::replyChosen, this, [this] {
         chooseReply(m_fullReply);
-        run();
+        runOrWait();
     });
-    m_actions->setTextLanguage([this] { return m_input->language(); });
-    connect(m_input, &InputPane::fullReplyToggled, this, [this](bool full) {
-        chooseReply(full);
-        rerun();
-    });
-    connect(m_input->fullReplyInput(), &FullReplyInput::kindChanged, this, [this] {
-        chooseReply(true);
-        rerun();
-    });
-    connect(m_input->fullReplyInput(), &FullReplyInput::toneChanged, this, &MainWindow::rerun);
-    connect(m_actions, &ActionBar::composeChosen, this, [this] {
-        chooseCompose();
-        run();
-    });
-    connect(m_input->composeInput(), &ComposeInput::kindChanged, this, [this] {
-        chooseCompose();
-        rerun();
-    });
-    connect(m_input->composeInput(), &ComposeInput::toneChanged, this, &MainWindow::rerun);
-    connect(m_input, &InputPane::edited, this, [this] {
-        if (m_input->page()->subject().trimmed().isEmpty()) {
-            m_ran = false; // cleared: options wait for the next Ctrl+Enter
-        }
-        if (const SkillInfo* s = m_catalog.find(m_skill)) {
-            m_runner->warmLater(m_skill, m_input->page()->input(*s, m_targetLang));
-        }
-    });
+    connectInput();
     connect(m_output, &OutputPane::copyClicked, this, &MainWindow::copyResult);
     connect(m_output, &OutputPane::secondaryClicked, this, &MainWindow::onSecondary);
     connect(m_output, &OutputPane::retryClicked, this, &MainWindow::onRetry);
@@ -169,6 +146,39 @@ void MainWindow::connectParts()
             &MainWindow::copyResult);
     connect(new QShortcut(QKeySequence(Qt::Key_Escape), this), &QShortcut::activated, this,
             &MainWindow::cancel);
+}
+
+void MainWindow::connectInput()
+{
+    m_actions->setTextLanguage([this] { return m_input->language(); });
+    connect(m_input, &InputPane::fullReplyToggled, this, [this](bool full) {
+        chooseReply(full);
+        rerun();
+    });
+    connect(m_input->fullReplyInput(), &FullReplyInput::kindChanged, this, [this] {
+        chooseReply(true);
+        rerun();
+    });
+    connect(m_input->fullReplyInput(), &FullReplyInput::toneChanged, this, &MainWindow::rerun);
+    connect(m_actions, &ActionBar::composeChosen, this, [this] {
+        chooseCompose();
+        runOrWait();
+    });
+    connect(m_input->composeInput(), &ComposeInput::kindChanged, this, [this] {
+        chooseCompose();
+        rerun();
+    });
+    connect(m_input->composeInput(), &ComposeInput::toneChanged, this, &MainWindow::rerun);
+    connect(m_input, &InputPane::runClicked, this, &MainWindow::run);
+    connect(m_input, &InputPane::edited, this, [this] {
+        if (m_input->page()->subject().trimmed().isEmpty()) {
+            m_ran = false; // cleared: options wait for the next run
+        }
+        updateRun();
+        if (const SkillInfo* s = m_catalog.find(m_skill)) {
+            m_runner->warmLater(m_skill, m_input->page()->input(*s, m_targetLang));
+        }
+    });
 }
 
 void MainWindow::setHistory(history::Keeper* keeper)
@@ -221,7 +231,7 @@ void MainWindow::useAgain(const history::Entry& entry)
     }
     m_input->page()->setSubject(entry.text);
     m_ran = false;
-    m_output->textView()->showMessage(tr("Your text is back. Run it again with Ctrl+Enter."), false);
+    m_output->textView()->showMessage(tr("Your text is back. Run it again when you are ready."), false);
 }
 
 void MainWindow::applyTheme()
@@ -235,6 +245,7 @@ void MainWindow::applyTheme()
     m_input->composeInput()->applyTheme(m_tokens);
     m_output->applyTheme(m_tokens);
     m_status->applyTheme(m_tokens);
+    updateRun();
     if (m_historyView != nullptr) {
         m_historyView->applyTheme(m_tokens);
     }
@@ -359,6 +370,58 @@ void MainWindow::selectSkill(const QString& skillId)
         m_output->setInfo(u"· "_s + chosen);
     }
     m_output->setRunning(busy());
+    updateRun();
+}
+
+QString MainWindow::runLabel(const SkillInfo& s) const
+{
+    switch (m_catalog.kindOf(s.id)) {
+    case SkillKind::QuickReply:
+        return tr("Write 3 replies");
+    case SkillKind::FullReply:
+        return tr("Write the reply");
+    case SkillKind::Compose:
+        return tr("Write it");
+    case SkillKind::Text:
+        break;
+    }
+    if (m_catalog.picksLanguage(s.base)) {
+        return m_targetLang.isEmpty() ? s.title.section(u':', 0, 0)
+                                      : tr("Into %1").arg(languageName(m_detector, m_targetLang));
+    }
+    return s.title.contains(u':') ? SkillCatalog::presetTitle(s) : s.title;
+}
+
+QString MainWindow::runKey() const
+{
+    const SkillInfo* s = m_catalog.find(m_skill);
+    if (s == nullptr) {
+        return {};
+    }
+    const QJsonObject in = QJsonObject::fromVariantMap(m_input->page()->input(*s, m_targetLang));
+    return m_skill + u'\n' + m_targetLang + u'\n' + QString::fromUtf8(QJsonDocument(in).toJson());
+}
+
+void MainWindow::updateRun()
+{
+    const SkillInfo* s = m_catalog.find(m_skill);
+    if (s == nullptr) {
+        return;
+    }
+    const QString icon = actionIcon(m_skill);
+    m_input->setRunAction(runLabel(*s), Theme::icon(icon, QColor(Qt::white), kRunIconSize),
+                          Theme::icon(icon, m_tokens.text, kRunIconSize));
+    // Filled while no result for this text and these options is showing (note 3).
+    m_input->setRunState(m_resultKey.isEmpty() || m_resultKey != runKey(), busy());
+}
+
+void MainWindow::runOrWait()
+{
+    if (m_input->isEmpty()) {
+        m_input->focusField();
+        return;
+    }
+    run();
 }
 
 QString MainWindow::chosenPreset(const SkillInfo& s) const
@@ -410,6 +473,8 @@ void MainWindow::run()
         return;
     }
     m_requestInput = in.value(s->mainInputIsContext() ? u"context"_s : u"text"_s).toString();
+    m_runKey = runKey();
+    m_resultKey.clear();
     m_rewriting = false;
     m_ran = true;
     m_streamed.clear();
@@ -486,6 +551,7 @@ void MainWindow::rewriteResult(const QString& skillId)
     m_rewriting = true;
     m_streamed.clear();
     m_output->startWork(false); // the result stays on screen until its new version comes
+    updateRun();
 }
 
 void MainWindow::onToken(const QString& piece)
@@ -507,6 +573,7 @@ void MainWindow::onToken(const QString& piece)
 void MainWindow::onFinished(const QJsonObject& result)
 {
     m_output->setRunning(false);
+    updateRun();
     if (m_rerunAfterStop) {
         // An option changed while this ran and the answer came before the stop: it is stale.
         m_rerunAfterStop = false;
@@ -544,6 +611,8 @@ void MainWindow::onFinished(const QJsonObject& result)
         m_output->textView()->showText(output);
     }
     showResult(result);
+    m_resultKey = m_runKey;
+    updateRun();
     keepInHistory(m_lastVariety, replies.join(u"\n\n"_s));
     loadStatus(); // the model that answered, and its memory
     Q_EMIT finished();
@@ -616,6 +685,7 @@ void MainWindow::onFailed(const QString& code, const QString& message)
 {
     m_rewriting = false;
     m_output->setRunning(false);
+    updateRun();
     if (code == u"cancelled"_s && m_rerunAfterStop) {
         m_rerunAfterStop = false;
         Q_EMIT finished();
