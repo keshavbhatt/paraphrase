@@ -260,6 +260,12 @@ QString TextResultView::diffHtml(const client::WordDiff& diff) const
             body += html(s.changed ? s.before : s.after);
             continue;
         }
+        if (s.before.trimmed().isEmpty() && s.after.trimmed().isEmpty()) {
+            // Only spacing changed: the new spacing, as Result shows it. Struck-out line breaks
+            // drew as a tall empty gap; the change list names it and can undo it.
+            body += html(s.after);
+            continue;
+        }
         if (!s.before.isEmpty()) {
             body += del.arg(m_tokens.del.name(), m_tokens.delBg.name(), html(s.before));
         }

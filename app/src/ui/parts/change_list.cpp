@@ -90,6 +90,9 @@ QString letters(const QString& word)
 
 QString punctuationName(const QString& mark)
 {
+    if (mark.isEmpty()) {
+        return ChangeList::tr("spacing");
+    }
     if (mark == u"."_s) {
         return ChangeList::tr("full stop");
     }
@@ -104,6 +107,25 @@ QString punctuationName(const QString& mark)
     }
     return ChangeList::tr("punctuation");
 }
+
+} // namespace
+
+QString spacingName(const QString& space)
+{
+    const auto breaks = space.count(u'\n');
+    if (breaks == 1) {
+        return ChangeList::tr("a line break");
+    }
+    if (breaks > 1) {
+        return ChangeList::tr("%1 line breaks").arg(breaks);
+    }
+    if (space.isEmpty()) {
+        return ChangeList::tr("nothing");
+    }
+    return space.size() == 1 ? ChangeList::tr("a space") : ChangeList::tr("%1 spaces").arg(space.size());
+}
+
+namespace {
 
 /// Levenshtein distance, for telling a spelling fix from another word.
 qsizetype distance(const QString& a, const QString& b)
@@ -167,6 +189,16 @@ QWidget* ChangeList::row(const client::WordDiff& diff, qsizetype k, bool undone)
     layout->setSpacing(8);
     const QString before = s.before.trimmed();
     const QString after = s.after.trimmed();
+    if (before.isEmpty() && after.isEmpty()) {
+        // Spacing only: "4 line breaks -> 2 line breaks", not "new -> removed".
+        layout->addWidget(chip(spacingName(s.before), u"pill"_s));
+        auto* arrow = new QLabel;
+        arrow->setPixmap(
+            Theme::icon(u"forward"_s, m_tokens.muted, kArrowSize).pixmap(kArrowSize, kArrowSize));
+        layout->addWidget(arrow);
+        layout->addWidget(chip(spacingName(s.after), u"pill"_s));
+        return finishRow(w, layout, k, undone, tr("spacing"));
+    }
     if (before.isEmpty()) {
         const bool atEnd = k + 1 >= segments.size() || segments.at(k + 1).after.startsWith(u'\n');
         layout->addWidget(chip(atEnd ? tr("end") : tr("new"), u"pill"_s));
@@ -177,7 +209,12 @@ QWidget* ChangeList::row(const client::WordDiff& diff, qsizetype k, bool undone)
     arrow->setPixmap(Theme::icon(u"forward"_s, m_tokens.muted, kArrowSize).pixmap(kArrowSize, kArrowSize));
     layout->addWidget(arrow);
     layout->addWidget(after.isEmpty() ? chip(tr("removed"), u"pill"_s) : chip(after, u"ins"_s));
-    QLabel* reason = makeLabel(changeReason(s.before, s.after), u"small"_s);
+    return finishRow(w, layout, k, undone, changeReason(s.before, s.after));
+}
+
+QWidget* ChangeList::finishRow(QWidget* w, QHBoxLayout* layout, qsizetype k, bool undone, const QString& why)
+{
+    QLabel* reason = makeLabel(why, u"small"_s);
     reason->setObjectName(u"reason%1"_s.arg(k));
     layout->addWidget(reason);
     layout->addStretch(1);

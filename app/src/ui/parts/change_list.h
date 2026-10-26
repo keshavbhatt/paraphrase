@@ -6,6 +6,7 @@
 #include <QScrollArea>
 #include <QSet>
 
+class QHBoxLayout;
 class QVBoxLayout;
 
 namespace paraphrase::app {
@@ -13,6 +14,8 @@ namespace paraphrase::app {
 /// Why a word changed, in a few words (popup-proofread.html, note 3): "capital letter",
 /// "comma", "spelling", "wording", "added word". Worked out from the two words alone.
 [[nodiscard]] QString changeReason(const QString& before, const QString& after);
+/// Whitespace as the change list names it: "2 line breaks", "a line break", "a space".
+[[nodiscard]] QString spacingName(const QString& space);
 
 /// Proofread's changes, one row each (main-window.html, note 5): the old word, an arrow, the
 /// new word, and Undo. An addition shows where it went ("end" of a line) and a removal says
@@ -35,6 +38,8 @@ Q_SIGNALS:
 
 private:
     [[nodiscard]] QWidget* row(const client::WordDiff& diff, qsizetype k, bool undone);
+    /// The reason and Undo (or Redo) at the end of a row.
+    QWidget* finishRow(QWidget* w, QHBoxLayout* layout, qsizetype k, bool undone, const QString& why);
 
     QVBoxLayout* m_rows = nullptr;
     Tokens m_tokens;

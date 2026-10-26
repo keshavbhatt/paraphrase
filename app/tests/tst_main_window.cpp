@@ -168,6 +168,27 @@ private Q_SLOTS:
         QCOMPARE(QApplication::clipboard()->text(), u"Whisk the egg's with the milk."_s);
     }
 
+    void showsASpacingChangeAsTheNewSpacing()
+    {
+        // Owner report: extra blank lines taken out drew as a tall gap of struck-out line
+        // breaks in Changes, and the row read "new -> removed, punctuation".
+        startDaemon({u"fast-model"_s});
+        MainWindow w;
+        w.start();
+        w.findChild<QTextEdit*>(u"text"_s)->setPlainText(u"See you on Monday.\n\n\n\n\nBring the notes."_s);
+        setAnswers({u"See you on Monday.\n\nBring the notes."_s});
+        w.selectSkill(u"proofread"_s);
+        runAndWait(w);
+        const auto* output = w.findChild<QTextBrowser*>(u"output"_s);
+        QVERIFY(!output->toPlainText().contains(u"\n\n\n"_s)); // the new spacing, no gap
+        const auto reasons = w.findChildren<QLabel*>(QRegularExpression(u"^reason\\d+$"_s));
+        QCOMPARE(reasons.size(), 1);
+        QCOMPARE(reasons.first()->text(), u"spacing"_s);
+        QCOMPARE(paraphrase::app::spacingName(u"\n\n\n\n\n"_s), u"5 line breaks"_s);
+        QCOMPARE(paraphrase::app::spacingName(u"\n\n"_s), u"2 line breaks"_s);
+        QCOMPARE(paraphrase::app::spacingName(u" "_s), u"a space"_s);
+    }
+
     void namesWhyEachWordChanged()
     {
         // popup-proofread.html, note 3: a short reason per change, from the two words alone.
