@@ -71,9 +71,9 @@ void Application::wire()
     connect(&m_integrations->shortcut(), &ShortcutBackend::activated, this, &Application::openFromShortcut);
     connect(&m_integrations->shortcut(), &ShortcutBackend::keysChanged, this, &Application::describe);
     connect(m_popup, &PopupController::newActionRequested, m_flow, &AppFlow::newAction);
-    connect(m_popup, &PopupController::openInWindow, this, [this](const QString& text) {
+    connect(m_popup, &PopupController::openInWindow, this, [this](const Handover& handover) {
         m_flow->showMain();
-        m_flow->mainWindow().takeText(text);
+        m_flow->mainWindow().takeOver(handover);
     });
     if (m_tray != nullptr) {
         connect(m_tray, &TrayIcon::windowRequested, m_flow, &AppFlow::showMain);

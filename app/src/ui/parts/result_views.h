@@ -9,6 +9,7 @@
 
 #include <optional>
 
+class QFrame;
 class QLabel;
 class QLineEdit;
 class QPlainTextEdit;
@@ -85,7 +86,15 @@ public:
     void setChosen(const QString& text);
     void applyTheme(const Tokens& t);
 
+Q_SIGNALS:
+    /// The popup's "Write a full reply in the window".
+    void fullReplyRequested();
+
 private:
+    [[nodiscard]] QWidget* buildMore();
+
+    QFrame* m_more = nullptr;
+    QPushButton* m_fullReply = nullptr;
     QLabel* m_editLabel = nullptr;
     QList<ChipButton*> m_choices;
     QList<QPushButton*> m_copies;

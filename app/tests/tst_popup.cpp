@@ -11,6 +11,7 @@
 #include "popup/popup_pages.h"
 #include "popup/popup_window.h"
 #include "ui/common/chip_button.h"
+#include "ui/core/handover.h"
 
 #include <QCoreApplication>
 #include <QDir>
@@ -176,6 +177,37 @@ private Q_SLOTS:
         popup.window()->findChild<QPushButton*>(u"reply2"_s)->click();
         popup.window()->findChild<ChipButton*>(u"insert"_s)->click();
         QCOMPARE(m_sent, QStringList{u"Thoda ruko."_s});
+    }
+
+    void opensAResultInTheWindowWithItsState()
+    {
+        // popup-open-in-window.html: a result page hands over its action, text and result.
+        QObject owner;
+        const auto backends = integrations(&owner);
+        PopupController popup(*backends);
+        QList<Handover> handed;
+        connect(&popup, &PopupController::openInWindow, &owner,
+                [&handed](const Handover& h) { handed.append(h); });
+        popup.showText(selected(u"Their going home."_s));
+        m_daemon.setAnswers({u"They're going home."_s});
+        pick(popup, u"action-proofread"_s);
+        popup.window()->findChild<QPushButton*>(u"openResultInWindow"_s)->click();
+        QCOMPARE(handed.size(), 1);
+        QCOMPARE(handed.first().text, u"Their going home."_s);
+        QCOMPARE(handed.first().skillId.section(u'.', 0, 0), u"proofread"_s);
+        QCOMPARE(handed.first().result.value(u"output"_s).toString(), u"They're going home."_s);
+        QVERIFY(!popup.window()->isVisible());
+
+        // A quick reply offers a full one in the window (note 3).
+        popup.showText(selected(u"Hello team,\n\nThe demo is tomorrow at 11.\n\nLuca"_s));
+        m_daemon.setAnswers({uR"({"replies": ["Thanks!", "See you there.", "Cannot make it."]})"_s});
+        pick(popup, u"action-reply"_s);
+        auto* more = popup.window()->findChild<QPushButton*>(u"fullReplyInWindow"_s);
+        QVERIFY(more != nullptr && more->isVisibleTo(popup.window()));
+        more->click();
+        QCOMPARE(handed.size(), 2);
+        QCOMPARE(handed.last().skillId, u"reply"_s);
+        QVERIFY(handed.last().text.startsWith(u"Hello team,"_s));
     }
 
     void keepsALongMessageToAFewScrollingLines()

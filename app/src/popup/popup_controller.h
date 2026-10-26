@@ -2,6 +2,7 @@
 
 #include "daemon_client.h"
 #include "integration/backends.h"
+#include "ui/core/handover.h"
 #include "ui/core/skill_catalog.h"
 #include "util/language_detector.h"
 
@@ -46,8 +47,9 @@ public:
     [[nodiscard]] PopupWindow* window() const { return m_window.get(); }
 
 Q_SIGNALS:
-    /// "Open in window": the main window takes the text (ADR-013).
-    void openInWindow(const QString& text);
+    /// "Open in window": the main window takes the text, and from a result page the action,
+    /// its language and the result (ADR-013, popup-open-in-window.html).
+    void openInWindow(const paraphrase::app::Handover& handover);
     void finished();           ///< a run ended, with a result or a message (tests)
     void newActionRequested(); ///< "New action..." under My actions
 
@@ -60,6 +62,8 @@ private:
     void onFailed(const QString& code, const QString& message);
     void insert();
     void copy();
+    /// The popup closes and the window takes over what it shows.
+    void handOver(bool withResult);
     /// Keeps the finished run, or for another version of it, its newest result.
     void keepInHistory(bool sameRun, const QString& result);
     [[nodiscard]] QString likelyBase() const;
@@ -80,6 +84,7 @@ private:
     QString m_skill;
     QString m_targetLang;
     QString m_streamed;
+    QJsonObject m_result; ///< the finished run on screen, for Open in window
     QTimer m_poll;
     QElapsedTimer m_pollClock;
     QString m_likelyTitle;

@@ -20,6 +20,7 @@
 #include <QClipboard>
 #include <QDateTime>
 #include <QDir>
+#include <QJsonObject>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMenu>
@@ -229,6 +230,37 @@ private Q_SLOTS:
         QCOMPARE(tone->sizeHint().width(), width);
         QCOMPARE(tone->toolTip(), u"Tone: Polite"_s);
         QVERIFY(w.findChild<QLabel*>(u"outInfo"_s)->text().startsWith(u"· polite"_s));
+    }
+
+    void takesOverWhatThePopupShowed()
+    {
+        // popup-open-in-window.html, notes 4 and 5.
+        startDaemon({u"fast-model"_s, u"quality-model"_s});
+        MainWindow w;
+        w.start();
+        const QSignalSpy finished(&w, &MainWindow::finished);
+
+        // A reply opens on Full reply with the message, waiting for what to say.
+        const QString email = u"Hello everyone,\n\nThe demo is tomorrow at 11.\n\nLuca"_s;
+        w.takeOver({.text = email, .skillId = u"reply"_s, .targetLang = {}, .result = {}});
+        QCOMPARE(w.currentSkill().section(u'.', 0, 0), u"draft"_s);
+        QCOMPARE(w.findChild<QTextEdit*>(u"fullMessage"_s)->toPlainText(), email);
+        QVERIFY(w.findChild<QTextEdit*>(u"intent"_s)->toPlainText().isEmpty());
+        QVERIFY(!w.findChild<QPushButton*>(u"asChat"_s)->isChecked()); // an email, by its shape
+
+        // Another action opens with the popup's result, without running again.
+        w.takeOver({
+            .text = u"Their going home."_s,
+            .skillId = u"proofread"_s,
+            .targetLang = {},
+            .result = QJsonObject{{u"output"_s, u"They're going home."_s}},
+        });
+        QCOMPARE(w.currentSkill(), u"proofread"_s);
+        QCOMPARE(w.findChild<QTextEdit*>(u"text"_s)->toPlainText(), u"Their going home."_s);
+        QCOMPARE(w.resultText(), u"They're going home."_s);
+        QCOMPARE(w.findChild<paraphrase::app::ChipButton*>(u"run"_s)->property("kind").toString(), QString());
+        QApplication::processEvents();
+        QCOMPARE(finished.size(), 0); // nothing ran
     }
 
     void runButtonNamesTheActionAndWaitsForText()

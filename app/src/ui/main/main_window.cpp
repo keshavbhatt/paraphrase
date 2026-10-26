@@ -305,6 +305,9 @@ void MainWindow::start()
     m_output->textView()->showMessage(tr("Paste or type your text on the left, then pick an action."), false);
     applyTheme();
     Q_EMIT actionsLoaded();
+    if (const auto pending = std::exchange(m_pending, std::nullopt)) {
+        takeOver(*pending);
+    }
 }
 
 void MainWindow::loadSkills()
@@ -597,20 +600,7 @@ void MainWindow::onFinished(const QJsonObject& result)
         Q_EMIT finished();
         return;
     }
-    QStringList replies;
-    if (kind == SkillKind::QuickReply) {
-        for (const auto& v : result.value(u"replies"_s).toArray()) {
-            replies.append(v.toString());
-        }
-        m_output->repliesView()->setReplies(replies);
-    } else if (writesDraft(kind)) {
-        m_output->fullView()->addVersion(output);
-    } else if (m_catalog.find(m_skill)->base == u"proofread"_s) {
-        m_output->textView()->showProofread(m_requestInput, result.value(u"output"_s).toString());
-    } else {
-        m_output->textView()->showText(output);
-    }
-    showResult(result);
+    const QStringList replies = display(result);
     m_resultKey = m_runKey;
     updateRun();
     keepInHistory(m_lastVariety, replies.join(u"\n\n"_s));
@@ -643,6 +633,68 @@ void MainWindow::keepInHistory(bool sameRun, const QString& replies)
     }
     entry.options = QJsonDocument(options).toJson(QJsonDocument::Compact);
     m_historyId = m_history->record(entry);
+}
+
+QStringList MainWindow::display(const QJsonObject& result)
+{
+    const QString output = result.value(u"output"_s).toString().trimmed();
+    const SkillKind kind = m_catalog.kindOf(m_skill);
+    QStringList replies;
+    if (kind == SkillKind::QuickReply) {
+        for (const auto& v : result.value(u"replies"_s).toArray()) {
+            replies.append(v.toString());
+        }
+        m_output->repliesView()->setReplies(replies);
+    } else if (writesDraft(kind)) {
+        m_output->fullView()->addVersion(output);
+    } else if (m_catalog.find(m_skill)->base == u"proofread"_s) {
+        m_output->textView()->showProofread(m_requestInput, result.value(u"output"_s).toString());
+    } else {
+        m_output->textView()->showText(output);
+    }
+    showResult(result);
+    return replies;
+}
+
+void MainWindow::takeOver(const Handover& handover)
+{
+    if (m_catalog.isEmpty()) {
+        m_pending = handover; // the actions are not loaded yet: start() applies it
+        return;
+    }
+    showHistory(false);
+    if (busy()) {
+        cancel();
+    }
+    if (handover.skillId.isEmpty()) {
+        takeText(handover.text);
+        return;
+    }
+    // popup-open-in-window.html, note 4: Reply opens on Full reply with the message, waiting
+    // for what the user wants to say. Nothing runs until they press Write the reply.
+    const SkillKind kind = m_catalog.kindOf(handover.skillId);
+    if (kind == SkillKind::QuickReply || kind == SkillKind::FullReply) {
+        m_input->fullReplyInput()->takeMessage(handover.text);
+        chooseReply(true);
+        m_ran = false;
+        m_input->fullReplyInput()->focusIntent();
+        return;
+    }
+    // Note 5: the same action and language, and the popup's result without running again.
+    m_targetLang = handover.targetLang;
+    selectSkill(handover.skillId);
+    m_input->page()->setSubject(handover.text);
+    m_ran = false;
+    if (handover.result.isEmpty()) {
+        m_output->textView()->showMessage(tr("Your text is here. Run it when you are ready."), false);
+        return;
+    }
+    m_requestInput = handover.text;
+    m_runKey = runKey();
+    display(handover.result);
+    m_resultKey = m_runKey;
+    m_ran = true;
+    updateRun();
 }
 
 void MainWindow::showResult(const QJsonObject& result)

@@ -14,6 +14,22 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-26 - The popup opens in the main window with what it shows
+
+Owner report: a long email made the popup taller than the screen, and its quick replies are
+one-liners with no way to a full reply. Mock `popup-open-in-window.html`, approved by the owner
+on 2026-10-26 (recorded in DOCS/mocks/index.html), and built:
+- A long message stays about six lines tall and scrolls inside its box.
+- "Open in window" on every popup result page (the expand button the actions page has). The
+  main window takes the text, the action, its language and the result as it showed, without
+  running again; a run still going stops and the window waits for Run.
+- Under quick replies: "Need more than a line? Write a full reply in the window". Reply opens
+  on Full reply with the message, the cursor in "What do you want to say?", nothing running.
+  Email or chat follows the message's shape until the user has chosen one in the window.
+- The hand-over is in memory only; history keeps the run once, where it finished.
+- Settings: the scroll bar sits at the window's edge, and the Models table wraps so every page
+  fits the window at its opening size (a test checks this with real fonts).
+
 ## 2026-10-26 - Spacing and consistency pass against the mocks
 
 Every screen (main window, popup, setup, settings; light and dark) compared with its approved

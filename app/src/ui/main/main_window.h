@@ -2,6 +2,7 @@
 
 #include "daemon_client.h"
 #include "ui/common/theme.h"
+#include "ui/core/handover.h"
 #include "ui/core/skill_catalog.h"
 #include "util/language_detector.h"
 
@@ -10,6 +11,7 @@
 #include <QWidget>
 
 #include <memory>
+#include <optional>
 
 class QSplitter;
 class QStackedWidget;
@@ -49,8 +51,11 @@ public:
 
     /// Connects to the daemon (starting it when needed) and loads the actions.
     void start();
-    /// Text handed over from the popup ("Open in window"): it becomes your text.
+    /// Text handed over from the popup's actions page: it becomes your text.
     void takeText(const QString& text);
+    /// What a popup result page hands over (popup-open-in-window.html): its action, text and
+    /// result, or for a reply, a full reply waiting for what to say.
+    void takeOver(const Handover& handover);
     /// With a global shortcut there is nothing to say; without one the notice explains how
     /// to add one by hand (ADR-013).
     void setGlobalShortcut(bool available);
@@ -105,6 +110,8 @@ private:
     void onFinished(const QJsonObject& result);
     void onFailed(const QString& code, const QString& message);
     void showResult(const QJsonObject& result);
+    /// A finished result on the right, as a run shows it; the quick replies it had.
+    QStringList display(const QJsonObject& result);
     /// Keeps the finished run, or for another version of it, its newest result.
     void keepInHistory(bool sameRun, const QString& replies);
     void useAgain(const history::Entry& entry);
@@ -144,13 +151,14 @@ private:
     QString m_streamed;     ///< text streamed so far
     QString m_fullReplyKey; ///< message and intent of the last full reply, to keep its versions
     bool m_fullReply = false;
-    bool m_rewriting = false;      ///< a Tone preset runs on the result
-    bool m_ran = false;            ///< something ran on the current text, so option changes run again
-    bool m_rerunAfterStop = false; ///< an option changed during a run
-    QString m_runKey;              ///< the action, options and text of the running request
-    QString m_resultKey;           ///< the same for the result on screen, empty while there is none
-    bool m_variety = false;        ///< the next run is another version (RunSkill's variety option)
-    bool m_lastVariety = false;    ///< the running request is another version
+    std::optional<Handover> m_pending; ///< handed over before the actions loaded
+    bool m_rewriting = false;          ///< a Tone preset runs on the result
+    bool m_ran = false;                ///< something ran on the current text, so option changes run again
+    bool m_rerunAfterStop = false;     ///< an option changed during a run
+    QString m_runKey;                  ///< the action, options and text of the running request
+    QString m_resultKey;               ///< the same for the result on screen, empty while there is none
+    bool m_variety = false;            ///< the next run is another version (RunSkill's variety option)
+    bool m_lastVariety = false;        ///< the running request is another version
 };
 
 } // namespace paraphrase::app

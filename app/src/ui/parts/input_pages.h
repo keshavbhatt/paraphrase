@@ -107,6 +107,10 @@ public:
     void setTones(const QList<std::pair<QString, QString>>& tones);
     void applyTheme(const Tokens& t);
     [[nodiscard]] bool chat() const;
+    /// A message from the popup: it fills the message, and "What do you want to say?" starts
+    /// empty. Email or chat follows the message until the user has chosen one here.
+    void takeMessage(const QString& text);
+    void focusIntent() const;
     [[nodiscard]] bool showsLanguage() const override { return true; }
     void setLanguage(const QString& name) override;
 

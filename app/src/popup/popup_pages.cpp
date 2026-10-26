@@ -292,8 +292,12 @@ QWidget* PopupResultPage::buildHead()
     row->addWidget(m_title);
     row->addStretch();
     row->addLayout(privacyLine(m_lock));
+    // popup-open-in-window.html, note 1: where the actions page has it.
+    m_expand = iconButton(u"openResultInWindow"_s, tr("Open in window"));
     m_close = iconButton(u"closePopup"_s, tr("Close"));
+    row->addWidget(m_expand);
     row->addWidget(m_close);
+    connect(m_expand, &QPushButton::clicked, this, &PopupResultPage::openInWindow);
     connect(m_back, &QPushButton::clicked, this, &PopupResultPage::back);
     connect(m_close, &QPushButton::clicked, this, &PopupResultPage::closeRequested);
     return head;
@@ -651,6 +655,7 @@ void PopupResultPage::applyTheme(const Tokens& t)
     m_grip->setPixmap(Theme::icon(u"grip"_s, t.muted, kIconSize).pixmap(kIconSize, kIconSize));
     m_clearLanguage->setIcon(Theme::icon(u"x"_s, t.accent, 12));
     m_back->setIcon(Theme::icon(u"left"_s, t.text, kIconSize));
+    m_expand->setIcon(Theme::icon(u"expand"_s, t.muted, kIconSize));
     m_close->setIcon(Theme::icon(u"x"_s, t.muted, kIconSize));
     setButtonIcon(m_copy, u"copy"_s, t.text, kIconSize);
     m_insert->setLeadingIcon({});

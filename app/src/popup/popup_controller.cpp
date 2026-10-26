@@ -92,10 +92,9 @@ void PopupController::connectWindow()
         Q_EMIT newActionRequested();
     });
     actions->actionBar()->setTextLanguage([this] { return m_detector.detect(m_text.text); });
-    connect(actions, &PopupActionsPage::openInWindow, this, [this] {
-        m_window->close();
-        Q_EMIT openInWindow(m_text.text);
-    });
+    connect(actions, &PopupActionsPage::openInWindow, this, [this] { handOver(false); });
+    connect(result, &PopupResultPage::openInWindow, this, [this] { handOver(true); });
+    connect(result->repliesView(), &QuickRepliesView::fullReplyRequested, this, [this] { handOver(true); });
     connect(result, &PopupResultPage::insertClicked, this, &PopupController::insert);
     connect(result, &PopupResultPage::copyClicked, this, &PopupController::copy);
     connect(result, &PopupResultPage::presetChosen, this,
@@ -214,6 +213,7 @@ void PopupController::run(const QString& skillId, const QString& targetLang)
     m_skill = skillId;
     m_targetLang = targetLang;
     m_streamed.clear();
+    m_result = {};
     const SkillKind kind = m_catalog.kindOf(skillId);
     QSettings().setValue(kLastKey, skill->base);
     PopupResultPage* page = m_window->resultPage();
@@ -262,6 +262,7 @@ void PopupController::onFinished(const QJsonObject& result)
     } else {
         page->textView()->showText(output);
     }
+    m_result = result;
     const bool chosen = !m_targetLang.isEmpty();
     const bool sameLanguage = !chosen || m_targetLang == m_detector.detect(m_text.text);
     const FactsCheck check =
@@ -350,6 +351,24 @@ void PopupController::onFailed(const QString& code, const QString& message)
     page->setInfo(code == u"cancelled"_s ? tr("· stopped") : message,
                   code == u"cancelled"_s ? u"small"_s : u"danger"_s);
     Q_EMIT finished();
+}
+
+void PopupController::handOver(bool withResult)
+{
+    Handover h{.text = m_text.text, .skillId = {}, .targetLang = {}, .result = {}};
+    if (withResult) {
+        h.skillId = m_skill;
+        h.targetLang = m_targetLang;
+        if (!m_result.isEmpty() && !m_runner->busy()) {
+            // As it shows now: a proofread with changes undone, the version on screen.
+            h.result = m_result;
+            if (m_catalog.kindOf(m_skill) == SkillKind::Text) {
+                h.result.insert(u"output"_s, m_window->resultPage()->result());
+            }
+        }
+    }
+    m_window->close(); // stops a run still going (note 5): the window waits for Run
+    Q_EMIT openInWindow(h);
 }
 
 void PopupController::insert()

@@ -10,7 +10,9 @@
 #include <QLabel>
 #include <QMenu>
 #include <QPushButton>
+#include <QRegularExpression>
 #include <QSettings>
+#include <QSignalBlocker>
 #include <QVBoxLayout>
 
 #include <algorithm>
@@ -189,6 +191,26 @@ FullReplyInput::FullReplyInput(QWidget* parent)
     for (const TextField* edit : {m_message, m_intent}) {
         connect(edit, &QTextEdit::textChanged, this, &InputPage::edited);
     }
+}
+
+void FullReplyInput::takeMessage(const QString& text)
+{
+    setSubject(text);
+    m_intent->clear();
+    if (!QSettings().contains(kKindKey)) {
+        // An email has paragraphs or opens with a greeting; a chat message is a line or two.
+        static const QRegularExpression greeting(
+            u"^\\s*(hi|hello|dear|hey|good (morning|afternoon|evening))\\b"_s,
+            QRegularExpression::CaseInsensitiveOption);
+        const bool email = text.trimmed().contains(u"\n\n"_s) || greeting.match(text).hasMatch();
+        const QSignalBlocker quiet(m_kind); // not the user's choice: nothing is remembered
+        m_kind->setCurrent(email ? 0 : 1);
+    }
+}
+
+void FullReplyInput::focusIntent() const
+{
+    m_intent->setFocus();
 }
 
 void FullReplyInput::setLanguage(const QString& name)

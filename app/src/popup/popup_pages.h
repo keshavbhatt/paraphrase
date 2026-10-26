@@ -116,6 +116,8 @@ Q_SIGNALS:
     void presetChosen(const QString& skillId);
     void languageChosen(const QString& code);
     void languageCleared();
+    /// The header's "Open in window": the main window takes the text and this result.
+    void openInWindow();
 
 private:
     [[nodiscard]] QWidget* buildHead();
@@ -136,6 +138,7 @@ private:
     QFrame* m_chosen = nullptr;
     QLabel* m_chosenName = nullptr;
     QPushButton* m_clearLanguage = nullptr;
+    QPushButton* m_expand = nullptr;
     QPushButton* m_close = nullptr;
     QWidget* m_presets = nullptr;
     QLabel* m_caption = nullptr;

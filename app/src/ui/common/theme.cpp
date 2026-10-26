@@ -127,6 +127,9 @@ QPushButton[kind="pill"] { background: @hover@; color: @muted@; border: none; bo
     min-height: 22px; max-height: 22px; font-size: 12px; }
 QPushButton[kind="pill"]:hover { color: @text@; }
 QFrame#confirm { border: 1px solid @danger@; border-radius: 10px; }
+QFrame#moreRow { border: 1px dashed @border@; border-radius: 10px; }
+QFrame#moreRow QLabel { font-size: 13px; }
+QFrame#moreRow QPushButton[kind="link"] { font-size: 13px; font-weight: 500; }
 QPushButton[kind="filter"] { border-radius: 14px; min-height: 26px; max-height: 28px; padding: 0 11px; font-size: 12px; }
 QPushButton[kind="filter"]:checked { background: @accentStrong@; border-color: @accentStrong@; color: @accentText@;
     font-weight: 500; }

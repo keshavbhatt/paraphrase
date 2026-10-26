@@ -7,6 +7,7 @@
 #include <QAbstractTextDocumentLayout>
 #include <QApplication>
 #include <QClipboard>
+#include <QFrame>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
@@ -40,6 +41,7 @@ QString html(const QString& text)
 constexpr int kLineHeight = 125;
 constexpr int kReplyGap = 10;
 constexpr int kPopupReplyGap = 12;
+constexpr int kArrowGap = 4;
 
 /// Plain text at the mocks' reading line height (mock.css: 15px/1.7). Qt scales the font's own
 /// line spacing, about 1.36 em, so 1.7 em is kLineHeight percent.
@@ -301,6 +303,7 @@ QuickRepliesView::QuickRepliesView(QWidget* parent)
                                         Qt::WidgetWithChildrenShortcut);
         connect(key, &QShortcut::activated, choice, &QPushButton::click);
     }
+    layout->addWidget(buildMore());
     layout->addSpacing(4);
     m_editLabel = makeLabel(tr("Edit before copying"), u"small"_s);
     layout->addWidget(m_editLabel);
@@ -309,8 +312,28 @@ QuickRepliesView::QuickRepliesView(QWidget* parent)
     layout->addStretch();
 }
 
+QWidget* QuickRepliesView::buildMore()
+{
+    // popup-open-in-window.html, note 3: quick replies are one-liners, an email wants more.
+    m_more = new QFrame;
+    m_more->setObjectName(u"moreRow"_s);
+    auto* row = new QHBoxLayout(m_more);
+    row->setContentsMargins(12, 4, 6, 4);
+    row->setSpacing(8);
+    QLabel* ask = makeLabel(tr("Need more than a line?"), u"muted"_s);
+    row->addWidget(ask, 1);
+    m_fullReply = makeButton(tr("Write a full reply in the window"), u"link"_s);
+    m_fullReply->setObjectName(u"fullReplyInWindow"_s);
+    m_fullReply->setLayoutDirection(Qt::RightToLeft); // the arrow after the words
+    row->addWidget(m_fullReply);
+    connect(m_fullReply, &QPushButton::clicked, this, &QuickRepliesView::fullReplyRequested);
+    m_more->hide(); // the popup's: the window has its own Full reply switch
+    return m_more;
+}
+
 void QuickRepliesView::setForPopup(bool popup)
 {
+    m_more->setVisible(popup);
     // popup-reply.html: full-width rows (Insert and Copy are below) and the reply goes into
     // the other app, so it is edited "before sending".
     for (QPushButton* copy : std::as_const(m_copies)) {
@@ -351,6 +374,9 @@ void QuickRepliesView::applyTheme(const Tokens& t)
     for (QPushButton* copy : std::as_const(m_copies)) {
         copy->setIcon(Theme::icon(u"copy"_s, t.text, kIconSize));
     }
+    m_fullReply->setIcon(
+        Theme::icon(u"forward"_s, t.accent, kIconSize, kArrowGap, 0)); // 4 px after the words
+    m_fullReply->setIconSize(QSize(kIconSize + kArrowGap, kIconSize));
 }
 
 FullReplyView::FullReplyView(QWidget* parent)
