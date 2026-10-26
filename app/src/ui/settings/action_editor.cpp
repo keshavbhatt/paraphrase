@@ -26,11 +26,17 @@ constexpr int kSampleHeight = 80;
 constexpr int kResultMaxHeight = 160; // a long result scrolls instead of stretching the card
 constexpr int kStackGap = 6;          // settings-actions.html: .stack gap under a field
 constexpr int kTryGap = 8;            // the Try it column and its button row
+constexpr int kFieldTop = 9;
+constexpr int kControlTop = 6;
+constexpr int kButtonsGap = 16; // .form + .row margin-top
 
-QLabel* fieldLabel(const QString& text)
+/// `top` lines the label up with the first line of its field (settings-actions.html
+/// .form label: 9 px beside a text field, 6 px beside the switch and the sample).
+QLabel* fieldLabel(const QString& text, int top)
 {
     QLabel* l = makeLabel(text, u"small"_s);
     l->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+    l->setContentsMargins(0, top, 0, 0);
     return l;
 }
 
@@ -69,7 +75,9 @@ ActionEditor::ActionEditor(QWidget* parent)
     buildForm(form);
     layout->addLayout(form);
     m_problem->setWordWrap(true);
+    m_problem->hide(); // shown only with a message, so it adds no gap of its own
     layout->addWidget(m_problem);
+    layout->addSpacing(kButtonsGap - layout->spacing());
     auto* buttons = new QHBoxLayout;
     buttons->addStretch();
     QPushButton* cancel = makeButton(tr("Cancel"));
@@ -93,6 +101,8 @@ void ActionEditor::buildForm(QGridLayout* form)
     m_sample->setObjectName(u"actionSample"_s);
     m_sample->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
     m_sample->setFixedHeight(kSampleHeight);
+    m_sample->setProperty("role", u"box"_s); // .tryout: a sunk sample, no border
+    m_sample->setProperty("sunk", true);
     m_sample->setPlainText(
         tr("We moved the launch to March 12 because the payment provider needs one more week "
            "of testing. Sorry for the wait, everyone!"));
@@ -133,13 +143,13 @@ void ActionEditor::buildForm(QGridLayout* form)
     connect(tryButton, &QPushButton::clicked, this,
             [this] { Q_EMIT tryClicked(action(), m_sample->toPlainText()); });
 
-    form->addWidget(fieldLabel(tr("Name")), 0, 0);
+    form->addWidget(fieldLabel(tr("Name"), kFieldTop), 0, 0);
     form->addWidget(m_name, 0, 1);
-    form->addWidget(fieldLabel(tr("What it does")), 1, 0);
+    form->addWidget(fieldLabel(tr("What it does"), kFieldTop), 1, 0);
     form->addLayout(what, 1, 1);
-    form->addWidget(fieldLabel(tr("Model")), 2, 0);
+    form->addWidget(fieldLabel(tr("Model"), kControlTop), 2, 0);
     form->addLayout(model, 2, 1);
-    form->addWidget(fieldLabel(tr("Try it")), 3, 0);
+    form->addWidget(fieldLabel(tr("Try it"), kControlTop), 3, 0);
     form->addLayout(tryIt, 3, 1);
 }
 
@@ -152,7 +162,7 @@ void ActionEditor::edit(const ActionInfo& action)
     m_tier->setCurrent(action.tier == u"quality"_s ? 1 : 0);
     m_tryResult->clear();
     fitTryResult();
-    m_problem->clear();
+    showProblem(QString());
     m_name->setFocus();
 }
 
@@ -194,6 +204,7 @@ void ActionEditor::fitTryResult()
 void ActionEditor::showProblem(const QString& message)
 {
     m_problem->setText(message);
+    m_problem->setVisible(!message.isEmpty());
 }
 
 } // namespace paraphrase::app

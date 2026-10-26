@@ -54,6 +54,7 @@ private:
     ToggleSwitch* m_switch;
     QLabel* m_switchDetail = nullptr;
     QLabel* m_problem = nullptr;
+    QFrame* m_switchRow = nullptr;
     QWidget* m_onRows = nullptr;
     QComboBox* m_keepFor = nullptr;
     QWidget* m_apps = nullptr;

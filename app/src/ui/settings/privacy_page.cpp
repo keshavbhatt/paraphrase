@@ -4,6 +4,7 @@
 #include "ui/common/flow_layout.h"
 #include "ui/common/toggle_switch.h"
 #include "ui/common/widgets.h"
+#include "ui/common/window_style.h"
 #include "ui/models/model_info.h"
 
 #include <QComboBox>
@@ -24,6 +25,7 @@ namespace paraphrase::app {
 namespace {
 
 constexpr std::array<int, 4> kKeepDays = {7, 30, 365, 0};
+constexpr int kIntroWidth = 640; // settings-privacy.html
 
 /// One `.opt` row: a bold title, a small detail, and the control on the right.
 QFrame* optionRow(const QString& title, QLabel* detail, QWidget* control, QWidget* below = nullptr)
@@ -39,7 +41,7 @@ QFrame* optionRow(const QString& title, QLabel* detail, QWidget* control, QWidge
     detail->setWordWrap(true);
     what->addWidget(detail);
     if (below != nullptr) {
-        what->addSpacing(6);
+        below->setContentsMargins(0, 6, 0, 0); // a gap that hides with it
         what->addWidget(below);
     }
     layout->addLayout(what, 1);
@@ -96,7 +98,8 @@ PrivacyPage::PrivacyPage(history::Keeper& keeper, QWidget* parent)
     column->addLayout(pageHeading(
         tr("Privacy"),
         tr("What you write is read by the model on this computer and nowhere else. There is no "
-           "account and no usage data. Paraphrase goes online only to download a model you chose.")));
+           "account and no usage data. Paraphrase goes online only to download a model you chose."),
+        kIntroWidth));
 
     auto* card = new QFrame;
     card->setObjectName(u"card"_s);
@@ -110,7 +113,8 @@ PrivacyPage::PrivacyPage(history::Keeper& keeper, QWidget* parent)
     m_problem->setObjectName(u"historyProblem"_s);
     m_problem->setWordWrap(true);
     m_problem->hide();
-    rows->addWidget(optionRow(tr("Keep a history"), m_switchDetail, m_switch, m_problem));
+    m_switchRow = optionRow(tr("Keep a history"), m_switchDetail, m_switch, m_problem);
+    rows->addWidget(m_switchRow);
 
     // 2 to 5, only while it is on.
     auto* onRows = new QVBoxLayout(m_onRows);
@@ -187,6 +191,7 @@ void PrivacyPage::buildFacts()
     m_size = makeLabel({});
     auto* where = new QHBoxLayout;
     where->setSpacing(6);
+    m_lock->setContentsMargins(0, 3, 0, 0); // on the first line's centre
     where->addWidget(m_lock, 0, Qt::AlignTop);
     where->addWidget(m_where, 1);
     facts->addWidget(makeLabel(tr("Kept"), u"muted"_s), 0, 0);
@@ -225,6 +230,7 @@ QWidget* PrivacyPage::buildConfirm()
     confirm->addWidget(remove);
     m_confirm->hide();
     auto* confirmWrap = new QWidget;
+    confirmWrap->hide(); // shown with the question: hidden, its padding takes no room
     auto* confirmPad = new QVBoxLayout(confirmWrap);
     confirmPad->setContentsMargins(0, 4, 0, 12);
     confirmPad->addWidget(m_confirm);
@@ -281,6 +287,7 @@ void PrivacyPage::ask(Asking what)
                                            "is back on."));
     }
     m_confirm->setVisible(what != Asking::Nothing);
+    m_confirm->parentWidget()->setVisible(what != Asking::Nothing); // and its padding
     m_deleteAll->setEnabled(what == Asking::Nothing);
 }
 
@@ -331,6 +338,9 @@ void PrivacyPage::reload()
                                : tr("Keep what you worked on and the results, so you can copy or reuse them "
                                     "later. Off: nothing you write is kept after you close it."));
     m_onRows->setVisible(on);
+    // Alone, the switch row is the card's last and draws no rule under it.
+    m_switchRow->setProperty("last", !on);
+    repolish(m_switchRow);
     if (on) {
         m_problem->hide();
         const auto* it = std::ranges::find(kKeepDays, history::Keeper::keepDays());

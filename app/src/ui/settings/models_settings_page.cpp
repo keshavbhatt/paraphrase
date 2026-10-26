@@ -27,7 +27,7 @@ QFrame* card(QVBoxLayout*& col)
     frame->setObjectName(u"card"_s);
     col = new QVBoxLayout(frame);
     col->setContentsMargins(18, 16, 18, 16);
-    col->setSpacing(10);
+    col->setSpacing(12);
     return frame;
 }
 
@@ -40,7 +40,7 @@ ModelsSettingsPage::ModelsSettingsPage(ModelsController& models, QWidget* parent
     , m_table(new InstalledModelsTable(models))
 {
     auto* col = new QVBoxLayout(this);
-    col->setContentsMargins(0, 0, 4, 0);
+    col->setContentsMargins(0, 0, 0, 0);
     col->setSpacing(18);
     col->addLayout(pageHeading(
         tr("Models"), tr("Paraphrase runs these models on this computer. Quick actions use the fast model; "
@@ -125,7 +125,8 @@ void ModelsSettingsPage::reload()
     m_folder->setText(
         tr("Models download only from their makers, at a fixed version, and are checked before use. "
            "They live in <span style=\"font-family: monospace\">%1</span> %2")
-            .arg(m_models.modelsDir().toHtmlEscaped(), link(u"open"_s, tr("Open folder"), m_tokens)));
+            .arg(m_models.modelsDir().toHtmlEscaped(),
+                 link(u"open"_s, tr("Open folder").replace(u' ', u"&nbsp;"_s), m_tokens)));
 }
 
 void ModelsSettingsPage::fillAddMenu()

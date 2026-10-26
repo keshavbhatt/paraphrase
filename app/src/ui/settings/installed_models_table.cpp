@@ -59,8 +59,9 @@ InstalledModelsTable::InstalledModelsTable(ModelsController& models, QWidget* pa
     , m_models(models)
     , m_grid(new QGridLayout(this))
 {
-    m_grid->setContentsMargins(0, 0, 0, 0);
-    m_grid->setHorizontalSpacing(16);
+    setObjectName(u"installedModels"_s);
+    m_grid->setContentsMargins(10, 0, 10, 0); // table.list cells: 10 px in from the card
+    m_grid->setHorizontalSpacing(20);
     m_grid->setVerticalSpacing(0);
     m_grid->setColumnStretch(Name, 3);
     m_grid->setColumnStretch(Use, 1);

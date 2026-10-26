@@ -30,7 +30,7 @@ std::pair<QFrame*, QVBoxLayout*> card()
     f->setObjectName(u"card"_s);
     auto* layout = new QVBoxLayout(f);
     layout->setContentsMargins(18, 16, 18, 16);
-    layout->setSpacing(10);
+    layout->setSpacing(12);
     return {f, layout};
 }
 
