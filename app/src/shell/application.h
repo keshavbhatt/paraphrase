@@ -42,6 +42,7 @@ private:
     /// With a tray and "keep running in the tray", closing the window leaves the app running.
     void applyKeepInTray();
     /// Appearance changed in Settings: every window takes the new colours.
+    void describe();
     static void retheme();
 
     std::unique_ptr<client::DaemonClient> m_client; ///< one connection to the daemon for everything

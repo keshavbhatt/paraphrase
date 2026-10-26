@@ -110,6 +110,8 @@ public:
 
 Q_SIGNALS:
     void activated();
+    /// keys() changed: the desktop bound the shortcut, or the user changed it in its settings.
+    void keysChanged();
 };
 
 } // namespace paraphrase::app

@@ -104,6 +104,9 @@ bool PortalShortcut::createSession()
     QDBusConnection::sessionBus().connect(
         QString::fromLatin1(portal::kService), QString::fromLatin1(portal::kPath), kInterface, u"Activated"_s,
         this, SLOT(onActivated(QDBusObjectPath, QString, qulonglong, QVariantMap)));
+    QDBusConnection::sessionBus().connect(
+        QString::fromLatin1(portal::kService), QString::fromLatin1(portal::kPath), kInterface,
+        u"ShortcutsChanged"_s, this, SLOT(onShortcutsChanged(QDBusMessage)));
     return !m_session.isEmpty();
 }
 
@@ -133,21 +136,33 @@ bool PortalShortcut::bind(const QKeySequence& keys)
     if (!bound) {
         return false;
     }
-    readTrigger(*bound);
+    readTrigger(bound->value(u"shortcuts"_s).value<QDBusArgument>());
     return true;
 }
 
-void PortalShortcut::readTrigger(const QVariantMap& results)
+void PortalShortcut::readTrigger(const QDBusArgument& arg)
 {
     // The desktop says which keys the user ended up with ("trigger_description").
-    const auto arg = results.value(u"shortcuts"_s).value<QDBusArgument>();
     QList<PortalShortcutEntry> shortcuts;
     arg >> shortcuts;
     for (const PortalShortcutEntry& s : std::as_const(shortcuts)) {
         if (s.id == QLatin1StringView(kShortcutId)) {
-            m_trigger = s.properties.value(u"trigger_description"_s).toString();
+            const QString trigger = s.properties.value(u"trigger_description"_s).toString();
+            if (trigger != m_trigger) {
+                m_trigger = trigger;
+                Q_EMIT keysChanged();
+            }
         }
     }
+}
+
+void PortalShortcut::onShortcutsChanged(const QDBusMessage& message)
+{
+    const QList<QVariant> args = message.arguments();
+    if (args.size() < 2 || args.at(0).value<QDBusObjectPath>().path() != m_session) {
+        return;
+    }
+    readTrigger(args.at(1).value<QDBusArgument>());
 }
 
 QString PortalShortcut::description() const

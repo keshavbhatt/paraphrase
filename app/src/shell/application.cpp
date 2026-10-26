@@ -32,7 +32,7 @@ Application::Application(QObject* parent)
         m_tray->applyTheme(Theme::current());
     }
     applyKeepInTray();
-    m_flow->setSettingsContext(m_preferences, m_tray != nullptr, describeDesktop(*m_integrations));
+    describe();
     wire();
 }
 
@@ -41,6 +41,12 @@ Application::~Application() = default;
 void Application::applyKeepInTray()
 {
     QApplication::setQuitOnLastWindowClosed(m_tray == nullptr || !Preferences::keepInTray());
+}
+
+void Application::describe()
+{
+    // What Settings and setup say about this desktop, the shortcut's keys among it.
+    m_flow->setSettingsContext(m_preferences, m_tray != nullptr, describeDesktop(*m_integrations));
 }
 
 void Application::retheme()
@@ -63,6 +69,7 @@ void Application::wire()
     connect(m_service, &AppService::popupRequested, this, &Application::openFromShortcut);
     connect(m_service, &AppService::windowRequested, m_flow, &AppFlow::showMain);
     connect(&m_integrations->shortcut(), &ShortcutBackend::activated, this, &Application::openFromShortcut);
+    connect(&m_integrations->shortcut(), &ShortcutBackend::keysChanged, this, &Application::describe);
     connect(m_popup, &PopupController::newActionRequested, m_flow, &AppFlow::newAction);
     connect(m_popup, &PopupController::openInWindow, this, [this](const QString& text) {
         m_flow->showMain();

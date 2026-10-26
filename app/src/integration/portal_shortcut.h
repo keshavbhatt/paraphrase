@@ -2,6 +2,8 @@
 
 #include "backends.h"
 
+#include <QDBusArgument>
+#include <QDBusMessage>
 #include <QDBusObjectPath>
 #include <QString>
 #include <QVariantMap>
@@ -37,10 +39,12 @@ public:
 private Q_SLOTS:
     void onActivated(const QDBusObjectPath& session, const QString& id, qulonglong timestamp,
                      const QVariantMap& options);
+    /// The user changed the keys in the desktop's settings (ShortcutsChanged).
+    void onShortcutsChanged(const QDBusMessage& message);
 
 private:
     [[nodiscard]] bool createSession();
-    void readTrigger(const QVariantMap& results);
+    void readTrigger(const QDBusArgument& arg);
 
     bool m_available = false;
     QString m_session;
