@@ -17,7 +17,7 @@ clipboard, leave the result on the clipboard, bind `paraphrase-app --popup` by h
 | Shortcut fallback | `CommandShortcut`: bind `paraphrase-app --popup` in the desktop's settings | same | same | same, in the compositor config |
 | Read the highlighted text | `X11SelectionCapture`: the PRIMARY selection, no focus needed | `DataControlCapture`: `ext-data-control-v1`, no focus needed | not possible: GNOME has no data-control; the clipboard is read while the popup has focus | `DataControlCapture` (wlroots has data-control) |
 | Which window the text came from | `X11WindowTracker`: `_NET_ACTIVE_WINDOW`, WM_CLASS for the app name | `KWinWindowTracker`: a KWin script reports activations over D-Bus | not known | not known |
-| Put the result back | `PasteInsert` with `XTestPasteKeys`: clipboard, Ctrl+V through XTEST, clipboard restored | `PasteInsert` with `PortalPasteKeys`: clipboard through data-control, Ctrl+V through the RemoteDesktop portal, clipboard restored | result on the clipboard, "Press Ctrl+V" (no window check, so nothing is typed) | same as GNOME until a window check exists |
+| Put the result back | `PasteInsert` with `XTestPasteKeys`: clipboard, Ctrl+V through XTEST; the result stays on the clipboard | `PasteInsert` with `PortalPasteKeys`: clipboard through data-control, Ctrl+V through the RemoteDesktop portal; the result stays on the clipboard | result on the clipboard, "Press Ctrl+V" (no window check, so nothing is typed) | same as GNOME until a window check exists |
 | Insert fallback | `ClipboardInsert`: the result stays on the clipboard | same | same | same |
 
 An X11 app on a Wayland session (Xwayland, `QT_QPA_PLATFORM=xcb`) gets no key grab and no
@@ -85,7 +85,7 @@ Runtime: the kf6-core24 content snap ships `libxcb`, `libxcb-xtest` and `libwayl
 | Test | Where it runs | What it covers |
 |---|---|---|
 | `tst_integrations` | ctest | ranking, the fallbacks |
-| `tst_paste_insert` | ctest | the window check, the clipboard restore, keys that fail, portal trigger strings |
+| `tst_paste_insert` | ctest | the window check, the result kept on the clipboard, keys that fail, portal trigger strings |
 | `tst_wayland_backends` | `scripts/desktop-test.sh` (a headless KWin on its own D-Bus session) | data-control between two clients, save and restore of every format, capture |
 | `tst_x11_backends` | `scripts/desktop-test.sh` (that KWin's Xwayland) | the window tracker, stepping aside on Xwayland; the key grab and XTest paste need a real X server and skip there |
 | `tst_live_session` | by hand, `PARAPHRASE_TEST_LIVE=1` on the user's KDE Wayland session | read-only: the KWin tracker, the portals, a shortcut session opened and closed, data-control connects |

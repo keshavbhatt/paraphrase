@@ -61,7 +61,7 @@ private Q_SLOTS:
         QVERIFY(!X11Shortcut().available());
     }
 
-    void pastesIntoTheTestWindowAndRestoresTheClipboard()
+    void pastesIntoTheTestWindowAndKeepsTheResult()
     {
         if (x11::isXwayland(x11::connection())) {
             QSKIP(
@@ -79,7 +79,7 @@ private Q_SLOTS:
         };
         QCOMPARE(insert.insert(u"Mia doesn't know"_s, target), InsertOutcome::Typed);
         QTRY_COMPARE_WITH_TIMEOUT(m_target->text(), u"Mia doesn't know"_s, 3000);
-        QTRY_COMPARE_WITH_TIMEOUT(QApplication::clipboard()->text(), u"what the user copied"_s, 3000);
+        QCOMPARE(QApplication::clipboard()->text(), u"Mia doesn't know"_s); // left for another Ctrl+V
     }
 
     void firesTheShortcut()

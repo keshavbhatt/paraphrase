@@ -5,25 +5,23 @@
 #include "paste_keys.h"
 #include "window_tracker.h"
 
-#include <QTimer>
-
 #include <memory>
 
 namespace paraphrase::app {
 
-/// Puts a result back by pasting it into the window the text came from: save the clipboard,
-/// put the result on it, press Ctrl+V, put the user's clipboard back a moment later. It types
-/// only into the remembered window; when that window is not active again, or anything is
-/// missing, the result stays on the clipboard for the user to paste (PLAN 6).
+/// Puts a result back by pasting it into the window the text came from: the result goes on
+/// the clipboard, where it stays, and Ctrl+V pastes it. It types only into the remembered
+/// window; when that window is not active again, or anything is missing, the user pastes it
+/// (PLAN 6). The clipboard is not put back afterwards (owner, 2026-10-26): a paste with no text
+/// field in focus lost the result.
 class PasteInsert final : public InsertBackend
 {
 public:
-    static constexpr int kFocusWaitMs = 600;    ///< for focus to come back after the popup hides
-    static constexpr int kRestoreDelayMs = 700; ///< for the target app to read the clipboard
+    static constexpr int kFocusWaitMs = 600; ///< for focus to come back after the popup hides
 
     PasteInsert(QString name, std::shared_ptr<WindowTracker> tracker,
                 std::shared_ptr<ClipboardAccess> clipboard, std::shared_ptr<PasteKeys> keys);
-    ~PasteInsert() override;
+    ~PasteInsert() override = default;
     PasteInsert(const PasteInsert&) = delete;
     PasteInsert& operator=(const PasteInsert&) = delete;
     PasteInsert(PasteInsert&&) = delete;
@@ -34,17 +32,12 @@ public:
     [[nodiscard]] InsertOutcome insert(const QString& text, const CapturedText& target) override;
     [[nodiscard]] TypingPermission typingPermission() const override { return m_keys->typingPermission(); }
     TypingPermission askTyping() override { return m_keys->askTyping(); }
-    /// Puts back what the user had copied now instead of after the delay (tests, shutdown).
-    void restoreNow();
 
 private:
     QString m_name;
     std::shared_ptr<WindowTracker> m_tracker;
     std::shared_ptr<ClipboardAccess> m_clipboard;
     std::shared_ptr<PasteKeys> m_keys;
-    QTimer m_restore;
-    ClipboardContent m_saved;
-    bool m_pending = false;
 };
 
 } // namespace paraphrase::app

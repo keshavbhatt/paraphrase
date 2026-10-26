@@ -244,7 +244,7 @@ The popup flow needs three things: a **global hotkey**, the **text** the user me
 
 Rules:
 - **Standalone first (D14):** every backend may be missing. The app checks what works at start-up, shows it in Settings, and when the user reaches for a missing one it says what to do instead (copy first, paste the result, or use the main window). No feature is reachable only through an integration.
-- **Clipboard hygiene:** save the user's clipboard before any synthetic copy/paste and restore it after.
+- **Clipboard hygiene:** save the user's clipboard before any synthetic copy and restore it after. Inserting a result is the exception (owner, 2026-10-26): the result stays on the clipboard after the paste, so a paste that lands nowhere (no text field in focus) is one Ctrl+V away instead of lost.
 - **Never type into a window the user didn't choose:** remember the target window at hotkey time; if focus changed, fall back to clipboard-only.
 - Keep `docs/platform-matrix.md` current; every backend has an integration test on a nested/headless compositor where possible.
 - The **IME addon (M6)** removes most of these limits because input methods receive surrounding text and commit text through the standard text-input protocols. Design the daemon API so the IME is just another client.

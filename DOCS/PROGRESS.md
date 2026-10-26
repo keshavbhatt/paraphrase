@@ -32,6 +32,10 @@ on 2026-10-26 (recorded in DOCS/mocks/index.html), and built:
 - Bug (owner): after inserting a proofread over one note in a browser canvas, the popup on the
   next note showed the first note's old text: the browser never updated the highlighted text.
   A capture now skips text that a result replaced (DOCS/platform-matrix.md).
+- Insert keeps the result on the clipboard (owner, 2026-10-26, changing PLAN's clipboard
+  hygiene for Insert only): a paste with no text field in focus had lost the result, since the
+  old clipboard came back 0.7 s later. A selection the result replaced still counts as stale, and
+  so does the result on the clipboard.
 - Tray menu: an icon per item, as in the app's menus (owner request, 2026-10-26). The desktop
   draws this menu, so it gets the theme's icons by name (document-edit, edit-select-text,
   configure, application-exit), with our Lucide icons where a theme lacks them.

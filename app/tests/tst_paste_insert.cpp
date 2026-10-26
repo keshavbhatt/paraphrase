@@ -85,14 +85,14 @@ private Q_SLOTS:
         m_insert = std::make_unique<PasteInsert>(u"fake"_s, m_tracker, m_clipboard, m_keys);
     }
 
-    void pastesIntoTheSameWindowAndRestoresTheClipboard()
+    void pastesIntoTheSameWindowAndKeepsTheResultOnTheClipboard()
     {
         QCOMPARE(m_insert->insert(u"Mia doesn't know"_s, fromTelegram()), InsertOutcome::Typed);
         QCOMPARE(m_keys->pastes, 1);
         QCOMPARE(m_keys->clipboardAtPaste, QByteArray("Mia doesn't know"));
-        // A moment later the user's clipboard is back, every format of it.
-        QTRY_COMPARE_WITH_TIMEOUT(m_clipboard->content.size(), 2, PasteInsert::kRestoreDelayMs * 3);
-        QCOMPARE(m_clipboard->text(), QByteArray("what the user copied"));
+        // It stays: a paste with no text field in focus lands nowhere (owner, 2026-10-26).
+        QTest::qWait(1000);
+        QCOMPARE(m_clipboard->text(), QByteArray("Mia doesn't know"));
     }
 
     void neverTypesIntoAnotherWindow()
@@ -115,17 +115,7 @@ private Q_SLOTS:
     {
         m_keys->works = false; // no permission, the session ended
         QCOMPARE(m_insert->insert(u"Mia doesn't know"_s, fromTelegram()), InsertOutcome::OnClipboard);
-        QTest::qWait(PasteInsert::kRestoreDelayMs * 2);
-        QCOMPARE(m_clipboard->text(), QByteArray("Mia doesn't know")); // not replaced by the old copy
-    }
-
-    void finishesAPendingRestoreFirst()
-    {
-        QCOMPARE(m_insert->insert(u"first"_s, fromTelegram()), InsertOutcome::Typed);
-        QCOMPARE(m_insert->insert(u"second"_s, fromTelegram()), InsertOutcome::Typed);
-        QCOMPARE(m_keys->clipboardAtPaste, QByteArray("second"));
-        m_insert->restoreNow();
-        QCOMPARE(m_clipboard->text(), QByteArray("what the user copied")); // not "first"
+        QCOMPARE(m_clipboard->text(), QByteArray("Mia doesn't know"));
     }
 
     void writesTriggersAsThePortalExpects()

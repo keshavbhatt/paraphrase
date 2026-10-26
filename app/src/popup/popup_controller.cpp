@@ -388,11 +388,10 @@ void PopupController::insert()
     if (m_history != nullptr && m_historyId != 0) {
         m_history->update(m_historyId, text); // the version put back, edited or not
     }
-    // The clipboard before the paste, which the paste puts back (read while the popup has focus).
-    const QString clipboardThen = QGuiApplication::clipboard()->text();
     const InsertOutcome outcome = m_integrations.insert().insert(text, m_text);
     if (outcome == InsertOutcome::Typed) {
-        m_integrations.capture().setReplaced(m_text.text, clipboardThen); // gone from the app now
+        // Gone from the app now; the clipboard keeps the result, which is no new copy either.
+        m_integrations.capture().setReplaced(m_text.text, text);
         m_window->close();
         return;
     }

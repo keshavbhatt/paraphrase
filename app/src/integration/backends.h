@@ -65,8 +65,8 @@ public:
     /// Text a result was just put in place of. It is gone from the app, so a selection that
     /// still reads as it is stale: some apps (a browser's canvas editor, a select-all from
     /// the keyboard) never update the highlighted text, and the popup opened on the old text.
-    /// `clipboard` is what the clipboard held then, and holds again once the paste restores
-    /// it: after a stale selection it counts only once the user copies something new.
+    /// `clipboard` is what the clipboard holds after it (the result): after a stale selection
+    /// the clipboard counts only once the user copies something new.
     void setReplaced(const QString& text, const QString& clipboard)
     {
         m_replaced = text.trimmed();
