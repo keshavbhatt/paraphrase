@@ -8,6 +8,9 @@ paraphrase_set_warnings(paraphrase)
 target_include_directories(paraphrase PRIVATE "${CMAKE_BINARY_DIR}/daemon/src/generated")
 target_link_libraries(paraphrase PRIVATE paraphrase_client Qt6::Core Qt6::DBus)
 
+include(GNUInstallDirs)
+install(TARGETS paraphrase RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
 if(PARAPHRASE_BUILD_TESTS)
     add_subdirectory(tests)
 endif()

@@ -1,0 +1,42 @@
+# Builds the snap on GitHub's CI (this machine has no LXD) and keeps it as a workflow artifact
+# for a local `snap install --dangerous`. Store publishing comes later (M5), as in Omnidict.
+name: snap
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app/**'
+      - 'daemon/**'
+      - 'client/**'
+      - 'cli/**'
+      - 'skills/**'
+      - 'cmake/**'
+      - 'CMakeLists.txt'
+      - 'third_party/**'
+      - 'snap/**'
+      - '.github/workflows/snap.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: snap-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+          fetch-depth: 0 # the version names the commit
+
+      - name: Build snap
+        uses: snapcore/action-build@v1
+        id: build
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: paraphrase-snap-amd64
+          path: ${{ steps.build.outputs.snap }}
+          retention-days: 14

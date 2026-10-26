@@ -115,6 +115,34 @@ enough glibc; no automatic updates; no D-Bus activation or desktop integration u
 user installs AppImageLauncher or we write the files ourselves; paths break if the file
 moves. Good as a portable "try it" build, not the main channel.
 
+## 5a. The snap (2026-10-27)
+
+`snap/snapcraft.yaml` builds the whole tree with the **kde-neon-6** extension (Qt 6.11 from
+the `kf6-core24` content snap, the runtime `scripts/dev-run.sh` targets), as Omnidict does.
+GitHub builds it (`.github/workflows/snap.yml`, amd64; this machine has no LXD) and keeps it as
+a workflow artifact for `sudo snap install --dangerous`. Grade `devel` and no store upload
+until the D-Bus names are approved (M5).
+
+- Apps: `paraphrase` is the app (`paraphrase-app`; the desktop file, the autostart entry and
+  the shortcut command `paraphrase --popup`), `paraphrase.cli` is the command-line client.
+  The daemon is no app of its own: the app or the CLI starts `paraphrase-daemon` beside it
+  (ADR-010), so no `daemon:` service fights its idle exit.
+- Install layout (CMake `install()`, `PARAPHRASE_PORTABLE_CPU=ON`): `bin/paraphrase-app`,
+  `bin/paraphrase-daemon`, `bin/paraphrase`; `share/paraphrase/skills/`; libllama, libggml
+  and libggml-base in the library folder; one CPU library per instruction-set level in
+  `lib/paraphrase/ggml/`, where the daemon loads them (ggml's own copy in `bin/` is left out of
+  the snap). Every installed program and library carries a relative RUNPATH. Checked from a
+  staged install: the daemon started, loaded `libggml-cpu-alderlake.so` on this laptop and
+  proofread with the fast model.
+- Plugs: the desktop set (desktop, desktop-legacy, wayland, x11, opengl, unity7) and
+  `network` for model downloads. Slots and plugs for the three bus names the app and daemon
+  own (`com.ktechpit.paraphrase.Daemon`, `.App`, `.WindowTracker`).
+- Data: models in `$SNAP_USER_COMMON/models` (never copied on refresh); settings and the
+  autostart entry in `$SNAP_USER_DATA/.config`, which snapd reads for `autostart:`.
+- Still to check in the installed snap: the RemoteDesktop portal paste, whether data-control
+  reaches a strict snap, the KWin window tracker (`org.kde.KWin` is not plugged, so it falls
+  back), the Secret portal for history, and the D-Bus names on a local install.
+
 ## 6. To verify in M1 (each is a short test, recorded here when done)
 
 - [ ] snap: RemoteDesktop portal typing on KDE and GNOME Wayland.

@@ -1,0 +1,127 @@
+name: paraphrase
+adopt-info: paraphrase
+grade: devel # stable once the store has approved the D-Bus names (DOCS/packaging.md)
+confinement: strict
+base: core24
+compression: lzo
+
+title: Paraphrase - offline AI writing
+summary: Private AI grammar checker, rewriter and smart reply writer that runs offline
+description: |
+  Paraphrase is a private AI grammar checker, proofreader, rewriter and smart reply writer that runs offline, on your own computer. What you write never leaves it: there is no account, no cloud and no usage data.
+
+  * Proofread and spell check: fix spelling, grammar and punctuation, with every change shown and one Undo per change.
+  * Rewrite and paraphrase: change the tone to professional, polite, friendly, casual, concise and more.
+  * Smart reply: three short replies to a message, or a full email reply from what you want to say.
+  * Summarize, format as bullets, a table or an email, and translate.
+  * Your own actions, in your own words.
+  * Works in English, Hindi and Hinglish, and on a best-effort basis in many more languages.
+  * Open it over any app with a shortcut, or use the window: paste, pick an action, copy.
+
+  The AI model (about 3.4 GB) is downloaded once, from the setup window; after that Paraphrase works without an internet connection.
+
+  Bugs and requests: https://github.com/keshavbhatt/paraphrase/issues
+website: https://github.com/keshavbhatt/paraphrase
+issues: https://github.com/keshavbhatt/paraphrase/issues
+source-code: https://github.com/keshavbhatt/paraphrase
+license: GPL-3.0-or-later
+icon: app/data/com.ktechpit.paraphrase.svg
+
+platforms:
+  amd64:
+
+# The daemon and the app each own a name on the session bus (DOCS/packaging.md, section 3).
+# The store approves these names on the first upload; a local install works without that.
+slots:
+  daemon-name:
+    interface: dbus
+    bus: session
+    name: com.ktechpit.paraphrase.Daemon
+  app-name:
+    interface: dbus
+    bus: session
+    name: com.ktechpit.paraphrase.App
+  window-tracker-name:
+    interface: dbus
+    bus: session
+    name: com.ktechpit.paraphrase.WindowTracker
+
+plugs:
+  daemon:
+    interface: dbus
+    bus: session
+    name: com.ktechpit.paraphrase.Daemon
+  app:
+    interface: dbus
+    bus: session
+    name: com.ktechpit.paraphrase.App
+
+apps:
+  # The app; it starts paraphrase-daemon beside it when the daemon is not running (ADR-010).
+  paraphrase:
+    command: usr/bin/paraphrase-app
+    desktop: usr/share/applications/com.ktechpit.paraphrase.desktop
+    common-id: com.ktechpit.paraphrase
+    # Start at login: the app writes this file into $SNAP_USER_DATA/.config/autostart when
+    # the user asks (Settings, General); snapd starts it from there.
+    autostart: com.ktechpit.paraphrase.desktop
+    extensions:
+      - kde-neon-6
+    slots:
+      - daemon-name
+      - app-name
+      - window-tracker-name
+    plugs: &plugs
+      - daemon
+      - app
+      - desktop
+      - desktop-legacy
+      - opengl
+      - x11
+      - wayland
+      - unity7
+      - network # model downloads only, nothing else
+  # The command-line client: `paraphrase.cli proofread`.
+  cli:
+    command: usr/bin/paraphrase
+    extensions:
+      - kde-neon-6
+    slots:
+      - daemon-name
+    plugs: *plugs
+
+parts:
+  paraphrase:
+    plugin: cmake
+    source: .
+    build-snaps:
+      - cmake/latest/stable
+    build-packages:
+      - git # the version names the commit
+      - libssl-dev # history encryption; libcrypto comes from the core24 base at run time
+    cmake-parameters:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DCMAKE_INSTALL_PREFIX=/usr
+      - -DPARAPHRASE_BUILD_TESTS=OFF
+      - -DPARAPHRASE_PORTABLE_CPU=ON # every CPU level, the best picked at run time (ADR-008)
+    override-build: |
+      craftctl default
+      # The version comes from the CMake project. A build that is not exactly a version tag
+      # (edge) carries the commit: 0.1.0+git1a2b3c4.
+      VER=$(grep -m1 '^CMAKE_PROJECT_VERSION:STATIC=' "${CRAFT_PART_BUILD}/CMakeCache.txt" | cut -d= -f2 | tr -d '[:space:]')
+      if ! git -c safe.directory="*" -C "${CRAFT_PART_SRC}" describe --exact-match --tags --match "v${VER}" >/dev/null 2>&1; then
+        HASH=$(git -c safe.directory="*" -C "${CRAFT_PART_SRC}" rev-parse --short=7 HEAD 2>/dev/null || true)
+        [ -n "${HASH}" ] && VER="${VER}+git${HASH}"
+      fi
+      craftctl set version="${VER}"
+    parse-info:
+      - usr/share/metainfo/com.ktechpit.paraphrase.metainfo.xml
+    prime:
+      - -usr/include
+      - -usr/lib/*/cmake
+      - -usr/lib/cmake
+      - -usr/lib/pkgconfig
+      - -usr/lib/*/pkgconfig
+      - -usr/bin/libggml-cpu-*.so # ggml's own copy; the daemon loads lib/paraphrase/ggml
+      - -usr/share/man
+      - -usr/share/doc
