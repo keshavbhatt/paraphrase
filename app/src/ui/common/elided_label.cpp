@@ -20,7 +20,7 @@ QSize ElidedLabel::minimumSizeHint() const
 QSize ElidedLabel::sizeHint() const
 {
     const QMargins m = contentsMargins();
-    return {fontMetrics().horizontalAdvance(m_full) + m.left() + m.right() + 2 * margin(),
+    return {fontMetrics().horizontalAdvance(m_full) + m.left() + m.right() + (2 * margin()),
             QLabel::sizeHint().height()};
 }
 
@@ -33,7 +33,7 @@ void ElidedLabel::resizeEvent(QResizeEvent* event)
 void ElidedLabel::elide()
 {
     const QString shown =
-        fontMetrics().elidedText(m_full, Qt::ElideMiddle, contentsRect().width() - 2 * margin());
+        fontMetrics().elidedText(m_full, Qt::ElideMiddle, contentsRect().width() - (2 * margin()));
     if (shown != text()) {
         setText(shown);
     }
