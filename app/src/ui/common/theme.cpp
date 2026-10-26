@@ -110,6 +110,8 @@ QPushButton#clearLanguage:hover { background: @hover@; }
 QFrame#popupFoot { border: none; border-top: 1px solid @border@; background: @bar@;
     border-bottom-left-radius: 14px; border-bottom-right-radius: 14px; }
 QLabel#source { background: @sunk@; border-radius: 10px; padding: 11px 14px; font-size: 15px; }
+QScrollArea#sourceArea { background: @sunk@; border-radius: 10px; }
+QScrollArea#sourceArea QLabel#source { background: transparent; padding: 0; }
 QWidget#resultBox QTextBrowser#output { background: @panel@; border: 1px solid @border@; border-radius: 10px; padding: 12px 14px; }
 QLabel#popupTitle { font-weight: 600; }
 QLabel[role="kbd"] { border: 1px solid @border@; border-bottom-width: 2px; border-radius: 5px;

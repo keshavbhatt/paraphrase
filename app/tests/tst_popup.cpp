@@ -19,6 +19,7 @@
 #include <QMenu>
 #include <QMutexLocker>
 #include <QPushButton>
+#include <QScrollArea>
 #include <QSettings>
 #include <QSignalSpy>
 #include <QTemporaryDir>
@@ -175,6 +176,33 @@ private Q_SLOTS:
         popup.window()->findChild<QPushButton*>(u"reply2"_s)->click();
         popup.window()->findChild<ChipButton*>(u"insert"_s)->click();
         QCOMPARE(m_sent, QStringList{u"Thoda ruko."_s});
+    }
+
+    void keepsALongMessageToAFewScrollingLines()
+    {
+        // A long email made the popup taller than the screen: the replies and the buttons
+        // were below its bottom edge.
+        QObject owner;
+        const auto backends = integrations(&owner);
+        PopupController popup(*backends);
+        QStringList paragraphs;
+        for (int i = 0; i < 12; ++i) {
+            paragraphs << u"Thank you to everyone who filled in the form; the team is using it to prepare."_s;
+        }
+        popup.showText(selected(paragraphs.join(u"\n\n"_s)));
+        popup.window()->show();
+        QTest::qWait(50);
+        const auto* box = popup.window()->findChild<QScrollArea*>(u"sourceArea"_s);
+        QVERIFY(box != nullptr);
+        QVERIFY(box->height() <= 160);
+        m_daemon.setAnswers(
+            {uR"({"replies": ["Thanks, see you tomorrow.", "I will be there.", "Can I join late?"]})"_s});
+        pick(popup, u"action-reply"_s);
+        QTest::qWait(100);                       // the replies settle and the popup fits them
+        QVERIFY(popup.window()->height() < 700); // about 550 with a short message
+
+        const auto* insert = popup.window()->findChild<ChipButton*>(u"insert"_s);
+        QVERIFY(insert->isVisible());
     }
 
     void rewritesInAnotherLanguage()

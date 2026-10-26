@@ -141,6 +141,7 @@ private:
     QLabel* m_caption = nullptr;
     QLabel* m_pill = nullptr;
     QLabel* m_source = nullptr;
+    QWidget* m_sourceView = nullptr; ///< m_source in its scrolling box
     BusyPill* m_busy = nullptr;
     QLabel* m_info = nullptr;
     QLabel* m_pick = nullptr;

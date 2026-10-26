@@ -17,6 +17,8 @@
 #include <QMenu>
 #include <QPushButton>
 #include <QRegularExpression>
+#include <QResizeEvent>
+#include <QScrollArea>
 #include <QStackedWidget>
 #include <QStyle>
 #include <QVBoxLayout>
@@ -47,6 +49,62 @@ QLabel* sourceBox()
     l->setTextFormat(Qt::PlainText);
     l->setTextInteractionFlags(Qt::TextSelectableByMouse);
     return l;
+}
+
+/// The text the popup works on, in its sunk box: as tall as the text up to about six lines,
+/// then it scrolls inside. A long email made the popup taller than the screen, with the
+/// replies and the buttons below its bottom edge.
+class SourceView : public QScrollArea
+{
+public:
+    explicit SourceView(QLabel* label)
+        : m_label(label)
+    {
+        setObjectName(u"sourceArea"_s);
+        setFrameShape(QFrame::NoFrame);
+        setWidgetResizable(true);
+        setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+        // The padding as margins, not the sheet's: heightForWidth() counts margins only, and
+        // a short message was cut to its first line.
+        label->setContentsMargins(14, 11, 14, 11);
+        setWidget(label);
+        QSizePolicy policy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+        policy.setHeightForWidth(true);
+        setSizePolicy(policy);
+    }
+
+    [[nodiscard]] bool hasHeightForWidth() const override { return true; }
+    [[nodiscard]] int heightForWidth(int width) const override
+    {
+        return std::min(m_label->heightForWidth(width), kMaxHeight);
+    }
+    [[nodiscard]] QSize sizeHint() const override
+    {
+        const int w = width() > 0 ? width() : kPopupBodyWidth;
+        return {w, heightForWidth(w)};
+    }
+    [[nodiscard]] QSize minimumSizeHint() const override { return {0, 0}; }
+
+protected:
+    void resizeEvent(QResizeEvent* event) override
+    {
+        QScrollArea::resizeEvent(event);
+        // The height follows the width: measured while the popup was still wider, a short
+        // message kept one line's height and was cut.
+        if (event->size().width() != event->oldSize().width()) {
+            updateGeometry();
+        }
+    }
+
+private:
+    static constexpr int kMaxHeight = 160;      ///< six lines of 15 px text and the padding
+    static constexpr int kPopupBodyWidth = 406; ///< 440 less the body's padding and borders
+    QLabel* m_label;
+};
+
+QWidget* sourceView(QLabel* label)
+{
+    return new SourceView(label);
 }
 
 QPushButton* iconButton(const QString& name, const QString& accessible)
@@ -108,7 +166,7 @@ PopupActionsPage::PopupActionsPage(const util::LanguageDetector& detector, QWidg
     captionRow->addWidget(m_caption);
     captionRow->addWidget(m_info, 1);
     bodyLayout->addLayout(captionRow);
-    bodyLayout->addWidget(m_source);
+    bodyLayout->addWidget(sourceView(m_source));
     bodyLayout->addSpacing(4); // the caption's own margin-top (popup-actions.html)
     bodyLayout->addWidget(makeLabel(tr("ACTIONS"), u"caption"_s));
     bodyLayout->addWidget(m_actions);
@@ -257,7 +315,8 @@ QWidget* PopupResultPage::buildBody()
     captionRow->addWidget(m_pill);
     layout->addLayout(captionRow);
     m_source = sourceBox();
-    layout->addWidget(m_source);
+    m_sourceView = sourceView(m_source);
+    layout->addWidget(m_sourceView);
     auto* infoRow = new QHBoxLayout;
     m_info = makeLabel(QString(), u"small"_s);
     m_info->setObjectName(u"popupInfo"_s);
@@ -410,7 +469,7 @@ void PopupResultPage::begin(SkillKind kind, const QString& title, const QString&
     m_caption->setText(reply ? tr("MESSAGE YOU GOT") : tr("YOUR TEXT"));
     m_pill->setVisible(false);
     m_source->setText(source);
-    m_source->setVisible(showSource);
+    m_sourceView->setVisible(showSource);
     m_caption->setVisible(showSource);
     m_info->setVisible(!reply);
     m_pick->setVisible(reply);
