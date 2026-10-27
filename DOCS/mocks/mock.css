@@ -120,8 +120,11 @@ del.d { color: var(--del); background: var(--del-bg); text-decoration-thickness:
 [data-os=linux] .titlebar .wc span:not(:last-child) { display: none; }
 
 /* Settings layout. */
-.settings { display: flex; flex-wrap: wrap; gap: 28px; padding: 24px; }
-.settings nav { flex: 1 1 170px; max-width: 210px; display: flex; flex-direction: column; gap: 2px; }
+.settings { display: flex; flex-wrap: wrap; gap: 14px; padding: 24px; }
+/* A thin line, the full height of the window, between the sections and the page (proposed
+   2026-10-27): 14px either side of it, as the 28px gap was. */
+.settings nav { flex: 1 1 170px; max-width: 224px; display: flex; flex-direction: column; gap: 2px;
+  border-right: 1px solid var(--border); margin-block: -24px; padding-block: 24px; padding-right: 14px; }
 .settings nav a { min-height: 38px; display: flex; align-items: center; padding: 0 12px; border-radius: 8px; color: var(--text); }
 .settings nav a:hover { background: var(--hover); }
 .settings nav a.on { background: var(--accent-soft); color: var(--accent); font-weight: 500; }
