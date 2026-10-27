@@ -16,6 +16,9 @@ inline constexpr char kPath[] = "/org/freedesktop/portal/desktop";
 /// True when the desktop portal offers `interface` (asks for its version property).
 [[nodiscard]] bool hasInterface(const QString& interface);
 
+/// The version of `interface` the desktop portal offers, or 0 when it has none.
+[[nodiscard]] uint version(const QString& interface);
+
 /// Tells the portal which app this host process is (org.freedesktop.host.portal.Registry),
 /// once per process; KDE's portals need it for apps that are not sandboxed.
 void registerApp();

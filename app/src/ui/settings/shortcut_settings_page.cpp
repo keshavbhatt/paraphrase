@@ -150,25 +150,56 @@ void ShortcutSettingsPage::setSupport(const DesktopSupport& support)
 QWidget* ShortcutSettingsPage::shortcutCard(const DesktopSupport& support)
 {
     const auto [c, column] = card();
+    const bool hasKeys = support.globalShortcut && !support.shortcut.isEmpty();
+    const bool noKeys = support.globalShortcut && !hasKeys && support.chooseKeys;
     auto* head = new QHBoxLayout;
     head->addWidget(makeLabel(tr("Open Paraphrase over any app"), u"h2"_s));
     head->addStretch();
-    head->addWidget(
-        pill(support.globalShortcut ? tr("Works") : tr("Not on this desktop"), support.globalShortcut));
+    if (noKeys) {
+        head->addWidget(pill(tr("No keys"), false));
+    } else {
+        head->addWidget(
+            pill(support.globalShortcut ? tr("Works") : tr("Not on this desktop"), support.globalShortcut));
+    }
     column->addLayout(head);
-    if (support.globalShortcut && !support.shortcut.isEmpty()) {
+    const std::function<void()> choose = support.chooseKeys;
+    const auto chooseButton = [&choose](const QString& label, const QString& kind, const QString& name) {
+        QPushButton* b = makeButton(label, kind);
+        b->setObjectName(name);
+        QObject::connect(b, &QPushButton::clicked, b, [choose] { choose(); });
+        return b;
+    };
+    if (hasKeys) {
+        // settings-general-shortcut.html: the keys, and Change keys opens the desktop's window.
         auto* keys = new QHBoxLayout;
         keys->setSpacing(6);
         for (const QString& key : support.shortcut.split(u'+')) {
             keys->addWidget(makeLabel(key, u"kbd"_s));
         }
         keys->addStretch();
+        const bool canChange = support.canChangeKeys && support.chooseKeys;
+        if (canChange) {
+            keys->addWidget(chooseButton(tr("Change keys"), QString(), u"changeKeys"_s));
+        }
         column->addLayout(keys);
         column->addWidget(wrapped(
-            tr("Select text in any app and press the shortcut. To change it, open %1 and look for "
-               "Paraphrase.")
-                .arg(support.changeIt.isEmpty() ? tr("your desktop's shortcut settings") : support.changeIt),
+            canChange
+                ? tr("Select text in any app and press the shortcut.")
+                : tr("Select text in any app and press the shortcut. To change it, open %1 and look for "
+                     "Paraphrase.")
+                      .arg(support.changeIt.isEmpty() ? tr("your desktop's shortcut settings")
+                                                      : support.changeIt),
             u"small"_s));
+    } else if (noKeys) {
+        // The desktop offers app shortcuts, but this one has none: taken by another app.
+        auto* row = new QHBoxLayout;
+        row->addWidget(
+            wrapped(tr("Your desktop has the shortcut but gave it no keys, for example because another "
+                       "app already uses Ctrl+Alt+Space."),
+                    u"small"_s),
+            1);
+        row->addWidget(chooseButton(tr("Choose keys"), u"primary"_s, u"chooseKeys"_s), 0, Qt::AlignVCenter);
+        column->addLayout(row);
     } else {
         column->addWidget(
             wrapped(tr("This desktop does not give apps a global shortcut. Bind the command below "

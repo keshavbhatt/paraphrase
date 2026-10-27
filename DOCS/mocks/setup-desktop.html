@@ -68,6 +68,28 @@
   <span class="pin" style="left: 20px; top: 372px">3</span>
 </div>
 
+<section class="states" aria-label="The shortcut, every state">
+  <h2>"Shortcut", every state</h2>
+  <div class="grant">
+    <span class="badge"><svg class="ic"><use href="#i-keyboard"/></svg></span>
+    <div class="stack" style="gap: 4px"><h3>Shortcut</h3><span class="small muted">a. Set: the desktop gave it keys. Change keys opens the desktop's own shortcut window.</span></div>
+    <div class="side">
+      <span class="row"><span class="kbd">Ctrl</span><span class="kbd">Alt</span><span class="kbd">Space</span></span>
+      <span class="row"><button class="btn">Change keys</button><span class="pill ok"><svg class="ic s"><use href="#i-check"/></svg>Set</span></span>
+    </div>
+  </div>
+  <div class="grant">
+    <span class="badge"><svg class="ic"><use href="#i-keyboard"/></svg></span>
+    <div class="stack" style="gap: 4px"><h3>Shortcut</h3><span class="small muted">b. No keys yet: the desktop has the shortcut but gave it no keys, for example because another app already uses Ctrl+Alt+Space. Choose keys in your desktop's window.</span></div>
+    <div class="side"><button class="btn primary">Choose keys</button><span class="pill warn">No keys</span></div>
+  </div>
+  <div class="grant">
+    <span class="badge"><svg class="ic"><use href="#i-keyboard"/></svg></span>
+    <div class="stack" style="gap: 4px"><h3>Shortcut</h3><span class="small muted">c. This desktop does not set it for apps. Bind paraphrase --popup to keys you like in System Settings, Shortcuts.</span></div>
+    <div class="side"><span class="pill warn">By hand</span></div>
+  </div>
+</section>
+
 <section class="states" aria-label="Put the result back, every state">
   <h2>"Put the result back", step by step</h2>
   <div class="grant">
@@ -94,6 +116,7 @@
 
 <section class="notes"><h2>Notes</h2><ol>
   <li><b>The shortcut</b>: set through the desktop when it offers one (the KDE and GNOME shortcut portal), its own dialog lets the user change the keys. Where it cannot be set, the row says how to bind <code>paraphrase-app --popup</code> by hand (settings-general-shortcut.html), with no button.</li>
+  <li><b>Shortcut states (approved 2026-10-27)</b>: (a) Change keys and (b) Choose keys open the desktop's own shortcut window (the portal's ConfigureShortcuts, version 2), and the row updates when the keys change. (b) replaces "By hand" when the desktop offers app shortcuts but this one has no keys, which happens when the keys are taken. On a portal without that window, (a) has no button and (b) asks the desktop for the shortcut again. The row follows the desktop live: it never keeps a status read at startup.</li>
   <li><b>Put the result back</b>: Allow opens the desktop's own "Control input devices" dialog now, at setup, instead of at the first Replace after a wait (owner, 2026-10-23). The answer is remembered, so it is asked once; a "no" leaves Replace on the clipboard with "press Ctrl+V". On X11 there is nothing to ask (d).</li>
   <li><b>Optional</b>: Skip for now and Next both go on; nothing here blocks setup (ADR-013: standalone first). The same two rows are in Settings, General and shortcut. This step comes first in setup again: the placeholder "Shortcut (later)" step goes.</li>
 </ol></section>

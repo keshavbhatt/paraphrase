@@ -48,9 +48,12 @@ void AppFlow::showSetup()
     m_setup = std::make_unique<SetupWindow>(m_client);
     m_setup->setDesktopSupport(m_support);
     connect(m_setup.get(), &SetupWindow::finished, this, [this] {
-        m_setup->hide();
+        // Let go of setup first: while it is set, showMain() only raises it. Show the main
+        // window before hiding setup, so the app always has a window and does not quit.
+        SetupWindow* setup = m_setup.release();
         showMain();
-        m_setup.release()->deleteLater();
+        setup->hide();
+        setup->deleteLater();
     });
     m_setup->show();
     QTimer::singleShot(0, m_setup.get(), &SetupWindow::start);
@@ -61,8 +64,12 @@ void AppFlow::setSettingsContext(Preferences* preferences, bool hasTray, const D
     m_preferences = preferences;
     m_hasTray = hasTray;
     m_support = support;
+    // Both follow the desktop live: the keys can change while either is open.
     if (m_settings) {
         m_settings->setDesktopSupport(support);
+    }
+    if (m_setup) {
+        m_setup->setDesktopSupport(support);
     }
 }
 

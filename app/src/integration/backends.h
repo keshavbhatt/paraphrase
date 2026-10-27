@@ -146,6 +146,11 @@ public:
     [[nodiscard]] virtual QString description() const = 0;
     /// The keys that open the popup, as the desktop shows them ("Ctrl+Alt+Space"), or "".
     [[nodiscard]] virtual QString keys() const { return {}; }
+    /// Whether the desktop has its own window for changing the keys.
+    [[nodiscard]] virtual bool canConfigure() const { return false; }
+    /// Lets the user choose the keys: the desktop's own window where it has one, else the
+    /// desktop is asked for the shortcut again. keysChanged() follows when they change.
+    virtual void configure() {}
 
 Q_SIGNALS:
     void activated();

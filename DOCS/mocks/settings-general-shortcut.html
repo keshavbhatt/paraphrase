@@ -41,8 +41,12 @@
       <h1>Shortcut</h1>
       <section class="card stack" style="gap: 12px">
         <div class="row"><h2>Open Paraphrase over any app</h2><span class="grow"></span><span class="pill ok">Works</span></div>
-        <div class="keys"><span class="kbd">Ctrl</span><span class="kbd">Alt</span><span class="kbd">Space</span></div>
-        <p class="small muted">Select text in any app and press the shortcut. To change it, open System Settings, Shortcuts, and look for Paraphrase.</p>
+        <div class="row"><div class="keys"><span class="kbd">Ctrl</span><span class="kbd">Alt</span><span class="kbd">Space</span></div><span class="grow"></span><button class="btn">Change keys</button></div>
+        <p class="small muted">Select text in any app and press the shortcut.</p>
+      </section>
+      <section class="card stack" style="gap: 12px" aria-label="No keys yet">
+        <div class="row"><h2>Open Paraphrase over any app</h2><span class="grow"></span><span class="pill warn">No keys</span></div>
+        <div class="row"><p class="small muted grow">Your desktop has the shortcut but gave it no keys, for example because another app already uses Ctrl+Alt+Space.</p><button class="btn primary">Choose keys</button></div>
       </section>
       <section class="card stack" style="gap: 10px">
         <h2>Bind it by hand</h2>
@@ -67,5 +71,6 @@
 <section class="notes"><h2>Notes</h2><ol>
   <li><b>General</b>: login start (ADR-010: the Background portal in a Flatpak, the snap's autostart key, ~/.config/autostart elsewhere) starts hidden in the tray; closing the window keeps the app in the tray only when a tray exists; Appearance overrides the desktop's light or dark.</li>
   <li><b>Shortcut</b>: the shortcut and whether it works here, from the backends the app found (DOCS/platform-matrix.md). Without a global shortcut the "bind it by hand" card comes first. The table lists each step with what this desktop allows, in plain words, never backend names.</li>
+  <li><b>Change keys / Choose keys (approved 2026-10-27)</b>: both open the desktop's own shortcut window (the portal's ConfigureShortcuts) instead of sending the user to System Settings. The second card is the state when the desktop offers app shortcuts but this one has no keys (taken by another app); it replaces the first card and the table says "No keys". The page follows the desktop live.</li>
 </ol></section>
 </body></html>

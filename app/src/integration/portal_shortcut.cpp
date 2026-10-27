@@ -6,6 +6,7 @@
 #include <QDBusConnection>
 #include <QDBusMessage>
 #include <QDBusMetaType>
+#include <QDBusPendingCall>
 #include <QKeySequence>
 
 using namespace Qt::StringLiterals;
@@ -46,7 +47,8 @@ namespace paraphrase::app {
 
 PortalShortcut::PortalShortcut(QObject* parent)
     : ShortcutBackend(parent)
-    , m_available(portal::hasInterface(kInterface))
+    , m_version(portal::version(kInterface))
+    , m_available(m_version > 0)
 {
     qDBusRegisterMetaType<PortalShortcutEntry>();
     qDBusRegisterMetaType<QList<PortalShortcutEntry>>();
@@ -138,6 +140,27 @@ bool PortalShortcut::bind(const QKeySequence& keys)
     }
     readTrigger(bound->value(u"shortcuts"_s).value<QDBusArgument>());
     return true;
+}
+
+void PortalShortcut::configure()
+{
+    if (!m_available) {
+        return;
+    }
+    if (!canConfigure()) {
+        // No window of its own: asking again lets the desktop show its "shortcut requested" one.
+        (void)bind(QKeySequence(u"Ctrl+Alt+Space"_s));
+        return;
+    }
+    if (m_session.isEmpty() && !createSession()) {
+        return;
+    }
+    // The desktop opens its shortcut settings for this app; ShortcutsChanged reports the keys.
+    QDBusMessage call = QDBusMessage::createMethodCall(QString::fromLatin1(portal::kService),
+                                                       QString::fromLatin1(portal::kPath), kInterface,
+                                                       u"ConfigureShortcuts"_s);
+    call << QVariant::fromValue(QDBusObjectPath(m_session)) << QString() << QVariantMap();
+    QDBusConnection::sessionBus().asyncCall(call);
 }
 
 void PortalShortcut::readTrigger(const QDBusArgument& arg)

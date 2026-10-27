@@ -59,10 +59,19 @@ DesktopSupport describeDesktop(const Integrations& integrations)
     s.shortcut = s.globalShortcut ? integrations.shortcut().keys() : QString();
     s.changeIt = whereToChange();
     const QString open = QObject::tr("Open over any app");
-    s.steps.append(s.globalShortcut
-                       ? step(open, QObject::tr("Shortcut from the desktop"), QObject::tr("Works"), true)
-                       : step(open, QObject::tr("A shortcut you bind to the command above"),
-                              QObject::tr("By hand"), false));
+    if (s.globalShortcut) {
+        ShortcutBackend* shortcut = &integrations.shortcut();
+        s.chooseKeys = [shortcut] { shortcut->configure(); };
+        s.canChangeKeys = shortcut->canConfigure();
+    }
+    if (!s.globalShortcut) {
+        s.steps.append(step(open, QObject::tr("A shortcut you bind to the command above"),
+                            QObject::tr("By hand"), false));
+    } else if (s.shortcut.isEmpty()) {
+        s.steps.append(step(open, QObject::tr("Shortcut from the desktop"), QObject::tr("No keys"), false));
+    } else {
+        s.steps.append(step(open, QObject::tr("Shortcut from the desktop"), QObject::tr("Works"), true));
+    }
     const QString read = QObject::tr("Read the selected text");
     const bool readsSelection = dynamic_cast<const ClipboardCapture*>(&integrations.capture()) == nullptr;
     s.steps.append(

@@ -13,7 +13,7 @@ clipboard, leave the result on the clipboard, bind `paraphrase-app --popup` by h
 
 | | X11 (any desktop) | KDE Plasma, Wayland | GNOME, Wayland | wlroots (Sway, Hyprland), Wayland |
 |---|---|---|---|---|
-| Global shortcut | `X11Shortcut`: XGrabKey on the root window, every Num Lock and Caps Lock state | `PortalShortcut`: GlobalShortcuts portal; the user can change the keys in System Settings, Shortcuts | `PortalShortcut` on GNOME 48 and later (portal there; not tested here) | portal where the desktop's portal has it; else bind the command |
+| Global shortcut | `X11Shortcut`: XGrabKey on the root window, every Num Lock and Caps Lock state | `PortalShortcut`: GlobalShortcuts portal; Change keys and Choose keys open the desktop's own window (ConfigureShortcuts, portal version 2), else the shortcut is asked for again | `PortalShortcut` on GNOME 48 and later (portal there; not tested here) | portal where the desktop's portal has it; else bind the command |
 | Shortcut fallback | `CommandShortcut`: bind the command the app shows (`paraphrase-app --popup`; `paraphrase --popup` in the snap, `flatpak run com.ktechpit.paraphrase --popup` in the Flatpak, the AppImage's path) in the desktop's settings | same | same | same, in the compositor config |
 | Read the highlighted text | `X11SelectionCapture`: the PRIMARY selection, no focus needed | `DataControlCapture`: `ext-data-control-v1`, no focus needed | not possible: GNOME has no data-control. `ClipboardCapture` reads the copied text, and since Wayland sends the clipboard only to the window with focus, the popup reads it again once it has focus (`needsFocus`, and on each clipboard change until an action runs) | `DataControlCapture` (wlroots has data-control) |
 | Which window the text came from | `X11WindowTracker`: `_NET_ACTIVE_WINDOW`, WM_CLASS for the app name | `KWinWindowTracker`: a KWin script reports activations over D-Bus | not known | not known |
@@ -69,7 +69,7 @@ goes through data-control, because a window that just lost focus may not set the
 | GlobalShortcuts, RemoteDesktop portals | `desktop` plug | no extra permission | works |
 | data-control (KDE) | plain Wayland socket: unverified | reported hidden by Flatpak's Wayland security context: the clipboard fallbacks apply | works |
 | History key: Secret portal, else Secret Service | Secret portal via `desktop`; the Secret Service needs `password-manager-service` | Secret portal, no permission | Secret portal on KDE; the Secret Service elsewhere |
-| KWin window tracker (`org.kde.KWin` on the session bus) | needs a D-Bus plug for `org.kde.KWin`: unverified; without it nothing is typed | needs `--talk-name=org.kde.KWin` | works |
+| KWin window tracker (`org.kde.KWin` on the session bus) | the script goes to the runtime folder, which KWin can read (the snap's /tmp is its own); `org.kde.KWin` on a strict snap with AppArmor: unverified (not enforced on the dev machine); without it nothing is typed | needs `--talk-name=org.kde.KWin` | works |
 
 ## Building and dependencies
 

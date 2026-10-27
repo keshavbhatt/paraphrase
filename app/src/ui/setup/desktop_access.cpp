@@ -104,6 +104,14 @@ void DesktopAccess::setSupport(const DesktopSupport& support)
 void DesktopAccess::showShortcut()
 {
     clearLayout(m_shortcut.side);
+    // setup-desktop.html, "Shortcut", every state: (a) set, (b) no keys yet, (c) by hand.
+    const auto chooseButton = [this](const QString& label, const QString& kind, const QString& name) {
+        QPushButton* b = makeButton(label, kind);
+        b->setObjectName(name);
+        const std::function<void()> choose = m_support.chooseKeys;
+        connect(b, &QPushButton::clicked, b, [choose] { choose(); });
+        return b;
+    };
     if (m_support.globalShortcut && !m_support.shortcut.isEmpty()) {
         auto* keys = new QHBoxLayout;
         keys->setSpacing(4);
@@ -112,8 +120,25 @@ void DesktopAccess::showShortcut()
             keys->addWidget(makeLabel(key, u"kbd"_s));
         }
         m_shortcut.side->addLayout(keys);
-        m_shortcut.side->addWidget(makeLabel(tr("✓ Set"), u"pill-ok"_s), 0, Qt::AlignRight);
+        auto* status = new QHBoxLayout;
+        status->setSpacing(8);
+        status->addStretch();
+        if (m_support.canChangeKeys && m_support.chooseKeys) {
+            status->addWidget(chooseButton(tr("Change keys"), QString(), u"changeKeys"_s));
+        }
+        status->addWidget(makeLabel(tr("✓ Set"), u"pill-ok"_s), 0, Qt::AlignVCenter);
+        m_shortcut.side->addLayout(status);
         m_shortcut.detail->setText(tr("Opens Paraphrase on the text you selected, over the app you are in."));
+        return;
+    }
+    if (m_support.globalShortcut && m_support.chooseKeys) {
+        m_shortcut.side->addWidget(chooseButton(tr("Choose keys"), u"primary"_s, u"chooseKeys"_s), 0,
+                                   Qt::AlignRight);
+        m_shortcut.side->addWidget(makeLabel(tr("No keys"), u"pill-warn"_s), 0, Qt::AlignRight);
+        m_shortcut.detail->setText(
+            tr("Your desktop has the shortcut but gave it no keys, for example because "
+               "another app already uses Ctrl+Alt+Space. Choose keys in your "
+               "desktop's window."));
         return;
     }
     // No shortcut from the desktop: say how to bind one by hand (settings-general-shortcut.html).

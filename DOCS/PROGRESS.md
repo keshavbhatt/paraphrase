@@ -37,6 +37,19 @@ Owner asked for M3, then a snap first (2026-10-26). M2's live app checks stay op
   the per-CPU libraries in `lib/paraphrase/ggml` and relative RUNPATHs. A staged install ran
   a real proofread. `snap/snapcraft.yaml` and a GitHub workflow that builds it
   (DOCS/packaging.md, 5a).
+- The snap on the dev machine (owner install): the app and daemon start, own their D-Bus
+  names, the setup window downloaded E2B into `~/snap/paraphrase/common/models` (366 s, sha256
+  checked) and a proofread ran. Owner findings, fixed:
+  - No taskbar icon: snapd names the desktop file `paraphrase_paraphrase`, so the window's app
+    id is now that inside a snap (`desktopFileName`); checked on the taskbar.
+  - "Open Paraphrase" at the end of setup closed the app: the main window was asked for while
+    setup still counted as open. Test `opensTheMainWindowWhenSetupIsDone`.
+  - Paste back showed "You paste": the KWin tracker script was written to the snap's own
+    /tmp, which KWin cannot see. It is now one file in the runtime folder.
+  - The shortcut showed "By hand" when the desktop had the shortcut but no keys (taken by
+    another app). Mocks approved (owner, 2026-10-27): "No keys" with Choose keys, and Change
+    keys next to set keys; both open the desktop's own window (ConfigureShortcuts). Setup
+    and Settings now follow the desktop live instead of what they read at startup.
 
 ## 2026-10-26 - The popup opens in the main window with what it shows
 

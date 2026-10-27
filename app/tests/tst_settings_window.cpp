@@ -321,6 +321,49 @@ private Q_SLOTS:
         tray->click(); // leave the preference as it was
     }
 
+    void letsTheUserChooseTheKeys()
+    {
+        // settings-general-shortcut.html: Change keys next to the keys, Choose keys when the
+        // desktop gave the shortcut none; both open the desktop's window.
+        QVERIFY(m_daemon.start({}));
+        DaemonClient client;
+        QVERIFY(client.connectToDaemon().isEmpty());
+        SettingsWindow w(client);
+        int chosen = 0;
+        paraphrase::app::DesktopSupport support;
+        support.globalShortcut = true;
+        support.canChangeKeys = true;
+        support.chooseKeys = [&chosen] { ++chosen; };
+        // The page's cards only: "Put the result back" there keeps a hidden copy of setup's row.
+        const auto shown = [&w](const QString& name) -> QPushButton* {
+            QCoreApplication::processEvents(); // new cards show, old ones go, on the next pass
+            QCoreApplication::sendPostedEvents(nullptr, QEvent::DeferredDelete);
+            for (QPushButton* b : w.findChildren<QPushButton*>(name)) {
+                if (b->isVisible()) {
+                    return b;
+                }
+            }
+            return nullptr;
+        };
+        w.setDesktopSupport(support);
+        w.show();
+        w.showPage(SettingsWindow::Shortcut);
+        auto* choose = shown(u"chooseKeys"_s);
+        QVERIFY(choose != nullptr);
+        choose->click();
+        QCOMPARE(chosen, 1);
+        support.shortcut = u"Ctrl+Alt+Space"_s;
+        w.setDesktopSupport(support);
+        QVERIFY(shown(u"chooseKeys"_s) == nullptr);
+        auto* change = shown(u"changeKeys"_s);
+        QVERIFY(change != nullptr);
+        change->click();
+        QCOMPARE(chosen, 2);
+        support.canChangeKeys = false; // no window of its own: the text says where instead
+        w.setDesktopSupport(support);
+        QVERIFY(shown(u"changeKeys"_s) == nullptr);
+    }
+
     void pagesFitTheWindowAtItsOpeningSize()
     {
         // Wider than its column, a page was cut off at the right under the scroll bar.
@@ -444,6 +487,21 @@ private Q_SLOTS:
             QTest::qWait(50);
             QCoreApplication::processEvents(); // queued shows land first
             QVERIFY(actions.grab().save(dir + u"/settings-shortcut-%1.png"_s.arg(QLatin1StringView(theme))));
+            support.canChangeKeys = true;
+            support.chooseKeys = [] {};
+            actions.setDesktopSupport(support);
+            QTest::qWait(50);
+            QCoreApplication::processEvents();
+            QVERIFY(actions.grab().save(dir +
+                                        u"/settings-shortcut-change-%1.png"_s.arg(QLatin1StringView(theme))));
+            support.shortcut.clear();
+            support.steps.first().status = u"No keys"_s;
+            support.steps.first().works = false;
+            actions.setDesktopSupport(support);
+            QTest::qWait(50);
+            QCoreApplication::processEvents();
+            QVERIFY(actions.grab().save(dir +
+                                        u"/settings-shortcut-nokeys-%1.png"_s.arg(QLatin1StringView(theme))));
             actions.showPage(SettingsWindow::General);
             QTest::qWait(50);
             QCoreApplication::processEvents(); // queued shows land first

@@ -8,6 +8,7 @@
 #include <QEventLoop>
 #include <QTimer>
 
+#include <algorithm>
 #include <atomic>
 
 using namespace Qt::StringLiterals;
@@ -37,12 +38,21 @@ void ResponseCatcher::onResponse(uint response, const QVariantMap& answer)
 
 bool hasInterface(const QString& interface)
 {
+    return version(interface) > 0;
+}
+
+uint version(const QString& interface)
+{
     QDBusMessage get =
         QDBusMessage::createMethodCall(QString::fromLatin1(kService), QString::fromLatin1(kPath),
                                        u"org.freedesktop.DBus.Properties"_s, u"Get"_s);
     get << interface << u"version"_s;
     const QDBusMessage reply = QDBusConnection::sessionBus().call(get, QDBus::Block, 2000);
-    return reply.type() == QDBusMessage::ReplyMessage;
+    if (reply.type() != QDBusMessage::ReplyMessage) {
+        return 0;
+    }
+    // Every portal interface starts at version 1; an answer without a number still means one.
+    return std::max(1U, reply.arguments().value(0).value<QDBusVariant>().variant().toUInt());
 }
 
 void registerApp()

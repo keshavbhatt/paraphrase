@@ -13,7 +13,7 @@ endif()
 # The windows and the popup against the real daemon service with a fake engine, on a private
 # socket, with model downloads from a local test server (app_daemon.h).
 paraphrase_add_test(tst_main_window tst_main_window.cpp paraphrase_ui paraphrase_api)
-paraphrase_add_test(tst_setup_window tst_setup_window.cpp paraphrase_ui paraphrase_api)
+paraphrase_add_test(tst_setup_window tst_setup_window.cpp paraphrase_shell paraphrase_ui paraphrase_api)
 paraphrase_add_test(tst_settings_window tst_settings_window.cpp paraphrase_ui paraphrase_api)
 paraphrase_add_test(tst_popup tst_popup.cpp paraphrase_popup paraphrase_api)
 foreach(test tst_main_window tst_setup_window tst_settings_window tst_popup)

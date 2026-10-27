@@ -30,6 +30,9 @@ public:
     bool bind(const QKeySequence& keys) override;
     [[nodiscard]] QString description() const override;
     [[nodiscard]] QString keys() const override { return m_trigger; }
+    /// ConfigureShortcuts, from version 2 of the portal.
+    [[nodiscard]] bool canConfigure() const override { return m_version >= 2; }
+    void configure() override;
     /// Ends the portal session; the desktop keeps the user's choice for the next one.
     void close();
 
@@ -46,6 +49,7 @@ private:
     [[nodiscard]] bool createSession();
     void readTrigger(const QDBusArgument& arg);
 
+    uint m_version = 0;
     bool m_available = false;
     QString m_session;
     QString m_trigger; ///< what the desktop says the shortcut is, e.g. "Ctrl+Alt+Space"

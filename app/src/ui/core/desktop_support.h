@@ -36,8 +36,12 @@ struct DesktopSupport
     Typing typing = Typing::Unavailable;
     /// Opens the desktop's own dialog and waits for the answer; empty where nothing is asked.
     std::function<Typing()> askTyping;
-    QString shortcut; ///< "Ctrl+Alt+Space", or "" without a global shortcut
-    QString changeIt; ///< where to change it, e.g. "System Settings, Shortcuts"
+    QString shortcut; ///< "Ctrl+Alt+Space", or "" without a global shortcut or keys
+    /// Lets the user choose the shortcut's keys (the desktop's own window); empty without a
+    /// global shortcut. With a global shortcut but no keys, setup and Settings say "No keys".
+    std::function<void()> chooseKeys;
+    bool canChangeKeys = false; ///< the desktop has a window for changing keys that are set
+    QString changeIt;           ///< where to change it, e.g. "System Settings, Shortcuts"
     QString command = launchLine({QStringLiteral("--popup")});
     QList<Step> steps;
 };
