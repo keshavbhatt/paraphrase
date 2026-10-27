@@ -66,6 +66,16 @@ Owner asked for M3, then a snap first (2026-10-26). M2's live app checks stay op
     background. Mocks approved (owner, 2026-10-27): 10px padding and 4px between them, so the
     header's words are evenly spaced (`spacesTheHeaderButtonsEvenly`); every main window mock
     now shows History in the header, as the app does.
+- Desktop integration, lessons from dabri (github.com/AshBuk/dabri, a speech-to-text app with
+  the same shortcut and paste-back problems; DOCS/platform-matrix.md):
+  - Paste keys are Shift+Insert, the same on every keyboard layout (Ctrl+V needs a "v" key,
+    which a Russian or Greek layout may lack); terminals get Ctrl+Shift+V, as Shift+Insert
+    pastes their selection there. Untested on a live Russian layout and in live terminals.
+  - A held shortcut opens once (GNOME repeats Activated, X11 the key press).
+  - The tray turns up when the panel does, for a start at login before the panel.
+  - Only a "no" to the typing dialog is kept; an error or no answer asks again.
+  - A dead portal session is restarted and the keys sent once more, if none went through.
+  - The unused clipboard save and restore is gone; the doc said the old clipboard came back.
   - The history list's scrollbar had a black track: Breeze paints a transparent groove in
     an item view black, so it now takes the pane's colour (also the language menu).
   - Inside a Flatpak the CLI waited forever: the D-Bus filter drops the daemon's answers to

@@ -26,8 +26,15 @@ void registerApp();
 /// Calls a portal method that answers through a Request object and waits for its Response
 /// (the portal pattern): `args` end with the options map, which gets a handle_token. The
 /// results, or nothing when the user cancelled, the call failed or `timeoutMs` passed.
+/// `response`, when given, gets the Response code (0 done, 1 the user cancelled, 2 another
+/// error) or kNoResponse when there was no answer at all.
 [[nodiscard]] std::optional<QVariantMap> request(const QString& interface, const QString& method,
-                                                 QVariantList args, int timeoutMs);
+                                                 QVariantList args, int timeoutMs, int* response = nullptr);
+
+/// request()'s `response` when the call failed or timed out.
+inline constexpr int kNoResponse = -1;
+/// request()'s `response` when the user said no in the desktop's dialog.
+inline constexpr int kCancelled = 1;
 
 /// A fresh token for handle_token and session_handle_token.
 [[nodiscard]] QString token();

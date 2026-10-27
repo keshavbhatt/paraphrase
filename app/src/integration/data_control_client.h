@@ -83,14 +83,10 @@ private:
 class DataControlClipboard final : public ClipboardAccess
 {
 public:
-    static constexpr qsizetype kMaxSaved = qsizetype{16} * 1024 * 1024; ///< bigger clipboards are not kept
-
     explicit DataControlClipboard(std::shared_ptr<DataControlClient> client)
         : m_client(std::move(client))
     {}
-    [[nodiscard]] ClipboardContent save() override;
     void setText(const QString& text) override;
-    void restore(const ClipboardContent& content) override;
 
 private:
     std::shared_ptr<DataControlClient> m_client;

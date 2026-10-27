@@ -312,21 +312,6 @@ void DataControlClient::setClipboard(const ClipboardContent& content)
     sync();
 }
 
-ClipboardContent DataControlClipboard::save()
-{
-    ClipboardContent saved;
-    qsizetype size = 0;
-    for (const QString& mime : m_client->mimeTypes(DataControlClient::Which::Clipboard)) {
-        QByteArray data = m_client->read(DataControlClient::Which::Clipboard, mime);
-        size += data.size();
-        if (size > kMaxSaved) {
-            break; // keep what fits; a huge image is not worth holding
-        }
-        saved.append({mime, std::move(data)});
-    }
-    return saved;
-}
-
 void DataControlClipboard::setText(const QString& text)
 {
     ClipboardContent content;
@@ -334,11 +319,6 @@ void DataControlClipboard::setText(const QString& text)
     for (const QString& mime : textMimes()) {
         content.append({mime, utf8});
     }
-    m_client->setClipboard(content);
-}
-
-void DataControlClipboard::restore(const ClipboardContent& content)
-{
     m_client->setClipboard(content);
 }
 

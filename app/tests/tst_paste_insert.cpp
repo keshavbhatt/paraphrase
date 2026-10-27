@@ -1,6 +1,6 @@
 // Putting a result back (PLAN 6) with fakes for the window, the clipboard and the keys: it
-// types only into the window the text came from, leaves the result on the clipboard
-// otherwise, and puts the user's clipboard back after a paste.
+// types only into the window the text came from and leaves the result on the clipboard,
+// with the paste keys every keyboard layout has.
 
 #include "integration/paste_insert.h"
 #include "integration/portal_shortcut.h"
@@ -30,9 +30,7 @@ class FakeClipboard final : public ClipboardAccess
 {
 public:
     ClipboardContent content{{u"text/plain"_s, "what the user copied"}, {u"image/png"_s, "png bytes"}};
-    [[nodiscard]] ClipboardContent save() override { return content; }
     void setText(const QString& text) override { content = {{u"text/plain"_s, text.toUtf8()}}; }
-    void restore(const ClipboardContent& saved) override { content = saved; }
     [[nodiscard]] QByteArray text() const { return content.value(0).second; }
 };
 
@@ -41,16 +39,28 @@ class FakeKeys final : public PasteKeys
 public:
     bool works = true;
     int pastes = 0;
+    PasteChord chord = PasteChord::ShiftInsert;
     QByteArray clipboardAtPaste;
     FakeClipboard* clipboard = nullptr;
     [[nodiscard]] QString name() const override { return u"fake keys"_s; }
     [[nodiscard]] bool available() const override { return true; }
-    [[nodiscard]] bool sendPaste() override
+    [[nodiscard]] bool sendPaste(PasteChord sent) override
     {
         ++pastes;
+        chord = sent;
         clipboardAtPaste = clipboard->text();
         return works;
     }
+};
+
+class FakeShortcut final : public ShortcutBackend
+{
+public:
+    [[nodiscard]] QString name() const override { return u"fake shortcut"_s; }
+    [[nodiscard]] bool available() const override { return true; }
+    bool bind(const QKeySequence& /*keys*/) override { return true; }
+    [[nodiscard]] QString description() const override { return {}; }
+    void press() { trigger(); }
 };
 
 CapturedText fromTelegram()
@@ -116,6 +126,44 @@ private Q_SLOTS:
         m_keys->works = false; // no permission, the session ended
         QCOMPARE(m_insert->insert(u"Mia doesn't know"_s, fromTelegram()), InsertOutcome::OnClipboard);
         QCOMPARE(m_clipboard->text(), QByteArray("Mia doesn't know"));
+    }
+
+    void pastesWithKeysEveryLayoutHas()
+    {
+        // Shift+Insert: a Russian or Greek layout may have no "v" for Ctrl+V (dabri #105).
+        QCOMPARE(m_insert->insert(u"Mia doesn't know"_s, fromTelegram()), InsertOutcome::Typed);
+        QCOMPARE(m_keys->chord, PasteChord::ShiftInsert);
+        QCOMPARE(chordKeysyms(PasteChord::ShiftInsert), (std::array<std::uint32_t, 3>{0xffe1, 0xff63, 0}));
+    }
+
+    void pastesTheClipboardInTerminals()
+    {
+        // A terminal pastes the selection with Shift+Insert, the very text the user selected.
+        CapturedText fromKonsole = fromTelegram();
+        fromKonsole.appName = u"org.kde.konsole"_s;
+        QCOMPARE(m_insert->insert(u"git status"_s, fromKonsole), InsertOutcome::Typed);
+        QCOMPARE(m_keys->chord, PasteChord::CtrlShiftV);
+        QCOMPARE(chordKeysyms(PasteChord::CtrlShiftV), (std::array<std::uint32_t, 3>{0xffe3, 0xffe1, 0x76}));
+        QCOMPARE(pasteChordFor(u"Gnome-terminal"_s), PasteChord::CtrlShiftV); // X11 WM_CLASS
+        QCOMPARE(pasteChordFor(u"kitty"_s), PasteChord::CtrlShiftV);
+        QCOMPARE(pasteChordFor(u"XTerm"_s), PasteChord::ShiftInsert); // its only paste
+        QCOMPARE(pasteChordFor(QString()), PasteChord::ShiftInsert);
+    }
+
+    void opensOncePerHoldOfTheShortcut()
+    {
+        // GNOME repeats Activated while the keys are held, X11 repeats the key press.
+        FakeShortcut shortcut;
+        const QSignalSpy activated(&shortcut, &ShortcutBackend::activated);
+        shortcut.press();
+        for (int i = 0; i < 10; ++i) { // held for half a second
+            QTest::qWait(50);
+            shortcut.press();
+        }
+        QCOMPARE(activated.count(), 1);
+        QTest::qWait(ShortcutBackend::kRepeatMs + 100); // let go, then a new press
+        shortcut.press();
+        QCOMPARE(activated.count(), 2);
     }
 
     void writesTriggersAsThePortalExpects()

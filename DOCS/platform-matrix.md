@@ -17,7 +17,7 @@ clipboard, leave the result on the clipboard, bind `paraphrase-app --popup` by h
 | Shortcut fallback | `CommandShortcut`: bind the command the app shows (`paraphrase-app --popup`; `paraphrase --popup` in the snap, `flatpak run com.ktechpit.paraphrase --popup` in the Flatpak, the AppImage's path) in the desktop's settings | same | same | same, in the compositor config |
 | Read the highlighted text | `X11SelectionCapture`: the PRIMARY selection, no focus needed | `DataControlCapture`: `ext-data-control-v1`, no focus needed | not possible: GNOME has no data-control. `ClipboardCapture` reads the copied text, and since Wayland sends the clipboard only to the window with focus, the popup reads it again once it has focus (`needsFocus`, and on each clipboard change until an action runs) | `DataControlCapture` (wlroots has data-control) |
 | Which window the text came from | `X11WindowTracker`: `_NET_ACTIVE_WINDOW`, WM_CLASS for the app name | `KWinWindowTracker`: a KWin script reports activations over D-Bus | not known | not known |
-| Put the result back | `PasteInsert` with `XTestPasteKeys`: clipboard, Ctrl+V through XTEST; the result stays on the clipboard | `PasteInsert` with `PortalPasteKeys`: clipboard through data-control, Ctrl+V through the RemoteDesktop portal; the result stays on the clipboard | result on the clipboard, "Press Ctrl+V" (no window check, so nothing is typed) | same as GNOME until a window check exists |
+| Put the result back | `PasteInsert` with `XTestPasteKeys`: clipboard, the paste keys through XTEST; the result stays on the clipboard | `PasteInsert` with `PortalPasteKeys`: clipboard through data-control, the paste keys through the RemoteDesktop portal; the result stays on the clipboard | result on the clipboard, "Press Ctrl+V" (no window check, so nothing is typed) | same as GNOME until a window check exists |
 | Insert fallback | `ClipboardInsert`: the result stays on the clipboard | same | same | same |
 
 An X11 app on a Wayland session (Xwayland, `QT_QPA_PLATFORM=xcb`) gets no key grab and no
@@ -42,11 +42,25 @@ known (the clipboard fallback, GNOME, wlroots, a sandbox that blocks `org.kde.KW
 result stays on the clipboard and the popup says "Press Ctrl+V". On KDE the window id is
 KWin's `internalId` of the active window; titles are never read.
 
-## Clipboard hygiene
+## The clipboard and the paste keys
 
-Before a paste the whole clipboard is saved (every format, up to 16 MB), the result is put
-on it, Ctrl+V is pressed, and 700 ms later the saved content is put back. On Wayland this
-goes through data-control, because a window that just lost focus may not set the clipboard.
+The result is put on the clipboard, the paste keys are pressed, and the result stays there
+(owner, 2026-10-26): a paste that lands nowhere, with no text field in focus, is one Ctrl+V
+away instead of lost. The user's earlier clipboard is not put back; dabri tried that and
+removed it, as it raced the target app still reading the clipboard. On Wayland the clipboard
+is set through data-control, because a window that just lost focus may not set it.
+
+The paste keys are Shift+Insert (2026-10-27, from dabri #105 and #106): Qt, GTK, browsers,
+Electron, LibreOffice and Java apps paste the clipboard with it, and its keys are the same on
+every keyboard layout, where Ctrl+V needs a key that makes "v", which a Russian or Greek
+layout may not have. Terminals paste the selection with Shift+Insert, which is the text the
+user selected, so a window whose class or desktop file names a known terminal (Konsole,
+GNOME Terminal, Console, Ptyxis, kitty, Alacritty, foot, WezTerm, Ghostty, Tilix and others,
+`paste_keys.cpp`) gets Ctrl+Shift+V. xterm keeps Shift+Insert, its only paste.
+
+When the portal session has ended (the desktop restarted, the user revoked it), a new one is
+started and the keys sent once more, but only when not one key went through, so nothing is
+pasted twice.
 
 ## Permissions the user sees
 
@@ -54,7 +68,13 @@ goes through data-control, because a window that just lost focus may not set the
   default) and lets the user change it later in System Settings, Shortcuts.
 - KDE, first Replace: the RemoteDesktop portal asks once to allow keyboard input. The restore
   token is kept in the app's settings (`integration/remoteDesktopToken`), so it is not asked
-  again until the user revokes it.
+  again until the user revokes it. Only a "no" in that dialog is kept
+  (`integration/remoteDesktopRefused`); a portal error or no answer asks again next time.
+- The tray: an app started at login may run before the panel's tray. It watches for the
+  tray (`org.kde.StatusNotifierWatcher` and its host) and adds its icon when it turns up;
+  Qt is asked only then, as it checks once per run and keeps a "no".
+- The shortcut held down: GNOME repeats Activated and X11 repeats the key press while the
+  keys are held, so a press within 600 ms of the last one is ignored.
 
 - History (off by default): turning it on asks the desktop's keyring for the history's key,
   the Secret portal first, else the Secret Service (KWallet, GNOME Keyring). A locked wallet

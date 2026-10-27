@@ -12,6 +12,7 @@ add_library(paraphrase_integration STATIC
     src/integration/integrations.cpp
     src/integration/kwin_window_tracker.cpp
     src/integration/paste_insert.cpp
+    src/integration/paste_keys.cpp
     src/integration/portal.cpp
     src/integration/portal_paste_keys.cpp
     src/integration/portal_shortcut.cpp

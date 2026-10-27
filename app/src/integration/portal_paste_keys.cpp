@@ -8,6 +8,8 @@
 #include <QGuiApplication>
 #include <QSettings>
 
+#include <array>
+
 using namespace Qt::StringLiterals;
 
 namespace paraphrase::app {
@@ -16,8 +18,6 @@ namespace {
 const QString kInterface = u"org.freedesktop.portal.RemoteDesktop"_s;
 const QString kTokenKey = u"integration/remoteDesktopToken"_s;
 const QString kRefusedKey = u"integration/remoteDesktopRefused"_s;
-constexpr int kControlL = 0xffe3; // XKB keysyms
-constexpr int kV = 0x76;
 
 } // namespace
 
@@ -35,13 +35,21 @@ QString PortalPasteKeys::name() const
     return QObject::tr("Paste through the RemoteDesktop portal");
 }
 
-bool PortalPasteKeys::startSession()
+bool PortalPasteKeys::startSession(bool* cancelled)
 {
-    portal::registerApp();
-    const auto created = portal::request(kInterface, u"CreateSession"_s,
-                                         {QVariantMap{{u"session_handle_token"_s, portal::token()}}}, 10'000);
-    if (!created) {
+    int response = portal::kNoResponse;
+    const auto said = [&response, cancelled] {
+        if (cancelled != nullptr) {
+            *cancelled = response == portal::kCancelled;
+        }
         return false;
+    };
+    portal::registerApp();
+    const auto created =
+        portal::request(kInterface, u"CreateSession"_s,
+                        {QVariantMap{{u"session_handle_token"_s, portal::token()}}}, 10'000, &response);
+    if (!created) {
+        return said();
     }
     const QString session = created->value(u"session_handle"_s).toString();
     QVariantMap select{{u"types"_s, kKeyboard}, {u"persist_mode"_s, kPersistUntilRevoked}};
@@ -49,13 +57,13 @@ bool PortalPasteKeys::startSession()
         select.insert(u"restore_token"_s, saved);
     }
     const QVariant path = QVariant::fromValue(QDBusObjectPath(session));
-    if (!portal::request(kInterface, u"SelectDevices"_s, {path, select}, 10'000)) {
-        return false;
+    if (!portal::request(kInterface, u"SelectDevices"_s, {path, select}, 10'000, &response)) {
+        return said();
     }
     const auto started =
-        portal::request(kInterface, u"Start"_s, {path, QString(), QVariantMap()}, kStartTimeoutMs);
+        portal::request(kInterface, u"Start"_s, {path, QString(), QVariantMap()}, kStartTimeoutMs, &response);
     if (!started) {
-        return false;
+        return said();
     }
     // A new token each time: the old one is used up (portal spec).
     QSettings().setValue(kTokenKey, started->value(u"restore_token"_s).toString());
@@ -83,34 +91,59 @@ TypingPermission PortalPasteKeys::typingPermission() const
 
 TypingPermission PortalPasteKeys::askTyping()
 {
-    if (m_available && m_session.isEmpty() && !startSession()) {
-        QSettings().setValue(kRefusedKey, true); // no, or no answer: Replace uses the clipboard
+    bool cancelled = false;
+    if (m_available && m_session.isEmpty() && !startSession(&cancelled) && cancelled) {
+        // Only a "no" is kept. A portal error or no answer is asked again next time, as a
+        // failure kept for good would leave Replace on the clipboard for no reason.
+        QSettings().setValue(kRefusedKey, true);
     }
     return typingPermission();
 }
 
-bool PortalPasteKeys::key(int keysym, bool pressed) const
+bool PortalPasteKeys::key(std::uint32_t keysym, bool pressed) const
 {
     QDBusMessage call = QDBusMessage::createMethodCall(QString::fromLatin1(portal::kService),
                                                        QString::fromLatin1(portal::kPath), kInterface,
                                                        u"NotifyKeyboardKeysym"_s);
-    call << QVariant::fromValue(QDBusObjectPath(m_session)) << QVariantMap() << keysym
+    call << QVariant::fromValue(QDBusObjectPath(m_session)) << QVariantMap() << static_cast<int>(keysym)
          << static_cast<uint>(pressed ? 1 : 0);
     return QDBusConnection::sessionBus().call(call, QDBus::Block, 2000).type() == QDBusMessage::ReplyMessage;
 }
 
-bool PortalPasteKeys::sendPaste()
+bool PortalPasteKeys::pressChord(PasteChord chord, bool* firstFailed) const
+{
+    const std::array<std::uint32_t, 3> keys = chordKeysyms(chord);
+    const std::size_t count = keys.back() == 0 ? 2 : 3; // Shift+Insert has two keys
+    std::size_t pressed = 0;
+    while (pressed < count && key(keys.at(pressed), true)) {
+        ++pressed;
+    }
+    *firstFailed = pressed == 0;
+    const bool all = pressed == count;
+    bool released = true;
+    while (pressed > 0) { // release what went down, so no modifier stays held
+        released = key(keys.at(--pressed), false) && released;
+    }
+    return all && released;
+}
+
+bool PortalPasteKeys::sendPaste(PasteChord chord)
 {
     if (!m_available || (m_session.isEmpty() && !startSession())) {
         return false;
     }
-    if (key(kControlL, true) && key(kV, true) && key(kV, false) && key(kControlL, false)) {
+    bool firstFailed = false;
+    if (pressChord(chord, &firstFailed)) {
         return true;
     }
-    // The session ended (revoked, the desktop restarted): start a new one next time.
-    (void)key(kControlL, false);
+    // The session ended (revoked, the desktop restarted). When not one key went through, a
+    // fresh session tries once more: nothing can be pasted twice. Otherwise the result stays
+    // on the clipboard.
     closeSession();
-    return false;
+    if (!firstFailed || !startSession()) {
+        return false;
+    }
+    return pressChord(chord, &firstFailed);
 }
 
 void PortalPasteKeys::closeSession()

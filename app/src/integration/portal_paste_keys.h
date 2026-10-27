@@ -4,9 +4,11 @@
 
 #include <QString>
 
+#include <cstdint>
+
 namespace paraphrase::app {
 
-/// Ctrl+V through the RemoteDesktop portal (Wayland): a keyboard-only session, started the
+/// The paste keys through the RemoteDesktop portal (Wayland): a keyboard-only session, started the
 /// first time a result is put back. The desktop asks the user once; the restore token it
 /// gives back is kept in QSettings, so later sessions start without asking.
 class PortalPasteKeys final : public PasteKeys
@@ -25,13 +27,17 @@ public:
 
     [[nodiscard]] QString name() const override;
     [[nodiscard]] bool available() const override { return m_available; }
-    [[nodiscard]] bool sendPaste() override;
+    [[nodiscard]] bool sendPaste(PasteChord chord) override;
     [[nodiscard]] TypingPermission typingPermission() const override;
     TypingPermission askTyping() override;
 
 private:
-    [[nodiscard]] bool startSession();
-    [[nodiscard]] bool key(int keysym, bool pressed) const;
+    /// Starts a session; `cancelled` says whether the user said no in the desktop's dialog.
+    [[nodiscard]] bool startSession(bool* cancelled = nullptr);
+    [[nodiscard]] bool key(std::uint32_t keysym, bool pressed) const;
+    /// Presses and releases the chord. Nothing pressed yet when the first key fails, so a
+    /// second try cannot paste twice: `firstFailed` says so.
+    [[nodiscard]] bool pressChord(PasteChord chord, bool* firstFailed) const;
     void closeSession();
 
     bool m_available = false;

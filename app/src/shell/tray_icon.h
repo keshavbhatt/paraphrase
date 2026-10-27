@@ -6,6 +6,7 @@
 #include <QObject>
 #include <QString>
 
+#include <functional>
 #include <utility>
 
 class QAction;
@@ -25,6 +26,12 @@ public:
     ~TrayIcon() override;
 
     [[nodiscard]] static bool available();
+    /// Calls `ready` once the desktop has a tray: now, or when its StatusNotifierWatcher and a
+    /// host turn up later, as when the app starts at login before the panel. Qt checks for a
+    /// tray once per run and keeps a "no", so it is asked only once the watcher is there.
+    /// `watcher` names another service in place of org.kde.StatusNotifierWatcher (tests).
+    static void whenAvailable(QObject* context, const std::function<void()>& ready,
+                              const QString& watcher = {});
     void applyTheme(const Tokens& t);
 
 Q_SIGNALS:

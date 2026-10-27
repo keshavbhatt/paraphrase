@@ -37,6 +37,8 @@ public:
 
 private:
     void wire();
+    /// The tray, once the desktop has one (TrayIcon::whenAvailable).
+    void addTray();
     /// The shortcut or `paraphrase-app --popup`: the popup, or the window if Settings says so.
     void openFromShortcut();
     /// With a tray and "keep running in the tray", closing the window leaves the app running.

@@ -27,13 +27,11 @@ Application::Application(QObject* parent)
 {
     m_flow->setHistory(m_history);
     m_popup->setHistory(m_history);
-    if (TrayIcon::available()) {
-        m_tray = new TrayIcon(this);
-        m_tray->applyTheme(Theme::current());
-    }
     applyKeepInTray();
     describe();
     wire();
+    // At login the app may start before the panel's tray: it gets one when the tray turns up.
+    TrayIcon::whenAvailable(this, [this] { addTray(); });
 }
 
 Application::~Application() = default;
@@ -75,12 +73,21 @@ void Application::wire()
         m_flow->showMain();
         m_flow->mainWindow().takeOver(handover);
     });
+}
+
+void Application::addTray()
+{
     if (m_tray != nullptr) {
-        connect(m_tray, &TrayIcon::windowRequested, m_flow, &AppFlow::showMain);
-        connect(m_tray, &TrayIcon::popupRequested, m_popup, &PopupController::show);
-        connect(m_tray, &TrayIcon::settingsRequested, m_flow, &AppFlow::showSettings);
-        connect(m_tray, &TrayIcon::quitRequested, qApp, &QApplication::quit);
+        return;
     }
+    m_tray = new TrayIcon(this);
+    m_tray->applyTheme(Theme::current());
+    connect(m_tray, &TrayIcon::windowRequested, m_flow, &AppFlow::showMain);
+    connect(m_tray, &TrayIcon::popupRequested, m_popup, &PopupController::show);
+    connect(m_tray, &TrayIcon::settingsRequested, m_flow, &AppFlow::showSettings);
+    connect(m_tray, &TrayIcon::quitRequested, qApp, &QApplication::quit);
+    applyKeepInTray(); // closing the window now leaves the app in the tray
+    describe();        // Settings offers "keep running in the tray"
 }
 
 void Application::openFromShortcut()

@@ -46,7 +46,7 @@ jobs:
           # The runner is Ubuntu 24.04 (core24), so scripts/dev-build.sh builds here directly with the
           # same packages as packaging/core24/Dockerfile.
           sudo apt-get update && sudo apt-get install -y --no-install-recommends build-essential \
-            libglib2.0-0t64 libdbus-1-3 libduktape207 shellcheck
+            libglib2.0-0t64 libdbus-1-3 libduktape207 dbus-daemon shellcheck
 
       - uses: astral-sh/setup-uv@v6
 

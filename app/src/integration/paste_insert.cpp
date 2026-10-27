@@ -23,7 +23,7 @@ InsertOutcome PasteInsert::insert(const QString& text, const CapturedText& targe
     // Never type into a window the user did not choose (PLAN 6).
     const bool sameWindow =
         !target.window.isEmpty() && m_tracker->waitUntilActive(target.window, kFocusWaitMs);
-    if (!sameWindow || !m_keys->sendPaste()) {
+    if (!sameWindow || !m_keys->sendPaste(pasteChordFor(target.appName))) {
         return InsertOutcome::OnClipboard;
     }
     return InsertOutcome::Typed;

@@ -36,7 +36,7 @@ public:
     XTestPasteKeys();
     [[nodiscard]] QString name() const override;
     [[nodiscard]] bool available() const override { return m_available; }
-    [[nodiscard]] bool sendPaste() override;
+    [[nodiscard]] bool sendPaste(PasteChord chord) override;
 
 private:
     xcb_connection_t* m_conn = nullptr;

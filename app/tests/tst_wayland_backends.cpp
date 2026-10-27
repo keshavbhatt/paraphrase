@@ -116,32 +116,6 @@ private Q_SLOTS:
             5000);
     }
 
-    void savesAndRestoresEveryFormat()
-    {
-        m_other->call([](DataControlClient& c) {
-            c.setClipboard({{u"text/plain"_s, "copied earlier"}, {u"text/html"_s, "<b>copied</b> earlier"}});
-        });
-        DataControlClipboard ours(m_ours);
-        QTRY_VERIFY_WITH_TIMEOUT(
-            m_ours->mimeTypes(DataControlClient::Which::Clipboard).contains(u"text/html"_s), 3000);
-        const ClipboardContent saved = ours.save(); // before a paste
-        QCOMPARE(saved.size(), 2);
-        ours.setText(u"the result"_s);
-        QVERIFY(!m_ours->mimeTypes(DataControlClient::Which::Clipboard).contains(u"text/html"_s));
-        ours.restore(saved); // after it
-        QCOMPARE(m_ours->read(DataControlClient::Which::Clipboard, u"text/html"_s),
-                 QByteArray("<b>copied</b> earlier"));
-        // The other app sees the restored formats too.
-        QStringList theirs;
-        QTRY_VERIFY_WITH_TIMEOUT(
-            [&] {
-                m_other->call(
-                    [&](DataControlClient& c) { theirs = c.mimeTypes(DataControlClient::Which::Clipboard); });
-                return theirs.contains(u"text/html"_s);
-            }(),
-            3000);
-    }
-
     void capturesTheClipboardWhenNothingIsHighlighted()
     {
         m_other->call([](DataControlClient& c) { c.setClipboard({{u"text/plain"_s, "copied text"}}); });

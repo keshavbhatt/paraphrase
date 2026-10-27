@@ -10,6 +10,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <memory>
+#include <ranges>
+#include <vector>
 #include <xcb/xcb.h>
 #include <xcb/xtest.h>
 
@@ -18,8 +20,6 @@ using namespace Qt::StringLiterals;
 namespace paraphrase::app {
 namespace {
 
-constexpr std::uint32_t kControlL = 0xffe3;
-constexpr std::uint32_t kV = 0x76;
 /// Num Lock (Mod2) and Caps Lock change the key state; grab with each combination.
 constexpr std::array<std::uint16_t, 4> kLockMasks = {
     0,
@@ -107,18 +107,29 @@ QString XTestPasteKeys::name() const
     return QObject::tr("Paste with XTest");
 }
 
-bool XTestPasteKeys::sendPaste()
+bool XTestPasteKeys::sendPaste(PasteChord chord)
 {
-    const auto control = m_available ? x11::keycode(m_conn, kControlL) : std::nullopt;
-    const auto v = m_available ? x11::keycode(m_conn, kV) : std::nullopt;
-    if (!control || !v) {
+    if (!m_available) {
         return false;
     }
+    std::vector<std::uint8_t> codes;
+    for (const std::uint32_t keysym : chordKeysyms(chord)) {
+        if (keysym == 0) {
+            continue;
+        }
+        const auto code = x11::keycode(m_conn, keysym);
+        if (!code) {
+            return false; // a layout with no such key: the result stays on the clipboard
+        }
+        codes.push_back(*code);
+    }
     const std::uint32_t root = x11::rootWindow(m_conn);
-    xcb_test_fake_input(m_conn, XCB_KEY_PRESS, *control, XCB_CURRENT_TIME, root, 0, 0, 0);
-    xcb_test_fake_input(m_conn, XCB_KEY_PRESS, *v, XCB_CURRENT_TIME, root, 0, 0, 0);
-    xcb_test_fake_input(m_conn, XCB_KEY_RELEASE, *v, XCB_CURRENT_TIME, root, 0, 0, 0);
-    xcb_test_fake_input(m_conn, XCB_KEY_RELEASE, *control, XCB_CURRENT_TIME, root, 0, 0, 0);
+    for (const std::uint8_t code : codes) {
+        xcb_test_fake_input(m_conn, XCB_KEY_PRESS, code, XCB_CURRENT_TIME, root, 0, 0, 0);
+    }
+    for (const std::uint8_t code : std::views::reverse(codes)) {
+        xcb_test_fake_input(m_conn, XCB_KEY_RELEASE, code, XCB_CURRENT_TIME, root, 0, 0, 0);
+    }
     xcb_flush(m_conn);
     return true;
 }
@@ -211,7 +222,7 @@ bool X11Shortcut::nativeEventFilter(const QByteArray& eventType, void* message, 
     if (key->detail != m_keycode || state != m_modifiers) {
         return false;
     }
-    Q_EMIT activated();
+    trigger();
     return true;
 }
 

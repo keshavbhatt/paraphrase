@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QElapsedTimer>
 #include <QKeySequence>
 #include <QObject>
 #include <QString>
@@ -152,10 +153,29 @@ public:
     /// desktop is asked for the shortcut again. keysChanged() follows when they change.
     virtual void configure() {}
 
+    /// A press within this long of the last one is the key held down: GNOME repeats
+    /// Activated while it is held, and X11 repeats the key press (dabri 6af2865).
+    static constexpr qint64 kRepeatMs = 600;
+
 Q_SIGNALS:
     void activated();
     /// keys() changed: the desktop bound the shortcut, or the user changed it in its settings.
     void keysChanged();
+
+protected:
+    /// Emits activated() for a press, once per hold: repeats while the keys are held would
+    /// capture the text again, and with the popup in front, capture from the popup.
+    void trigger()
+    {
+        const bool repeat = m_lastPress.isValid() && m_lastPress.elapsed() < kRepeatMs;
+        m_lastPress.start(); // a long hold keeps repeating within the window: all ignored
+        if (!repeat) {
+            Q_EMIT activated();
+        }
+    }
+
+private:
+    QElapsedTimer m_lastPress;
 };
 
 } // namespace paraphrase::app

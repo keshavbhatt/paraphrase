@@ -76,8 +76,11 @@ QString token()
 }
 
 std::optional<QVariantMap> request(const QString& interface, const QString& method, QVariantList args,
-                                   int timeoutMs)
+                                   int timeoutMs, int* response)
 {
+    if (response != nullptr) {
+        *response = kNoResponse;
+    }
     if (args.isEmpty() || args.back().typeId() != QMetaType::QVariantMap) {
         return std::nullopt;
     }
@@ -106,6 +109,9 @@ std::optional<QVariantMap> request(const QString& interface, const QString& meth
     }
     bus.disconnect(QString::fromLatin1(kService), requestPath(handle), u"org.freedesktop.portal.Request"_s,
                    u"Response"_s, &catcher, SLOT(onResponse(uint, QVariantMap)));
+    if (response != nullptr && catcher.code) {
+        *response = static_cast<int>(*catcher.code);
+    }
     if (!catcher.code || *catcher.code != 0) {
         return std::nullopt; // 1: the user cancelled, 2: another error
     }

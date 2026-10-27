@@ -204,7 +204,7 @@ void PortalShortcut::onActivated(const QDBusObjectPath& session, const QString& 
         if (const QString token = options.value(u"activation_token"_s).toString(); !token.isEmpty()) {
             qputenv("XDG_ACTIVATION_TOKEN", token.toUtf8());
         }
-        Q_EMIT activated();
+        trigger();
     }
 }
 

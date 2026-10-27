@@ -8,12 +8,12 @@
 
 namespace paraphrase::app {
 
-/// The clipboard's whole content, every format, so it can be put back after a paste.
+/// Clipboard content in several formats, as data-control offers it.
 using ClipboardContent = QList<std::pair<QString, QByteArray>>; ///< (mime type, data)
 
-/// Reads and writes the clipboard without needing focus where the session allows it
-/// (Wayland data-control); on X11 the Qt clipboard does. Used to paste a result and then
-/// put back what the user had copied (PLAN 6, clipboard hygiene).
+/// Sets the clipboard without needing focus where the session allows it (Wayland
+/// data-control); on X11 the Qt clipboard does. The result is put there to be pasted, and
+/// it stays (owner, 2026-10-26; DOCS/platform-matrix.md, Clipboard).
 class ClipboardAccess
 {
 public:
@@ -24,9 +24,7 @@ public:
     ClipboardAccess(ClipboardAccess&&) = delete;
     ClipboardAccess& operator=(ClipboardAccess&&) = delete;
 
-    [[nodiscard]] virtual ClipboardContent save() = 0;
     virtual void setText(const QString& text) = 0;
-    virtual void restore(const ClipboardContent& content) = 0;
 };
 
 } // namespace paraphrase::app
