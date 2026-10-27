@@ -4,7 +4,6 @@
 
 #include <QObject>
 #include <QString>
-#include <QTemporaryDir>
 
 namespace paraphrase::app {
 
@@ -38,10 +37,9 @@ public Q_SLOTS:
     Q_SCRIPTABLE void activated(const QString& window, const QString& app);
 
 private:
-    [[nodiscard]] bool load();
+    [[nodiscard]] static bool load();
     static void unload();
 
-    QTemporaryDir m_dir;
     bool m_loaded = false;
     QString m_active;
     QString m_app;

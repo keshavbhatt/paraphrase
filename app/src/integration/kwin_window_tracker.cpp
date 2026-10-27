@@ -5,7 +5,9 @@
 #include <QDBusConnectionInterface>
 #include <QDBusMessage>
 #include <QDeadlineTimer>
+#include <QDir>
 #include <QFile>
+#include <QStandardPaths>
 
 using namespace Qt::StringLiterals;
 
@@ -61,10 +63,14 @@ report();
 
 bool KWinWindowTracker::load()
 {
-    if (!m_dir.isValid()) {
+    // KWin reads the script from a path, so it must be one KWin sees: a snap has its own /tmp,
+    // but its runtime folder (/run/user/<uid>/snap.<name>) is a real one. One file, overwritten
+    // each run: a killed run leaves nothing behind.
+    const QString dir = QStandardPaths::writableLocation(QStandardPaths::RuntimeLocation);
+    if (dir.isEmpty() || !QDir().mkpath(dir)) {
         return false;
     }
-    const QString path = m_dir.filePath(u"tracker.js"_s);
+    const QString path = dir + u"/paraphrase-window-tracker.js"_s;
     QFile file(path);
     if (!file.open(QIODevice::WriteOnly) ||
         file.write(script(QDBusConnection::sessionBus().baseService()).toUtf8()) < 0) {
