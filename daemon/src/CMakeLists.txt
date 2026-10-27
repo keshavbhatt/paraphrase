@@ -10,9 +10,14 @@ configure_file(app/version.h.in "${CMAKE_CURRENT_BINARY_DIR}/generated/paraphras
 qt_add_executable(paraphrase-daemon app/main.cpp)
 paraphrase_set_warnings(paraphrase-daemon)
 target_include_directories(paraphrase-daemon PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/generated")
-# Development builds find the skills in the source tree; packages install them.
-target_compile_definitions(paraphrase-daemon PRIVATE
-    PARAPHRASE_SOURCE_SKILLS_DIR="${PROJECT_SOURCE_DIR}/skills")
+# Development builds (with tests) find the skills in the source tree; packages install them
+# and carry no path of the machine they were built on.
+if(PARAPHRASE_BUILD_TESTS)
+    set(_skills_source_dir "${PROJECT_SOURCE_DIR}/skills")
+else()
+    set(_skills_source_dir "")
+endif()
+target_compile_definitions(paraphrase-daemon PRIVATE PARAPHRASE_SOURCE_SKILLS_DIR="${_skills_source_dir}")
 target_link_libraries(paraphrase-daemon PRIVATE paraphrase_api Qt6::Core Qt6::DBus llama)
 
 include(GNUInstallDirs)
