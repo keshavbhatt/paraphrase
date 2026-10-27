@@ -1,13 +1,19 @@
-# Builds the snap on GitHub's CI (this machine has no LXD) and attaches it to the draft
-# release "snap-edge" (drafts are seen only by the repo's collaborators; release files do not
-# count against the Actions storage quota, which workflow artifacts hit). Install it with
-#   gh release download snap-edge -p '*.snap' && sudo snap install --dangerous paraphrase_*.snap
-# Store publishing comes later (M5), as in Omnidict.
+# Builds the snap on GitHub's CI (never on a developer machine) and publishes it to the Snap
+# Store, as Omnidict does:
+#   push to main        -> edge      (version 0.1.0+git<hash>)
+#   version tag v1.2.3  -> stable    (version 1.2.3; the tag must match project(VERSION))
+# Edge is where a build is checked before it is tagged: snap install paraphrase --edge.
+# Nothing is kept on GitHub (no workflow artifact, no release file).
+#
+# Publishing needs the SNAPCRAFT_STORE_CREDENTIALS secret and the repo variable
+# PUBLISH_TO_STORE=true (DOCS/packaging.md, 5a); without them the snap is only built, as a check.
+# Stable also needs grade: stable in snap/snapcraft.yaml.
 name: snap
 
 on:
   push:
     branches: [main]
+    tags: ['v*']
     paths:
       - 'app/**'
       - 'daemon/**'
@@ -23,34 +29,39 @@ on:
 
 concurrency:
   group: snap-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
 
 jobs:
   build:
     runs-on: ubuntu-24.04
-    permissions:
-      contents: write # the draft release
     steps:
       - uses: actions/checkout@v5
         with:
           submodules: recursive
           fetch-depth: 0 # the version names the commit
 
+      - name: Check that the tag matches the CMake version
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          project=$(awk '/^project\(paraphrase/ {on = 1} on && $1 == "VERSION" {print $2; exit}' CMakeLists.txt)
+          if [ "${TAG#v}" != "$project" ]; then
+            echo "tag $TAG does not match project(VERSION) $project in CMakeLists.txt" >&2
+            exit 1
+          fi
+
       - name: Build snap
         uses: snapcore/action-build@v1
         id: build
 
-      - name: Attach to the draft release snap-edge
+      - name: Publish to the Snap Store
+        if: >-
+          vars.PUBLISH_TO_STORE == 'true' && github.event_name == 'push' &&
+          (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+        uses: snapcore/action-publish@v1
         env:
-          GH_TOKEN: ${{ github.token }}
-          SNAP_FILE: ${{ steps.build.outputs.snap }}
-        run: |
-          if ! gh release view snap-edge >/dev/null 2>&1; then
-            gh release create snap-edge --draft --prerelease --title "Snap (edge build)" \
-              --notes "The latest snap built from main, for testing: sudo snap install --dangerous"
-          fi
-          # One snap at a time: the newest replaces the others.
-          for old in $(gh release view snap-edge --json assets -q '.assets[].name'); do
-            gh release delete-asset snap-edge "$old" --yes
-          done
-          gh release upload snap-edge "$SNAP_FILE"
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+        with:
+          snap: ${{ steps.build.outputs.snap }}
+          release: ${{ startsWith(github.ref, 'refs/tags/v') && 'stable' || 'edge' }}

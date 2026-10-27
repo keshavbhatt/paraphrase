@@ -50,6 +50,9 @@ Owner asked for M3, then a snap first (2026-10-26). M2's live app checks stay op
     another app). Mocks approved (owner, 2026-10-27): "No keys" with Choose keys, and Change
     keys next to set keys; both open the desktop's own window (ConfigureShortcuts). Setup
     and Settings now follow the desktop live instead of what they read at startup.
+- The snap workflow now publishes to the Snap Store as Omnidict's does (owner): main to edge,
+  version tags to stable, nothing kept on GitHub. It needs the store name and credentials
+  from the owner first (DOCS/packaging.md, 5a); until then it only builds.
 
 ## 2026-10-26 - The popup opens in the main window with what it shows
 

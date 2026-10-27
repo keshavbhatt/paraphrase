@@ -119,10 +119,21 @@ moves. Good as a portable "try it" build, not the main channel.
 
 `snap/snapcraft.yaml` builds the whole tree with the **kde-neon-6** extension (Qt 6.11 from
 the `kf6-core24` content snap, the runtime `scripts/dev-run.sh` targets), as Omnidict does.
-GitHub builds it (`.github/workflows/snap.yml`, amd64; this machine has no LXD) and attaches
-it to the draft release `snap-edge` (workflow artifacts hit the account's storage quota) for
-`sudo snap install --dangerous`. Grade `devel` and no store upload
-until the D-Bus names are approved (M5).
+GitHub builds it (`.github/workflows/snap.yml`, amd64; this machine has no LXD) and publishes
+it to the Snap Store as Omnidict does (owner, 2026-10-27): each push to main goes to **edge**
+(`snap install paraphrase --edge`), a tag `vX.Y.Z` matching `project(VERSION)` goes to
+**stable**. Nothing is kept on GitHub. Grade `devel` until the store approves the D-Bus names;
+stable needs grade `stable`.
+
+Publishing needs, once, from the owner:
+
+1. `snapcraft register paraphrase` (the name; if taken, a store name request or another name).
+2. `snapcraft export-login --snaps=paraphrase --channels=edge,beta,candidate,stable creds.txt`,
+   then `gh secret set SNAPCRAFT_STORE_CREDENTIALS < creds.txt` and delete `creds.txt`.
+3. `gh variable set PUBLISH_TO_STORE --body true`.
+
+Without them the workflow only builds, as a check. The first upload goes to manual review:
+the snap owns well-known D-Bus names (slots), which the store must approve.
 
 - Apps: `paraphrase` is the app (`paraphrase-app`; the desktop file, the autostart entry and
   the shortcut command `paraphrase --popup`), `paraphrase.cli` is the command-line client.
@@ -140,9 +151,10 @@ until the D-Bus names are approved (M5).
   own (`com.ktechpit.paraphrase.Daemon`, `.App`, `.WindowTracker`).
 - Data: models in `$SNAP_USER_COMMON/models` (never copied on refresh); settings and the
   autostart entry in `$SNAP_USER_DATA/.config`, which snapd reads for `autostart:`.
-- Still to check in the installed snap: the RemoteDesktop portal paste, whether data-control
-  reaches a strict snap, the KWin window tracker (`org.kde.KWin` is not plugged, so it falls
-  back), the Secret portal for history, and the D-Bus names on a local install.
+- Checked in the installed snap on the dev machine (2026-10-27, AppArmor not enforced there):
+  app and daemon start and own their D-Bus names, the model download and a proofread work.
+  Still to check: the RemoteDesktop portal paste, data-control, the KWin window tracker
+  (`org.kde.KWin` is not plugged) with AppArmor enforcing, and the Secret portal for history.
 
 ## 6. To verify in M1 (each is a short test, recorded here when done)
 
