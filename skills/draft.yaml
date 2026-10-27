@@ -1,6 +1,6 @@
 id: draft
 version: 5
-revision: 18
+revision: 22
 title: Full reply
 tier: quality
 max_input_tokens: 2000
@@ -10,7 +10,7 @@ speculative: none
 sampling: { temperature: 0.6, top_p: 0.9, top_k: 40, repeat_penalty: 1.05, seed: null }
 output: { type: text, language: same }
 presets:
-  email: { title: Email, shape: "an email: a greeting line to the person who wrote the message, using the name they signed with if there is one; the reply in short paragraphs, with a blank line between paragraphs; then a closing in the language of the reply, such as \"Best regards,\" in English, as the last line, with no name after it" }
+  email: { title: Email, shape: "an email: a greeting line to the person who signed the message, by the name or title they signed with, or \"Hello,\" in English if it is not signed; the reply in short paragraphs, with a blank line between paragraphs; then a closing in the language of the reply, such as \"Best regards,\" in English, as the last line, with no name after it" }
   chat: { title: Chat message, shape: "a chat message: one short paragraph, with no greeting line and no sign-off" }
 system: |
   You write the reply to the message inside <message>, as the person who received it. You sign nothing: the user adds their name. The message may be one email, a chat message or a whole thread; reply to its last message, using the rest as background.

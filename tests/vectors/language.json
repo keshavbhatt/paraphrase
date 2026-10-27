@@ -4250,6 +4250,30 @@
    "plain_name": "English"
   },
   {
+   "text": "Hey @mira_dev\n\nBuild #312 passed automatic review. Newer builds should now pass automatic review as well.\n\nThanks for your patience",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Hi Priya,\n\nYour visa appointment is confirmed for 14 June at 10:00. Please bring your passport and two photos.\n\nRegards,\nDaniel Ortiz",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Hello Sam,\n\nCan you join the design review on Thursday at 3 pm? We will go through the new checkout screens.\n\nLena",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "@arjun the staging deploy is green, you can test the login fix now",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
    "text": "आदरणीय सर,\n\nमैं आपको बताना चाहता हूँ कि हमारी कंपनी का सालाना कार्यक्रम 20 दिसंबर को होटल ग्रैंड में है। आपको मुख्य अतिथि के रूप में आमंत्रित करना हमारे लिए सम्मान की बात होगी। कृपया अपनी सहमति बताएँ।\n\nसादर,\nरमेश गुप्ता",
    "lang": "hi",
    "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
@@ -4347,6 +4371,18 @@
   },
   {
    "text": "Main kal se leave pe hoon, Rahul meri jagah standup lega. Jira tickets maine usko assign kar diye hain.",
+   "lang": "hinglish",
+   "prompt_name": "Hinglish: Hindi written in Latin letters as in chat messages. Keep it Hinglish even in a formal tone: do not translate it into English or Devanagari",
+   "plain_name": "Hinglish (Hindi in Latin letters)"
+  },
+  {
+   "text": "नमस्ते रोहित जी,\n\nआपका ऑर्डर कल भेज दिया गया है। ट्रैकिंग नंबर 48213 है।\n\nधन्यवाद,\nकविता",
+   "lang": "hi",
+   "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
+   "plain_name": "Hindi"
+  },
+  {
+   "text": "Hi Neha,\n\nTumhara laptop repair ho gaya hai, kal office se le lena.\n\nThanks,\nVikram",
    "lang": "hinglish",
    "prompt_name": "Hinglish: Hindi written in Latin letters as in chat messages. Keep it Hinglish even in a formal tone: do not translate it into English or Devanagari",
    "plain_name": "Hinglish (Hindi in Latin letters)"

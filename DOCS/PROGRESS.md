@@ -58,6 +58,9 @@ Owner asked for M3, then a snap first (2026-10-26). M2's live app checks stay op
     card picks it now (`picksAnOptionFromAClickAnywhereOnItsCard`).
   - No keys for the snap's shortcut: a test run had left an entry `paraphrase_paraphrase`
     holding Ctrl+Alt+Space; removed.
+- Full reply greeted the user by their own name (owner report, 2026-10-27: "Hey @keshavnrj"
+  came back as "Dear keshavnrj"): draft revision 22 greets whoever signed the message, by
+  name or title, or "Hello,". Eval in DOCS/models.md; revisions 19 to 21 rejected.
 - Flatpak (owner, 2026-10-27: start Flathub packaging, test locally first):
   `packaging/flatpak/com.ktechpit.paraphrase.yaml` and `scripts/build-flatpak.sh`
   (DOCS/packaging.md, 5b). The KWin tracker script goes to the runtime folder the host shares

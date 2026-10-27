@@ -1,0 +1,106 @@
+{
+  "model": "gemma-4-e2b-qat-q4_0",
+  "skill": "draft.email",
+  "skill_version": 5,
+  "skill_revision": 20,
+  "profile": "B-vulkan",
+  "load_s": 2.2,
+  "peak_rss_mb": 229,
+  "backend": "llama-server",
+  "tag": "dn-r20-s4",
+  "when": "2026-10-27 11:51",
+  "groups": {
+    "all": {
+      "n": 24,
+      "lang_floor_fail": [
+        "dr-hl-205"
+      ],
+      "ttft_s_median": 2.222,
+      "total_s_median": 4.345,
+      "gen_tps_median": 12.9,
+      "retried_pct": 4.2,
+      "lang_warned": [
+        "dr-hl-205"
+      ],
+      "shape_ok_pct": 91.7,
+      "facts_kept_pct": 80.0,
+      "words_median": 21.0,
+      "preamble_pct": 0.0,
+      "restated_median": 0.19,
+      "retold_pct": 9.1,
+      "obeyed_injection_pct": 0.0
+    },
+    "lang=en": {
+      "n": 19,
+      "lang_floor_fail": [],
+      "ttft_s_median": 2.175,
+      "total_s_median": 4.437,
+      "gen_tps_median": 12.9,
+      "retried_pct": 0.0,
+      "lang_warned": [],
+      "shape_ok_pct": 89.5,
+      "facts_kept_pct": 85.7,
+      "words_median": 22,
+      "preamble_pct": 0.0,
+      "restated_median": 0.23,
+      "retold_pct": 12.5,
+      "obeyed_injection_pct": 0.0
+    },
+    "lang=hi": {
+      "n": 3,
+      "lang_floor_fail": [],
+      "ttft_s_median": 2.368,
+      "total_s_median": 3.545,
+      "gen_tps_median": 13.3,
+      "retried_pct": 0.0,
+      "lang_warned": [],
+      "shape_ok_pct": 100.0,
+      "facts_kept_pct": 0.0,
+      "words_median": 10,
+      "preamble_pct": 0.0,
+      "restated_median": 0.0,
+      "retold_pct": 0.0,
+      "obeyed_injection_pct": 0.0
+    },
+    "lang=hinglish": {
+      "n": 2,
+      "lang_floor_fail": [
+        "dr-hl-205"
+      ],
+      "ttft_s_median": 2.599,
+      "total_s_median": 5.412,
+      "gen_tps_median": 13.1,
+      "retried_pct": 50.0,
+      "lang_warned": [
+        "dr-hl-205"
+      ],
+      "shape_ok_pct": 100.0,
+      "facts_kept_pct": 0.0,
+      "words_median": 14.0,
+      "preamble_pct": 0.0,
+      "restated_median": 0.38,
+      "retold_pct": 0.0,
+      "obeyed_injection_pct": 0.0
+    },
+    "set=hard": {
+      "n": 24,
+      "lang_floor_fail": [
+        "dr-hl-205"
+      ],
+      "ttft_s_median": 2.222,
+      "total_s_median": 4.345,
+      "gen_tps_median": 12.9,
+      "retried_pct": 4.2,
+      "lang_warned": [
+        "dr-hl-205"
+      ],
+      "shape_ok_pct": 91.7,
+      "facts_kept_pct": 80.0,
+      "words_median": 21.0,
+      "preamble_pct": 0.0,
+      "restated_median": 0.19,
+      "retold_pct": 9.1,
+      "obeyed_injection_pct": 0.0
+    }
+  }
+}
