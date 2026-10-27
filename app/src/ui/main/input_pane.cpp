@@ -73,6 +73,7 @@ void InputPane::buildHead()
         {.name = u"fullReply"_s, .text = tr("Full reply")},
     });
     m_paste = makeButton(tr("Paste"), u"flat"_s);
+    m_paste->setObjectName(u"paste"_s);
     m_clear = makeButton(tr("Clear"), u"flat"_s);
     head()->addWidget(m_title);
     head()->addWidget(m_info);
@@ -111,7 +112,6 @@ void InputPane::showKind(SkillKind kind)
     }
     // main-window-reply.html: the language as a pill, no word count, no Clear.
     m_clear->setVisible(text);
-    m_paste->setVisible(!page()->showsLanguage());
     updateHint();
     updateRun();
     m_replyKind->setVisible(!text && !compose && m_fullAvailable);
@@ -230,16 +230,6 @@ void InputPane::updateInfo()
 {
     const QString text = page()->subject();
     const QString name = text.trimmed().isEmpty() ? QString() : languageName(m_detector, language());
-    if (page()->showsLanguage()) {
-        m_info->clear();
-        m_pill->setVisible(false);
-        QString shown;
-        if (!text.trimmed().isEmpty()) {
-            shown = name.isEmpty() ? tr("Best effort") : name;
-        }
-        page()->setLanguage(shown);
-        return;
-    }
     if (m_kind != SkillKind::Text) {
         m_info->clear();
         m_pill->setText(name.isEmpty() ? tr("Best effort") : name);

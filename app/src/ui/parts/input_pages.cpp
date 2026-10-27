@@ -177,21 +177,9 @@ FullReplyInput::FullReplyInput(QWidget* parent)
     , m_tone(new TonePicker(kToneKey, u"professional"_s))
 {
     QVBoxLayout* layout = pageLayout(this);
-    // main-window-reply-draft.html: the message's language and Paste sit beside its label.
-    auto* messageRow = new QHBoxLayout;
-    messageRow->setSpacing(8);
-    messageRow->addWidget(makeLabel(tr("The email or chat you are answering"), u"small"_s), 1);
-    m_language = makeLabel(QString(), u"pill"_s);
-    m_language->setObjectName(u"fullLangPill"_s);
-    m_language->hide();
-    messageRow->addWidget(m_language, 0, Qt::AlignVCenter);
-    QPushButton* paste = makeButton(tr("Paste"), u"flat"_s);
-    paste->setObjectName(u"fullPaste"_s);
-    messageRow->addWidget(paste);
-    layout->addLayout(messageRow);
+    // main-window-reply-draft.html: the language and Paste are in the pane's header, where
+    // Quick replies has them, so switching between the two moves nothing.
     layout->addWidget(m_message, 1);
-    connect(paste, &QPushButton::clicked, this,
-            [this] { m_message->setPlainText(QApplication::clipboard()->text()); });
     layout->addWidget(makeLabel(tr("What do you want to say?"), u"small"_s));
     m_intent->setFixedHeight(kIntentHeight);
     layout->addWidget(m_intent);
@@ -234,12 +222,6 @@ void FullReplyInput::takeMessage(const QString& text)
 void FullReplyInput::focusIntent() const
 {
     m_intent->setFocus();
-}
-
-void FullReplyInput::setLanguage(const QString& name)
-{
-    m_language->setText(name);
-    m_language->setVisible(!name.isEmpty());
 }
 
 QString FullReplyInput::subject() const

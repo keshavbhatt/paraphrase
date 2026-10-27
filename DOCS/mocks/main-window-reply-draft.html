@@ -42,10 +42,11 @@
       <section class="pane" aria-labelledby="msg-h">
         <div class="ph">
           <h2 id="msg-h" class="cap" style="font-size: 11px">Message you got</h2><span class="grow"></span>
+          <span class="pill">English</span>
           <span class="seg" role="group" aria-label="Kind of reply"><a href="main-window-reply.html"><span>Quick replies</span></a><span class="on">Full reply</span></span>
+          <button class="btn flat">Paste</button>
         </div>
         <div class="pb">
-          <div class="row"><span class="small muted grow">The email or chat you are answering</span><span class="pill">English</span><button class="btn flat">Paste</button></div>
           <textarea id="msg" class="field" rows="7" style="flex: 1; resize: none">Hi Priya,
 
 Thanks for sending the Q3 vendor report. Could we get on a call this Thursday at 3 pm to go through the delivery delays? I'd also like the updated cost sheet before then, if possible.
@@ -109,5 +110,6 @@ Priya</div>
   <li><b>One editable draft</b>, streamed as it is written. "Another version" keeps the earlier ones (‹ ›). Names, dates, times and amounts come only from the message and the intent; the reply never claims to attach or include something that is not in it.</li>
   <li><b>Copy reply</b> copies the draft as edited; nothing is sent from this window. "Shorter" rewrites the draft with the Concise tone. Full replies run on the quality model when it is installed (status line), quick replies on the fast one.</li>
   <li><b>A split (proposed 2026-10-27)</b> between the message and "What do you want to say?", as in Quick replies: drag it to make either box taller, for a long message or a long note of your own. No line until the pointer is over it; the message keeps at least 3 lines and your note 2; the place is kept for the next start.</li>
+  <li><b>The header (owner, 2026-10-27)</b>: the message's language and Paste sit in the pane's header beside Quick replies / Full reply, in the same places as in Quick replies, so switching between the two moves nothing, and the message gets the line the old "The email or chat you are answering" row took.</li>
 </ol></section>
 </body></html>

@@ -66,6 +66,12 @@ Owner asked for M3, then a snap first (2026-10-26). M2's live app checks stay op
     background. Mocks approved (owner, 2026-10-27): 10px padding and 4px between them, so the
     header's words are evenly spaced (`spacesTheHeaderButtonsEvenly`); every main window mock
     now shows History in the header, as the app does.
+- Switching Quick replies and Full reply shifted the layout: Full reply had its own row with
+  the language and Paste. Owner's request (2026-10-27, main-window-reply-draft.html note):
+  both sit in the pane's header as in Quick replies, and the message takes that row
+  (`switchingReplyKindsMovesNothing`).
+- The history list's scrollbar kept black edges: Breeze paints a scrollbar's margin black in
+  an item view, so the 2 px inset is padding now (checked in the Flatpak's own Breeze).
 - Desktop integration, lessons from dabri (github.com/AshBuk/dabri, a speech-to-text app with
   the same shortcut and paste-back problems; DOCS/platform-matrix.md):
   - Paste keys are Shift+Insert, the same on every keyboard layout (Ctrl+V needs a "v" key,

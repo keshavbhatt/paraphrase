@@ -39,11 +39,6 @@ public:
     /// The request's inputs for this skill; empty when the page is not filled enough to run.
     [[nodiscard]] virtual QVariantMap input(const SkillInfo& skill, const QString& targetLang) const = 0;
     virtual void clear() = 0;
-    /// Whether the page shows the text's language and Paste itself, beside its own label
-    /// (main-window-reply-draft.html); the pane's head then leaves them out.
-    [[nodiscard]] virtual bool showsLanguage() const { return false; }
-    /// The detected language's name, empty while there is no text.
-    virtual void setLanguage(const QString& name) { Q_UNUSED(name) }
 
 Q_SIGNALS:
     void edited();
@@ -113,15 +108,12 @@ public:
     /// empty. Email or chat follows the message until the user has chosen one here.
     void takeMessage(const QString& text);
     void focusIntent() const;
-    [[nodiscard]] bool showsLanguage() const override { return true; }
-    void setLanguage(const QString& name) override;
 
 Q_SIGNALS:
     void kindChanged(); ///< email or chat message
     void toneChanged();
 
 private:
-    QLabel* m_language = nullptr;
     TextField* m_message = nullptr;
     TextField* m_intent = nullptr;
     SegmentedControl* m_kind = nullptr;

@@ -429,6 +429,39 @@ private Q_SLOTS:
         QCOMPARE(run->width(), width);
     }
 
+    void switchingReplyKindsMovesNothing()
+    {
+        // main-window-reply-draft.html: the language and Paste stay in the header for both,
+        // and the message starts in the same place, so the switch shifts nothing.
+        startDaemon({u"fast-model"_s, u"quality-model"_s});
+        MainWindow w;
+        w.resize(1200, 760);
+        w.start();
+        w.selectSkill(u"reply"_s);
+        w.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&w));
+        auto* full = w.findChild<QPushButton*>(u"fullReply"_s);
+        if (full == nullptr || full->parentWidget()->isHidden()) {
+            QSKIP("no full reply skill (skills/draft.yaml) in this tree");
+        }
+        w.findChild<QTextEdit*>(u"message"_s)->setPlainText(u"Can we meet on Thursday at 3 pm?"_s);
+        const auto* paste = w.findChild<QPushButton*>(u"paste"_s);
+        const auto* pill = w.findChild<QLabel*>(u"langPill"_s);
+        const auto place = [&w](const QWidget* widget) { return widget->mapTo(&w, QPoint(0, 0)); };
+        QTRY_VERIFY(pill->isVisible());
+        const QPoint pastePlace = place(paste);
+        const QPoint messagePlace = place(w.findChild<QTextEdit*>(u"message"_s));
+
+        full->click();
+        const auto* fullMessage = w.findChild<QTextEdit*>(u"fullMessage"_s);
+        QCOMPARE(fullMessage->toPlainText(), u"Can we meet on Thursday at 3 pm?"_s); // carried over
+        QTRY_VERIFY(fullMessage->isVisible());
+        QVERIFY(paste->isVisible());
+        QVERIFY(pill->isVisible());
+        QCOMPARE(place(paste), pastePlace);
+        QCOMPARE(place(fullMessage), messagePlace);
+    }
+
     void writesAFullReplyAndKeepsItsVersions()
     {
         startDaemon({u"fast-model"_s, u"quality-model"_s});
