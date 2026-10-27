@@ -2,6 +2,7 @@
 
 #include "history/history_keeper.h"
 #include "ui/common/chip_button.h"
+#include "ui/common/grip_splitter.h"
 #include "ui/common/menu_icons.h"
 #include "ui/common/widgets.h"
 #include "ui/parts/result_views.h"
@@ -34,6 +35,8 @@ constexpr int kDayHeight = 30;
 constexpr int kEntryHeight = 54;
 constexpr int kBadge = 26;
 constexpr int kSmallIcon = 14;
+constexpr int kCaptionGap = 10;   ///< .pb { gap: 10px }
+constexpr int kBoxMinHeight = 76; ///< two lines of a .box
 
 struct Filter
 {
@@ -451,6 +454,37 @@ QWidget* HistoryView::buildDetailHead()
     return detailHead;
 }
 
+QWidget* HistoryView::buildEntryBody()
+{
+    // main-window-history.html: your text over the result, half each, with a split between
+    // them that gives either more and keeps its place.
+    const auto column = [](const QString& title) {
+        auto* box = new QWidget;
+        auto* layout = new QVBoxLayout(box);
+        layout->setContentsMargins(0, 0, 0, 0);
+        layout->setSpacing(kCaptionGap);
+        layout->addWidget(caption(title));
+        return std::pair{box, layout};
+    };
+    const auto [textBox, textColumn] = column(tr("Your text"));
+    m_text = makeBox(u"entryText"_s, true);
+    m_text->setMinimumHeight(kBoxMinHeight);
+    textColumn->addWidget(m_text, 1);
+    const auto [resultBox, resultColumn] = column(tr("Result"));
+    m_result = makeBox(u"entryResult"_s, false);
+    m_result->setMinimumHeight(kBoxMinHeight);
+    resultColumn->addWidget(m_result, 1);
+    m_diff = new TextResultView;
+    m_diff->setObjectName(u"entryDiff"_s);
+    m_diff->setMinimumHeight(kBoxMinHeight);
+    m_diff->hide();
+    resultColumn->addWidget(m_diff, 1);
+    auto* split = new GripSplitter(Qt::Vertical);
+    split->setObjectName(u"historySplit"_s);
+    split->stack(textBox, resultBox, u"history/split"_s, GripSplitter::Start::Even);
+    return split;
+}
+
 QWidget* HistoryView::buildDetail()
 {
     m_detail = new QFrame;
@@ -462,16 +496,7 @@ QWidget* HistoryView::buildDetail()
     auto* body = new QVBoxLayout;
     body->setContentsMargins(14, 14, 14, 14);
     body->setSpacing(10);
-    body->addWidget(caption(tr("Your text")));
-    m_text = makeBox(u"entryText"_s, true);
-    body->addWidget(m_text, 1);
-    body->addWidget(caption(tr("Result")));
-    m_result = makeBox(u"entryResult"_s, false);
-    body->addWidget(m_result, 1);
-    m_diff = new TextResultView;
-    m_diff->setObjectName(u"entryDiff"_s);
-    m_diff->hide();
-    body->addWidget(m_diff, 1);
+    body->addWidget(buildEntryBody(), 1);
     detail->addLayout(body, 1);
     auto* foot = new QFrame;
     foot->setObjectName(u"paneFoot"_s);

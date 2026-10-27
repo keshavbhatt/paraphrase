@@ -4,6 +4,7 @@
 
 #include <QMouseEvent>
 #include <QPainter>
+#include <QSettings>
 
 namespace paraphrase::app {
 namespace {
@@ -65,6 +66,23 @@ void GripHandle::mouseReleaseEvent(QMouseEvent* event)
 GripSplitter::GripSplitter(Qt::Orientation orientation, QWidget* parent)
     : QSplitter(orientation, parent)
 {}
+
+void GripSplitter::stack(QWidget* top, QWidget* bottom, const QString& settingsKey, Start start)
+{
+    setChildrenCollapsible(false);
+    setHandleWidth(kPaneHandle);
+    addWidget(top);
+    addWidget(bottom);
+    const bool even = start == Start::Even;
+    setStretchFactor(0, 1);
+    setStretchFactor(1, even ? 1 : 0);
+    if (!restoreState(QSettings().value(settingsKey).toByteArray())) {
+        // Sizes are scaled to the room there is; 0 is held at the bottom box's minimum.
+        setSizes(even ? QList<int>{1, 1} : QList<int>{QWIDGETSIZE_MAX, 0});
+    }
+    connect(this, &QSplitter::splitterMoved, this,
+            [this, settingsKey] { QSettings().setValue(settingsKey, saveState()); });
+}
 
 QSplitterHandle* GripSplitter::createHandle()
 {

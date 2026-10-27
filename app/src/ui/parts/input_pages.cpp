@@ -26,10 +26,9 @@ namespace {
 
 constexpr int kMessageMinHeight = 94; ///< three lines (main-window-reply.html, note 5)
 constexpr int kDraftHeight = 70;      ///< two lines
-/// The split between them: the pane's 10px gaps on both sides of an invisible handle.
-constexpr int kSplitHandle = 20;
 constexpr int kDraftLabelGap = 6;
 const QString kReplySplitKey = u"reply/split"_s;
+const QString kFullReplySplitKey = u"reply/fullSplit"_s;
 constexpr int kIntentHeight = 76;
 const QString kKindKey = u"reply/kind"_s;
 const QString kToneKey = u"reply/tone"_s;
@@ -121,18 +120,8 @@ QuickReplyInput::QuickReplyInput(QWidget* parent)
     m_draft->setMinimumHeight(kDraftHeight);
     draftColumn->addWidget(m_draft, 1);
     m_split->setObjectName(u"replySplit"_s);
-    m_split->setChildrenCollapsible(false);
-    m_split->setHandleWidth(kSplitHandle);
-    m_split->addWidget(m_message);
-    m_split->addWidget(draftBox);
-    m_split->setStretchFactor(0, 1);
-    m_split->setStretchFactor(1, 0);
-    if (!m_split->restoreState(QSettings().value(kReplySplitKey).toByteArray())) {
-        m_split->setSizes({QWIDGETSIZE_MAX, 0}); // the reply so far at its smallest
-    }
+    m_split->stack(m_message, draftBox, kReplySplitKey, GripSplitter::Start::BottomSmallest);
     layout->addWidget(m_split, 1);
-    connect(m_split, &QSplitter::splitterMoved, this,
-            [this] { QSettings().setValue(kReplySplitKey, m_split->saveState()); });
     for (const TextField* edit : {m_message, m_draft}) {
         connect(edit, &QTextEdit::textChanged, this, &InputPage::edited);
     }
@@ -175,14 +164,23 @@ FullReplyInput::FullReplyInput(QWidget* parent)
           {.name = u"asChat"_s, .text = tr("Chat message")},
       }))
     , m_tone(new TonePicker(kToneKey, u"professional"_s))
+    , m_split(new GripSplitter(Qt::Vertical))
 {
     QVBoxLayout* layout = pageLayout(this);
     // main-window-reply-draft.html: the language and Paste are in the pane's header, where
-    // Quick replies has them, so switching between the two moves nothing.
-    layout->addWidget(m_message, 1);
-    layout->addWidget(makeLabel(tr("What do you want to say?"), u"small"_s));
-    m_intent->setFixedHeight(kIntentHeight);
-    layout->addWidget(m_intent);
+    // Quick replies has them, so switching between the two moves nothing. A split between the
+    // message and what you want to say makes either taller (note 7).
+    m_message->setMinimumHeight(kMessageMinHeight);
+    auto* intentBox = new QWidget;
+    auto* intentColumn = new QVBoxLayout(intentBox);
+    intentColumn->setContentsMargins(0, 0, 0, 0);
+    intentColumn->setSpacing(kDraftLabelGap);
+    intentColumn->addWidget(makeLabel(tr("What do you want to say?"), u"small"_s));
+    m_intent->setMinimumHeight(kIntentHeight);
+    intentColumn->addWidget(m_intent, 1);
+    m_split->setObjectName(u"fullReplySplit"_s);
+    m_split->stack(m_message, intentBox, kFullReplySplitKey, GripSplitter::Start::BottomSmallest);
+    layout->addWidget(m_split, 1);
     auto* options = new QHBoxLayout;
     options->setSpacing(8);
     options->addWidget(makeLabel(tr("Write it as"), u"small"_s));

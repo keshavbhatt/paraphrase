@@ -19,6 +19,7 @@ class QTextBrowser;
 namespace paraphrase::app {
 
 class ChangeList;
+class GripSplitter;
 class ChipButton;
 class StreamCaret;
 
@@ -44,6 +45,10 @@ public:
     void setShowResult(bool result);
     /// The text box as tall as its text, up to a cap, instead of filling the space (popup).
     void setFitToText(bool fit);
+    /// A split between the text and the list of changes (the window, main-window.html note
+    /// 8): the list starts at the height its rows need; a place the user drags it to is kept
+    /// in QSettings under `settingsKey`.
+    void splitChanges(const QString& settingsKey);
     [[nodiscard]] QString result() const { return m_result; }
     [[nodiscard]] bool hasDiff() const { return m_diff.has_value(); }
     [[nodiscard]] qsizetype changeCount() const;
@@ -61,6 +66,8 @@ private:
     QTextBrowser* m_output = nullptr;
     StreamCaret* m_caret = nullptr;
     ChangeList* m_changes = nullptr;
+    GripSplitter* m_split = nullptr;
+    QString m_splitKey;
     std::optional<client::WordDiff> m_diff;
     QSet<qsizetype> m_undone;
     QString m_result;

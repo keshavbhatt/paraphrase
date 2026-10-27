@@ -62,6 +62,8 @@ private:
     [[nodiscard]] QLayout* buildChips();
     [[nodiscard]] QWidget* buildDetail();
     [[nodiscard]] QWidget* buildDetailHead();
+    /// Your text and the result, with a split between them.
+    [[nodiscard]] QWidget* buildEntryBody();
 
     history::Keeper& m_keeper;
     QList<history::Entry> m_entries;

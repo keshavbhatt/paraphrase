@@ -68,6 +68,7 @@ OutputPane::OutputPane(QWidget* parent)
     , m_skeleton(new SkeletonView)
 {
     buildHead();
+    m_text->splitChanges(u"proofread/split"_s); // the popup keeps its fitted list
     m_pages->addWidget(m_text);
     m_pages->addWidget(m_replies);
     m_pages->addWidget(m_full);

@@ -15,6 +15,7 @@ namespace paraphrase::app {
 namespace {
 
 constexpr int kMaxHeight = 220;
+constexpr int kTwoRows = 66; ///< two 30 px rows and their gap, plus the frame
 constexpr int kArrowSize = 14;
 
 QLabel* chip(const QString& text, const QString& kind)
@@ -70,9 +71,16 @@ void ChangeList::setDiff(const client::WordDiff* diff, const QSet<qsizetype>& un
     }
     // At least that much too: in the popup the window fits its content, and a list squeezed
     // to two rows of five hid the rest behind a scrollbar.
-    const int fit = std::min(height + (2 * frameWidth()), kMaxHeight);
-    setMaximumHeight(fit);
-    setMinimumHeight(fit);
+    m_fitHeight = std::min(height + (2 * frameWidth()), kMaxHeight);
+    if (m_resizable) {
+        // In a split (the window): it starts at that height, and the user may drag it from
+        // two rows up to the pane's height (main-window.html, note 8).
+        setMinimumHeight(std::min(m_fitHeight, kTwoRows));
+        setMaximumHeight(QWIDGETSIZE_MAX);
+        return;
+    }
+    setMaximumHeight(m_fitHeight);
+    setMinimumHeight(m_fitHeight);
 }
 
 namespace {

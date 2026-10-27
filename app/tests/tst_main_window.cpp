@@ -320,6 +320,76 @@ private Q_SLOTS:
         QCOMPARE(settings->x() - (history->x() + history->width()), 4);
     }
 
+    void splitsShareTheHeightWhereTwoBoxesStack()
+    {
+        // main-window.html note 8, main-window-history.html, main-window-reply-draft.html
+        // note 7: a split wherever two boxes share a column; a drag is kept.
+        namespace history = paraphrase::app::history;
+        using paraphrase::app::ChangeList;
+        startDaemon({u"fast-model"_s, u"quality-model"_s});
+        const QTemporaryDir dir;
+        auto keeper = fakeHistory(dir.filePath(u"history.sqlite"_s));
+        QCOMPARE(keeper->turnOn(), history::Keeper::Problem::None);
+        MainWindow w;
+        w.setHistory(keeper.get());
+        w.resize(1200, 760);
+        w.start();
+        w.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&w));
+        const auto drag = [](QSplitter* split, int dy) {
+            QSplitterHandle* handle = split->handle(1);
+            // A box shown again comes back with its handle at the next layout pass.
+            QTRY_VERIFY(!handle->isHidden() && handle->y() > 0);
+            const QPoint from = handle->rect().center();
+            const QPoint to = from + QPoint(0, dy);
+            QTest::mousePress(handle, Qt::LeftButton, {}, from);
+            QMouseEvent move(QEvent::MouseMove, QPointF(to), handle->mapToGlobal(QPointF(to)), Qt::NoButton,
+                             Qt::LeftButton, Qt::NoModifier);
+            QApplication::sendEvent(handle, &move);
+            QTest::mouseRelease(handle, Qt::LeftButton, {}, to);
+        };
+
+        // Proofread: the list starts as tall as its rows, and a drag makes it taller.
+        w.findChild<QTextEdit*>(u"text"_s)->setPlainText(u"Whisk the egg's with the milk"_s);
+        setAnswers({u"Whisk the eggs with the milk."_s});
+        w.selectSkill(u"proofread"_s);
+        runAndWait(w);
+        auto* changesSplit = w.findChild<QSplitter*>(u"changesSplit"_s);
+        QVERIFY(changesSplit != nullptr);
+        const auto* changes = changesSplit->findChild<ChangeList*>(u"changes"_s); // History has one too
+        QTRY_COMPARE(changes->height(), changes->fitHeight());
+        const int fitted = changes->height();
+        drag(changesSplit, -100);
+        QTRY_COMPARE(changes->height(), fitted + 100);
+        QVERIFY(QSettings().contains(u"proofread/split"_s));
+
+        // History: your text and the result, half each.
+        w.showHistory(true);
+        auto* historySplit = w.findChild<QSplitter*>(u"historySplit"_s);
+        QVERIFY(historySplit != nullptr);
+        QTRY_VERIFY(historySplit->isVisible());
+        const QList<int> halves = historySplit->sizes();
+        QVERIFY(qAbs(halves.at(0) - halves.at(1)) <= 1);
+        drag(historySplit, 60);
+        QTRY_COMPARE(historySplit->sizes().at(0), halves.at(0) + 60);
+        w.showHistory(false);
+
+        // Full reply: the message takes the height, what you want to say starts at two lines.
+        w.selectSkill(u"reply"_s);
+        auto* full = w.findChild<QPushButton*>(u"fullReply"_s);
+        if (full == nullptr || full->parentWidget()->isHidden()) {
+            QSKIP("no full reply skill (skills/draft.yaml) in this tree");
+        }
+        full->click();
+        auto* fullSplit = w.findChild<QSplitter*>(u"fullReplySplit"_s);
+        const auto* intent = w.findChild<QTextEdit*>(u"intent"_s);
+        QTRY_VERIFY(intent->isVisible());
+        QCOMPARE(intent->height(), 76);
+        QVERIFY(w.findChild<QTextEdit*>(u"fullMessage"_s)->height() > 2 * intent->height());
+        drag(fullSplit, -30);
+        QTRY_COMPARE(intent->height(), 106);
+    }
+
     void runsAToneFromTheMenu()
     {
         startDaemon({u"fast-model"_s, u"quality-model"_s});

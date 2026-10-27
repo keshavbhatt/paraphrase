@@ -1,6 +1,7 @@
 #include "ui/parts/result_views.h"
 
 #include "ui/common/chip_button.h"
+#include "ui/common/grip_splitter.h"
 #include "ui/common/widgets.h"
 #include "ui/parts/change_list.h"
 
@@ -14,6 +15,7 @@
 #include <QPainter>
 #include <QPlainTextEdit>
 #include <QPushButton>
+#include <QSettings>
 #include <QShortcut>
 #include <QTextBlockFormat>
 #include <QTextBrowser>
@@ -182,6 +184,11 @@ void TextResultView::showProofread(const QString& before, const QString& after)
     clear();
     m_diff.emplace(before, corrected);
     render();
+    // Until the user drags the split, the list is as tall as its rows need.
+    if (m_split != nullptr && !QSettings().contains(m_splitKey)) {
+        const int fit = m_changes->fitHeight();
+        m_split->setSizes({std::max(1, m_split->height() - fit - m_split->handleWidth()), fit});
+    }
 }
 
 void TextResultView::showMessage(const QString& message, bool problem)
@@ -208,6 +215,18 @@ void TextResultView::fitHeight()
     const int chrome = m_output->height() - m_output->viewport()->height();
     const int text = static_cast<int>(std::ceil(m_output->document()->size().height()));
     m_output->setFixedHeight(std::min(text + chrome, kMaxFitHeight));
+}
+
+void TextResultView::splitChanges(const QString& settingsKey)
+{
+    m_splitKey = settingsKey;
+    layout()->removeWidget(m_output);
+    layout()->removeWidget(m_changes);
+    m_changes->setResizable(true);
+    m_split = new GripSplitter(Qt::Vertical);
+    m_split->setObjectName(u"changesSplit"_s);
+    m_split->stack(m_output, m_changes, settingsKey, GripSplitter::Start::BottomSmallest);
+    layout()->addWidget(m_split);
 }
 
 void TextResultView::setShowResult(bool result)

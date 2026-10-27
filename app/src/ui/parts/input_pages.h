@@ -118,6 +118,7 @@ private:
     TextField* m_intent = nullptr;
     SegmentedControl* m_kind = nullptr;
     TonePicker* m_tone = nullptr;
+    GripSplitter* m_split = nullptr;
 };
 
 /// What to write from scratch (main-window-compose.html): a description in the user's words,

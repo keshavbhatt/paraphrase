@@ -32,6 +32,10 @@ public:
     /// Rebuilds the rows; nullptr hides the list.
     void setDiff(const client::WordDiff* diff, const QSet<qsizetype>& undone);
     void applyTheme(const Tokens& t) { m_tokens = t; }
+    /// In a split the list may be made taller or shorter than its rows need; fitHeight() is
+    /// still what they need, up to a cap.
+    void setResizable(bool resizable) { m_resizable = resizable; }
+    [[nodiscard]] int fitHeight() const { return m_fitHeight; }
 
 Q_SIGNALS:
     void undoToggled(qsizetype change);
@@ -43,6 +47,8 @@ private:
 
     QVBoxLayout* m_rows = nullptr;
     Tokens m_tokens;
+    bool m_resizable = false;
+    int m_fitHeight = 0;
 };
 
 } // namespace paraphrase::app

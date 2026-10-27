@@ -70,20 +70,30 @@ Owner asked for M3, then a snap first (2026-10-26). M2's live app checks stay op
   the language and Paste. Owner's request (2026-10-27, main-window-reply-draft.html note):
   both sit in the pane's header as in Quick replies, and the message takes that row
   (`switchingReplyKindsMovesNothing`).
-- The history list's scrollbar kept black edges: Breeze paints a scrollbar's margin black in
-  an item view, so the 2 px inset is padding now (checked in the Flatpak's own Breeze).
+- Black scrollbar tracks and edges, everywhere (owner report, 2026-10-27). Cause, from
+  Breeze's source: its scroll area event filter paints behind the scrollbars in the
+  viewport's colour, and the style sheet's "background: transparent" leaves an empty brush
+  there, whose colour is black. Breeze skips a scroll area with a style sheet of its own, so
+  MenuIconStyle gives each an empty one; the History-only patches are gone. Checked in the
+  Flatpak's Qt and Breeze: no black pixel in the window or History.
+- Splits where two boxes share a column (mocks approved, owner, 2026-10-27): Full reply's
+  message and "What do you want to say?", History's text and result (half each), and
+  Proofread's text and list of changes in the window (the list starts at its rows' height;
+  the popup keeps its fitted list). Each drag is kept (`splitsShareTheHeightWhereTwoBoxesStack`).
+- Owner checks on the Flatpak (2026-10-27): the Quick replies split, the grip on the main
+  split, the header spacing, Replace into a browser field and into Konsole, and a held
+  shortcut opening the popup once all work.
 - Desktop integration, lessons from dabri (github.com/AshBuk/dabri, a speech-to-text app with
   the same shortcut and paste-back problems; DOCS/platform-matrix.md):
   - Paste keys are Shift+Insert, the same on every keyboard layout (Ctrl+V needs a "v" key,
     which a Russian or Greek layout may lack); terminals get Ctrl+Shift+V, as Shift+Insert
-    pastes their selection there. Untested on a live Russian layout and in live terminals.
+    pastes their selection there. Owner checked a browser and Konsole; a Russian layout is
+    still untested.
   - A held shortcut opens once (GNOME repeats Activated, X11 the key press).
   - The tray turns up when the panel does, for a start at login before the panel.
   - Only a "no" to the typing dialog is kept; an error or no answer asks again.
   - A dead portal session is restarted and the keys sent once more, if none went through.
   - The unused clipboard save and restore is gone; the doc said the old clipboard came back.
-  - The history list's scrollbar had a black track: Breeze paints a transparent groove in
-    an item view black, so it now takes the pane's colour (also the language menu).
   - Inside a Flatpak the CLI waited forever: the D-Bus filter drops the daemon's answers to
     a client that owns no name under the app id; every client now owns one (DOCS/packaging.md 5b).
   - No keys for the snap's shortcut: a test run had left an entry `paraphrase_paraphrase`
