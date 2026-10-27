@@ -19,13 +19,14 @@ public:
     ~GripHandle() override = default;
 
 protected:
+    bool event(QEvent* event) override;
     void paintEvent(QPaintEvent* event) override;
-    void enterEvent(QEnterEvent* event) override;
-    void leaveEvent(QEvent* event) override;
     void mousePressEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
 
 private:
+    void setHovered(bool hovered);
+
     bool m_hovered = false;
     bool m_dragging = false;
 };

@@ -80,6 +80,11 @@ Owner asked for M3, then a snap first (2026-10-26). M2's live app checks stay op
   message and "What do you want to say?", History's text and result (half each), and
   Proofread's text and list of changes in the window (the list starts at its rows' height;
   the popup keeps its fitted list). Each drag is kept (`splitsShareTheHeightWhereTwoBoxesStack`).
+- The split grip showed only while dragging in the Flatpak (owner report, 2026-10-27): Breeze
+  puts a proxy over a hovered splitter handle (breezesplitterproxy.cpp), which takes the
+  pointer, so the handle got no Enter; it gets Breeze's HoverEnter and HoverLeave, which the
+  grip follows now. The "grabbing the mouse only for popup windows" line is that proxy
+  grabbing on a press under Wayland: a warning only, dragging works.
 - A line between the Settings sections and the page, the window's full height (mock approved,
   owner, 2026-10-27; `dividesTheSectionsFromThePage`).
 - Owner checks on the Flatpak (2026-10-27): the Quick replies split, the grip on the main

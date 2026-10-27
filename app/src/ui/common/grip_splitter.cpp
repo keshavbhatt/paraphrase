@@ -35,18 +35,32 @@ void GripHandle::paintEvent(QPaintEvent* /*event*/)
     painter.drawRoundedRect(grip, kGripThickness / 2.0, kGripThickness / 2.0);
 }
 
-void GripHandle::enterEvent(QEnterEvent* event)
+bool GripHandle::event(QEvent* event)
 {
-    m_hovered = true;
-    update();
-    QSplitterHandle::enterEvent(event);
+    // Breeze shows a proxy over a hovered splitter handle to widen its grip, which takes the
+    // pointer, so the handle gets no Enter or Leave: only Breeze's HoverEnter and, when the
+    // proxy goes, a HoverLeave (breezesplitterproxy.cpp). Either pair shows the grip.
+    switch (event->type()) {
+    case QEvent::Enter:
+    case QEvent::HoverEnter:
+        setHovered(true);
+        break;
+    case QEvent::Leave:
+    case QEvent::HoverLeave:
+        setHovered(false);
+        break;
+    default:
+        break;
+    }
+    return QSplitterHandle::event(event);
 }
 
-void GripHandle::leaveEvent(QEvent* event)
+void GripHandle::setHovered(bool hovered)
 {
-    m_hovered = false;
-    update();
-    QSplitterHandle::leaveEvent(event);
+    if (m_hovered != hovered) {
+        m_hovered = hovered;
+        update();
+    }
 }
 
 void GripHandle::mousePressEvent(QMouseEvent* event)

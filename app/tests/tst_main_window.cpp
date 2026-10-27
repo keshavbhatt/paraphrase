@@ -300,6 +300,22 @@ private Q_SLOTS:
         const auto* grip = qobject_cast<GripHandle*>(panes->handle(1));
         QVERIFY(grip != nullptr);
         QCOMPARE(grip->orientation(), Qt::Horizontal);
+        // Under Breeze a proxy takes the pointer over a handle, which then gets only Breeze's
+        // HoverEnter and HoverLeave: the grip follows those too.
+        QSplitterHandle* handle = reply->handle(1);
+        QTRY_VERIFY(!handle->isHidden() && handle->y() > 0);
+        const auto gripShown = [handle] {
+            const QImage shot = handle->grab().toImage();
+            return shot.pixelColor(shot.rect().center()) != shot.pixelColor(0, 0);
+        };
+        QVERIFY(!gripShown());
+        QHoverEvent enter(QEvent::HoverEnter, QPointF(5, 5), QPointF(5, 5), QPointF(-1, -1));
+        QApplication::sendEvent(handle, &enter);
+        QVERIFY(gripShown());
+        QHoverEvent leave(QEvent::HoverLeave, QPointF(-1, -1), QPointF(-1, -1), QPointF(5, 5));
+        QApplication::sendEvent(handle, &leave);
+        QVERIFY(!gripShown());
+
         panes->setOrientation(Qt::Vertical);         // what a narrow window does; the offscreen one
         QCOMPARE(grip->orientation(), Qt::Vertical); // cannot get that narrow
     }
