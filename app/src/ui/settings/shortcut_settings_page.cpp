@@ -12,6 +12,7 @@
 #include <QGridLayout>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QMouseEvent>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QStyle>
@@ -23,6 +24,23 @@ using namespace Qt::StringLiterals;
 
 namespace paraphrase::app {
 namespace {
+
+/// An option as a card: a click anywhere on it picks it, not only on the small circle.
+class OptionCard : public QFrame
+{
+public:
+    QRadioButton* radio = nullptr;
+
+protected:
+    void mouseReleaseEvent(QMouseEvent* event) override
+    {
+        if (event->button() == Qt::LeftButton && rect().contains(event->position().toPoint())) {
+            radio->setChecked(true);
+            radio->setFocus(Qt::MouseFocusReason);
+        }
+        QFrame::mouseReleaseEvent(event);
+    }
+};
 
 /// A card and its column: sub-layouts go in with addLayout, which gives their widgets a parent.
 std::pair<QFrame*, QVBoxLayout*> card()
@@ -83,13 +101,15 @@ QWidget* ShortcutSettingsPage::opensCard()
     const bool window = Preferences::shortcutOpensWindow();
     auto* group = new QButtonGroup(card);
     const auto option = [&](const QString& name, const QString& title, const QString& detail, bool on) {
-        auto* box = new QFrame;
+        auto* box = new OptionCard;
+        box->setCursor(Qt::PointingHandCursor);
         box->setProperty("role", u"opt"_s);
         box->setProperty("on", on);
         auto* row = new QHBoxLayout(box);
         row->setContentsMargins(14, 12, 14, 12);
         row->setSpacing(10);
         auto* radio = new QRadioButton;
+        box->radio = radio;
         radio->setObjectName(name);
         radio->setChecked(on);
         radio->setAccessibleName(title);
@@ -104,6 +124,9 @@ QWidget* ShortcutSettingsPage::opensCard()
         more->setWordWrap(true);
         text->addWidget(more);
         row->addLayout(text, 1);
+        // The labels pass clicks through to the card.
+        head->setAttribute(Qt::WA_TransparentForMouseEvents);
+        more->setAttribute(Qt::WA_TransparentForMouseEvents);
         connect(radio, &QRadioButton::toggled, box, [box](bool checked) {
             box->setProperty("on", checked);
             box->style()->unpolish(box);

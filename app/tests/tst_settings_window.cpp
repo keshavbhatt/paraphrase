@@ -364,6 +364,38 @@ private Q_SLOTS:
         QVERIFY(shown(u"changeKeys"_s) == nullptr);
     }
 
+    void picksAnOptionFromAClickAnywhereOnItsCard()
+    {
+        // Owner report (2026-10-27): only the small circle picked "The shortcut opens".
+        QVERIFY(m_daemon.start({}));
+        DaemonClient client;
+        QVERIFY(client.connectToDaemon().isEmpty());
+        SettingsWindow w(client);
+        w.show();
+        w.showPage(SettingsWindow::Shortcut);
+        QCoreApplication::processEvents();
+        auto* toWindow = w.findChild<QAbstractButton*>(u"opensWindow"_s);
+        auto* toPopup = w.findChild<QAbstractButton*>(u"opensPopup"_s);
+        QVERIFY(toWindow != nullptr && toPopup != nullptr);
+        const bool before = paraphrase::app::Preferences::shortcutOpensWindow();
+        // On the card's text: the labels let the click through to the card.
+        const auto clickText = [](QAbstractButton* radio) {
+            QWidget* box = radio->parentWidget();
+            const auto labels = box->findChildren<QLabel*>();
+            QVERIFY(!labels.isEmpty());
+            const QLabel* detail = labels.last();
+            QVERIFY(detail->testAttribute(Qt::WA_TransparentForMouseEvents));
+            QTest::mouseClick(box, Qt::LeftButton, {}, detail->geometry().center());
+        };
+        clickText(toWindow);
+        QVERIFY(toWindow->isChecked());
+        QVERIFY(paraphrase::app::Preferences::shortcutOpensWindow());
+        clickText(toPopup);
+        QVERIFY(toPopup->isChecked());
+        QVERIFY(!paraphrase::app::Preferences::shortcutOpensWindow());
+        paraphrase::app::Preferences::setShortcutOpensWindow(before);
+    }
+
     void pagesFitTheWindowAtItsOpeningSize()
     {
         // Wider than its column, a page was cut off at the right under the scroll bar.

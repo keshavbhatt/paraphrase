@@ -245,6 +245,11 @@ void TextResultView::render()
                 .arg(diffHtml(diff)));
     }
     m_changes->setDiff(&diff, m_undone);
+    // Result is the corrected text alone, over the whole height; the list with Undo belongs to
+    // Changes (main-window.html, approved 2026-10-27).
+    if (m_showResult) {
+        m_changes->hide();
+    }
 }
 
 QString TextResultView::diffHtml(const client::WordDiff& diff) const

@@ -164,6 +164,14 @@ private Q_SLOTS:
         std::ranges::sort(undos, {}, [](const QPushButton* b) { return b->objectName().mid(4).toInt(); });
         undos.front()->click();
         QCOMPARE(w.resultText(), u"Whisk the egg's with the milk."_s);
+        // Result: the corrected text alone, the undo kept, no list (approved 2026-10-27).
+        w.findChild<QAbstractButton*>(u"showResult"_s)->click();
+        QApplication::processEvents();
+        QVERIFY(!changes->isVisible());
+        QCOMPARE(w.findChild<QTextBrowser*>(u"output"_s)->toPlainText(), u"Whisk the egg's with the milk."_s);
+        w.findChild<QAbstractButton*>(u"showChanges"_s)->click();
+        QApplication::processEvents();
+        QVERIFY(changes->isVisible());
         w.copyResult();
         QCOMPARE(QApplication::clipboard()->text(), u"Whisk the egg's with the milk."_s);
     }

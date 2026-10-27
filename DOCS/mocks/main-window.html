@@ -89,6 +89,25 @@
   <span class="pin" style="left: 588px; top: 470px">5</span>
   <span class="pin" style="left: 8px; top: 668px">6</span>
 </div>
+<section class="states" aria-label="Proofread, the Result tab" style="max-width: 640px; margin: 0 auto 32px; padding: 0 16px; display: flex; flex-direction: column; gap: 10px">
+  <h2>Proofread, the Result tab</h2>
+  <section class="pane" aria-labelledby="out-h2">
+    <div class="ph">
+      <h2 id="out-h2" class="cap" style="font-size: 11px">Proofread</h2><span class="small muted">· 4 changes · kept in English</span><span class="grow"></span>
+      <span class="seg" role="group" aria-label="View"><span>Changes</span><span class="on">Result</span></span>
+    </div>
+    <div class="pb" style="min-height: 420px">Pancakes (serves 4)
+1. Mix the flour, sugar and a pinch of salt in a large bowl.
+2. Whisk the eggs with the milk and add it slowly to the dry ingredients.
+3. Let the batter rest for 10 minutes.
+4. Cook on a medium heat until bubbles appear on the surface.</div>
+    <div class="pf">
+      <button class="btn big primary"><svg class="ic s"><use href="#i-copy"/></svg>Copy result <span class="num">Ctrl Shift C</span></button>
+      <button class="btn big">Use as my text</button>
+      <button class="btn big"><svg class="ic s"><use href="#i-refresh"/></svg>Retry</button>
+    </div>
+  </section>
+</section>
 <section class="notes"><h2>Notes</h2><ol>
   <li><b>Standalone first</b> (ADR-013, PLAN D14): this window needs nothing from the desktop but a window and the clipboard while it has focus, so it works in every package format and session. The notice appears only when an integration is missing, names the missing piece in plain words, and can be hidden; it never blocks anything.</li>
   <li><b>The same actions as the popup</b>, the same skills: Ctrl+1 to Ctrl+7 pick one. Tone, Format, Translate and My actions open a short menu of their presets. Running an action on new text replaces the result; the text on the left is never changed by the app.</li>
@@ -96,5 +115,6 @@
   <li><b>The result</b> streams in as the model writes. For Proofread it is the word diff with one line per change and Undo, as in the popup (PLAN D6); for Tone it shows versions and the facts kept; for Reply see the reply mock.</li>
   <li><b>Copy result</b> is the main action here (the popup's is Replace). "Use as my text" moves the result to the left so the user can run another action on it, for example Proofread then Tone. Nothing is ever typed into another app from this window.</li>
   <li><b>Status line</b>: which model answers and the memory it takes; the daemon starts when this window needs it and stops after a quiet period (ADR-010). Narrow windows stack the two panes.</li>
+  <li><b>Result tab (approved 2026-10-27)</b>: only the corrected text, using the whole height of the pane, so it can be read in one go. The list of changes with Undo is on the Changes tab only; an Undo made there shows in Result. The popup's Result does the same.</li>
 </ol></section>
 </body></html>

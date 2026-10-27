@@ -50,6 +50,14 @@ Owner asked for M3, then a snap first (2026-10-26). M2's live app checks stay op
     another app). Mocks approved (owner, 2026-10-27): "No keys" with Choose keys, and Change
     keys next to set keys; both open the desktop's own window (ConfigureShortcuts). Setup
     and Settings now follow the desktop live instead of what they read at startup.
+  - Proofread's Result tab kept the list of changes under the text, so a long result had
+    little room. Mock approved (owner, 2026-10-27, main-window.html): Result shows the
+    corrected text alone at full height; the list with Undo is on Changes only. Window and
+    popup.
+  - "The shortcut opens" in Settings picked an option only from its small circle; the whole
+    card picks it now (`picksAnOptionFromAClickAnywhereOnItsCard`).
+  - No keys for the snap's shortcut: a test run had left an entry `paraphrase_paraphrase`
+    holding Ctrl+Alt+Space; removed.
 - The snap workflow now publishes to the Snap Store as Omnidict's does (owner): main to edge,
   version tags to stable, nothing kept on GitHub. It needs the store name and credentials
   from the owner first (DOCS/packaging.md, 5a); until then it only builds.
