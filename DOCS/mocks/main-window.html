@@ -70,7 +70,8 @@
 2. Whisk the <del class="d">egg's</del> <ins class="d">eggs</ins> with the milk and add it slowly to the dry ingredients<ins class="d">.</ins>
 3. Let the batter rest for 10 <del class="d">minute</del> <ins class="d">minutes</ins>.
 4. Cook on a medium heat until bubbles <del class="d">appears</del> <ins class="d">appear</ins> on the surface.</div>
-        <div class="changes small">
+        <div class="vsplit" role="separator" aria-orientation="horizontal" aria-label="Resize the text and the list of changes" data-min-before="120" data-min-after="66"></div>
+        <div class="changes small" style="overflow: auto">
           <div class="row"><del class="d mono">egg's</del><svg class="ic s muted"><use href="#i-forward"/></svg><ins class="d mono">eggs</ins><span class="muted">plural, not possessive</span><span class="grow"></span><button class="btn flat" style="min-height: 28px; color: var(--link)">Undo</button></div>
           <div class="row"><span class="pill mono">end</span><svg class="ic s muted"><use href="#i-forward"/></svg><ins class="d mono">.</ins><span class="muted">full stop</span><span class="grow"></span><button class="btn flat" style="min-height: 28px; color: var(--link)">Undo</button></div>
           <div class="row"><del class="d mono">minute</del><svg class="ic s muted"><use href="#i-forward"/></svg><ins class="d mono">minutes</ins><span class="muted">plural</span><span class="grow"></span><button class="btn flat" style="min-height: 28px; color: var(--link)">Undo</button></div>
@@ -96,6 +97,7 @@
   <span class="pin" style="left: 588px; top: 470px">5</span>
   <span class="pin" style="left: 8px; top: 668px">6</span>
   <span class="pin" style="left: 578px; top: 400px">7</span>
+  <span class="pin" style="left: 1160px; top: 560px">8</span>
 </div>
 <section class="states" aria-label="Proofread, the Result tab" style="max-width: 640px; margin: 0 auto 32px; padding: 0 16px; display: flex; flex-direction: column; gap: 10px">
   <h2>Proofread, the Result tab</h2>
@@ -125,6 +127,7 @@
   <li><b>Status line</b>: which model answers and the memory it takes; the daemon starts when this window needs it and stops after a quiet period (ADR-010). Narrow windows stack the two panes.</li>
   <li><b>Result tab (approved 2026-10-27)</b>: only the corrected text, using the whole height of the pane, so it can be read in one go. The list of changes with Undo is on the Changes tab only; an Undo made there shows in Result. The popup's Result does the same.</li>
   <li><b>The split between the panes (approved 2026-10-27)</b>: drag it to make either pane wider. While the pointer is over it, or drags it, a short grip shows, as on the split in Reply; otherwise it is invisible. When the panes stack in a narrow window the grip turns across.</li>
+  <li><b>A split on Changes (proposed 2026-10-27)</b> between the marked-up text and the list of changes: the list starts at the height its rows need (as now, up to 220px), and dragging the split gives the list more room for a text with many changes, or the text more. No line until the pointer is over it; the list keeps at least two rows; the place is kept. The popup keeps its fitted list, as it sizes itself to its content.</li>
 </ol></section>
 <script>
 (() => {

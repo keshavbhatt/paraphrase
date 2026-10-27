@@ -151,3 +151,11 @@ body.clean .pin, body.clean .notes { display: none; }
    (approved 2026-10-27). */
 .mwhead .btn.flat { padding: 0 10px; }
 .mwhead .btn.flat + .btn.flat { margin-left: -6px; }
+
+/* A split inside a pane (main-window-reply.html note 5): an invisible band between two boxes
+   with a short grip on hover and a row-resize cursor. Drag it to share the height; neither
+   side goes below its data-min-before / data-min-after (mock.js). The box after it keeps the
+   height dragged to; the box before it takes the rest. */
+.vsplit { flex: none; height: 10px; margin: -5px 0; cursor: row-resize; display: grid; place-items: center; position: relative; z-index: 1; }
+.vsplit::after { content: ""; width: 36px; height: 3px; border-radius: 2px; background: var(--border); opacity: 0; transition: opacity .12s; }
+.vsplit:hover::after, .vsplit.drag::after { opacity: 1; }

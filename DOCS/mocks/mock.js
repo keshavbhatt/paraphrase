@@ -84,5 +84,25 @@
     if (q.get('notes') === '0') document.body.classList.add('clean');
     tb.querySelector('#rv-notes').onclick = () => document.body.classList.toggle('clean');
     if (q.get('review') === '0') tb.remove();
+
+    // .vsplit: drag to share the height of the boxes before and after it (mock.css).
+    for (const split of document.querySelectorAll('.vsplit')) {
+      const before = split.previousElementSibling, after = split.nextElementSibling;
+      const minBefore = +(split.dataset.minBefore || 60), minAfter = +(split.dataset.minAfter || 60);
+      split.addEventListener('pointerdown', (e) => {
+        split.setPointerCapture(e.pointerId);
+        split.classList.add('drag');
+        const y0 = e.clientY, h0 = after.offsetHeight, room = h0 + before.offsetHeight;
+        before.style.flex = '1 1 0';
+        before.style.minHeight = '0';
+        const move = (ev) => {
+          const h = Math.max(minAfter, Math.min(room - minBefore, h0 - (ev.clientY - y0)));
+          after.style.flex = `0 0 ${h}px`;
+        };
+        const up = () => { split.classList.remove('drag'); split.removeEventListener('pointermove', move); };
+        split.addEventListener('pointermove', move);
+        split.addEventListener('pointerup', up, { once: true });
+      });
+    }
   });
 })();

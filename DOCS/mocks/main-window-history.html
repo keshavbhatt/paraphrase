@@ -74,10 +74,15 @@
         <div class="ph"><h2 class="cap" style="font-size: 11px">Tone · Elaborate</h2><span class="small muted">· into Hindi · from KWrite · today 22:08</span><span class="grow"></span>
           <button class="btn flat icon" aria-label="Delete this entry"><svg class="ic s"><use href="#i-trash"/></svg></button></div>
         <div class="pb">
-          <span class="cap">Your text</span>
-          <div class="box" style="background: var(--sunk); border-color: transparent">Are you free for dinner on Friday? Mia and I were thinking of trying the new Thai place near the station.</div>
-          <span class="cap">Result</span>
-          <div class="box">क्या आप शुक्रवार को रात के खाने के लिए उपलब्ध हैं? मैं और Mia स्टेशन के पास उस नए थाई रेस्तरां को आज़माने के बारे में सोच रहे थे।</div>
+          <div style="flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; gap: 10px">
+            <span class="cap">Your text</span>
+            <div class="box" style="flex: 1; overflow: auto; background: var(--sunk); border-color: transparent">Are you free for dinner on Friday? Mia and I were thinking of trying the new Thai place near the station.</div>
+          </div>
+          <div class="vsplit" role="separator" aria-orientation="horizontal" aria-label="Resize your text and the result" data-min-before="90" data-min-after="90"></div>
+          <div style="flex: 1 1 0; min-height: 0; display: flex; flex-direction: column; gap: 10px">
+            <span class="cap">Result</span>
+            <div class="box" style="flex: 1; overflow: auto">क्या आप शुक्रवार को रात के खाने के लिए उपलब्ध हैं? मैं और Mia स्टेशन के पास उस नए थाई रेस्तरां को आज़माने के बारे में सोच रहे थे।</div>
+          </div>
         </div>
         <div class="pf">
           <button class="btn big primary"><svg class="ic s"><use href="#i-copy"/></svg>Copy result <span class="num">Ctrl Shift C</span></button>
@@ -128,5 +133,6 @@
   <li><b>Where it lives</b> is always said at the bottom, with a way to the privacy settings (settings-privacy.html).</li>
   <li><b>Off</b>: the History button still shows, and says plainly that nothing is kept, with a way to turn it on (which opens the privacy settings with the switch).</li>
   <li><b>Header buttons (approved 2026-10-27)</b>: History and Settings have 10px padding and sit 4px apart, so "On this device", History and Settings are evenly spaced (about 24px between words) when no button shows its background; the open or hovered one still shows its full background.</li>
+  <li><b>A split (proposed 2026-10-27)</b> between "Your text" and "Result": they share the height evenly, and dragging the split gives either more, for a long text or a long result. No line until the pointer is over it; each keeps at least 2 lines; the place is kept.</li>
 </ol></section>
 </body></html>

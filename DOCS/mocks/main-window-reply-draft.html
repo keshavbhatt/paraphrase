@@ -46,14 +46,17 @@
         </div>
         <div class="pb">
           <div class="row"><span class="small muted grow">The email or chat you are answering</span><span class="pill">English</span><button class="btn flat">Paste</button></div>
-          <textarea id="msg" class="field" rows="7">Hi Priya,
+          <textarea id="msg" class="field" rows="7" style="flex: 1; resize: none">Hi Priya,
 
 Thanks for sending the Q3 vendor report. Could we get on a call this Thursday at 3 pm to go through the delivery delays? I'd also like the updated cost sheet before then, if possible.
 
 Best,
 Daniel</textarea>
-          <label for="intent" class="small muted">What do you want to say?</label>
-          <textarea id="intent" class="field" rows="2" placeholder="For example: yes, but Friday morning works better">Thursday doesn't work, offer Friday 11 am. Cost sheet by Wednesday.</textarea>
+          <div class="vsplit" role="separator" aria-orientation="horizontal" aria-label="Resize the message and what you want to say" data-min-before="94" data-min-after="104"></div>
+          <div style="flex: 0 0 104px; display: flex; flex-direction: column; gap: 6px">
+            <label for="intent" class="small muted">What do you want to say?</label>
+            <textarea id="intent" class="field" rows="2" style="flex: 1; resize: none" placeholder="For example: yes, but Friday morning works better">Thursday doesn't work, offer Friday 11 am. Cost sheet by Wednesday.</textarea>
+          </div>
           <div class="opts">
             <span class="small muted">Write it as</span>
             <span class="seg" role="group" aria-label="Write it as"><span class="on">Email</span><span>Chat message</span></span>
@@ -96,6 +99,7 @@ Priya</div>
   <span class="pin" style="left: 8px; top: 560px">4</span>
   <span class="pin" style="left: 588px; top: 260px">5</span>
   <span class="pin" style="left: 588px; top: 640px">6</span>
+  <span class="pin" style="left: 8px; top: 470px">7</span>
 </div>
 <section class="notes"><h2>Notes</h2><ol>
   <li><b>Two kinds of reply</b> (PLAN 3, <code>reply.draft</code>): "Quick replies" is the approved screen (three short replies to pick from, main-window-reply.html), "Full reply" writes one complete reply. The switch sits in the left pane on both screens; the choice is remembered.</li>
@@ -104,5 +108,6 @@ Priya</div>
   <li><b>Write it as</b>: Email (greeting, paragraphs, sign-off with the name the message was addressed to) or Chat message (one short paragraph, no greeting or sign-off). Tone uses the same presets as the Tone action. Both choices are remembered.</li>
   <li><b>One editable draft</b>, streamed as it is written. "Another version" keeps the earlier ones (‹ ›). Names, dates, times and amounts come only from the message and the intent; the reply never claims to attach or include something that is not in it.</li>
   <li><b>Copy reply</b> copies the draft as edited; nothing is sent from this window. "Shorter" rewrites the draft with the Concise tone. Full replies run on the quality model when it is installed (status line), quick replies on the fast one.</li>
+  <li><b>A split (proposed 2026-10-27)</b> between the message and "What do you want to say?", as in Quick replies: drag it to make either box taller, for a long message or a long note of your own. No line until the pointer is over it; the message keeps at least 3 lines and your note 2; the place is kept for the next start.</li>
 </ol></section>
 </body></html>
