@@ -1,6 +1,7 @@
 #include "ui/main/main_window.h"
 
 #include "history/history_keeper.h"
+#include "ui/common/grip_splitter.h"
 #include "ui/common/menu_icons.h"
 #include "ui/core/facts_check.h"
 #include "ui/core/languages.h"
@@ -78,7 +79,8 @@ void MainWindow::buildUi()
     m_input = new InputPane(m_detector);
     m_output = new OutputPane;
     m_status = new StatusBar;
-    m_panes = new QSplitter(Qt::Horizontal);
+    m_panes = new GripSplitter(Qt::Horizontal); // a grip on hover (main-window.html, note 7)
+    m_panes->setObjectName(u"panes"_s);
     m_panes->setChildrenCollapsible(false);
     m_panes->setHandleWidth(14);
     m_panes->addWidget(m_input);

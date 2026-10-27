@@ -8,6 +8,7 @@
 #include "daemon_client.h"
 #include "fake_secrets.h"
 #include "ui/common/chip_button.h"
+#include "ui/common/grip_splitter.h"
 #include "ui/common/menu_icons.h"
 #include "ui/main/history_view.h"
 #include "ui/main/main_window.h"
@@ -277,6 +278,29 @@ private Q_SLOTS:
         w.show();
         QVERIFY(QTest::qWaitForWindowExposed(&w));
         QTRY_VERIFY(w.findChild<QTextEdit*>(u"draft"_s)->height() > 70);
+    }
+
+    void bothSplitsShowAGripThatTurnsWithThePanes()
+    {
+        // main-window.html note 7, main-window-reply.html note 5: grip handles, across when
+        // the panes stack in a narrow window.
+        using paraphrase::app::GripHandle;
+        startDaemon({u"fast-model"_s});
+        MainWindow w;
+        w.resize(1200, 760);
+        w.start();
+        w.selectSkill(u"reply"_s);
+        w.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&w));
+        auto* panes = w.findChild<QSplitter*>(u"panes"_s);
+        const auto* reply = w.findChild<QSplitter*>(u"replySplit"_s);
+        QVERIFY(panes != nullptr && reply != nullptr);
+        QVERIFY(qobject_cast<GripHandle*>(reply->handle(1)) != nullptr);
+        const auto* grip = qobject_cast<GripHandle*>(panes->handle(1));
+        QVERIFY(grip != nullptr);
+        QCOMPARE(grip->orientation(), Qt::Horizontal);
+        panes->setOrientation(Qt::Vertical);         // what a narrow window does; the offscreen one
+        QCOMPARE(grip->orientation(), Qt::Vertical); // cannot get that narrow
     }
 
     void runsAToneFromTheMenu()

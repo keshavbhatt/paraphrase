@@ -60,6 +60,8 @@ Owner asked for M3, then a snap first (2026-10-26). M2's live app checks stay op
     (owner, 2026-10-27, main-window-reply.html): the message takes the pane's height, and a
     split (grip on hover) between it and the reply so far makes either taller; its place is
     kept (`replyMessageFillsThePaneAndTheSplitResizesIt`).
+  - The split between the main panes now shows the same grip on hover (mock approved, owner,
+    2026-10-27, main-window.html note 7), across when the panes stack.
   - The history list's scrollbar had a black track: Breeze paints a transparent groove in
     an item view black, so it now takes the pane's colour (also the language menu).
   - Inside a Flatpak the CLI waited forever: the D-Bus filter drops the daemon's answers to
