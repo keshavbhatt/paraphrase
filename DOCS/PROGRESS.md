@@ -84,7 +84,8 @@ Owner asked for M3, then a snap first (2026-10-26). M2's live app checks stay op
   puts a proxy over a hovered splitter handle (breezesplitterproxy.cpp), which takes the
   pointer, so the handle got no Enter; it gets Breeze's HoverEnter and HoverLeave, which the
   grip follows now. The "grabbing the mouse only for popup windows" line is that proxy
-  grabbing on a press under Wayland: a warning only, dragging works.
+  grabbing on a press under Wayland: a warning only, dragging works. Owner checked the grip
+  on hover and the Settings line on the Flatpak (2026-10-27).
 - A line between the Settings sections and the page, the window's full height (mock approved,
   owner, 2026-10-27; `dividesTheSectionsFromThePage`).
 - Owner checks on the Flatpak (2026-10-27): the Quick replies split, the grip on the main
