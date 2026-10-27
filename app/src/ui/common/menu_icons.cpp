@@ -1,6 +1,7 @@
 #include "ui/common/menu_icons.h"
 
 #include <QAbstractItemView>
+#include <QAbstractScrollArea>
 #include <QComboBox>
 #include <QCoreApplication>
 #include <QHash>
@@ -193,6 +194,13 @@ void MenuIconStyle::polish(QWidget* widget)
     if (popup != nullptr && !popup->testAttribute(Qt::WA_TranslucentBackground)) {
         popup->setAttribute(Qt::WA_TranslucentBackground);
         popup->setWindowFlags(popup->windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
+    }
+    // Breeze paints behind a scroll area's scrollbars in its viewport's colour, which the
+    // style sheet's "background: transparent" leaves as an empty brush, whose colour is black:
+    // a black track and edges on every scrollbar (owner report, 2026-10-27). Breeze leaves a
+    // scroll area with a style sheet of its own alone, so each gets an empty one.
+    if (qobject_cast<QAbstractScrollArea*>(widget) != nullptr && widget->styleSheet().isEmpty()) {
+        widget->setStyleSheet(u"/* its own, so Breeze leaves it alone */"_s);
     }
     QProxyStyle::polish(widget);
 }
