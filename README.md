@@ -1,14 +1,56 @@
-# Paraphrase
+# Paraphrase - Offline AI Writing Assistant for Linux
 
-A fast, private writing assistant for the Linux desktop that runs a local language model:
-proofread, change tone, smart replies, summarize and translate in any app, with nothing
-leaving the machine.
+![Paraphrase: write better, nothing leaves your computer](screenshots/banner.png)
+
+Paraphrase fixes, rewrites, answers, summarizes and translates your writing with a language
+model that runs on your own computer. Select text in any app, press a shortcut, and put the
+result back where the text was, or use its window. No account, no internet once the model is
+downloaded, and nothing you write leaves the machine.
+
+<p>
+  <a href="https://snapcraft.io/paraphrase"><img height="56" alt="Get it from the Snap Store" src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg"></a>
+</p>
+
+## Features
+
+- **Proofread**: spelling, grammar and punctuation, with every change shown and an Undo for each
+- **Tone**: professional, polite, friendly, concise and more, keeping names, dates and numbers
+- **Reply**: three quick replies, or a full email or chat reply from a few words of yours
+- **Summarize** long emails and documents, and **Format** text as bullets, a table or an email
+- **Translate** into English, Hindi, Hinglish and 20 more languages
+- **Write** an email, a note or a post from a short description
+- **My actions**: your own instructions, saved as actions of their own
+- **Over any app**: a global shortcut opens a popup on the selected text and puts the result
+  back (KDE Plasma; GNOME is in progress); the window works on every desktop
+- **Private**: open models (Gemma 4) run locally; history is off unless you turn it on, and
+  then encrypted with a key kept in your keyring
+
+## Screenshots
+
+![Fix your writing on your own computer](screenshots/00-proofread.png)
+![Over any app](screenshots/01-popup.png)
+![Say it the right way](screenshots/02-tone.png)
+![Replies, written for you](screenshots/03-reply.png)
+![Translate, Hindi and Hinglish included](screenshots/04-translate.png)
+![The point of a long message](screenshots/05-summarize.png)
+![Runs on your computer](screenshots/06-models.png)
+
+## Install
+
+```sh
+sudo snap install paraphrase --edge
+```
+
+The first run downloads a model and checks it: Gemma 4 E2B (3.4 GB), or E4B (5.2 GB) for
+better quality. Paraphrase is in development: the edge channel follows the main branch.
+
+# Development
 
 ## Status
 
-M0 (feasibility) is done: Gemma 4 E2B and E4B, see `DOCS/models.md`. M1 (the daemon and the
-CLI) is in progress: the CLI proofreads, rewrites and replies. See `DOCS/PLAN.md` for the plan and `DOCS/PROGRESS.md` for where things
-stand; code follows `DOCS/CODING_STANDARDS.md`.
+M0 (feasibility) and M1 (the daemon and the CLI) are done. M2 (the window and the popup)
+is built, with live desktop checks left; M3 (settings, packaging, GNOME) is in progress. See `DOCS/PLAN.md` for the plan and `DOCS/PROGRESS.md` for
+where things stand; code follows `DOCS/CODING_STANDARDS.md`.
 
 ## Layout
 
@@ -19,7 +61,8 @@ cli/           paraphrase, the command-line client (D-Bus, DOCS/api.md)
 third_party/   llama.cpp (git submodule, pinned)
 skills/        skill YAML files and GBNF grammars
 eval/          Python eval harness, latency bench and datasets (offline tooling, never shipped)
-scripts/       build and model download scripts
+scripts/       build, model download and screenshot scripts
+screenshots/   the README's screenshots and banner (scripts/screenshots.sh)
 models.json    model catalog: pinned upstream revisions, sha256, licences
 ```
 
@@ -85,5 +128,7 @@ result per line with its `line` number; a line that is not valid JSON gets
 
 The CLI starts `paraphrase-daemon` when it is not running, or runs it privately when there is
 no session bus. Answers stream into a terminal; a pipe gets the finished answer only.
+
+`scripts/screenshots.sh` remakes the images in `screenshots/` with the real models.
 
 Licence: see `LICENSING.md`.

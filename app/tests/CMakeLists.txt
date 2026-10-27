@@ -30,5 +30,9 @@ paraphrase_add_test(tst_facts_check tst_facts_check.cpp paraphrase_ui)
 # Every action with the real models, by hand only (PARAPHRASE_TEST_REAL=1); it skips otherwise.
 paraphrase_add_test(tst_real_models tst_real_models.cpp paraphrase_popup)
 
+# The README's screenshots with the real models, by hand only (scripts/screenshots.sh); it
+# skips otherwise.
+paraphrase_add_test(tst_screenshots tst_screenshots.cpp paraphrase_popup paraphrase_ui paraphrase_api)
+
 # The opt-in history: sealing, the wrong-key guard and delete all, with a fake keyring.
 paraphrase_add_test(tst_history tst_history.cpp paraphrase_history)
