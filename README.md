@@ -9,6 +9,7 @@ downloaded, and nothing you write leaves the machine.
 
 <p>
   <a href="https://snapcraft.io/paraphrase"><img height="56" alt="Get it from the Snap Store" src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg"></a>
+  <a href="https://aur.archlinux.org/packages/paraphrase-git"><img height="56" alt="Get it from the AUR" src="screenshots/badge-aur.svg"></a>
 </p>
 
 ## Features
@@ -37,12 +38,22 @@ downloaded, and nothing you write leaves the machine.
 
 ## Install
 
+Any Linux distribution, from the Snap Store:
+
 ```sh
 sudo snap install paraphrase --edge
 ```
 
+Arch Linux, from the AUR ([paraphrase-git](https://aur.archlinux.org/packages/paraphrase-git)),
+built on your computer from the main branch:
+
+```sh
+yay -S paraphrase-git
+```
+
 The first run downloads a model and checks it: Gemma 4 E2B (3.4 GB), or E4B (5.2 GB) for
-better quality. Paraphrase is in development: the edge channel follows the main branch.
+better quality. Paraphrase is in development: the edge channel and the AUR package follow
+the main branch.
 
 # Development
 

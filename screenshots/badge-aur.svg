@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="270" height="56" viewBox="0 0 270 56" role="img" aria-label="Get it from the AUR">
+  <title>Get it from the AUR</title>
+  <!-- The Snap Store badge's frame (README): #252525, a #CDCDCD edge, 2px corners; two lines
+       of text, the second one large. -->
+  <rect x="0.5" y="0.5" width="269" height="55" rx="2" fill="#252525" stroke="#CDCDCD"/>
+  <!-- A package: a box seen from above, in white lines. -->
+  <g fill="none" stroke="#fff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M25 12 L39 19 L39 36 L25 43 L11 36 L11 19 Z"/>
+    <path d="M11 19 L25 26 L39 19"/>
+    <path d="M25 26 L25 43"/>
+    <path d="M18 15.5 L32 22.5"/>
+  </g>
+  <g fill="#fff" font-family="Ubuntu, 'Segoe UI', Inter, 'Noto Sans', Helvetica, Arial, sans-serif">
+    <text x="51" y="20" font-size="12.5">Get it from the</text>
+    <text x="50" y="43" font-size="20">Arch User Repository</text>
+  </g>
+</svg>
