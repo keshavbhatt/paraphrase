@@ -145,3 +145,9 @@ body.clean .pin, body.clean .notes { display: none; }
 #review { position: fixed; right: 12px; bottom: 12px; z-index: 100; display: flex; gap: 8px; align-items: center; background: var(--elevated); border: 1px solid var(--border); border-radius: 10px; padding: 6px 8px; box-shadow: var(--shadow); font-size: 12px; }
 #review .name { color: var(--muted); }
 #review button, #review select { font: inherit; background: var(--panel); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 3px 8px; }
+
+/* The main window's header buttons (History, Settings): 10px padding and 4px between them, so
+   the words in the header stay evenly spaced (about 24px) when no button shows its background
+   (proposed 2026-10-27). */
+.mwhead .btn.flat { padding: 0 10px; }
+.mwhead .btn.flat + .btn.flat { margin-left: -6px; }
