@@ -2,12 +2,12 @@
 Type=Application
 Name=Paraphrase
 GenericName=Offline AI Writing Assistant
-Comment=Proofread, change tone and write replies with AI that runs on this computer
+Comment=Offline AI grammar checker
 Exec=paraphrase-app
 Icon=com.ktechpit.paraphrase
 Terminal=false
 Categories=Utility;TextTools;
-Keywords=grammar;spelling;proofread;rewrite;paraphrase;tone;reply;email;summarize;translate;writing;assistant;AI;offline;
+Keywords=grammar;spelling;spell;proofread;rewrite;paraphrase;tone;reply;email;summarize;summary;translate;Hindi;Hinglish;writing;assistant;AI;LLM;offline;
 StartupNotify=true
 SingleMainWindow=true
 Actions=popup;

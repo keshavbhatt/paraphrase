@@ -31,6 +31,8 @@ public:
 
     /// The script KWin runs: reports activations to `service` (this process's bus name).
     [[nodiscard]] static QString script(const QString& service);
+    /// Where the script goes: a folder KWin can read. Empty when there is none.
+    [[nodiscard]] static QString scriptPath();
 
 public Q_SLOTS:
     /// Called by the KWin script.

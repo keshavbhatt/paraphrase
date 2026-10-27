@@ -3,10 +3,12 @@
 
 #include "integration/clipboard_backends.h"
 #include "integration/integrations.h"
+#include "integration/kwin_window_tracker.h"
 #include "integration/launch_command.h"
 
 #include <QClipboard>
 #include <QGuiApplication>
+#include <QTemporaryDir>
 #include <QTest>
 
 using namespace Qt::StringLiterals;
@@ -69,6 +71,13 @@ private Q_SLOTS:
         qunsetenv("SNAP_NAME");
         qputenv("FLATPAK_ID", "com.ktechpit.paraphrase");
         QCOMPARE(launchLine({u"--hidden"_s}), u"flatpak run com.ktechpit.paraphrase --hidden"_s);
+        // KWin reads the window tracker's script from the one runtime folder the host shares.
+        const QTemporaryDir runtime;
+        const QByteArray realRuntime = qgetenv("XDG_RUNTIME_DIR");
+        qputenv("XDG_RUNTIME_DIR", runtime.path().toUtf8());
+        QCOMPARE(paraphrase::app::KWinWindowTracker::scriptPath(),
+                 runtime.path() + u"/app/com.ktechpit.paraphrase/paraphrase-window-tracker.js"_s);
+        qputenv("XDG_RUNTIME_DIR", realRuntime);
         qunsetenv("FLATPAK_ID");
         qputenv("APPIMAGE", "/home/a b/Paraphrase.AppImage");
         QCOMPARE(launchLine({u"--popup"_s}), u"\"/home/a b/Paraphrase.AppImage\" --popup"_s);

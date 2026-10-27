@@ -1,0 +1,58 @@
+# Flatpak manifest, the base for the Flathub repository (DOCS/packaging.md, 5b). Local test:
+# scripts/build-flatpak.sh. The KDE runtime has what the build needs: Qt 6.11 (Widgets, DBus,
+# Network, Svg, Sql with SQLite), OpenSSL's libcrypto and the Wayland protocols. llama.cpp
+# comes from the git submodule, built for every CPU level, the best one picked at run time.
+app-id: com.ktechpit.paraphrase
+runtime: org.kde.Platform
+runtime-version: '6.11'
+sdk: org.kde.Sdk
+command: paraphrase-app
+finish-args:
+  # model downloads only: Paraphrase never sends text anywhere (DOCS/PLAN.md)
+  - --share=network
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --device=dri
+  # the tray icon: StatusNotifierItem, as KDE and the AppIndicator extension read it
+  - --talk-name=org.kde.StatusNotifierWatcher
+  # KDE: a KWin script reports the active window, so a result is pasted only into the window
+  # its text came from (DOCS/platform-matrix.md). The script lives in the runtime folder the
+  # host shares with the app ($XDG_RUNTIME_DIR/app/com.ktechpit.paraphrase).
+  - --talk-name=org.kde.KWin
+  # The daemon and the app own com.ktechpit.paraphrase.Daemon, .App and .WindowTracker: names
+  # under the app id need no permission. The shortcut, typing, Secret and Background portals
+  # need none either.
+
+cleanup:
+  - /include
+  - /lib/cmake
+  - /lib/pkgconfig
+  - /share/man
+  - /share/doc
+  - /bin/libggml-cpu-*.so # ggml's own copy; the daemon loads lib/paraphrase/ggml
+
+modules:
+  - name: paraphrase
+    buildsystem: cmake-ninja
+    builddir: true
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=Release
+      - -DPARAPHRASE_BUILD_TESTS=OFF
+      - -DPARAPHRASE_PORTABLE_CPU=ON
+    sources:
+      # The Flathub copy replaces this with the release tag (submodules come with it):
+      #   - type: git
+      #     url: https://github.com/keshavbhatt/paraphrase.git
+      #     tag: v<version>
+      #     commit: <sha>
+      - type: dir
+        path: ../..
+        skip:
+          - models # downloaded models, many GB, never part of a build
+          - build
+          - .flatpak-builder
+          - .venv
+          - .git
+          - eval
+          - screenshots

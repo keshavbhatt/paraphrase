@@ -58,6 +58,14 @@ Owner asked for M3, then a snap first (2026-10-26). M2's live app checks stay op
     card picks it now (`picksAnOptionFromAClickAnywhereOnItsCard`).
   - No keys for the snap's shortcut: a test run had left an entry `paraphrase_paraphrase`
     holding Ctrl+Alt+Space; removed.
+- Flatpak (owner, 2026-10-27: start Flathub packaging, test locally first):
+  `packaging/flatpak/com.ktechpit.paraphrase.yaml` and `scripts/build-flatpak.sh`
+  (DOCS/packaging.md, 5b). The KWin tracker script goes to the runtime folder the host shares
+  with a Flatpak. Metainfo and desktop file follow the Flathub keyword research
+  (FlathubSEO/docs/paraphrase-keyword-research.md): name "Paraphrase", summary "Offline AI
+  grammar checker", keywords proofread, rewrite, spell first; screenshots, branding and a
+  0.1.0 release entry. Both validators pass; the linter's one error is the KWin permission,
+  which needs a Flathub exception. Not built yet: waits for the reply greeting fix (owner).
 - The snap workflow now publishes to the Snap Store as Omnidict's does (owner): main to edge,
   version tags to stable, nothing kept on GitHub. It needs the store name and credentials
   from the owner first (DOCS/packaging.md, 5a); until then it only builds.

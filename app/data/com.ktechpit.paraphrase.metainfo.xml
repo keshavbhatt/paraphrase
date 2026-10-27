@@ -1,57 +1,116 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Name, summary, the first three keywords and the description follow the FlathubSEO notes
+     (FlathubSEO/docs/paraphrase-keyword-research.md, 2026-10-27): the name is the brand alone,
+     the summary is at most 35 characters, and only the first three single-word keywords of at
+     most 10 letters reach Flathub's web search. -->
 <component type="desktop-application">
   <id>com.ktechpit.paraphrase</id>
-  <name>Paraphrase - Offline AI Writing Assistant</name>
-  <summary>Private AI grammar checker, rewriter and smart reply writer that runs offline</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+
   <developer id="com.ktechpit">
     <name>KTechpit</name>
   </developer>
-  <metadata_license>CC0-1.0</metadata_license>
-  <project_license>GPL-3.0-or-later</project_license>
+
+  <name>Paraphrase</name>
+  <summary>Offline AI grammar checker</summary>
+  <icon type="stock">com.ktechpit.paraphrase</icon>
+
+  <branding>
+    <color type="primary" scheme_preference="light">#c9d3fb</color>
+    <color type="primary" scheme_preference="dark">#1d3399</color>
+  </branding>
+
   <url type="homepage">https://github.com/keshavbhatt/paraphrase</url>
   <url type="bugtracker">https://github.com/keshavbhatt/paraphrase/issues</url>
   <url type="vcs-browser">https://github.com/keshavbhatt/paraphrase</url>
   <launchable type="desktop-id">com.ktechpit.paraphrase.desktop</launchable>
+
   <description>
     <p>
-      Paraphrase is a private AI grammar checker, proofreader, rewriter and smart reply writer
-      that runs offline, on your own computer. What you write never leaves it: there is no
-      account, no cloud and no usage data.
+      Paraphrase is a private AI writing assistant: a grammar checker, spell checker,
+      paraphrasing tool and smart reply writer that runs offline, on your own computer. The
+      AI model (Google Gemma, a local LLM) works without the internet, so what you write never
+      leaves your computer: no account, no cloud and no usage data.
     </p>
     <ul>
-      <li>Proofread and spell check: fix spelling, grammar and punctuation, with every change shown and one Undo per change</li>
-      <li>Rewrite and paraphrase: change the tone to professional, polite, friendly, casual, concise and more</li>
-      <li>Smart reply: three short replies to a message, or a full email reply from what you want to say</li>
-      <li>Summarize, format as bullets, a table or an email, and translate</li>
-      <li>Your own actions, in your own words</li>
-      <li>Works in English, Hindi and Hinglish, and on a best-effort basis in many more languages</li>
-      <li>Open it over any app with a shortcut, or use the window: paste, pick an action, copy</li>
+      <li>Grammar checker and spell check: fix spelling, grammar and punctuation, with every change shown and one Undo per change</li>
+      <li>Paraphrase and rewrite: change the tone to professional, polite, friendly, casual, confident, concise or more detailed, keeping every name, date and number</li>
+      <li>Smart reply: three quick replies to a message, or a full email reply or chat reply from a few words of yours</li>
+      <li>Summarize a long email or document, or turn notes into bullet points, a table or an email</li>
+      <li>Translate, tested in English, Hindi and Hinglish, and on a best-effort basis in many more languages</li>
+      <li>Write an email, a message, a social media post or a note from a short description</li>
+      <li>Custom actions: your own instructions, saved as actions of their own</li>
+      <li>Over any app: select text, press the global shortcut, and put the result back where the text was; or use the window, paste, pick an action and copy</li>
     </ul>
     <p>
       The AI model is downloaded once from its maker, at a fixed version, and checked before
       use. Downloading a model is the only time Paraphrase goes online.
     </p>
   </description>
+
+  <screenshots>
+    <screenshot type="default" xml:lang="en">
+      <caption>Proofreading with every change shown and an Undo for each</caption>
+      <image>https://raw.githubusercontent.com/keshavbhatt/paraphrase/main/screenshots/00-proofread.png</image>
+    </screenshot>
+    <screenshot xml:lang="en">
+      <caption>Over any app: fix the selected text and put it back</caption>
+      <image>https://raw.githubusercontent.com/keshavbhatt/paraphrase/main/screenshots/01-popup.png</image>
+    </screenshot>
+    <screenshot xml:lang="en">
+      <caption>Change the tone, keeping every name, date and number</caption>
+      <image>https://raw.githubusercontent.com/keshavbhatt/paraphrase/main/screenshots/02-tone.png</image>
+    </screenshot>
+    <screenshot xml:lang="en">
+      <caption>A full email reply from a few words of yours</caption>
+      <image>https://raw.githubusercontent.com/keshavbhatt/paraphrase/main/screenshots/03-reply.png</image>
+    </screenshot>
+    <screenshot xml:lang="en">
+      <caption>Translate, Hindi and Hinglish included</caption>
+      <image>https://raw.githubusercontent.com/keshavbhatt/paraphrase/main/screenshots/04-translate.png</image>
+    </screenshot>
+    <screenshot xml:lang="en">
+      <caption>Summarize a long message</caption>
+      <image>https://raw.githubusercontent.com/keshavbhatt/paraphrase/main/screenshots/05-summarize.png</image>
+    </screenshot>
+    <screenshot xml:lang="en">
+      <caption>The AI models run on your computer</caption>
+      <image>https://raw.githubusercontent.com/keshavbhatt/paraphrase/main/screenshots/06-models.png</image>
+    </screenshot>
+  </screenshots>
+
   <categories>
     <category>Office</category>
     <category>Utility</category>
   </categories>
   <keywords>
-    <keyword>grammar</keyword>
-    <keyword>spelling</keyword>
     <keyword>proofread</keyword>
     <keyword>rewrite</keyword>
+    <keyword>spell</keyword>
+    <keyword>grammar</keyword>
+    <keyword>grammar checker</keyword>
+    <keyword>spell check</keyword>
+    <keyword>spelling</keyword>
+    <keyword>proofreading</keyword>
     <keyword>paraphrase</keyword>
+    <keyword>paraphraser</keyword>
+    <keyword>rewriter</keyword>
+    <keyword>writing assistant</keyword>
+    <keyword>AI writing</keyword>
     <keyword>tone</keyword>
     <keyword>reply</keyword>
-    <keyword>email</keyword>
+    <keyword>smart reply</keyword>
+    <keyword>email reply</keyword>
     <keyword>summarize</keyword>
+    <keyword>summarizer</keyword>
     <keyword>translate</keyword>
-    <keyword>writing</keyword>
-    <keyword>assistant</keyword>
-    <keyword>AI</keyword>
-    <keyword>offline</keyword>
+    <keyword>Hindi</keyword>
+    <keyword>Hinglish</keyword>
+    <keyword>offline AI</keyword>
+    <keyword>local AI</keyword>
     <keyword>LLM</keyword>
+    <keyword>AI</keyword>
   </keywords>
   <provides>
     <binary>paraphrase-app</binary>
@@ -65,4 +124,12 @@
     <control>pointing</control>
   </supports>
   <content_rating type="oars-1.1"/>
+
+  <releases>
+    <release version="0.1.0" date="2026-10-27" type="development">
+      <description>
+        <p>First preview: proofread, tone, replies, summaries, formats, translation, writing and custom actions, in the window and over any app.</p>
+      </description>
+    </release>
+  </releases>
 </component>

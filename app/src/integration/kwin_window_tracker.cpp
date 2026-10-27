@@ -61,16 +61,28 @@ report();
 )"_s.arg(service, QString::fromLatin1(kObjectPath));
 }
 
-bool KWinWindowTracker::load()
+QString KWinWindowTracker::scriptPath()
 {
     // KWin reads the script from a path, so it must be one KWin sees: a snap has its own /tmp,
-    // but its runtime folder (/run/user/<uid>/snap.<name>) is a real one. One file, overwritten
-    // each run: a killed run leaves nothing behind.
-    const QString dir = QStandardPaths::writableLocation(QStandardPaths::RuntimeLocation);
+    // but its runtime folder (/run/user/<uid>/snap.<name>) is a real one. A Flatpak's runtime
+    // folder is private except app/<app id>, which the host sees at the same path. One file,
+    // overwritten each run: a killed run leaves nothing behind.
+    QString dir = QStandardPaths::writableLocation(QStandardPaths::RuntimeLocation);
+    if (const QString flatpak = qEnvironmentVariable("FLATPAK_ID"); !flatpak.isEmpty() && !dir.isEmpty()) {
+        dir += u"/app/"_s + flatpak;
+    }
     if (dir.isEmpty() || !QDir().mkpath(dir)) {
+        return {};
+    }
+    return dir + u"/paraphrase-window-tracker.js"_s;
+}
+
+bool KWinWindowTracker::load()
+{
+    const QString path = scriptPath();
+    if (path.isEmpty()) {
         return false;
     }
-    const QString path = dir + u"/paraphrase-window-tracker.js"_s;
     QFile file(path);
     if (!file.open(QIODevice::WriteOnly) ||
         file.write(script(QDBusConnection::sessionBus().baseService()).toUtf8()) < 0) {

@@ -156,6 +156,36 @@ the snap owns well-known D-Bus names (slots), which the store must approve.
   Still to check: the RemoteDesktop portal paste, data-control, the KWin window tracker
   (`org.kde.KWin` is not plugged) with AppArmor enforcing, and the Secret portal for history.
 
+## 5b. The Flatpak (2026-10-27)
+
+`packaging/flatpak/com.ktechpit.paraphrase.yaml`, the base for the Flathub repository, as
+Omnidict's: `org.kde.Platform` 6.11, built from source with the same CMake options as the snap
+(`PARAPHRASE_PORTABLE_CPU=ON`, no tests). The runtime and SDK have everything: Qt 6.11 with
+the SQLite driver, OpenSSL's libcrypto and the `ext-data-control` Wayland protocol (checked in
+`org.kde.Sdk//6.11`). llama.cpp comes from the submodule, so the build needs no network, as
+Flathub requires. The local source is this checkout without `models/`, `build/`, `eval/` and
+`.git` (the revision then reads "unknown"); the Flathub copy takes the release tag instead.
+
+`scripts/build-flatpak.sh` lints the manifest and the metainfo, builds in `build/flatpak` and
+installs for the user; `--lint` only lints. Run with `flatpak run com.ktechpit.paraphrase`, the
+CLI with `--command=paraphrase`; models go to `~/.var/app/com.ktechpit.paraphrase`.
+
+Permissions: network (model downloads), the display sockets, the GPU, the tray
+(`org.kde.StatusNotifierWatcher`) and `org.kde.KWin` for the window tracker. The three bus
+names start with the app id, so owning them needs no permission; the shortcut, typing,
+Secret and Background portals need none either. The Secret Service fallback
+(`org.freedesktop.secrets`) is left out (section 2).
+
+- **KWin**: `flatpak-builder-lint` reports `finish-args-kwin-talk-name` as an error: Flathub
+  grants talking to KWin only as an exception asked for in the submission. Without it, KDE
+  Wayland has no way to tell which window the text came from, so Replace and Insert fall back
+  to the clipboard ("You paste"), as the snap did before its script path was fixed. The
+  script the tracker loads is written to
+  `$XDG_RUNTIME_DIR/app/com.ktechpit.paraphrase`, the one runtime folder the host can read
+  (`KWinWindowTracker::scriptPath`).
+- **Metainfo for Flathub**: the linter wants a shorter name and a `<release>` entry; the name,
+  summary and keywords follow the FlathubSEO notes, as Omnidict's do.
+
 ## 6. To verify in M1 (each is a short test, recorded here when done)
 
 - [ ] snap: RemoteDesktop portal typing on KDE and GNOME Wayland.
