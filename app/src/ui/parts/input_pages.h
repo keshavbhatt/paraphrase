@@ -16,6 +16,7 @@ class QPushButton;
 namespace paraphrase::app {
 
 class SegmentedControl;
+class GripSplitter;
 class TextField;
 class TonePicker;
 
@@ -85,6 +86,7 @@ public:
 private:
     TextField* m_message = nullptr;
     TextField* m_draft = nullptr;
+    GripSplitter* m_split = nullptr;
 };
 
 /// The message, what you want to say, email or chat message, and a tone

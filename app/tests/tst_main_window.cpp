@@ -28,6 +28,8 @@
 #include <QPushButton>
 #include <QSettings>
 #include <QSignalSpy>
+#include <QSplitter>
+#include <QSplitterHandle>
 #include <QStandardPaths>
 #include <QTemporaryDir>
 #include <QTest>
@@ -229,6 +231,52 @@ private Q_SLOTS:
         QCOMPARE(w.resultText(), u"Yes, can I bring dessert?"_s);
         w.copyResult();
         QCOMPARE(QApplication::clipboard()->text(), u"Yes, can I bring dessert?"_s);
+    }
+
+    void replyMessageFillsThePaneAndTheSplitResizesIt()
+    {
+        // main-window-reply.html, note 5: the message takes the pane's height; dragging the
+        // split makes the reply so far taller, and the next window keeps it.
+        startDaemon({u"fast-model"_s});
+        {
+            MainWindow w;
+            w.resize(1200, 760);
+            w.start();
+            w.selectSkill(u"reply"_s);
+            w.show();
+            QVERIFY(QTest::qWaitForWindowExposed(&w));
+            const auto* message = w.findChild<QTextEdit*>(u"message"_s);
+            const auto* draft = w.findChild<QTextEdit*>(u"draft"_s);
+            const auto* split = w.findChild<QSplitter*>(u"replySplit"_s);
+            QVERIFY(split != nullptr);
+            QCOMPARE(draft->height(), 70); // two lines, the rest is the message's
+            QVERIFY(message->height() > 3 * draft->height());
+
+            const auto drag = [split](int dy) {
+                QSplitterHandle* handle = split->handle(1);
+                const QPoint from = handle->rect().center();
+                const QPoint to = from + QPoint(0, dy);
+                QTest::mousePress(handle, Qt::LeftButton, {}, from);
+                QMouseEvent move(QEvent::MouseMove, QPointF(to), handle->mapToGlobal(QPointF(to)),
+                                 Qt::NoButton, Qt::LeftButton, Qt::NoModifier);
+                QApplication::sendEvent(handle, &move);
+                QTest::mouseRelease(handle, Qt::LeftButton, {}, to);
+            };
+            drag(-120);
+            QTRY_COMPARE(draft->height(), 190);
+            // Neither box shrinks below its smallest size: three lines and two lines.
+            drag(2000);
+            QTRY_COMPARE(draft->height(), 70);
+            drag(-2000);
+            QTRY_COMPARE(message->height(), 94);
+        }
+        MainWindow w;
+        w.resize(1200, 760);
+        w.start();
+        w.selectSkill(u"reply"_s);
+        w.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&w));
+        QTRY_VERIFY(w.findChild<QTextEdit*>(u"draft"_s)->height() > 70);
     }
 
     void runsAToneFromTheMenu()

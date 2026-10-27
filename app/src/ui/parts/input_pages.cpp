@@ -1,5 +1,6 @@
 #include "ui/parts/input_pages.h"
 
+#include "ui/common/grip_splitter.h"
 #include "ui/common/text_field.h"
 #include "ui/common/widgets.h"
 #include "ui/parts/tone_picker.h"
@@ -23,8 +24,12 @@ using namespace Qt::StringLiterals;
 namespace paraphrase::app {
 namespace {
 
-constexpr int kMessageHeight = 120; ///< four lines (main-window-reply.html)
-constexpr int kDraftHeight = 70;    ///< two lines
+constexpr int kMessageMinHeight = 94; ///< three lines (main-window-reply.html, note 5)
+constexpr int kDraftHeight = 70;      ///< two lines
+/// The split between them: the pane's 10px gaps on both sides of an invisible handle.
+constexpr int kSplitHandle = 20;
+constexpr int kDraftLabelGap = 6;
+const QString kReplySplitKey = u"reply/split"_s;
 constexpr int kIntentHeight = 76;
 const QString kKindKey = u"reply/kind"_s;
 const QString kToneKey = u"reply/tone"_s;
@@ -102,14 +107,32 @@ QuickReplyInput::QuickReplyInput(QWidget* parent)
     : InputPage(parent)
     , m_message(field(u"message"_s, tr("Paste the message you got")))
     , m_draft(field(u"draft"_s, tr("Start typing and the replies will continue it")))
+    , m_split(new GripSplitter(Qt::Vertical))
 {
     QVBoxLayout* layout = pageLayout(this);
-    m_message->setFixedHeight(kMessageHeight);
-    layout->addWidget(m_message);
-    layout->addWidget(makeLabel(tr("Your reply so far (optional)"), u"small"_s));
-    m_draft->setFixedHeight(kDraftHeight);
-    layout->addWidget(m_draft);
-    layout->addStretch();
+    // main-window-reply.html: the message takes the pane's height; a split between it and the
+    // reply so far makes either taller, and keeps its place for the next start.
+    m_message->setMinimumHeight(kMessageMinHeight);
+    auto* draftBox = new QWidget;
+    auto* draftColumn = new QVBoxLayout(draftBox);
+    draftColumn->setContentsMargins(0, 0, 0, 0);
+    draftColumn->setSpacing(kDraftLabelGap);
+    draftColumn->addWidget(makeLabel(tr("Your reply so far (optional)"), u"small"_s));
+    m_draft->setMinimumHeight(kDraftHeight);
+    draftColumn->addWidget(m_draft, 1);
+    m_split->setObjectName(u"replySplit"_s);
+    m_split->setChildrenCollapsible(false);
+    m_split->setHandleWidth(kSplitHandle);
+    m_split->addWidget(m_message);
+    m_split->addWidget(draftBox);
+    m_split->setStretchFactor(0, 1);
+    m_split->setStretchFactor(1, 0);
+    if (!m_split->restoreState(QSettings().value(kReplySplitKey).toByteArray())) {
+        m_split->setSizes({QWIDGETSIZE_MAX, 0}); // the reply so far at its smallest
+    }
+    layout->addWidget(m_split, 1);
+    connect(m_split, &QSplitter::splitterMoved, this,
+            [this] { QSettings().setValue(kReplySplitKey, m_split->saveState()); });
     for (const TextField* edit : {m_message, m_draft}) {
         connect(edit, &QTextEdit::textChanged, this, &InputPage::edited);
     }

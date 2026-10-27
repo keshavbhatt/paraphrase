@@ -56,6 +56,14 @@ Owner asked for M3, then a snap first (2026-10-26). M2's live app checks stay op
     popup.
   - "The shortcut opens" in Settings picked an option only from its small circle; the whole
     card picks it now (`picksAnOptionFromAClickAnywhereOnItsCard`).
+  - Quick replies kept the message at four lines with empty space below it. Mock approved
+    (owner, 2026-10-27, main-window-reply.html): the message takes the pane's height, and a
+    split (grip on hover) between it and the reply so far makes either taller; its place is
+    kept (`replyMessageFillsThePaneAndTheSplitResizesIt`).
+  - The history list's scrollbar had a black track: Breeze paints a transparent groove in
+    an item view black, so it now takes the pane's colour (also the language menu).
+  - Inside a Flatpak the CLI waited forever: the D-Bus filter drops the daemon's answers to
+    a client that owns no name under the app id; every client now owns one (DOCS/packaging.md 5b).
   - No keys for the snap's shortcut: a test run had left an entry `paraphrase_paraphrase`
     holding Ctrl+Alt+Space; removed.
 - Full reply greeted the user by their own name (owner report, 2026-10-27: "Hey @keshavnrj"
