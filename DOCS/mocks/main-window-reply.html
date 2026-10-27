@@ -41,7 +41,7 @@
         <div class="ph"><h2 id="msg-h" class="cap" style="font-size: 11px">Message you got</h2><span class="grow"></span><span class="pill">Hindi</span><button class="btn flat">Paste</button></div>
         <div class="pb">
           <label for="msg" class="small muted" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Message you got</label>
-          <textarea id="msg" class="field" rows="4" lang="hi">बेटा, रविवार को दादी का जन्मदिन है। सब लोग दोपहर 12 बजे तक घर आ जाना, खाना साथ में खाएँगे।</textarea>
+          <textarea id="msg" class="field" rows="4" lang="hi" style="flex: 1; resize: none">बेटा, रविवार को दादी का जन्मदिन है। सब लोग दोपहर 12 बजे तक घर आ जाना, खाना साथ में खाएँगे।</textarea>
           <label for="draft" class="small muted">Your reply so far (optional)</label>
           <textarea id="draft" class="field" rows="2" lang="hi" placeholder="Start typing and the replies will continue it"></textarea>
         </div>
@@ -76,7 +76,7 @@
 </div>
 <section class="notes"><h2>Notes</h2><ol>
   <li><b>The message</b> is pasted here, or handed over from the popup ("Open in window" there, PLAN 3.2). The detected language shows as a pill; replies are written in it. For a language Paraphrase has not tested, the pill reads "Best effort" after the name.</li>
-  <li><b>Your reply so far</b> is optional: when filled, every reply continues it (the reply skill's draft input).</li>
+  <li><b>Your reply so far</b> is optional: when filled, every reply continues it (the reply skill's draft input). The message box takes the rest of the pane's height, as in Full reply, so a long message shows in full; the reply-so-far box stays two lines (proposed 2026-10-27).</li>
   <li><b>Three replies from one run</b>, each with its own Copy; number keys 1 to 3 put one in the edit box. If the engine's language check still fails on a reply after its retry, that reply carries a small "Not in Hindi?" note instead of being dropped (ADR-006).</li>
   <li><b>Copy reply</b> copies the edit box; nothing is sent or typed anywhere from this window. "Make it polite" runs the Tone action on the chosen reply, so replies and tones combine without leaving the window.</li>
 </ol></section>
