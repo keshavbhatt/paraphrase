@@ -13,6 +13,7 @@
 #include "ui/settings/shortcut_settings_page.h"
 
 #include <QEvent>
+#include <QFrame>
 #include <QHBoxLayout>
 #include <QScrollArea>
 #include <QStackedWidget>
@@ -67,8 +68,14 @@ SettingsWindow::SettingsWindow(client::DaemonClient& client, Preferences* prefer
     resize(1080, 780);
     auto* root = new QHBoxLayout(this);
     root->setContentsMargins(kGutter, 0, 0, 0); // the rest is inside each column
-    root->setSpacing(28);
+    // A line the window's full height between the sections and the page, 14px either side
+    // (mock.css .settings nav, approved 2026-10-27).
+    root->setSpacing(14);
     root->addWidget(m_nav, 0, Qt::AlignTop);
+    auto* divider = new QFrame;
+    divider->setObjectName(u"settingsDivider"_s);
+    divider->setFixedWidth(1);
+    root->addWidget(divider);
     root->addWidget(m_pages, 1);
     addPages();
     connect(m_nav, &SettingsNav::pageChosen, this, [this](int page) { showPage(static_cast<Page>(page)); });

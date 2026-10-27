@@ -15,6 +15,7 @@ constexpr char16_t kWindowSheet[] = uR"(
 QWidget#setupWindow, QWidget#settingsWindow { background: @bg@; color: @text@; font-size: 14px; }
 QFrame#band { background: @bar@; border: none; border-bottom: 1px solid @border@; }
 QFrame#footBand { background: @bar@; border: none; border-top: 1px solid @border@; }
+QFrame#settingsDivider { background: @border@; border: none; }
 QLabel[role="h1"] { font-size: 20px; font-weight: 600; }
 QLabel[role="h2"] { font-size: 15px; font-weight: 600; }
 QLabel[role="title"] { font-size: 16px; font-weight: 600; }

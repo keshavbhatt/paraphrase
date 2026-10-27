@@ -121,7 +121,7 @@ del.d { color: var(--del); background: var(--del-bg); text-decoration-thickness:
 
 /* Settings layout. */
 .settings { display: flex; flex-wrap: wrap; gap: 14px; padding: 24px; }
-/* A thin line, the full height of the window, between the sections and the page (proposed
+/* A thin line, the full height of the window, between the sections and the page (approved
    2026-10-27): 14px either side of it, as the 28px gap was. */
 .settings nav { flex: 1 1 170px; max-width: 224px; display: flex; flex-direction: column; gap: 2px;
   border-right: 1px solid var(--border); margin-block: -24px; padding-block: 24px; padding-right: 14px; }

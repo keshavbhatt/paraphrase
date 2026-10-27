@@ -22,6 +22,7 @@
 #include <QDateTime>
 #include <QDir>
 #include <QFontMetrics>
+#include <QFrame>
 #include <QGuiApplication>
 #include <QJsonArray>
 #include <QJsonDocument>
@@ -192,6 +193,24 @@ private Q_SLOTS:
         const auto* problem = w.findChild<QLabel*>(u"historyProblem"_s);
         QVERIFY(!problem->isHidden());
         QVERIFY(problem->text().contains(u"keyring"_s));
+    }
+
+    void dividesTheSectionsFromThePage()
+    {
+        // mock.css .settings nav (approved 2026-10-27): a 1px line the window's full height,
+        // 14px from the sections and from the page.
+        QVERIFY(m_daemon.start({u"fast-model"_s}));
+        DaemonClient client;
+        QVERIFY(client.connectToDaemon().isEmpty());
+        SettingsWindow w(client);
+        w.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&w));
+        const auto* divider = w.findChild<QFrame*>(u"settingsDivider"_s);
+        QVERIFY(divider != nullptr);
+        QCOMPARE(divider->width(), 1);
+        QCOMPARE(divider->height(), w.height());
+        const auto* pages = w.findChild<QStackedWidget*>();
+        QCOMPARE(pages->x() - (divider->x() + divider->width()), 14);
     }
 
     void listsTheInstalledModels()

@@ -80,6 +80,8 @@ Owner asked for M3, then a snap first (2026-10-26). M2's live app checks stay op
   message and "What do you want to say?", History's text and result (half each), and
   Proofread's text and list of changes in the window (the list starts at its rows' height;
   the popup keeps its fitted list). Each drag is kept (`splitsShareTheHeightWhereTwoBoxesStack`).
+- A line between the Settings sections and the page, the window's full height (mock approved,
+  owner, 2026-10-27; `dividesTheSectionsFromThePage`).
 - Owner checks on the Flatpak (2026-10-27): the Quick replies split, the grip on the main
   split, the header spacing, Replace into a browser field and into Konsole, and a held
   shortcut opening the popup once all work. Later the same day, on the next build: no black
