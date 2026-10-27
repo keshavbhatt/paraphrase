@@ -10,6 +10,7 @@
 #include "ui/common/chip_button.h"
 #include "ui/common/grip_splitter.h"
 #include "ui/common/menu_icons.h"
+#include "ui/main/bars.h"
 #include "ui/main/history_view.h"
 #include "ui/main/main_window.h"
 #include "ui/parts/change_list.h"
@@ -301,6 +302,22 @@ private Q_SLOTS:
         QCOMPARE(grip->orientation(), Qt::Horizontal);
         panes->setOrientation(Qt::Vertical);         // what a narrow window does; the offscreen one
         QCOMPARE(grip->orientation(), Qt::Vertical); // cannot get that narrow
+    }
+
+    void spacesTheHeaderButtonsEvenly()
+    {
+        // mock.css .mwhead .btn.flat: 10px padding, 4px between History and Settings.
+        startDaemon({u"fast-model"_s});
+        MainWindow w;
+        w.resize(1200, 760);
+        w.start();
+        w.findChild<paraphrase::app::HeaderBar*>(u"header"_s)->setHistoryShown(true);
+        w.show();
+        QVERIFY(QTest::qWaitForWindowExposed(&w));
+        const auto* history = w.findChild<QPushButton*>(u"history"_s);
+        const auto* settings = w.findChild<QPushButton*>(u"settings"_s);
+        QTRY_VERIFY(history->isVisible());
+        QCOMPARE(settings->x() - (history->x() + history->width()), 4);
     }
 
     void runsAToneFromTheMenu()

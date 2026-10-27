@@ -62,6 +62,10 @@ Owner asked for M3, then a snap first (2026-10-26). M2's live app checks stay op
     kept (`replyMessageFillsThePaneAndTheSplitResizesIt`).
   - The split between the main panes now shows the same grip on hover (mock approved, owner,
     2026-10-27, main-window.html note 7), across when the panes stack.
+  - The header's History and Settings left a wide gap between them when neither showed its
+    background. Mocks approved (owner, 2026-10-27): 10px padding and 4px between them, so the
+    header's words are evenly spaced (`spacesTheHeaderButtonsEvenly`); every main window mock
+    now shows History in the header, as the app does.
   - The history list's scrollbar had a black track: Breeze paints a transparent groove in
     an item view black, so it now takes the pane's colour (also the language menu).
   - Inside a Flatpak the CLI waited forever: the D-Bus filter drops the daemon's answers to

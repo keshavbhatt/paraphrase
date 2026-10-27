@@ -58,6 +58,7 @@ QPushButton:disabled { color: @muted@; }
 QPushButton[kind="flat"] { background: transparent; border-color: transparent; }
 QPushButton[kind="flat"]:hover { background: @hover@; }
 QPushButton[kind="flat"]:checked { background: @accentSoft@; color: @accent@; }
+QFrame#header QPushButton[kind="flat"] { padding: 0 10px; } /* even header gaps (mock.css .mwhead) */
 QPushButton[kind="link"] { background: transparent; border-color: transparent; color: @link@; min-height: 26px; padding: 0 8px; }
 QPushButton[kind="link"]:hover { background: @hover@; }
 QWidget#installedModels QPushButton[kind="link"] { padding: 0 14px; }

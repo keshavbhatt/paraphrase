@@ -148,6 +148,6 @@ body.clean .pin, body.clean .notes { display: none; }
 
 /* The main window's header buttons (History, Settings): 10px padding and 4px between them, so
    the words in the header stay evenly spaced (about 24px) when no button shows its background
-   (proposed 2026-10-27). */
+   (approved 2026-10-27). */
 .mwhead .btn.flat { padding: 0 10px; }
 .mwhead .btn.flat + .btn.flat { margin-left: -6px; }

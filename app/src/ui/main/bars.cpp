@@ -14,6 +14,7 @@ namespace {
 constexpr int kMarkSize = 18;
 constexpr int kSmallIcon = 14;
 constexpr int kDotSize = 8;
+constexpr int kHeaderButtonGap = 4;
 
 } // namespace
 
@@ -39,10 +40,15 @@ HeaderBar::HeaderBar(QWidget* parent)
     m_history->setCheckable(true);
     m_history->setToolTip(tr("History (Ctrl+H)"));
     m_history->hide();
-    row->addWidget(m_history);
+    // The two buttons sit 4px apart, so with their 10px padding the header's words are evenly
+    // spaced when neither shows its background (mock.css, .mwhead .btn.flat).
+    auto* buttons = new QHBoxLayout;
+    buttons->setSpacing(kHeaderButtonGap);
+    buttons->addWidget(m_history);
     m_settings = makeButton(tr("Settings"), u"flat"_s);
     m_settings->setObjectName(u"settings"_s);
-    row->addWidget(m_settings);
+    buttons->addWidget(m_settings);
+    row->addLayout(buttons);
     connect(m_history, &QPushButton::clicked, this, &HeaderBar::historyClicked);
     connect(m_settings, &QPushButton::clicked, this, &HeaderBar::settingsClicked);
 }
