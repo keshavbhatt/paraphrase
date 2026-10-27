@@ -61,8 +61,11 @@ private Q_SLOTS:
     void namesTheCommandForEachPackage()
     {
         // The shortcut to bind and the login entry start the app the way its package does.
+        QCOMPARE(desktopFileName(), u"com.ktechpit.paraphrase"_s);
         qputenv("SNAP_NAME", "paraphrase");
         QCOMPARE(launchLine({u"--popup"_s}), u"paraphrase --popup"_s);
+        // snapd installs the desktop file as <snap>_<app>; the window's app id must match it.
+        QCOMPARE(desktopFileName(), u"paraphrase_paraphrase"_s);
         qunsetenv("SNAP_NAME");
         qputenv("FLATPAK_ID", "com.ktechpit.paraphrase");
         QCOMPARE(launchLine({u"--hidden"_s}), u"flatpak run com.ktechpit.paraphrase --hidden"_s);

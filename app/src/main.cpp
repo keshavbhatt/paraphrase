@@ -6,6 +6,7 @@
 //   paraphrase-app --popup    open the popup on the selected text (bind this to a shortcut)
 //   paraphrase-app --hidden   start in the tray (login autostart)
 
+#include "integration/launch_command.h"
 #include "paraphrase/version.h"
 #include "shell/app_service.h"
 #include "shell/application.h"
@@ -27,7 +28,7 @@ int main(int argc, char* argv[])
     QApplication::setOrganizationName(u"ktechpit"_s);
     QApplication::setApplicationVersion(
         QStringLiteral(PARAPHRASE_VERSION_STRING " (" PARAPHRASE_GIT_REVISION_STRING ")"));
-    QApplication::setDesktopFileName(u"com.ktechpit.paraphrase"_s);
+    QApplication::setDesktopFileName(paraphrase::app::desktopFileName());
     // Menus draw their icons a little larger than the style's default (menus.html).
     QApplication::setStyle(new paraphrase::app::MenuIconStyle(QApplication::style()->name()));
 

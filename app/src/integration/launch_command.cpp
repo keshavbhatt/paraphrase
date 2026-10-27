@@ -57,4 +57,13 @@ QString launchLine(const QStringList& arguments)
     return parts.join(u' ');
 }
 
+QString desktopFileName()
+{
+    if (const QString snap = qEnvironmentVariable("SNAP_INSTANCE_NAME", qEnvironmentVariable("SNAP_NAME"));
+        !snap.isEmpty()) {
+        return snap + u"_paraphrase"_s; // the app's name in snapcraft.yaml
+    }
+    return u"com.ktechpit.paraphrase"_s;
+}
+
 } // namespace paraphrase::app

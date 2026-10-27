@@ -14,4 +14,9 @@ namespace paraphrase::app {
 /// quoted where it needs to be (Desktop Entry Specification, "The Exec key").
 [[nodiscard]] QString launchLine(const QStringList& arguments);
 
+/// The name of the desktop file that starts this app, without `.desktop`: the window's app id,
+/// which the taskbar matches to find the icon. snapd installs the file as `<snap>_<app>`, so a
+/// snap uses that; everywhere else it is `com.ktechpit.paraphrase`.
+[[nodiscard]] QString desktopFileName();
+
 } // namespace paraphrase::app
