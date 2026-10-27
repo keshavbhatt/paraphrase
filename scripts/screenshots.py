@@ -196,6 +196,23 @@ def banner(window: Image.Image, size: tuple[int, int] = (2160, 720)) -> Image.Im
     return img.convert("RGB")
 
 
+def social(window: Image.Image, size: tuple[int, int] = (1280, 640)) -> Image.Image:
+    """GitHub's social preview (2:1): the name and tagline over the window, cut at the bottom."""
+    w, h = size
+    img = background(w, h)
+    d = ImageDraw.Draw(img)
+    name_font, tag_font = font(FONT_BOLD, 64), font(FONT_REG, 30)
+    logo = icon(72)
+    name_w = d.textlength("Paraphrase", font=name_font)
+    x = int((w - (72 + 20 + name_w)) / 2)
+    img.alpha_composite(logo, (x, 44))
+    d.text((x + 92, 34), "Paraphrase", font=name_font, fill=(255, 255, 255))
+    text_centered(d, 136, "Offline AI writing assistant for Linux", tag_font, SUBTITLE, w)
+    fr = framed(window, 1000, radius=14)
+    img.alpha_composite(fr, ((w - fr.width) // 2, 140))
+    return img.convert("RGB")
+
+
 PLAN = [
     (
         "00-proofread",
@@ -261,6 +278,7 @@ def main(raw_dir: str) -> None:
         framed_windows[key] = window
         compose(window, head, sub).save(out / f"{name}.png", optimize=True)
     banner(framed_windows["proofread"]).save(out / "banner.png", optimize=True)
+    social(framed_windows["proofread"]).save(out / "social.png", optimize=True)
     for f in sorted(out.glob("*.png")):
         print(f.relative_to(ROOT), Image.open(f).size, f.stat().st_size // 1024, "KB")
 
