@@ -183,6 +183,16 @@ Secret and Background portals need none either. The Secret Service fallback
   script the tracker loads is written to
   `$XDG_RUNTIME_DIR/app/com.ktechpit.paraphrase`, the one runtime folder the host can read
   (`KWinWindowTracker::scriptPath`).
+- **Answers reach a client only if it owns a name** (found in the local build, 2026-10-27):
+  the daemon sends each answer as a signal addressed to the client that asked, and the
+  Flatpak bus filter drops a message to a client that owns no name under the app id. The
+  window owns `.App`, the CLI owned nothing, so a CLI run never ended. Inside a Flatpak every
+  client now owns `com.ktechpit.paraphrase.Client.p<pid>` (`DaemonClient::sandboxName`).
+  Checked: the Flatpak CLI proofreads and rewrites. A strict snap mediates D-Bus by AppArmor
+  label, not by names, so this does not apply there.
+- **Build locally**: the Builder asks the host's `flatpak` for the SDK with its own
+  `XDG_DATA_HOME`, so it finds no user installation; the script sets `FLATPAK_USER_DIR`.
+  Package: 33 MB. Models copied in by hand need their file times kept (`.sha256` stamps).
 - **Metainfo for Flathub**: the linter wants a shorter name and a `<release>` entry; the name,
   summary and keywords follow the FlathubSEO notes, as Omnidict's do.
 

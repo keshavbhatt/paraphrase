@@ -27,7 +27,10 @@ lint
 [ "${1:-}" = "--lint" ] && exit 0
 
 mkdir -p "$OUT"
-flatpak run --command=flatpak-builder --filesystem="$DIR" org.flatpak.Builder \
+# The Builder asks the host's flatpak for the SDK with its own XDG_DATA_HOME, a folder of its
+# sandbox, so the host would look for the user installation there: name the real one.
+flatpak run --env=FLATPAK_USER_DIR="$HOME/.local/share/flatpak" --command=flatpak-builder \
+    --filesystem="$DIR" org.flatpak.Builder \
     --user --install --force-clean --ccache \
     --state-dir="$OUT/state" "$OUT/app" "$MANIFEST"
 echo "installed: flatpak run com.ktechpit.paraphrase"

@@ -1,6 +1,7 @@
 // The ranked backends (PLAN 6): the first available one of each kind is used, the clipboard
 // and "bind this command" always work, and the status lists every backend for Settings.
 
+#include "daemon_client.h"
 #include "integration/clipboard_backends.h"
 #include "integration/integrations.h"
 #include "integration/kwin_window_tracker.h"
@@ -78,7 +79,11 @@ private Q_SLOTS:
         QCOMPARE(paraphrase::app::KWinWindowTracker::scriptPath(),
                  runtime.path() + u"/app/com.ktechpit.paraphrase/paraphrase-window-tracker.js"_s);
         qputenv("XDG_RUNTIME_DIR", realRuntime);
+        // The bus filter passes the daemon's answers only to clients owning a name under the app id.
+        QCOMPARE(paraphrase::client::DaemonClient::sandboxName(),
+                 u"com.ktechpit.paraphrase.Client.p%1"_s.arg(QCoreApplication::applicationPid()));
         qunsetenv("FLATPAK_ID");
+        QVERIFY(paraphrase::client::DaemonClient::sandboxName().isEmpty());
         qputenv("APPIMAGE", "/home/a b/Paraphrase.AppImage");
         QCOMPARE(launchLine({u"--popup"_s}), u"\"/home/a b/Paraphrase.AppImage\" --popup"_s);
         qunsetenv("APPIMAGE");

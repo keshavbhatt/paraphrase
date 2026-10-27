@@ -35,6 +35,10 @@ public:
     /// gets error(id, "daemon-gone", ...) so no caller waits for an answer that cannot come.
     [[nodiscard]] QDBusMessage call(const QString& method, const QVariantList& args);
 
+    /// Inside a Flatpak, the bus name this process owns so the daemon's answers reach it
+    /// (com.ktechpit.paraphrase.Client.p<pid>); empty elsewhere.
+    [[nodiscard]] static QString sandboxName();
+
 Q_SIGNALS:
     void token(const QString& requestId, int variant, const QString& text);
     void retrying(const QString& requestId, const QString& reason);
@@ -62,6 +66,7 @@ private:
     [[nodiscard]] QString startPrivately();
     /// Starts the daemon on the session bus unless it already owns its name; waits for it.
     static void startOnBus();
+    static void ownSandboxName();
     /// Before a call: starts the daemon again if it quit while idle.
     void keepRunning();
     [[nodiscard]] bool subscribe();

@@ -1,5 +1,5 @@
 # Backend ranking and the fallbacks that always work.
-paraphrase_add_test(tst_integrations tst_integrations.cpp paraphrase_integration)
+paraphrase_add_test(tst_integrations tst_integrations.cpp paraphrase_integration paraphrase_client)
 # Putting a result back, with fakes: the window check and the clipboard restore.
 paraphrase_add_test(tst_paste_insert tst_paste_insert.cpp paraphrase_integration)
 # The desktop backends against a headless KWin (scripts/desktop-test.sh); skipped elsewhere.

@@ -102,11 +102,32 @@ QString DaemonClient::connectToDaemon()
         startOnBus();
         if (names->isServiceRegistered(kService)) {
             m_connection = bus;
+            ownSandboxName();
             return subscribe() ? QString() : tr("Cannot listen to the daemon on the session bus.");
         }
         // It could not own its name (a snap waiting for its name declaration): run it privately.
     }
     return startPrivately();
+}
+
+QString DaemonClient::sandboxName()
+{
+    if (qEnvironmentVariable("FLATPAK_ID").isEmpty()) {
+        return {};
+    }
+    return kService.section(u'.', 0, 2) + u".Client.p"_s +
+           QString::number(QCoreApplication::applicationPid());
+}
+
+void DaemonClient::ownSandboxName()
+{
+    // A Flatpak's bus filter lets the daemon send only to clients that own a name under the
+    // app id: without one, the answers (signals addressed to this client) are dropped and a
+    // run never ends. Each process owns its own name; the bus frees it when the process ends.
+    if (const QString name = sandboxName(); !name.isEmpty()) {
+        QDBusConnection::sessionBus().interface()->registerService(
+            name, QDBusConnectionInterface::DontQueueService, QDBusConnectionInterface::DontAllowReplacement);
+    }
 }
 
 void DaemonClient::startOnBus()
