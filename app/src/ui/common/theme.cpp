@@ -160,9 +160,10 @@ QScrollBar::add-line, QScrollBar::sub-line { width: 0; height: 0; border: none; 
 QScrollBar::add-page, QScrollBar::sub-page { background: none; }
 QAbstractScrollArea::corner { background: transparent; }
 /* Breeze paints the groove of a scrollbar in an item view black when its background is
-   transparent, so these name the colour of what is behind them. */
-QListWidget#historyList QScrollBar:vertical { background: @panel@; }
-QMenu QListWidget#languageList QScrollBar:vertical { background: @elevated@; }
+   transparent, and its margin too, which no background covers: these name the colour of
+   what is behind them and inset the handle with padding instead. */
+QListWidget#historyList QScrollBar:vertical { background: @panel@; margin: 0; padding: 2px; }
+QMenu QListWidget#languageList QScrollBar:vertical { background: @elevated@; margin: 0; padding: 2px; }
 )";
 
 constexpr double kDisabledOpacity = 0.45;
