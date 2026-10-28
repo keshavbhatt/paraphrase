@@ -2078,6 +2078,90 @@
    "plain_name": "English"
   },
   {
+   "text": "Hi Arjun\nOn Sunday I ran into Tomas Novak in Prague and he handed me your gift. Thanks a lot!",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Thanks so much for covering my shift on Saturday, I owe you one!",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Got the flowers you sent for mum's birthday, she cried a little 😊 thank you",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Your recommendation letter got me the job! Starting at Infosys on 3 March. Can't thank you enough.",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "We got engaged last night!! 💍",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Dad passed away this morning. Funeral is on Thursday at 11.",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Sorry I missed your call yesterday, was stuck in a meeting all evening. What's up?",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Just finished reading the book you lent me, loved the ending. When do you want it back?",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "My sister loved the cake you baked for her party, she keeps asking for the recipe",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Congrats on the promotion!! So well deserved 🎉",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Happy birthday Arjun! Hope you have a wonderful day 🎂",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Hope you're feeling better after the surgery. Let me know if you need anything.",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "The parcel you sent arrived today but the glass vase was broken 😢",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Long time! I saw your photos from Goa, looked amazing. How have you been?",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
    "text": "बेटा, रविवार को दादी का जन्मदिन है। सब लोग दोपहर 12 बजे तक घर आ जाना, खाना साथ में खाएँगे।",
    "lang": "hi",
    "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
@@ -2238,6 +2322,30 @@
    "lang": "hi",
    "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
    "plain_name": "Hindi"
+  },
+  {
+   "text": "भैया, आपका भेजा हुआ गिफ्ट कल रोहन ने दे दिया। बहुत सुंदर है, धन्यवाद!",
+   "lang": "hi",
+   "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
+   "plain_name": "Hindi"
+  },
+  {
+   "text": "बधाई हो! सुना है आपकी नई नौकरी लग गई।",
+   "lang": "hi",
+   "prompt_name": "Hindi in Devanagari script (English words already in Latin letters stay as they are)",
+   "plain_name": "Hindi"
+  },
+  {
+   "text": "Yaar thanks for the birthday wishes, kal party mein aana pakka!",
+   "lang": "hinglish",
+   "prompt_name": "Hinglish: Hindi written in Latin letters as in chat messages. Keep it Hinglish even in a formal tone: do not translate it into English or Devanagari",
+   "plain_name": "Hinglish (Hindi in Latin letters)"
+  },
+  {
+   "text": "Bhai tumhara bheja hua parcel aaj mila, mummy ko saree bahut pasand aayi 😊",
+   "lang": "hinglish",
+   "prompt_name": "Hinglish: Hindi written in Latin letters as in chat messages. Keep it Hinglish even in a formal tone: do not translate it into English or Devanagari",
+   "plain_name": "Hinglish (Hindi in Latin letters)"
   },
   {
    "text": "¿Vienes a cenar el sábado? Cocino paella a las nueve.",
@@ -4269,6 +4377,18 @@
   },
   {
    "text": "@arjun the staging deploy is green, you can test the login fix now",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Dear Mr Bhatt,\n\nThank you for your generous donation to the school library. The students have already started reading the new books.\n\nWarm regards,\nSunita Rao\nPrincipal",
+   "lang": "en",
+   "prompt_name": "English",
+   "plain_name": "English"
+  },
+  {
+   "text": "Hi Arjun,\n\nJust wanted to say thank you for the quick fix on the login bug last week. The client noticed and was really pleased.\n\nBest,\nMaria",
    "lang": "en",
    "prompt_name": "English",
    "plain_name": "English"
