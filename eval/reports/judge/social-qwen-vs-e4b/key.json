@@ -1,0 +1,604 @@
+{
+ "tags": [
+  "xm-e4b-all",
+  "xm-qwen-all"
+ ],
+ "labels": {
+  "reply/rp-en-101": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-en-102": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-103": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-104": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-105": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-106": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-107": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-108": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-en-109": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-110": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-111": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-112": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-113": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-en-114": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-en-115": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-en-116": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-117": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-118": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-119": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-120": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-121": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-en-122": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-123": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-124": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-en-125": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-127": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-128": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-129": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-en-130": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-131": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-en-132": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-en-133": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-en-134": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-en-135": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-136": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-137": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-en-138": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-139": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-140": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-141": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-en-144": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-201": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-en-202": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-en-203": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-204": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-205": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-206": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-en-207": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-208": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-209": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-210": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-211": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-en-212": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-en-213": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-hi-101": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-hi-102": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-hi-103": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-hi-104": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-hi-105": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-hi-106": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-hi-107": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-hi-108": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-hi-109": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-hi-110": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-hi-111": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-hi-112": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-hi-113": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-hl-112": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "reply/rp-hl-113": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-hi-201": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-hi-202": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-hi-203": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-hi-204": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-hi-205": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "reply/rp-hl-205": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.chat/dr-en-103": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-en-106": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.chat/dr-en-109": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-en-113": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-en-115": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-en-117": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-en-121": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.chat/dr-en-123": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.chat/dr-en-125": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-en-129": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-en-130": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.chat/dr-en-131": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.chat/dr-en-132": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-en-133": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-en-134": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-en-135": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.chat/dr-en-136": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-en-137": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.chat/dr-en-138": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.chat/dr-en-139": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-en-140": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.chat/dr-en-141": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-en-142": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-en-145": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.chat/dr-en-202": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.chat/dr-en-204": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-en-205": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.chat/dr-en-206": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.chat/dr-en-207": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-en-208": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.chat/dr-hi-101": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.chat/dr-hl-101": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.chat/dr-hi-105": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-hi-106": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-hi-107": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-hl-203": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.chat/dr-hi-108": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-hl-204": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.chat/dr-hi-111": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-hi-112": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.chat/dr-hl-206": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.chat/dr-hl-207": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-hl-201": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.chat/dr-hl-202": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.chat/dr-hi-202": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.email/dr-en-101": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.email/dr-en-102": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.email/dr-en-104": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.email/dr-en-105": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.email/dr-en-107": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.email/dr-en-108": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.email/dr-en-110": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.email/dr-en-111": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.email/dr-en-112": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.email/dr-en-114": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.email/dr-en-116": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.email/dr-en-118": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.email/dr-en-119": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.email/dr-en-120": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.email/dr-en-122": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.email/dr-en-124": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.email/dr-en-126": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.email/dr-en-127": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.email/dr-en-128": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.email/dr-en-143": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.email/dr-en-144": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.email/dr-en-201": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.email/dr-en-203": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.email/dr-hl-102": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.email/dr-hi-104": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.email/dr-hi-109": {
+   "A": "xm-qwen-all",
+   "B": "xm-e4b-all"
+  },
+  "draft.email/dr-hi-110": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.email/dr-hl-205": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  },
+  "draft.email/dr-hi-201": {
+   "A": "xm-e4b-all",
+   "B": "xm-qwen-all"
+  }
+ }
+}
