@@ -1,0 +1,604 @@
+{
+ "tags": [
+  "soc-base-all",
+  "soc-c5-all"
+ ],
+ "labels": {
+  "reply/rp-en-101": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-en-102": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-103": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-104": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-105": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-106": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-107": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-108": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-en-109": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-110": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-111": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-112": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-113": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-en-114": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-en-115": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-en-116": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-117": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-118": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-119": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-120": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-121": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-en-122": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-123": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-124": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-en-125": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-127": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-128": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-129": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-en-130": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-131": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-en-132": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-en-133": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-en-134": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-en-135": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-136": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-137": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-en-138": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-139": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-140": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-141": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-en-144": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-201": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-en-202": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-en-203": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-204": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-205": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-206": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-en-207": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-208": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-209": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-210": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-211": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-en-212": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-en-213": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-hi-101": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-hi-102": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-hi-103": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-hi-104": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-hi-105": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-hi-106": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-hi-107": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-hi-108": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-hi-109": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-hi-110": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-hi-111": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-hi-112": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-hi-113": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-hl-112": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "reply/rp-hl-113": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-hi-201": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-hi-202": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-hi-203": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-hi-204": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-hi-205": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "reply/rp-hl-205": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.chat/dr-en-103": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-en-106": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.chat/dr-en-109": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-en-113": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-en-115": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-en-117": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-en-121": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.chat/dr-en-123": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.chat/dr-en-125": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-en-129": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-en-130": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.chat/dr-en-131": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.chat/dr-en-132": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-en-133": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-en-134": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-en-135": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.chat/dr-en-136": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-en-137": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.chat/dr-en-138": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.chat/dr-en-139": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-en-140": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.chat/dr-en-141": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-en-142": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-en-145": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.chat/dr-en-202": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.chat/dr-en-204": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-en-205": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.chat/dr-en-206": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.chat/dr-en-207": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-en-208": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.chat/dr-hi-101": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.chat/dr-hl-101": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.chat/dr-hi-105": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-hi-106": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-hi-107": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-hl-203": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.chat/dr-hi-108": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-hl-204": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.chat/dr-hi-111": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-hi-112": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.chat/dr-hl-206": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.chat/dr-hl-207": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-hl-201": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.chat/dr-hl-202": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.chat/dr-hi-202": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.email/dr-en-101": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.email/dr-en-102": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.email/dr-en-104": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.email/dr-en-105": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.email/dr-en-107": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.email/dr-en-108": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.email/dr-en-110": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.email/dr-en-111": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.email/dr-en-112": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.email/dr-en-114": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.email/dr-en-116": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.email/dr-en-118": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.email/dr-en-119": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.email/dr-en-120": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.email/dr-en-122": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.email/dr-en-124": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.email/dr-en-126": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.email/dr-en-127": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.email/dr-en-128": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.email/dr-en-143": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.email/dr-en-144": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.email/dr-en-201": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.email/dr-en-203": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.email/dr-hl-102": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.email/dr-hi-104": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.email/dr-hi-109": {
+   "A": "soc-c5-all",
+   "B": "soc-base-all"
+  },
+  "draft.email/dr-hi-110": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.email/dr-hl-205": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  },
+  "draft.email/dr-hi-201": {
+   "A": "soc-base-all",
+   "B": "soc-c5-all"
+  }
+ }
+}

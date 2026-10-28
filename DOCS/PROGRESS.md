@@ -14,6 +14,26 @@ Newest first. One entry per working session.
 | M5 Release | todo |
 | M6 IME + Windows | todo |
 
+## 2026-10-28 - Replies to everyday messages: who did what
+
+- A thank-you for a gift passed on by a friend (rp-en-129, dr-en-130) got a Full reply that
+  only retold it ("That's great to hear you met Tomas Novak and received the gift"), never the
+  thanks; quick replies said "Glad Tomas liked it!". Owner: fix the whole family, not one
+  message at a time.
+- New everyday set for reply and Full reply: 26 messages (thanks, a gift or favour passed on by
+  someone else, congratulations, birthday wishes, condolences, apologies, news, a lent book) in
+  English, Hindi and Hinglish, 6 of them holdout. The judge rubric gained `mixed_up_roles` and
+  `misses_the_point`; regex patterns alone caught 1 of the 7 role mix-ups the judges found.
+- Shipped Full reply (draft) revision 23 and quick reply revision 8: one general rule ("you" in
+  the message is the user; reply to what they said the way a warm, thoughtful person would)
+  instead of more special cases. Blind judging in DOCS/models.md.
+- Finding: the model matters more than the prompt. On the same 149 items E4B with the new
+  prompts is acceptable in 122, E2B in 105; E2B mixes up roles 14 times with any prompt, E4B
+  4 times. Recommendation to the owner: E4B for replies on 16 GB machines; fine-tuning a LoRA
+  adapter only if E2B must get there for 8 GB machines. Waiting on the owner.
+- Lost about 85 minutes to queued eval runs that waited on `pgrep -f` matching their own
+  command line; runs now go in one script that checks its log, not the process list.
+
 ## 2026-10-27 - Hindi email greetings, M3 gaps, the snap recipe
 
 Owner asked for M3, then a snap first (2026-10-26). M2's live app checks stay open.

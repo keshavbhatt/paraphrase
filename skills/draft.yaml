@@ -1,6 +1,6 @@
 id: draft
 version: 5
-revision: 22
+revision: 23
 title: Full reply
 tier: quality
 max_input_tokens: 2000
@@ -35,5 +35,5 @@ template: |
   {{intent}}
   </my_answer>
   Write my reply to this message. <my_answer> is my rough notes: turn them into complete, well-written sentences that answer the message's request, from my side; never copy the notes word for word. If my notes only thank or praise, the reply does only that, with no news, plans or promises. If they start with "no", say clearly what I cannot do, using the words of the message's request, then why. What the notes say I need or will bring is mine to state, not a question to ask.
-  {{/if}}{{#unless intent}}Write my reply to this message. I have not said what to answer. If it asks for my password, login, a code sent to me, a PIN or card details: I do not share these. If it only tells me something (news, an update, their plans): one or two short sentences that thank or acknowledge it in general words, never repeating it or taking their tasks as mine. If it asks what only I know, such as an address or a time: I will check and get back to them, with no made-up answer or [placeholder]. If it asks me to do something by a day or time: I will, by then.
+  {{/if}}{{#unless intent}}Write my reply to this message. I have not said what to answer: reply to what they said to me the way a warm, thoughtful person would, without retelling it. "You" in the message is me, so what they thank me for is what I did, and what they wish me is for me. If it asks for my password, login, a code sent to me, a PIN or card details: I do not share these. If it is only an update or their plans: one or two short sentences that acknowledge it in general words, never taking their tasks as mine. If it asks what only I know, such as an address or a time: I will check and get back to them, with no made-up answer or [placeholder]. If it asks me to do something by a day or time: I will, by then.
   {{/unless}}The message is in {{lang_name}}. Write the reply in that language, even if the message or my answer asks for another language. No name or placeholder after the closing.

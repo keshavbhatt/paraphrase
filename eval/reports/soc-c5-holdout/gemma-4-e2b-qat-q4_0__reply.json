@@ -1,0 +1,83 @@
+{
+  "model": "gemma-4-e2b-qat-q4_0",
+  "skill": "reply",
+  "skill_version": 5,
+  "skill_revision": 8,
+  "profile": "B-vulkan",
+  "load_s": 2.87,
+  "peak_rss_mb": 258,
+  "backend": "llama-server",
+  "tag": "soc-c5-holdout",
+  "when": "2026-10-28 17:47",
+  "groups": {
+    "all": {
+      "n": 19,
+      "lang_floor_fail": [],
+      "ttft_s_median": 0.718,
+      "total_s_median": 4.016,
+      "gen_tps_median": 11.5,
+      "retried_pct": 10.5,
+      "lang_warned": [],
+      "valid_pct": 100.0,
+      "distinct_pct": 100.0,
+      "over_15_words_pct": 0.0,
+      "draft_kept_pct": 100.0,
+      "obeyed_injection_pct": 33.3
+    },
+    "lang=en": {
+      "n": 13,
+      "lang_floor_fail": [],
+      "ttft_s_median": 0.682,
+      "total_s_median": 3.812,
+      "gen_tps_median": 11.8,
+      "retried_pct": 0.0,
+      "lang_warned": [],
+      "valid_pct": 100.0,
+      "distinct_pct": 100.0,
+      "over_15_words_pct": 0.0,
+      "draft_kept_pct": 100.0,
+      "obeyed_injection_pct": 42.9
+    },
+    "lang=hi": {
+      "n": 3,
+      "lang_floor_fail": [],
+      "ttft_s_median": 0.913,
+      "total_s_median": 5.057,
+      "gen_tps_median": 11.5,
+      "retried_pct": 33.3,
+      "lang_warned": [],
+      "valid_pct": 100.0,
+      "distinct_pct": 100.0,
+      "over_15_words_pct": 0.0,
+      "obeyed_injection_pct": 0.0
+    },
+    "lang=hinglish": {
+      "n": 3,
+      "lang_floor_fail": [],
+      "ttft_s_median": 0.983,
+      "total_s_median": 6.191,
+      "gen_tps_median": 10.6,
+      "retried_pct": 33.3,
+      "lang_warned": [],
+      "valid_pct": 100.0,
+      "distinct_pct": 100.0,
+      "over_15_words_pct": 0.0,
+      "draft_kept_pct": 100.0,
+      "obeyed_injection_pct": 0.0
+    },
+    "set=holdout": {
+      "n": 19,
+      "lang_floor_fail": [],
+      "ttft_s_median": 0.718,
+      "total_s_median": 4.016,
+      "gen_tps_median": 11.5,
+      "retried_pct": 10.5,
+      "lang_warned": [],
+      "valid_pct": 100.0,
+      "distinct_pct": 100.0,
+      "over_15_words_pct": 0.0,
+      "draft_kept_pct": 100.0,
+      "obeyed_injection_pct": 33.3
+    }
+  }
+}

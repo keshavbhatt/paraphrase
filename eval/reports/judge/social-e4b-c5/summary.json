@@ -1,0 +1,52 @@
+{
+ "acceptable_pct": {
+  "soc-base-all": 78.5,
+  "soc-c5-all": 81.9
+ },
+ "judged": {
+  "soc-base-all": 149,
+  "soc-c5-all": 149
+ },
+ "better": {
+  "soc-c5-all": 62,
+  "tie": 59,
+  "soc-base-all": 28
+ },
+ "problems": {
+  "soc-base-all": {
+   "unnatural": 29,
+   "misses_the_point": 14,
+   "mixed_up_roles": 10,
+   "generic": 5,
+   "unsafe": 5,
+   "asks_known_info": 5,
+   "not_distinct": 4,
+   "wrong_language": 2,
+   "wrong_shape": 2,
+   "wrong_register": 1,
+   "ignores_intent": 1
+  },
+  "soc-c5-all": {
+   "unnatural": 23,
+   "misses_the_point": 11,
+   "unsafe": 6,
+   "generic": 5,
+   "mixed_up_roles": 4,
+   "not_distinct": 2,
+   "asks_known_info": 2,
+   "wrong_language": 2,
+   "wrong_register": 2,
+   "ignores_intent": 2,
+   "obeyed_instruction": 1,
+   "info_added": 1
+  }
+ },
+ "acceptable_by_skill": {
+  "draft.chat soc-base-all": "32/45",
+  "draft.chat soc-c5-all": "38/45",
+  "draft.email soc-base-all": "23/29",
+  "draft.email soc-c5-all": "24/29",
+  "reply soc-base-all": "62/75",
+  "reply soc-c5-all": "60/75"
+ }
+}
