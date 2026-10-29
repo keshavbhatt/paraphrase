@@ -9,7 +9,7 @@
   <project_license>GPL-3.0-or-later</project_license>
 
   <developer id="com.ktechpit">
-    <name>KTechpit</name>
+    <name>Keshav Bhatt</name>
   </developer>
 
   <name>Paraphrase</name>
@@ -24,6 +24,8 @@
   <url type="homepage">https://github.com/keshavbhatt/paraphrase</url>
   <url type="bugtracker">https://github.com/keshavbhatt/paraphrase/issues</url>
   <url type="vcs-browser">https://github.com/keshavbhatt/paraphrase</url>
+  <url type="donation">https://www.paypal.com/paypalme/keshavnrj/10</url>
+  <url type="contact">https://ktechpit.com</url>
   <launchable type="desktop-id">com.ktechpit.paraphrase.desktop</launchable>
 
   <description>
@@ -126,10 +128,18 @@
   <content_rating type="oars-1.1"/>
 
   <releases>
-    <release version="0.1.0" date="2026-10-27" type="development">
+    <release version="0.1.0" date="2026-10-29" type="stable">
       <description>
-        <p>First preview: proofread, tone, replies, summaries, formats, translation, writing and custom actions, in the window and over any app.</p>
+        <p>The first version: a private AI writing assistant that runs on your own computer.</p>
+        <ul>
+          <li>Proofread, change the tone, reply, summarize, format, translate and write, in the window or over any app with a shortcut</li>
+          <li>Replies answer what the message says to you: thanks, wishes, news and questions</li>
+          <li>Models chosen for your computer: Fast (Gemma 4 E2B) with 8 GB of memory, Quality (Gemma 4 E4B) with 16 GB; switch them in Settings</li>
+          <li>Custom actions of your own, and a history that is off unless you turn it on, then encrypted</li>
+        </ul>
       </description>
     </release>
   </releases>
+
+  <update_contact>connect@ktechpit.com</update_contact>
 </component>
