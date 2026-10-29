@@ -133,7 +133,8 @@ Publishing needs, once, from the owner:
 3. `gh variable set PUBLISH_TO_STORE --body true`.
 
 Without them the workflow only builds, as a check. The first upload goes to manual review:
-the snap owns well-known D-Bus names (slots), which the store must approve.
+the snap owns well-known D-Bus names (slots), which the store must approve. Approved on
+2026-10-28: https://forum.snapcraft.io/t/paraphrase-approve-dbus-slots-for-com-ktechpit-paraphrase/53850
 
 - Apps: `paraphrase` is the app (`paraphrase-app`; the desktop file, the autostart entry and
   the shortcut command `paraphrase --popup`), `paraphrase.cli` is the command-line client.

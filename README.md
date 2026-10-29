@@ -51,8 +51,10 @@ built on your computer from the main branch:
 yay -S paraphrase-git
 ```
 
-The first run downloads a model and checks it: Gemma 4 E2B (3.4 GB), or E4B (5.2 GB) for
-better quality. Paraphrase is in development: the edge channel and the AUR package follow
+The first run offers the models that fit your computer and checks what it downloads: Fast,
+Gemma 4 E2B (3.4 GB), runs on 8 GB of memory; Quality, Gemma 4 E4B (5.2 GB), needs 16 GB and
+writes better replies and drafts. You can add, remove or switch models any time in
+Settings > Models. Paraphrase is in development: the edge channel and the AUR package follow
 the main branch.
 
 # Development

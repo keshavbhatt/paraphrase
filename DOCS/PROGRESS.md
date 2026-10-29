@@ -30,7 +30,13 @@ Newest first. One entry per working session.
 - Finding: the model matters more than the prompt. On the same 149 items E4B with the new
   prompts is acceptable in 122, E2B in 105; E2B mixes up roles 14 times with any prompt, E4B
   4 times. Recommendation to the owner: E4B for replies on 16 GB machines; fine-tuning a LoRA
-  adapter only if E2B must get there for 8 GB machines. Waiting on the owner.
+  adapter only if E2B must get there for 8 GB machines.
+- Owner (2026-10-29): keep the model choice based on what the computer can run, and tell users
+  they can switch models. That is how it works already: setup offers Quality only where it fits
+  and Full reply runs on it when installed; setup says models can be changed in Settings, and
+  the README now says so too.
+- The Snap Store granted the three D-Bus slots on 2026-10-28 (forum topic 53850), so the snap
+  is out of manual review.
 - Lost about 85 minutes to queued eval runs that waited on `pgrep -f` matching their own
   command line; runs now go in one script that checks its log, not the process list.
 
