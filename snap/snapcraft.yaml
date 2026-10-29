@@ -1,6 +1,6 @@
 name: paraphrase
 adopt-info: paraphrase
-grade: devel # stable once the store has approved the D-Bus names (DOCS/packaging.md)
+grade: stable # the store approved the D-Bus names on 2026-10-28 (DOCS/packaging.md)
 confinement: strict
 base: core24
 compression: lzo

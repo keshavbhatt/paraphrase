@@ -122,8 +122,8 @@ the `kf6-core24` content snap, the runtime `scripts/dev-run.sh` targets), as Omn
 GitHub builds it (`.github/workflows/snap.yml`, amd64; this machine has no LXD) and publishes
 it to the Snap Store as Omnidict does (owner, 2026-10-27): each push to main goes to **edge**
 (`snap install paraphrase --edge`), a tag `vX.Y.Z` matching `project(VERSION)` goes to
-**stable**. Nothing is kept on GitHub. Grade `devel` until the store approves the D-Bus names;
-stable needs grade `stable`.
+**stable**. Nothing is kept on GitHub. Grade `stable` since the store approved the D-Bus
+names (2026-10-28); stable needs it. The first stable release is `v0.1.0` (owner, 2026-10-29).
 
 Publishing needs, once, from the owner:
 
