@@ -41,7 +41,7 @@ downloaded, and nothing you write leaves the machine.
 Any Linux distribution, from the Snap Store:
 
 ```sh
-sudo snap install paraphrase --edge
+sudo snap install paraphrase
 ```
 
 Arch Linux, from the AUR ([paraphrase-git](https://aur.archlinux.org/packages/paraphrase-git)),
